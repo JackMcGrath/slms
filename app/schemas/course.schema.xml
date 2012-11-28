@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<database name="default" defaultIdMethod="native" package="course" namespace="Zerebral\BusinessBundle\Model\Course" defaultPhpNamingMethod="phpname">
+	<table name="courses" phpName="Course" idMethod="native">
+		<column name="id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
+		<column name="name" type="VARCHAR" size="100" required="true"/>
+		<column name="is_active" type="BOOLEAN" size="1" sqlType="tinyint(1) unsigned" required="true"/>
+		<validator column="id">
+			<rule name="required" message="The field id is required."/>
+			<rule name="maxValue" value="REPLACEME" message="The field id must be not greater than REPLACEME."/>
+			<rule name="type" value="int" message="The column id must be an int value."/>
+		</validator>
+		<validator column="name">
+			<rule name="required" message="The field name is required."/>
+			<rule name="type" value="string" message="The column name must be an string value."/>
+		</validator>
+		<validator column="is_active">
+			<rule name="required" message="The field is_active is required."/>
+			<rule name="type" value="boolean" message="The column is_active must be an boolean value."/>
+		</validator>
+	</table>
+</database>

@@ -1,0 +1,9 @@
+.idea
+web/bundles/
+web/.htaccess
+app/bootstrap.php.cache
+app/cache/*
+app/logs/*
+build/
+vendor
+composer.lock

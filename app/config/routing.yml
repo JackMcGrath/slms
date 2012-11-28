@@ -1,0 +1,15 @@
+#zerebral_frontend:
+#    resource: "@ZerebralFrontendBundle/Resources/config/routing.yml"
+#    prefix:   /
+
+zerebral_frontend:
+    resource: "@ZerebralFrontendBundle/Controller"
+    type:     annotation
+
+#zerebral_business:
+#    resource: "@ZerebralBusinessBundle/Resources/config/routing.yml"
+#    prefix:   /
+
+#zerebral_common:
+#    resource: "@ZerebralCommonBundle/Resources/config/routing.yml"
+#    prefix:   /

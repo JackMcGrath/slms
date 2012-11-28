@@ -1,0 +1,4 @@
+parameters:
+#    zerebral_common.example.class: Zerebral\CommonBundle\Example
+
+services:
