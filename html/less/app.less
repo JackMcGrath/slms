@@ -51,6 +51,8 @@ body {
 
     h1,h2,h3,h4,h5,h6{
         font-weight:lighter;
+        color:rgba(0,175,219,1);
+        margin-top: 3px;
     }
 
     .note{
@@ -59,6 +61,17 @@ body {
 
     .text-center{
         text-align: center;
+    }
+
+    .table thead th{
+        background-color: #F2F2F2;
+        //@todo use bootstrap linear-gradiend mixin or create own
+        background-image: -ms-linear-gradient(top, #F2F2F2, #E8E8E8);
+        background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#F2F2F2), to(#E8E8E8));
+        background-image: -webkit-linear-gradient(top, #F2F2F2, #E8E8E8);
+        background-image: -o-linear-gradient(top, #F2F2F2, #E8E8E8);
+        background-image: linear-gradient(top, #F2F2F2, #E8E8E8);
+        background-image: -moz-linear-gradient(top, #F2F2F2, #E8E8E8);
     }
 
     ::-webkit-scrollbar{width:7px;height:7px;}
