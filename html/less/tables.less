@@ -35,4 +35,16 @@
         border-bottom-right-radius: @tableRadius;
         -moz-border-radius-bottomright: @tableRadius;
     }
+
+    tr{
+        &>td{
+            &:last-child{
+                text-align: center;
+
+                *{
+                    text-align: left;
+                }
+            }
+        }
+    }
 }
