@@ -6,19 +6,19 @@
     position:fixed;
     top:0;left:0;right:0;
     z-index:401;
-    box-shadow:inset 0px -1px 4px 0px rgba(0,0,0,0.05);
+    .box-shadow(inset 0px -1px 4px 0px rgba(0,0,0,0.05));
 
     .navbar-inner{
         display:block;
         clear:both;
         background: transparent;
         border: none;
-        box-shadow: none;
+        .box-shadow(none);
 
         .nav .active > a {
             background: transparent;
-            color: #777;
-            box-shadow: none;
+            color: @navbarLinkColor;
+            .box-shadow(none);
         }
     }
 
@@ -29,7 +29,6 @@
     [class*="span"]{
         &:first-child{
             margin-left: 0;
-
             figure{
                 margin-left: 0;
             }
@@ -44,9 +43,7 @@
 .subHeadInner{
     h3{
         font-size:24px;
-        font-family:"OpenSansLight";
         color:rgba(0,175,219,1);
         float:left;
-        font-weight:lighter;
     }
 }

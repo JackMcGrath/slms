@@ -1,0 +1,38 @@
+.table thead th{
+    background-color: #F2F2F2;
+    .gradientBar(#F2F2F2, #E8E8E8, #666, 0 0px 0 rgba(0,0,0,.25));
+}
+
+.table-bordered {
+    @tableRadius: @baseBorderRadius;
+    // For first th or td in the first row in the first thead or tbody
+    thead:first-child tr:first-child th:first-child,
+    tbody:first-child tr:first-child td:first-child {
+        -webkit-border-top-left-radius: @tableRadius;
+        border-top-left-radius: @tableRadius;
+        -moz-border-radius-topleft: @tableRadius;
+    }
+    thead:first-child tr:first-child th:last-child,
+    tbody:first-child tr:first-child td:last-child {
+        -webkit-border-top-right-radius: @tableRadius;
+        border-top-right-radius: @tableRadius;
+        -moz-border-radius-topright: @tableRadius;
+    }
+
+    // For first th or td in the first row in the first thead or tbody
+    thead:last-child tr:last-child th:first-child,
+    tbody:last-child tr:last-child td:first-child,
+    tfoot:last-child tr:last-child td:first-child {
+        .border-radius(0 0 0 4px);
+        -webkit-border-bottom-left-radius: @tableRadius;
+        border-bottom-left-radius: @tableRadius;
+        -moz-border-radius-bottomleft: @tableRadius;
+    }
+    thead:last-child tr:last-child th:last-child,
+    tbody:last-child tr:last-child td:last-child,
+    tfoot:last-child tr:last-child td:last-child {
+        -webkit-border-bottom-right-radius: @tableRadius;
+        border-bottom-right-radius: @tableRadius;
+        -moz-border-radius-bottomright: @tableRadius;
+    }
+}

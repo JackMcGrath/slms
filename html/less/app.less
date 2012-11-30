@@ -3,6 +3,7 @@
 
 @import "/less/variables.less";
 @import "/less/fonts.less";
+@import "/less/tables.less";
 @import "/less/icons.less";
 @import "/less/forms.less";
 @import "/less/buttons.less";
@@ -14,8 +15,6 @@ body {
     padding-bottom: 40px;
     background-repeat:repeat;
     background-color:rgb(251,251,251);
-    font-family: "OpenSansLight";
-    color: #333;
 
     .navbar .container-fluid, #main {
         padding-left: 0;
@@ -26,8 +25,7 @@ body {
         padding: 9px 0;
 
         li{
-            font-family: "OpenSansLight";
-            color: #444;
+            color: @btnInverseBackground;
             cursor: pointer;
             font-size: 16px;
             margin-bottom: 2px;
@@ -59,23 +57,8 @@ body {
         margin-top: 3px;
     }
 
-    .note{
-        text-align: center;
-    }
-
     .text-center{
         text-align: center;
-    }
-
-    .table thead th{
-        background-color: #F2F2F2;
-        //@todo use bootstrap linear-gradiend mixin or create own
-        background-image: -ms-linear-gradient(top, #F2F2F2, #E8E8E8);
-        background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#F2F2F2), to(#E8E8E8));
-        background-image: -webkit-linear-gradient(top, #F2F2F2, #E8E8E8);
-        background-image: -o-linear-gradient(top, #F2F2F2, #E8E8E8);
-        background-image: linear-gradient(top, #F2F2F2, #E8E8E8);
-        background-image: -moz-linear-gradient(top, #F2F2F2, #E8E8E8);
     }
 
     ::-webkit-scrollbar{width:7px;height:7px;}
