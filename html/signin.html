@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="utf-8">
-    <title>Bootstrap, from Twitter</title>
+    <title>Zerebral</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet/less" media="screen" type="text/css" href="/less/app.less">
@@ -25,49 +25,22 @@
     <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
 </head>
 
-<body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="navbar-inner">
-            <div class="container-fluid">
-                <div class="span2 pull-left">
-                    <figure class="logo btn btn-success">Virgin</figure>
-                </div>
-                <div class="span7 pull-left">
-                    <br>
-                </div>
-            </div>
-        </div>
-    </div>
+<body class="blue">
+    <div class="container top-center signin-container">
+        <form class="form-signin">
+            <label>Email Adress:</label>
+            <input type="text" placeholder="Email Adress" />
 
-    <div class="container top-center">
-        <form class="form-signin form-horizontal">
-            <div class="control-group">
-                <label class="control-label">Username:</label>
-                <div class="controls">
-                    <input type="text" placeholder="Username">
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label">Password:</label>
-                <div class="controls">
-                    <input type="password" placeholder="Password">
-                    <a href="#" class="pull-right">Forgot password?</a>
-                </div>
-            </div>
+            <label>Password: <a href="#" class="pull-right"> Forget your password?</a>
+            </label>
+            <input type="password" placeholder="Password" />
 
             <div class="clearfix"></div>
-            <button class="btn btn-primary pull-right" type="submit">Sign in</button>
+            <input class="btn btn-primary span12" type="submit"  value="Sign in" />
         </form>
         <div class="text-center">
-            Sign Up <a href="#">here</a> or <a href="#">contact us</a>
+            <h3><strong>Ze</strong>rebral</h3>
         </div>
-    </div>
-    <div class="container-fluid">
-        <hr>
-
-        <footer>
-            <p>&copy; Company 2012</p>
-        </footer>
     </div>
 </body>
 </html>
