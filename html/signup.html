@@ -25,68 +25,102 @@
     <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
 </head>
 
-<body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="navbar-inner">
-            <div class="container-fluid">
-                <div class="span2 pull-left">
-                    <figure class="logo btn btn-success">Virgin</figure>
-                </div>
-                <div class="span7 pull-left">
-                    <br>
-                </div>
-            </div>
-        </div>
+<body class="blue">
+    <div class="container">
+        <h3 class="span3 text-white"><strong>Ze</strong>rebral</h3>
     </div>
-
     <div class="container top-center">
-        <form class="form-signin form-horizontal">
-            <div class="control-group text-center">
-                <label class="radio inline">
-                    <input type="radio" value="option1"> Teacher
-                </label>
-                <label class="radio inline">
-                    <input type="radio" value="option1"> Student
-                </label>
-                <label class="radio inline">
-                    <input type="radio" value="option1"> Parent
-                </label>
+        <div class="row">
+            <div class="span7">
+                <form class="form-signin">
+                    <div class="row radiobox">
+                        <div class="span2">
+                            <label class="radio inline">
+                                <input type="radio" value="option1"> Teacher
+                            </label>
+                        </div>
+                        <div class="span2">
+                            <label class="radio inline">
+                                <input type="radio" value="option1"> Student
+                            </label>
+                        </div>
+                        <div class="span2">
+                            <label class="radio inline">
+                                <input type="radio" value="option1"> Parent
+                            </label>
+                        </div>
+                    </div>
+
+                    <label>What is your email adress?</label>
+                    <input type="text" placeholder="Email" />
+
+                    <div class="row">
+                        <div class="span3">
+                            <label>Fitst Name:</label>
+                            <input type="text" id="inputEmail" placeholder="Fitst Name" />
+                        </div>
+                        <div class="span3">
+                            <label>Last Name:</label>
+                            <input type="password" placeholder="Last Name" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="span3">
+                            <label>Choose a Password:</label>
+                            <input type="password" placeholder="Choose a Password">
+                        </div>
+                        <div class="span3">
+                            <label>Confirm Password:</label>
+                            <input type="password" placeholder="Confirm Password">
+                        </div>
+                    </div>
+
+                    <input class="btn btn-primary" type="submit" value="Create an account" />
+                </form>
             </div>
-            <div class="control-group">
-                <label class="control-label">Username:</label>
-                <div class="controls">
-                    <input type="text" placeholder="Username">
+            <div class="span4 signup-subpane">
+            <div class="row">
+                <div class="span1">
+                    <i class="icon-teacher"></i>
+                </div>
+                <div class="span3">
+                    <h4>Teachers</h4>
+                    <p>
+                        can reduce their workload due to the increased ease of classroom management, grading, and collaboration which our technology accomplishes more efficiently than ever before.
+                    </p>
                 </div>
             </div>
-            <div class="control-group">
-                <label class="control-label" for="inputEmail">Email:</label>
-                <div class="controls">
-                    <input type="text" id="inputEmail" placeholder="Email">
+            <div class="row">
+                <div class="span1">
+                    <i class="icon-student"></i>
+                </div>
+                <div class="span3">
+                    <h4>Students</h4>
+                    <p>can thrive in familiar social environment, engaging each other with safe social networking tools, class discussions, easy homework submission, and file storage for large projects.</p>
                 </div>
             </div>
-            <div class="control-group">
-                <label class="control-label">Choose Password:</label>
-                <div class="controls">
-                    <input type="password" placeholder="Choose Password">
+            <div class="row">
+                <div class="span1">
+                    <i class="icon-teacher"></i>
+                </div>
+                <div class="span3">
+                    <h4>Parents</h4>
+                    <p>
+                        can reduce their workload due to the increased ease of classroom management, grading, and collaboration which our technology accomplishes more efficiently than ever before.
+                    </p>
                 </div>
             </div>
-            <div class="control-group">
-                <label class="control-label">Confirm Password:</label>
-                <div class="controls">
-                    <input type="password" placeholder="Confirm Password">
-                </div>
-            </div>
-            <button class="btn btn-primary pull-right" type="submit">Sign in</button>
-        </form>
-        <div class="text-center">
-            Have an account? Sign In <a href="#">here</a>
         </div>
     </div>
-    <div class="container-fluid">
-        <hr>
-
-        <footer>
-            <p>&copy; Company 2012</p>
+    <div class="container">
+        <footer class="row">
+            <div class="span3">
+                Common Room Networks, Inc</br>
+                251 Atlantis Cir</br>
+                Oxford, MI 48371</br>
+                hello@zerebral.com</br>
+            </div>
         </footer>
     </div>
 </body>
