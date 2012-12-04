@@ -25,9 +25,9 @@ assetic:
 propel:
     dbal:
         driver:               mysql
-        user:                 dev
-        password:             dev
-        dsn:                  mysql:host=weavora-2;dbname=zerebral;charset=UTF8
+        user:                 root
+        password:             root
+        dsn:                  mysql:host=localhost;dbname=zerebral;charset=UTF8
         options:              {}
         attributes:           {}
 

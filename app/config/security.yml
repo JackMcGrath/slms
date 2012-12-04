@@ -5,17 +5,19 @@ jms_security_extra:
 security:
     encoders:
         Symfony\Component\Security\Core\User\User: plaintext
+        Zerebral\BusinessBundle\Model\User\User: md5
+        Zerebral\BusinessBundle\Model\User\Student: md5
+        Zerebral\BusinessBundle\Model\User\Teacher: md5
 
     role_hierarchy:
         ROLE_ADMIN:       ROLE_USER
         ROLE_SUPER_ADMIN: [ROLE_USER, ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
 
     providers:
-        in_memory:
-            memory:
-                users:
-                    user:  { password: userpass, roles: [ 'ROLE_USER' ] }
-                    admin: { password: adminpass, roles: [ 'ROLE_ADMIN' ] }
+        main:
+            propel:
+                class: Zerebral\BusinessBundle\Model\User\User
+                property: email
 
     firewalls:
         dev:
@@ -23,17 +25,19 @@ security:
             security: false
 
         login:
-            pattern:  ^/demo/secured/login$
+            pattern:  ^/login$
             security: false
 
         secured_area:
-            pattern:    ^/demo/secured/
+            pattern:    ^/
+            anonymous: ~
             form_login:
-                check_path: /demo/secured/login_check
-                login_path: /demo/secured/login
+                login_path:  /login
+                check_path:  /login_check
+
             logout:
-                path:   /demo/secured/logout
-                target: /demo/
+                path:   /logout
+                target: /
             #anonymous: ~
             #http_basic:
             #    realm: "Secured Demo Area"
@@ -41,3 +45,6 @@ security:
     access_control:
         #- { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: https }
         #- { path: ^/_internal/secure, roles: IS_AUTHENTICATED_ANONYMOUSLY, ip: 127.0.0.1 }
+#       - { path: ^/reset-password, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+#       - { path: ^/admin, roles: ROLE_ADMIN }
+#       - { path: ^/, roles: ROLE_USER }

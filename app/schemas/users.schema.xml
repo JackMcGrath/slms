@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<database name="default" defaultIdMethod="native" package="user" namespace="Zerebral\BusinessBundle\Model\User" defaultPhpNamingMethod="phpname">
+	<table name="users" phpName="User" idMethod="native">
+		<column name="id" phpName="Id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
+		<column name="role" phpName="Role" type="VARCHAR" valueSet="director,parent,teacher,student" sqlType="enum('director','parent','teacher','student')" required="true">
+			<!--inheritance="single">-->
+			<!--<inheritance key="director" class="Director" extends="User"/>-->
+			<!--<inheritance key="parent" class="StudentParent" extends="User"/>-->
+			<!--<inheritance key="teacher" class="Teacher" extends="User"/>-->
+			<!--<inheritance key="student" class="Student" extends="User"/>-->
+		</column>
+		<column name="email" phpName="Email" type="VARCHAR" size="100" required="true"/>
+		<column name="password" phpName="Password" type="VARCHAR" size="40" required="true"/>
+		<column name="salt" phpName="Salt" type="VARCHAR" size="32" required="true"/>
+		<column name="is_active" type="BOOLEAN" size="1" sqlType="tinyint(1) unsigned" required="true"/>
+		<validator column="role">
+			<rule name="required" message="The field role is required."/>
+			<rule name="type" value="string" message="The column role must be an string value."/>
+		</validator>
+		<validator column="email">
+			<rule name="required" message="The field email is required."/>
+			<rule name="type" value="string" message="The column email must be an string value."/>
+		</validator>
+		<validator column="password">
+			<rule name="required" message="The field password is required."/>
+			<rule name="type" value="string" message="The column password must be an string value."/>
+		</validator>
+	</table>
+	<table name="students" phpName="Student" idMethod="native">
+		<column name="id" phpName="Id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
+		<column name="user_id" phpName="UserId" type="INTEGER" sqlType="int(11) unsigned" required="true"/>
+		<column name="bio" phpName="Bio" type="VARCHAR" size="200" required="false"/>
+		<foreign-key foreignTable="users">
+			<reference local="user_id" foreign="id"/>
+		</foreign-key>
+		<behavior name="delegate">
+			<parameter name="to" value="users"/>
+		</behavior>
+
+	</table>
+	<table name="teachers" phpName="Teacher" idMethod="native">
+		<column name="id" phpName="Id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
+		<column name="user_id" phpName="UserId" type="INTEGER" sqlType="int(11) unsigned" required="true"/>
+		<foreign-key foreignTable="users">
+			<reference local="user_id" foreign="id"/>
+		</foreign-key>
+		<behavior name="delegate">
+			<parameter name="to" value="users"/>
+		</behavior>
+	</table>
+</database>

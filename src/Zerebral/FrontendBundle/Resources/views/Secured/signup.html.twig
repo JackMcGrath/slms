@@ -1,0 +1,40 @@
+{#{% extends 'SeoFrontendBundle::clearLayout.html.twig' %}#}
+
+
+{#{% block content %}#}
+    <div class="welcome-screen">
+        <div class="block">
+            <div class="head">
+                <h2>Zerebral <small>sign up</small></h2>
+            </div>
+            <div class="block-content">
+                <form class="login form-vertical" action="{{ path("signup") }}" method="post">
+                    <fieldset>
+                    <div class="control-group">
+                        <label for="email">Email</label>
+                        <div class="controls">
+                            <input type="text" id="email" placeholder="Email..."  name="email" value="{{ user.getEmail }}">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="password">Password</label>
+                        <div class="controls">
+                            <input type="password" placeholder="Password" name="password" id="password">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        {% if error %}
+                            <div class="alert alert-error">{{ error.message }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row">
+                        {#<div class="span2"><a href="{{ path('password_reset') }}">Forgot password?</a></div>#}
+                        <div class="span1"><button type="submit" class="btn btn-primary">Sign up!</button></div>
+                    </div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+    </div>
+{#{% endblock %}#}

@@ -71,7 +71,8 @@ class CourseTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'event' => array(),
+            'event' =>  array (
+),
         );
     } // getBehaviors()
 
