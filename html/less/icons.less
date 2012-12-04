@@ -43,3 +43,41 @@ i.icon-new-group{
 .icon-new-blog{
     background-image:url('../img/icons/glyphicons_351_book_open.png');
 }
+
+@bigIconSideSize: 33px;
+i[class*='icon-big-']{
+    width:@bigIconSideSize;
+    height:@bigIconSideSize;
+}
+.icon-big-home{
+    background-image:url('../img/icons-left-menu.png');
+    background-position:0px 0px;
+}
+.icon-big-bell{
+    background-image:url('../img/icons-left-menu.png');
+    background-position:0px @bigIconSideSize * (-1);
+}
+.icon-big-notepad{
+    background-image:url('../img/icons-left-menu.png');
+    background-position:0px @bigIconSideSize * (-2);
+}
+.icon-big-bookmark{
+    background-image:url('../img/icons-left-menu.png');
+    background-position:0px @bigIconSideSize * (-3);
+}
+.icon-big-mail{
+    background-image:url('../img/icons-left-menu.png');
+    background-position:0px @bigIconSideSize * (-4);
+}
+.icon-big-calendar{
+    background-image:url('../img/icons-left-menu.png');
+    background-position:0px @bigIconSideSize * (-5);
+}
+.icon-big-members{
+    background-image:url('../img/icons-left-menu.png');
+    background-position:0px @bigIconSideSize * (-6);
+}
+.icon-big-folder{
+    background-image:url('../img/icons-left-menu.png');
+    background-position:0px @bigIconSideSize * (-7);
+}

@@ -14,35 +14,79 @@
 body {
     padding-top: 60px;
     padding-bottom: 40px;
-    background-repeat:repeat;
-    background-color:rgb(251,251,251);
+//    background-color:rgb(251,251,251);
+    background: url(../img/main-bg.png) repeat;
 
-    .navbar .container-fluid, #main {
-        padding-left: 0;
-        padding-right: 0;
+//    .navbar .container-fluid, #main {
+//        padding-left: 0;
+//        padding-right: 0;
+//    }
+
+    .primary{
+        background: @white;
+        padding: 10px 40px;
+
+        &.span11{
+            margin-left: 0;
+            width: 93.5%;
+            min-height: 665px;
+        }
     }
 
     .sidebar-nav {
-        padding: 9px 0;
 
-        li{
-            color: @btnInverseBackground;
-            cursor: pointer;
-            font-size: 16px;
-            margin-bottom: 2px;
+        ul{
+            text-align: center;
 
-            figure{
-                padding: 6px 14px 6px 14px;
-                margin: 0;
+            &.nav-list{
+                padding: 0;
 
-                &:hover{
-                    background-color: rgba(0, 0, 0, 0.03);
+                li{
+                    color: @btnInverseBackground;
+                    cursor: pointer;
+                    font-size: 11px;
+                    margin-bottom: 2px;
+
+                    figure{
+                        padding: 6px 0px 6px 0px;
+                        margin: 0;
+                        position: relative;
+
+                        &.active{
+                            i{
+                                opacity: 1;
+                            }
+
+                            color: #4d789d;
+
+                            &::after{
+                                @rowSize: 8px;
+                                content: '';
+                                display: inline-block;
+                                border-left: @rowSize solid transparent;
+                                border-right: @rowSize solid white;
+                                border-bottom: @rowSize solid transparent;
+                                border-top: @rowSize solid transparent;
+                                position: absolute;
+                                top: 22px;
+                                right: 0;
+                            }
+                        }
+
+                        &:hover{
+                            .active;
+                        }
+
+                    }
+
+                    i{
+                        opacity: 0.6;
+                        margin-top: 4px;
+                        margin-left: auto;
+                        margin-right: auto;
+                        display: block;
+                    }
                 }
-            }
-
-            i{
-                opacity: 0.7;
-                margin-top: 4px;
             }
         }
     }
@@ -52,9 +96,12 @@ body {
     }
 
     h1,h2,h3,h4,h5,h6{
-        font-weight:lighter;
-        color:rgba(0,175,219,1);
         margin-top: 3px;
+        margin-bottom: 3px;
+    }
+
+    hr{
+        margin-top: @baseLineHeight - 5;
     }
 
     .text-center{
@@ -75,14 +122,4 @@ body {
 .blue{
     background: #5884a7;
     padding-top: 0px;
-}
-
-.navbar.signup{
-    &.navbar-fixed-top{
-        a{
-            color: @white;
-        }
-        background: #4d789d;
-        border-bottom-color: #446b8c;
-    }
 }
