@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Zerebral</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet/less" media="screen" type="text/css" href="/less/app.less">
+    <script> /* For dev environment: */ localStorage.clear(); </script>
+    <script type="text/javascript" src="/js/core/less-1.3.0.min.js" ></script>
+
+
+    <script type="text/javascript" src="/js/core/jquery-1.8.3.min.js" ></script>
+    <script type="text/javascript" src="/js/bootstrap/bootstrap-button.js" ></script>
+    <script type="text/javascript" src="/js/bootstrap/bootstrap-dropdown.js" ></script>
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Fav and touch icons -->
+    <link rel="shortcut icon" href="../assets/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
+</head>
+
+<body>
+
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container-fluid">
+            <div class="span1">
+            </div>
+            <div class="span6 pull-left">
+                <a class="brand" href="#"><strong>Ze</strong>rebral</a>
+                <!--<i class="icon-globe"></i>-->
+                <form class="navbar-search pull-left" _lpchecked="1">
+                    <input type="text" class="search-query" placeholder="Search">
+                </form>
+            </div>
+            <ul class="nav menu span3 pull-right profile">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-white icon-user"></i> &nbsp; Slava Belokurski &nbsp; <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#"><i class="icon-user"></i> Profile</a></li>
+                        <li><a href="#" data-target="settingsModal"><i class="icon-cog"></i> Settings</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#" data-target="loginModal"><i class="icon-share-alt"></i> Log In</a></li>
+                        <li><a href="#" data-target="registerModal"><i class="icon-bookmark"></i> Register</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#"><i class="icon-question-sign"></i> Help</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="container-fluid" id="main">
+    <div class="row-fluid">
+        <div class="span1">
+            <div class="sidebar-nav">
+                <ul class="nav nav-list">
+                    <li class=""><figure><div class="menuText"><i class="icon-big-home"></i>Home</div></figure></li>
+                    <li class=""><figure class="active"><div class="menuText"><i class="icon-big-bell"></i>Notifications</div></figure></li>
+                    <li class=""><figure><div class="menuText"><i class="icon-big-notepad"></i>Courses</div></figure></li>
+                    <li class=""><figure><div class="menuText"><i class="icon-big-bookmark"></i>Assigments</div></figure></li>
+                    <li class=""><figure><div class="menuText"><i class="icon-big-mail"></i>Messages</div></figure></li>
+                    <li class=""><figure><div class="menuText"><i class="icon-big-calendar"></i>Calendar</div></figure></li>
+                    <li class=""><figure><div class="menuText"><i class="icon-big-members"></i>Members</div></figure></li>
+                    <li class=""><figure><div class="menuText"><i class="icon-big-folder"></i>Files</div></figure></li>
+                </ul>
+            </div>
+        </div>
+        <div class="span11 primary">
+            <div class="row-fluid">
+                <div class="span12">
+                    <div class="row-fluid">
+                        <h2 class="span6 pull-left">Create Course</h2>
+                    </div>
+                    <hr/>
+
+                    <form class="form-horizontal span5 create-form">
+                        <div class="alert alert-danger">
+                            <button type="button" class="close" data-dismiss="alert">×</button>
+                            <strong>Warning!</strong> Best check yo self, you're not looking too good.
+                        </div>
+                        <div class="control-group error">
+                            <label class="control-label">Course Name</label>
+                            <div class="controls">
+                                <input type="text" id="inputEmail" placeholder="Name..." class="input-xlarge">
+                                <span class="help-inline">e.g. History</span>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Description</label>
+                            <div class="controls">
+                                <textarea rows="6" class="input-block-level"></textarea>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Subject Area</label>
+                            <div class="controls">
+                                <select class="input-xlarge">
+                                    <option>Mathematics</option>
+                                    <option>Mathematics</option>
+                                    <option>Mathematics</option>
+                                    <option>Mathematics</option>
+                                    <option>Mathematics</option>
+                                </select>
+                                <a href="#">create new</a>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Grade Level</label>
+                            <div class="controls">
+                                <select class="input-xlarge">
+                                    <option>Pre-K</option>
+                                    <option>Pre-K</option>
+                                    <option>Pre-K</option>
+                                    <option>Pre-K</option>
+                                    <option>Pre-K</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <div class="controls">
+                                <input type="submit" class="btn btn-danger" value="Create" />
+                                <input type="submit" class="btn" value="Cancel" />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <footer>
+        <p>&copy; Company 2012</p>
+    </footer>
+
+</div>
+
+</body>
+</html>
