@@ -15,7 +15,11 @@ body {
     padding-top: 60px;
     padding-bottom: 40px;
 //    background-color:rgb(251,251,251);
-    background: url(../img/main-bg.png) repeat;
+    background: #f1f1f1;
+
+    #main{
+        margin-top: 15px;
+    }
 
 //    .navbar .container-fluid, #main {
 //        padding-left: 0;
@@ -84,7 +88,7 @@ body {
                     }
 
                     i{
-                        opacity: 0.6;
+                        opacity: 0.5;
                         margin-top: 4px;
                         margin-left: auto;
                         margin-right: auto;
@@ -98,18 +102,15 @@ body {
                             right: 0px;
                             background: @red;
                             color: @white;
-                            padding: 3px 5px;
+                            padding: 2px 4px;
                             text-align: center;
-                            .border-radius(2px);
+//                            border: 1px solid @pink;
+                            .border-radius(1px);
                         }
                     }
                 }
             }
         }
-    }
-
-    footer{
-        color: @white;
     }
 
     h1,h2,h3,h4,h5,h6{
@@ -119,6 +120,11 @@ body {
 
     hr{
         margin-top: @baseLineHeight - 5;
+        margin-bottom: @baseLineHeight + 10;
+    }
+
+    .alert {
+        margin-bottom: @baseLineHeight + 25;
     }
 
     .text-center{
