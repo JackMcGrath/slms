@@ -1,0 +1,88 @@
+@import "/less/bootstrap/bootstrap.less";
+@import "/less/bootstrap/responsive.less";
+
+@import "/less/variables.less";
+@import "/less/fonts.less";
+@import "/less/tables.less";
+@import "/less/icons.less";
+@import "/less/pagination.less";
+@import "/less/forms.less";
+@import "/less/buttons.less";
+@import "/less/navigation-top.less";
+@import "/less/signup.less";
+
+body {
+    padding-top: 60px;
+    padding-bottom: 40px;
+    background-repeat:repeat;
+    background-color:rgb(251,251,251);
+
+    .navbar .container-fluid, #main {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .sidebar-nav {
+        padding: 9px 0;
+
+        li{
+            color: @btnInverseBackground;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 2px;
+
+            figure{
+                padding: 6px 14px 6px 14px;
+                margin: 0;
+
+                &:hover{
+                    background-color: rgba(0, 0, 0, 0.03);
+                }
+            }
+
+            i{
+                opacity: 0.7;
+                margin-top: 4px;
+            }
+        }
+    }
+
+    footer{
+        color: @white;
+    }
+
+    h1,h2,h3,h4,h5,h6{
+        font-weight:lighter;
+        color:rgba(0,175,219,1);
+        margin-top: 3px;
+    }
+
+    .text-center{
+        text-align: center;
+    }
+
+    .top-center{
+        margin-top: 6%;
+    }
+
+    ::-webkit-scrollbar{width:7px;height:7px;}
+    ::-webkit-scrollbar-track{background-color:rgba(0,0,0,0.0);}
+    ::-webkit-scrollbar-track:hover{background-color:rgba(0,0,0,0.05);}
+    ::-webkit-scrollbar-thumb{background-color:rgba(0,175,219,0.4);}
+    ::-webkit-scrollbar-thumb:hover{background-color:rgba(0,175,219,0.7);}
+}
+
+.blue{
+    background: #5884a7;
+    padding-top: 0px;
+}
+
+.navbar.signup{
+    &.navbar-fixed-top{
+        a{
+            color: @white;
+        }
+        background: #4d789d;
+        border-bottom-color: #446b8c;
+    }
+}
