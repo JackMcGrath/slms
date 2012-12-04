@@ -1,21 +1,146 @@
 <?xml version="1.0" encoding="utf-8"?>
 <database name="default" defaultIdMethod="native" package="course" namespace="Zerebral\BusinessBundle\Model\Course" defaultPhpNamingMethod="phpname">
-	<table name="courses" phpName="Course" idMethod="native">
-		<column name="id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
-		<column name="name" type="VARCHAR" size="100" required="true"/>
-		<column name="is_active" type="BOOLEAN" size="1" sqlType="tinyint(1) unsigned" required="true"/>
-		<validator column="id">
-			<rule name="required" message="The field id is required."/>
-			<rule name="maxValue" value="REPLACEME" message="The field id must be not greater than REPLACEME."/>
-			<rule name="type" value="int" message="The column id must be an int value."/>
-		</validator>
-		<validator column="name">
-			<rule name="required" message="The field name is required."/>
-			<rule name="type" value="string" message="The column name must be an string value."/>
-		</validator>
-		<validator column="is_active">
-			<rule name="required" message="The field is_active is required."/>
-			<rule name="type" value="boolean" message="The column is_active must be an boolean value."/>
-		</validator>
-	</table>
+    <table name="courses" phpName="Course" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="discipline_id" phpName="DisciplineId" type="TINYINT" size="2" sqlType="tinyint(2) unsigned" required="true"/>
+        <column name="grade_level_id" phpName="GradeLevelId" type="TINYINT" size="2" sqlType="tinyint(2) unsigned" required="true"/>
+        <column name="name" phpName="Name" type="VARCHAR" size="100" required="true"/>
+        <column name="description" phpName="Description" type="LONGVARCHAR" required="false"/>
+        <column name="created_by" phpName="CreatedBy" type="INTEGER" sqlType="int(11) unsigned" required="true"/>
+        <column name="created_at" phpName="CreatedAt" type="TIMESTAMP" required="true"/>
+        <column name="updated_at" phpName="UpdatedAt" type="TIMESTAMP" required="false"/>
+        <validator column="id">
+            <rule name="required" message="The field id is required."/>
+            <rule name="maxValue" value="REPLACEME" message="The field id must be not greater than REPLACEME."/>
+            <rule name="type" value="int" message="The column id must be an int value."/>
+        </validator>
+        <validator column="discipline_id">
+            <rule name="required" message="The field discipline_id is required."/>
+            <rule name="maxValue" value="REPLACEME" message="The field discipline_id must be not greater than REPLACEME."/>
+            <rule name="type" value="int" message="The column discipline_id must be an int value."/>
+        </validator>
+        <validator column="grade_level_id">
+            <rule name="required" message="The field grade_level_id is required."/>
+            <rule name="maxValue" value="REPLACEME" message="The field grade_level_id must be not greater than REPLACEME."/>
+            <rule name="type" value="int" message="The column grade_level_id must be an int value."/>
+        </validator>
+        <validator column="name">
+            <rule name="required" message="The field name is required."/>
+            <rule name="type" value="string" message="The column name must be an string value."/>
+        </validator>
+        <validator column="description">
+            <rule name="type" value="string" message="The column description must be an string value."/>
+        </validator>
+        <validator column="created_by">
+            <rule name="required" message="The field created_by is required."/>
+            <rule name="maxValue" value="REPLACEME" message="The field created_by must be not greater than REPLACEME."/>
+            <rule name="type" value="int" message="The column created_by must be an int value."/>
+        </validator>
+        <validator column="created_at">
+            <rule name="required" message="The field created_at is required."/>
+            <rule name="type" value="string" message="The column created_at must be an string value."/>
+        </validator>
+        <validator column="updated_at">
+            <rule name="type" value="string" message="The column updated_at must be an string value."/>
+        </validator>
+        <foreign-key foreignTable="teachers" name="courses_teachers" onUpdate="CASCADE">
+            <reference local="created_by" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="disciplines" name="courses_disciplines" onUpdate="CASCADE">
+            <reference local="discipline_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="grade_levels" name="courses_grade_levels" onUpdate="CASCADE">
+            <reference local="grade_level_id" foreign="id"/>
+        </foreign-key>
+        <index name="courses_disciplines">
+            <index-column name="discipline_id"/>
+        </index>
+        <index name="courses_grade_levels">
+            <index-column name="grade_level_id"/>
+        </index>
+        <index name="courses_teachers">
+            <index-column name="created_by"/>
+        </index>
+    </table>
+    <table name="disciplines" phpName="Discipline" idMethod="native">
+        <column name="id" phpName="Id" type="TINYINT" size="2" sqlType="tinyint(2) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="name" phpName="Name" type="VARCHAR" size="50" required="true"/>
+        <validator column="id">
+            <rule name="required" message="The field id is required."/>
+            <rule name="maxValue" value="REPLACEME" message="The field id must be not greater than REPLACEME."/>
+            <rule name="type" value="int" message="The column id must be an int value."/>
+        </validator>
+        <validator column="name">
+            <rule name="required" message="The field name is required."/>
+            <rule name="type" value="string" message="The column name must be an string value."/>
+        </validator>
+    </table>
+    <table name="grade_levels" phpName="GradeLevel" idMethod="native">
+        <column name="id" phpName="Id" type="TINYINT" size="2" sqlType="tinyint(2) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="name" phpName="Name" type="VARCHAR" size="50" required="true"/>
+        <validator column="id">
+            <rule name="required" message="The field id is required."/>
+            <rule name="maxValue" value="REPLACEME" message="The field id must be not greater than REPLACEME."/>
+            <rule name="type" value="int" message="The column id must be an int value."/>
+        </validator>
+        <validator column="name">
+            <rule name="required" message="The field name is required."/>
+            <rule name="type" value="string" message="The column name must be an string value."/>
+        </validator>
+    </table>
+    <table name="course_students" phpName="CourseStudent" idMethod="native">
+        <column name="course_id" phpName="CourseId" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" required="true"/>
+        <column name="student_id" phpName="StudentId" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" required="true"/>
+        <column name="created_at" phpName="CreatedAt" type="TIMESTAMP" required="true"/>
+        <validator column="course_id">
+            <rule name="required" message="The field course_id is required."/>
+            <rule name="maxValue" value="REPLACEME" message="The field course_id must be not greater than REPLACEME."/>
+            <rule name="type" value="int" message="The column course_id must be an int value."/>
+        </validator>
+        <validator column="student_id">
+            <rule name="required" message="The field student_id is required."/>
+            <rule name="maxValue" value="REPLACEME" message="The field student_id must be not greater than REPLACEME."/>
+            <rule name="type" value="int" message="The column student_id must be an int value."/>
+        </validator>
+        <validator column="created_at">
+            <rule name="required" message="The field created_at is required."/>
+            <rule name="type" value="string" message="The column created_at must be an string value."/>
+        </validator>
+        <foreign-key foreignTable="courses" name="course_students_course" onUpdate="CASCADE">
+            <reference local="course_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="students" name="course_students_students" onUpdate="CASCADE">
+            <reference local="student_id" foreign="id"/>
+        </foreign-key>
+        <index name="course_students_students">
+            <index-column name="student_id"/>
+        </index>
+    </table>
+    <table name="course_teachers" phpName="CourseTeacher" idMethod="native">
+        <column name="course_id" phpName="CourseId" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" required="true"/>
+        <column name="teacher_id" phpName="TeacherId" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" required="true"/>
+        <column name="created_at" phpName="CreatedAt" type="TIMESTAMP" required="false"/>
+        <validator column="course_id">
+            <rule name="required" message="The field course_id is required."/>
+            <rule name="maxValue" value="REPLACEME" message="The field course_id must be not greater than REPLACEME."/>
+            <rule name="type" value="int" message="The column course_id must be an int value."/>
+        </validator>
+        <validator column="teacher_id">
+            <rule name="required" message="The field teacher_id is required."/>
+            <rule name="maxValue" value="REPLACEME" message="The field teacher_id must be not greater than REPLACEME."/>
+            <rule name="type" value="int" message="The column teacher_id must be an int value."/>
+        </validator>
+        <validator column="created_at">
+            <rule name="type" value="string" message="The column created_at must be an string value."/>
+        </validator>
+        <foreign-key foreignTable="courses" name="course_teachers_course" onUpdate="CASCADE">
+            <reference local="course_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="teachers" name="course_teachers_teachers" onUpdate="CASCADE">
+            <reference local="teacher_id" foreign="id"/>
+        </foreign-key>
+        <index name="course_teachers_teachers">
+            <index-column name="teacher_id"/>
+        </index>
+    </table>
 </database>
