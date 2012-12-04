@@ -14,6 +14,9 @@ use \PropelObjectCollection;
 use \PropelPDO;
 use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\QueryEvent;
+use Zerebral\BusinessBundle\Model\Assignment\Assignment;
+use Zerebral\BusinessBundle\Model\Course\Course;
+use Zerebral\BusinessBundle\Model\Course\CourseTeacher;
 use Zerebral\BusinessBundle\Model\User\Teacher;
 use Zerebral\BusinessBundle\Model\User\TeacherPeer;
 use Zerebral\BusinessBundle\Model\User\TeacherQuery;
@@ -33,6 +36,18 @@ use Zerebral\BusinessBundle\Model\User\User;
  * @method TeacherQuery leftJoinUser($relationAlias = null) Adds a LEFT JOIN clause to the query using the User relation
  * @method TeacherQuery rightJoinUser($relationAlias = null) Adds a RIGHT JOIN clause to the query using the User relation
  * @method TeacherQuery innerJoinUser($relationAlias = null) Adds a INNER JOIN clause to the query using the User relation
+ *
+ * @method TeacherQuery leftJoinAssignment($relationAlias = null) Adds a LEFT JOIN clause to the query using the Assignment relation
+ * @method TeacherQuery rightJoinAssignment($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Assignment relation
+ * @method TeacherQuery innerJoinAssignment($relationAlias = null) Adds a INNER JOIN clause to the query using the Assignment relation
+ *
+ * @method TeacherQuery leftJoinCourse($relationAlias = null) Adds a LEFT JOIN clause to the query using the Course relation
+ * @method TeacherQuery rightJoinCourse($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Course relation
+ * @method TeacherQuery innerJoinCourse($relationAlias = null) Adds a INNER JOIN clause to the query using the Course relation
+ *
+ * @method TeacherQuery leftJoinCourseTeacher($relationAlias = null) Adds a LEFT JOIN clause to the query using the CourseTeacher relation
+ * @method TeacherQuery rightJoinCourseTeacher($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CourseTeacher relation
+ * @method TeacherQuery innerJoinCourseTeacher($relationAlias = null) Adds a INNER JOIN clause to the query using the CourseTeacher relation
  *
  * @method Teacher findOne(PropelPDO $con = null) Return the first Teacher matching the query
  * @method Teacher findOneOrCreate(PropelPDO $con = null) Return the first Teacher matching the query, or a new Teacher object populated from the query conditions when no match is found
@@ -376,6 +391,228 @@ abstract class BaseTeacherQuery extends ModelCriteria
         return $this
             ->joinUser($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'User', '\Zerebral\BusinessBundle\Model\User\UserQuery');
+    }
+
+    /**
+     * Filter the query by a related Assignment object
+     *
+     * @param   Assignment|PropelObjectCollection $assignment  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   TeacherQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByAssignment($assignment, $comparison = null)
+    {
+        if ($assignment instanceof Assignment) {
+            return $this
+                ->addUsingAlias(TeacherPeer::ID, $assignment->getTeacherId(), $comparison);
+        } elseif ($assignment instanceof PropelObjectCollection) {
+            return $this
+                ->useAssignmentQuery()
+                ->filterByPrimaryKeys($assignment->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByAssignment() only accepts arguments of type Assignment or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Assignment relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return TeacherQuery The current query, for fluid interface
+     */
+    public function joinAssignment($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Assignment');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Assignment');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Assignment relation Assignment object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery A secondary query class using the current class as primary query
+     */
+    public function useAssignmentQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinAssignment($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Assignment', '\Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery');
+    }
+
+    /**
+     * Filter the query by a related Course object
+     *
+     * @param   Course|PropelObjectCollection $course  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   TeacherQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByCourse($course, $comparison = null)
+    {
+        if ($course instanceof Course) {
+            return $this
+                ->addUsingAlias(TeacherPeer::ID, $course->getCreatedBy(), $comparison);
+        } elseif ($course instanceof PropelObjectCollection) {
+            return $this
+                ->useCourseQuery()
+                ->filterByPrimaryKeys($course->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByCourse() only accepts arguments of type Course or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Course relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return TeacherQuery The current query, for fluid interface
+     */
+    public function joinCourse($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Course');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Course');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Course relation Course object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Zerebral\BusinessBundle\Model\Course\CourseQuery A secondary query class using the current class as primary query
+     */
+    public function useCourseQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinCourse($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Course', '\Zerebral\BusinessBundle\Model\Course\CourseQuery');
+    }
+
+    /**
+     * Filter the query by a related CourseTeacher object
+     *
+     * @param   CourseTeacher|PropelObjectCollection $courseTeacher  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   TeacherQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByCourseTeacher($courseTeacher, $comparison = null)
+    {
+        if ($courseTeacher instanceof CourseTeacher) {
+            return $this
+                ->addUsingAlias(TeacherPeer::ID, $courseTeacher->getTeacherId(), $comparison);
+        } elseif ($courseTeacher instanceof PropelObjectCollection) {
+            return $this
+                ->useCourseTeacherQuery()
+                ->filterByPrimaryKeys($courseTeacher->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByCourseTeacher() only accepts arguments of type CourseTeacher or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the CourseTeacher relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return TeacherQuery The current query, for fluid interface
+     */
+    public function joinCourseTeacher($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('CourseTeacher');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'CourseTeacher');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the CourseTeacher relation CourseTeacher object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Zerebral\BusinessBundle\Model\Course\CourseTeacherQuery A secondary query class using the current class as primary query
+     */
+    public function useCourseTeacherQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinCourseTeacher($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CourseTeacher', '\Zerebral\BusinessBundle\Model\Course\CourseTeacherQuery');
     }
 
     /**
