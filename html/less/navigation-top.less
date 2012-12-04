@@ -13,14 +13,32 @@
         margin: 5px 0 0;
     }
 
-    .logo{
-        margin-right: 5px;
+    .brand{
+        background: url(../img/logo.png) no-repeat 0 5px;
+        width: 77px;
+        height: 36px;
+        padding: 0px 20px 0 0;
     }
 
-    i.icon-globe{
+    i.icon-bell{
         display: inline-block;
-        margin-top: 5px;
-        opacity: 0.7;
+        margin-top: 10px;
+        opacity: 1;
+        margin-right: 20px;
+        position: relative;
+
+        small{
+            position: absolute;
+            top: -3px;
+            right: 0px;
+            background: @red;
+            color: @white;
+            padding: 0px 2px;
+            line-height: 10px;
+            text-align: center;
+            font-size: 8px;
+            .border-radius(1px);
+        }
     }
 
     .navbar-search{
