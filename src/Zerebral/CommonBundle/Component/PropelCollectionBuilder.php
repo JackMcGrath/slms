@@ -1,6 +1,6 @@
 <?php
 
-namespace Zerebral\CommonBundle\Components;
+namespace Zerebral\CommonBundle\Component;
 
 use \PropelCollection;
 

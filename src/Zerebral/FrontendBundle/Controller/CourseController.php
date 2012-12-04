@@ -11,7 +11,7 @@ use Zerebral\BusinessBundle\Model as Model;
 /**
  * @Route("/courses")
  */
-class CourseController extends \Zerebral\CommonBundle\Components\Controller
+class CourseController extends \Zerebral\CommonBundle\Component\Controller
 {
     /**
      * @Route("/", name="courses")
