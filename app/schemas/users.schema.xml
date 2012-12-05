@@ -23,10 +23,6 @@
             <rule name="maxValue" value="REPLACEME" message="The field id must be not greater than REPLACEME."/>
             <rule name="type" value="int" message="The column id must be an int value."/>
         </validator>
-        <validator column="role">
-            <rule name="required" message="The field role is required."/>
-            <rule name="type" value="string" message="The column role must be an string value."/>
-        </validator>
         <validator column="first_name">
             <rule name="required" message="The field first_name is required."/>
             <rule name="type" value="string" message="The column first_name must be an string value."/>
@@ -42,10 +38,6 @@
             <rule name="required" message="The field email is required."/>
             <rule name="type" value="string" message="The column email must be an string value."/>
         </validator>
-        <validator column="password">
-            <rule name="required" message="The field password is required."/>
-            <rule name="type" value="string" message="The column password must be an string value."/>
-        </validator>
         <validator column="salt">
             <rule name="required" message="The field salt is required."/>
             <rule name="type" value="string" message="The column salt must be an string value."/>
@@ -53,13 +45,6 @@
         <validator column="is_active">
             <rule name="required" message="The field is_active is required."/>
             <rule name="type" value="boolean" message="The column is_active must be an boolean value."/>
-        </validator>
-        <validator column="created_at">
-            <rule name="type" value="string" message="The column created_at must be an string value."/>
-        </validator>
-        <validator column="updated_at">
-            <rule name="required" message="The field updated_at is required."/>
-            <rule name="type" value="string" message="The column updated_at must be an string value."/>
         </validator>
 	</table>
 	<table name="students" phpName="Student" idMethod="native">

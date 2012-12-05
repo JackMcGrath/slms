@@ -1,40 +1,99 @@
-{#{% extends 'SeoFrontendBundle::clearLayout.html.twig' %}#}
+{% extends 'ZerebralFrontendBundle::blueLayout.html.twig' %}
 
+{% block content %}
 
-{#{% block content %}#}
-    <div class="welcome-screen">
-        <div class="block">
-            <div class="head">
-                <h2>Zerebral <small>sign up</small></h2>
-            </div>
-            <div class="block-content">
-                <form class="login form-vertical" action="{{ path("signup") }}" method="post">
-                    <fieldset>
-                    <div class="control-group">
-                        <label for="email">Email</label>
-                        <div class="controls">
-                            <input type="text" id="email" placeholder="Email..."  name="email" value="{{ user.getEmail }}">
+    {% macro getError(model, key) %}
+        {% if key in model.getValidationFailures|keys %}
+            {{ 'error' }}
+        {% endif %}
+    {% endmacro %}
+
+    {% import _self as error %}
+
+    <div class="container top-center">
+        <div class="row">
+            <div class="span7">
+                <form class="form-signin" action="{{ path("signup") }}" method="post">
+                    <div class="row radiobox">
+                        <div class="span2">
+                            <label class="radio inline">
+                                <input type="radio" value="teacher" name="role" {{ user.getRole == 'teacher' ? 'checked' : '' }} /> Teacher
+                            </label>
+                        </div>
+                        <div class="span2">
+                            <label class="radio inline">
+                                <input type="radio" value="student" name="role" {{ user.getRole == 'student' ? 'checked' : '' }} /> Student
+                            </label>
+                        </div>
+                        <div class="span2">
+                            <label class="radio inline">
+                                <input type="radio" value="parent" name="role" disabled="disabled"> Parent
+                            </label>
                         </div>
                     </div>
-                    <div class="control-group">
-                        <label for="password">Password</label>
-                        <div class="controls">
-                            <input type="password" placeholder="Password" name="password" id="password">
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        {% if error %}
-                            <div class="alert alert-error">{{ error.message }}</div>
-                        {% endif %}
+
+                    <div class="control-group {{ error.getError(user, 'users.email') }}">
+                        <label>What is your email adress?</label>
+                        <input type="text" placeholder="Email" name="email" value="{{ user.getEmail }}" />
                     </div>
 
                     <div class="row">
-                        {#<div class="span2"><a href="{{ path('password_reset') }}">Forgot password?</a></div>#}
-                        <div class="span1"><button type="submit" class="btn btn-primary">Sign up!</button></div>
+                        <div class="span3 control-group {{ error.getError(user, 'users.first_name') }}">
+                            <label>Fitst Name:</label>
+                            <input type="text" id="inputEmail" placeholder="Fitst Name" name="first_name" value="{{ user.getFirstName }}" />
+                        </div>
+                        <div class="span3 control-group control-group {{ error.getError(user, 'users.last_name') }}">
+                            <label>Last Name:</label>
+                            <input type="text" placeholder="Last Name" name="last_name" value="{{ user.getLastName }}" />
+                        </div>
                     </div>
-                    </fieldset>
+
+                    <div class="row">
+                        <div class="span3 control-group {{ error.getError(user, 'users.password') }}">
+                            <label>Choose a Password:</label>
+                            <input type="password" placeholder="Choose a Password" name="password" value="{{ user.getPlainPassword }}" />
+                        </div>
+                        <div class="span3 control-group {{ error.getError(user, 'users.password_confirmation') }}">
+                            <label>Confirm Password:</label>
+                            <input type="password" placeholder="Confirm Password" name="password_confirmation" value="{{ user.getPasswordConfirmation }}" />
+                        </div>
+                    </div>
+                    <input class="btn btn-primary" type="submit" value="Create an account" />
                 </form>
             </div>
+            <div class="span4 signup-subpane">
+                <div class="row">
+                    <div class="span1">
+                        <i class="icon-teacher"></i>
+                    </div>
+                    <div class="span3">
+                        <h4>Teachers</h4>
+                        <p>
+                            can reduce their workload due to the increased ease of classroom management, grading, and collaboration which our technology accomplishes more efficiently than ever before.
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="span1">
+                        <i class="icon-student"></i>
+                    </div>
+                    <div class="span3">
+                        <h4>Students</h4>
+                        <p>can thrive in familiar social environment, engaging each other with safe social networking tools, class discussions, easy homework submission, and file storage for large projects.</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="span1">
+                        <i class="icon-teacher"></i>
+                    </div>
+                    <div class="span3">
+                        <h4>Parents</h4>
+                        <p>
+                            can reduce their workload due to the increased ease of classroom management, grading, and collaboration which our technology accomplishes more efficiently than ever before.
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+{% endblock %}
 
