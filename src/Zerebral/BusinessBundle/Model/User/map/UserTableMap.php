@@ -44,17 +44,37 @@ class UserTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('role', 'Role', 'VARCHAR', true, null, null);
+        $this->addColumn('first_name', 'FirstName', 'VARCHAR', true, 100, null);
+        $this->addColumn('last_name', 'LastName', 'VARCHAR', true, 100, null);
+        $this->addColumn('salutation', 'Salutation', 'VARCHAR', false, 5, null);
         $this->addColumn('email', 'Email', 'VARCHAR', true, 100, null);
         $this->addColumn('password', 'Password', 'VARCHAR', true, 40, null);
         $this->addColumn('salt', 'Salt', 'VARCHAR', true, 32, null);
-        $this->addColumn('is_active', 'IsActive', 'BOOLEAN', true, 1, null);
+        $this->addColumn('is_active', 'IsActive', 'BOOLEAN', true, 1, true);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', true, null, null);
         // validators
+        $this->addValidator('id', 'required', 'propel.validator.RequiredValidator', '', 'The field id is required.');
+        $this->addValidator('id', 'maxValue', 'propel.validator.MaxValueValidator', 'REPLACEME', 'The field id must be not greater than REPLACEME.');
+        $this->addValidator('id', 'type', 'propel.validator.TypeValidator', 'int', 'The column id must be an int value.');
         $this->addValidator('role', 'required', 'propel.validator.RequiredValidator', '', 'The field role is required.');
         $this->addValidator('role', 'type', 'propel.validator.TypeValidator', 'string', 'The column role must be an string value.');
+        $this->addValidator('first_name', 'required', 'propel.validator.RequiredValidator', '', 'The field first_name is required.');
+        $this->addValidator('first_name', 'type', 'propel.validator.TypeValidator', 'string', 'The column first_name must be an string value.');
+        $this->addValidator('last_name', 'required', 'propel.validator.RequiredValidator', '', 'The field last_name is required.');
+        $this->addValidator('last_name', 'type', 'propel.validator.TypeValidator', 'string', 'The column last_name must be an string value.');
+        $this->addValidator('salutation', 'type', 'propel.validator.TypeValidator', 'string', 'The column salutation must be an string value.');
         $this->addValidator('email', 'required', 'propel.validator.RequiredValidator', '', 'The field email is required.');
         $this->addValidator('email', 'type', 'propel.validator.TypeValidator', 'string', 'The column email must be an string value.');
         $this->addValidator('password', 'required', 'propel.validator.RequiredValidator', '', 'The field password is required.');
         $this->addValidator('password', 'type', 'propel.validator.TypeValidator', 'string', 'The column password must be an string value.');
+        $this->addValidator('salt', 'required', 'propel.validator.RequiredValidator', '', 'The field salt is required.');
+        $this->addValidator('salt', 'type', 'propel.validator.TypeValidator', 'string', 'The column salt must be an string value.');
+        $this->addValidator('is_active', 'required', 'propel.validator.RequiredValidator', '', 'The field is_active is required.');
+        $this->addValidator('is_active', 'type', 'propel.validator.TypeValidator', 'boolean', 'The column is_active must be an boolean value.');
+        $this->addValidator('created_at', 'type', 'propel.validator.TypeValidator', 'string', 'The column created_at must be an string value.');
+        $this->addValidator('updated_at', 'required', 'propel.validator.RequiredValidator', '', 'The field updated_at is required.');
+        $this->addValidator('updated_at', 'type', 'propel.validator.TypeValidator', 'string', 'The column updated_at must be an string value.');
     } // initialize()
 
     /**
