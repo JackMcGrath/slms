@@ -53,9 +53,9 @@
                             <label>Choose a Password:</label>
                             <input type="password" placeholder="Choose a Password" name="password" value="{{ user.getPlainPassword }}" />
                         </div>
-                        <div class="span3 control-group {{ error.getError(user, 'users.password') }}">
+                        <div class="span3 control-group {{ error.getError(user, 'users.password_confirmation') }}">
                             <label>Confirm Password:</label>
-                            <input type="password" placeholder="Confirm Password" name="password_confirmation" value="{{ user.getPlainPassword }}" />
+                            <input type="password" placeholder="Confirm Password" name="password_confirmation" value="{{ user.getPasswordConfirmation }}" />
                         </div>
                     </div>
                     <input class="btn btn-primary" type="submit" value="Create an account" />

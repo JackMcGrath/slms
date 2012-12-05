@@ -62,16 +62,20 @@ class SecuredController extends Controller
      */
     public function signupAction()
     {
+        $request = $this->getRequest();
+        
         $user = new User\User();
-        if ($this->getRequest()->isMethod('post')) {
-            $user = $this->getModelByRole($this->getRequest()->get('role', 'teacher'));
+        if ($request->isMethod('post')) {
+            $user = $this->getModelByRole($request->get('role', User\User::ROLE_TEACHER));
 
             try {
                 $user->setPasswordEncoder($this->getPasswordEncoder($user));
-                $user->setEmail($this->getRequest()->get('email'));
-                $user->setPlainPassword($this->getRequest()->get('password'));
-                $user->setFirstName($this->getRequest()->get('first_name'));
-                $user->setLastName($this->getRequest()->get('last_name'));
+                $user->setEmail($request->get('email'));
+                $user->setPlainPassword($request->get('password'));
+                $user->setPasswordConfirmation($request->get('password_confirmation'));
+                $user->setFirstName($request->get('first_name'));
+                $user->setLastName($request->get('last_name'));
+                $user->setRole($request->get('role'));
 
                 if($user->validate())
                 {
@@ -89,6 +93,11 @@ class SecuredController extends Controller
         );
     }
 
+    /**
+     * @param $role
+     * @return \Zerebral\BusinessBundle\Model\User\User
+     * @throws \Exception
+     */
     protected function getModelByRole($role){
         switch($role){
             case User\User::ROLE_STUDENT :
@@ -98,7 +107,7 @@ class SecuredController extends Controller
                 return new User\Teacher();
             break;
             default:
-                return null;
+                throw new \Exception('role');
         }
     }
 

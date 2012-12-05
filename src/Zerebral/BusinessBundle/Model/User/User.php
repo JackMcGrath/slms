@@ -20,6 +20,12 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
     private $plainPassword;
 
     /**
+     * Password confirmation
+     * @var string
+     */
+    private $passwordConfirmation;
+
+    /**
      * Password encoder
      * @var PasswordEncoderInterface
      */
@@ -101,6 +107,23 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
         return $this->plainPassword;
     }
 
+
+    /**
+     * @param string $passwordConfirmation
+     */
+    public function setPasswordConfirmation($passwordConfirmation)
+    {
+        $this->passwordConfirmation = $passwordConfirmation;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPasswordConfirmation()
+    {
+        return $this->passwordConfirmation;
+    }
+
     /**
      * @param \Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface $passwordEncoder
      */
@@ -147,6 +170,31 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
         if ($this->getPasswordEncoder() && $this->getPlainPassword()) {
             $password = $this->getPasswordEncoder()->encodePassword($this->getPlainPassword(), $this->getSalt());
             $this->setPassword($password);
+        }
+    }
+
+    public function validate($columns = null)
+    {
+        parent::validate($columns);
+
+        $this->validatePassword();
+        $this->validatePasswordConfirmation();
+
+
+        return count($this->validationFailures) == 0;
+    }
+
+    private function validatePassword()
+    {
+        if (trim(strlen($this->getPlainPassword())) == 0) {
+            $this->validationFailures[UserPeer::PASSWORD] = new \ValidationFailed(UserPeer::PASSWORD, "Please, fill password");
+        }
+    }
+
+    private function validatePasswordConfirmation()
+    {
+        if ($this->getPasswordConfirmation() != $this->getPlainPassword()) {
+            $this->validationFailures['users.password_confirmation'] = new \ValidationFailed('users.password_confirmation', "Password confirmation didn't match with password");
         }
     }
 } 
