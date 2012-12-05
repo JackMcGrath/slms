@@ -67,10 +67,9 @@
                     <li class="">
                         <figure class="active notice">
                             <div class="menuText">
-                             <i class="icon-big-bell"> <small>7</small></i>
-                            Notifications
-
-                        </div>
+                                <i class="icon-big-bell"> <small>7</small></i>
+                                Notifications
+                            </div>
                         </figure>
                     </li>
                     <li class=""><figure class="active"><div class="menuText"><i class="icon-big-notepad"></i>Courses</div></figure></li>
@@ -86,7 +85,7 @@
             <div class="row-fluid">
                 <div class="span12">
                     <div class="row-fluid">
-                        <h2 class="span6 pull-left">Create New Course</h2>
+                        <h2 class="span6 pull-left">Algebra <small>Create new assignment</small></h2>
                     </div>
                     <hr/>
 
@@ -95,11 +94,11 @@
                             <button type="button" class="close" data-dismiss="alert">×</button>
                             <strong>Warning!</strong> Best check yo self, you're not looking too good.
                         </div>
-                        <div class="control-group error">
-                            <label class="control-label">Course Name</label>
+                        <div class="control-group">
+                            <label class="control-label">Title *</label>
                             <div class="controls">
-                                <input type="text" id="inputEmail" placeholder="Name..." class="input-xlarge">
-                                <span class="help-inline">e.g. History</span>
+                                <input type="text" id="inputEmail" placeholder="Title..." class="input-xlarge">
+                                <span class="help-inline">e.g. Test</span>
                             </div>
                         </div>
                         <div class="control-group">
@@ -109,30 +108,65 @@
                             </div>
                         </div>
                         <div class="control-group">
-                            <label class="control-label">Subject Area</label>
+                            <label class="control-label">Category</label>
                             <div class="controls">
                                 <select class="input-xlarge">
-                                    <option>Mathematics</option>
-                                    <option>Mathematics</option>
-                                    <option>Mathematics</option>
-                                    <option>Mathematics</option>
-                                    <option>Mathematics</option>
+                                    <option>Homework</option>
+                                    <option>Homework</option>
+                                    <option>Homework</option>
+                                    <option>Homework</option>
+                                    <option>Homework</option>
                                 </select>
                                 <a href="#">Create new</a>
                             </div>
                         </div>
                         <div class="control-group">
-                            <label class="control-label">Grade Level</label>
+                            <label class="control-label">Max points</label>
                             <div class="controls">
-                                <select class="input-xlarge">
-                                    <option>Pre-K</option>
-                                    <option>Pre-K</option>
-                                    <option>Pre-K</option>
-                                    <option>Pre-K</option>
-                                    <option>Pre-K</option>
-                                </select>
+                                <input type="text" class="input-micro"/>
+                                <a href="#">Manage grading</a>
                             </div>
                         </div>
+
+                        <div class="form-inline">
+                            <div class="control-group">
+                                <label class="control-label">Due date</label>
+                                <div class="controls">
+                                    <input type="text" class="input-small"/>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Due time</label>
+                                <div class="controls">
+                                    <input type="text" class="input-small"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="clearfix"></div>
+
+                        <div class="control-group">
+                            <label class="control-label">Attachment</label>
+                            <div class="controls">
+                                <input type="file" class="input-large"/>
+                                <div class="help-block">
+                                    <a href="#">Add another file</a> <span>(Maximum size 5 MB)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="control-group radio-control-group">
+                            <label class="control-label">Assign students</label>
+                            <div class="controls">
+                                <div class="form-inline ">
+                                    <label class="radio"><input type="radio"/> All</label>
+                                    <label class="radio"><input type="radio"/> <a href="">Choose from the list</a></label>
+                                </div>
+                            </div>
+                        </div>
+
+
+
                         <div class="form-actions">
                             <input type="submit" class="btn btn-danger" value="Create" />
                             <input type="submit" class="btn" value="Cancel" />
