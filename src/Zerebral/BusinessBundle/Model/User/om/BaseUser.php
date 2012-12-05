@@ -5,11 +5,13 @@ namespace Zerebral\BusinessBundle\Model\User\om;
 use \BaseObject;
 use \BasePeer;
 use \Criteria;
+use \DateTime;
 use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
 use \PropelCollection;
+use \PropelDateTime;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
@@ -57,6 +59,24 @@ abstract class BaseUser extends BaseObject implements Persistent
     protected $role;
 
     /**
+     * The value for the first_name field.
+     * @var        string
+     */
+    protected $first_name;
+
+    /**
+     * The value for the last_name field.
+     * @var        string
+     */
+    protected $last_name;
+
+    /**
+     * The value for the salutation field.
+     * @var        string
+     */
+    protected $salutation;
+
+    /**
      * The value for the email field.
      * @var        string
      */
@@ -76,9 +96,22 @@ abstract class BaseUser extends BaseObject implements Persistent
 
     /**
      * The value for the is_active field.
+     * Note: this column has a database default value of: true
      * @var        boolean
      */
     protected $is_active;
+
+    /**
+     * The value for the created_at field.
+     * @var        string
+     */
+    protected $created_at;
+
+    /**
+     * The value for the updated_at field.
+     * @var        string
+     */
+    protected $updated_at;
 
     /**
      * @var        PropelObjectCollection|Student[] Collection to store aggregation of Student objects.
@@ -119,6 +152,28 @@ abstract class BaseUser extends BaseObject implements Persistent
     protected $teachersScheduledForDeletion = null;
 
     /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see        __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->is_active = true;
+    }
+
+    /**
+     * Initializes internal state of BaseUser object.
+     * @see        applyDefaults()
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->applyDefaultValues();
+        EventDispatcherProxy::trigger(array('construct','model.construct'), new ModelEvent($this));
+}
+
+    /**
      * Get the [id] column value.
      *
      * @return int
@@ -136,6 +191,36 @@ abstract class BaseUser extends BaseObject implements Persistent
     public function getRole()
     {
         return $this->role;
+    }
+
+    /**
+     * Get the [first_name] column value.
+     *
+     * @return string
+     */
+    public function getFirstName()
+    {
+        return $this->first_name;
+    }
+
+    /**
+     * Get the [last_name] column value.
+     *
+     * @return string
+     */
+    public function getLastName()
+    {
+        return $this->last_name;
+    }
+
+    /**
+     * Get the [salutation] column value.
+     *
+     * @return string
+     */
+    public function getSalutation()
+    {
+        return $this->salutation;
     }
 
     /**
@@ -179,6 +264,86 @@ abstract class BaseUser extends BaseObject implements Persistent
     }
 
     /**
+     * Get the [optionally formatted] temporal [created_at] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null, and 0 if column value is 0000-00-00 00:00:00
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getCreatedAt($format = null)
+    {
+        if ($this->created_at === null) {
+            return null;
+        }
+
+        if ($this->created_at === '0000-00-00 00:00:00') {
+            // while technically this is not a default value of null,
+            // this seems to be closest in meaning.
+            return null;
+        }
+
+        try {
+            $dt = new DateTime($this->created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [updated_at] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null, and 0 if column value is 0000-00-00 00:00:00
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getUpdatedAt($format = null)
+    {
+        if ($this->updated_at === null) {
+            return null;
+        }
+
+        if ($this->updated_at === '0000-00-00 00:00:00') {
+            // while technically this is not a default value of null,
+            // this seems to be closest in meaning.
+            return null;
+        }
+
+        try {
+            $dt = new DateTime($this->updated_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
+    }
+
+    /**
      * Set the value of [id] column.
      *
      * @param int $v new value
@@ -219,6 +384,69 @@ abstract class BaseUser extends BaseObject implements Persistent
 
         return $this;
     } // setRole()
+
+    /**
+     * Set the value of [first_name] column.
+     *
+     * @param string $v new value
+     * @return User The current object (for fluent API support)
+     */
+    public function setFirstName($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->first_name !== $v) {
+            $this->first_name = $v;
+            $this->modifiedColumns[] = UserPeer::FIRST_NAME;
+        }
+
+
+        return $this;
+    } // setFirstName()
+
+    /**
+     * Set the value of [last_name] column.
+     *
+     * @param string $v new value
+     * @return User The current object (for fluent API support)
+     */
+    public function setLastName($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->last_name !== $v) {
+            $this->last_name = $v;
+            $this->modifiedColumns[] = UserPeer::LAST_NAME;
+        }
+
+
+        return $this;
+    } // setLastName()
+
+    /**
+     * Set the value of [salutation] column.
+     *
+     * @param string $v new value
+     * @return User The current object (for fluent API support)
+     */
+    public function setSalutation($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->salutation !== $v) {
+            $this->salutation = $v;
+            $this->modifiedColumns[] = UserPeer::SALUTATION;
+        }
+
+
+        return $this;
+    } // setSalutation()
 
     /**
      * Set the value of [email] column.
@@ -313,6 +541,52 @@ abstract class BaseUser extends BaseObject implements Persistent
     } // setIsActive()
 
     /**
+     * Sets the value of [created_at] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return User The current object (for fluent API support)
+     */
+    public function setCreatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->created_at !== null || $dt !== null) {
+            $currentDateAsString = ($this->created_at !== null && $tmpDt = new DateTime($this->created_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->created_at = $newDateAsString;
+                $this->modifiedColumns[] = UserPeer::CREATED_AT;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setCreatedAt()
+
+    /**
+     * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return User The current object (for fluent API support)
+     */
+    public function setUpdatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->updated_at !== null || $dt !== null) {
+            $currentDateAsString = ($this->updated_at !== null && $tmpDt = new DateTime($this->updated_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->updated_at = $newDateAsString;
+                $this->modifiedColumns[] = UserPeer::UPDATED_AT;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setUpdatedAt()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -322,6 +596,10 @@ abstract class BaseUser extends BaseObject implements Persistent
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->is_active !== true) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return true
         return true;
     } // hasOnlyDefaultValues()
@@ -346,10 +624,15 @@ abstract class BaseUser extends BaseObject implements Persistent
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->role = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
-            $this->email = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-            $this->password = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-            $this->salt = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
-            $this->is_active = ($row[$startcol + 5] !== null) ? (boolean) $row[$startcol + 5] : null;
+            $this->first_name = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+            $this->last_name = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+            $this->salutation = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+            $this->email = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+            $this->password = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+            $this->salt = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+            $this->is_active = ($row[$startcol + 8] !== null) ? (boolean) $row[$startcol + 8] : null;
+            $this->created_at = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+            $this->updated_at = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -358,7 +641,7 @@ abstract class BaseUser extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 6; // 6 = UserPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 11; // 11 = UserPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating User object", $e);
@@ -630,6 +913,15 @@ abstract class BaseUser extends BaseObject implements Persistent
         if ($this->isColumnModified(UserPeer::ROLE)) {
             $modifiedColumns[':p' . $index++]  = '`role`';
         }
+        if ($this->isColumnModified(UserPeer::FIRST_NAME)) {
+            $modifiedColumns[':p' . $index++]  = '`first_name`';
+        }
+        if ($this->isColumnModified(UserPeer::LAST_NAME)) {
+            $modifiedColumns[':p' . $index++]  = '`last_name`';
+        }
+        if ($this->isColumnModified(UserPeer::SALUTATION)) {
+            $modifiedColumns[':p' . $index++]  = '`salutation`';
+        }
         if ($this->isColumnModified(UserPeer::EMAIL)) {
             $modifiedColumns[':p' . $index++]  = '`email`';
         }
@@ -641,6 +933,12 @@ abstract class BaseUser extends BaseObject implements Persistent
         }
         if ($this->isColumnModified(UserPeer::IS_ACTIVE)) {
             $modifiedColumns[':p' . $index++]  = '`is_active`';
+        }
+        if ($this->isColumnModified(UserPeer::CREATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '`created_at`';
+        }
+        if ($this->isColumnModified(UserPeer::UPDATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '`updated_at`';
         }
 
         $sql = sprintf(
@@ -659,6 +957,15 @@ abstract class BaseUser extends BaseObject implements Persistent
                     case '`role`':
                         $stmt->bindValue($identifier, $this->role, PDO::PARAM_STR);
                         break;
+                    case '`first_name`':
+                        $stmt->bindValue($identifier, $this->first_name, PDO::PARAM_STR);
+                        break;
+                    case '`last_name`':
+                        $stmt->bindValue($identifier, $this->last_name, PDO::PARAM_STR);
+                        break;
+                    case '`salutation`':
+                        $stmt->bindValue($identifier, $this->salutation, PDO::PARAM_STR);
+                        break;
                     case '`email`':
                         $stmt->bindValue($identifier, $this->email, PDO::PARAM_STR);
                         break;
@@ -670,6 +977,12 @@ abstract class BaseUser extends BaseObject implements Persistent
                         break;
                     case '`is_active`':
                         $stmt->bindValue($identifier, (int) $this->is_active, PDO::PARAM_INT);
+                        break;
+                    case '`created_at`':
+                        $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
+                        break;
+                    case '`updated_at`':
+                        $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -828,16 +1141,31 @@ abstract class BaseUser extends BaseObject implements Persistent
                 return $this->getRole();
                 break;
             case 2:
-                return $this->getEmail();
+                return $this->getFirstName();
                 break;
             case 3:
-                return $this->getPassword();
+                return $this->getLastName();
                 break;
             case 4:
-                return $this->getSalt();
+                return $this->getSalutation();
                 break;
             case 5:
+                return $this->getEmail();
+                break;
+            case 6:
+                return $this->getPassword();
+                break;
+            case 7:
+                return $this->getSalt();
+                break;
+            case 8:
                 return $this->getIsActive();
+                break;
+            case 9:
+                return $this->getCreatedAt();
+                break;
+            case 10:
+                return $this->getUpdatedAt();
                 break;
             default:
                 return null;
@@ -870,10 +1198,15 @@ abstract class BaseUser extends BaseObject implements Persistent
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getRole(),
-            $keys[2] => $this->getEmail(),
-            $keys[3] => $this->getPassword(),
-            $keys[4] => $this->getSalt(),
-            $keys[5] => $this->getIsActive(),
+            $keys[2] => $this->getFirstName(),
+            $keys[3] => $this->getLastName(),
+            $keys[4] => $this->getSalutation(),
+            $keys[5] => $this->getEmail(),
+            $keys[6] => $this->getPassword(),
+            $keys[7] => $this->getSalt(),
+            $keys[8] => $this->getIsActive(),
+            $keys[9] => $this->getCreatedAt(),
+            $keys[10] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->collStudents) {
@@ -923,16 +1256,31 @@ abstract class BaseUser extends BaseObject implements Persistent
                 $this->setRole($value);
                 break;
             case 2:
-                $this->setEmail($value);
+                $this->setFirstName($value);
                 break;
             case 3:
-                $this->setPassword($value);
+                $this->setLastName($value);
                 break;
             case 4:
-                $this->setSalt($value);
+                $this->setSalutation($value);
                 break;
             case 5:
+                $this->setEmail($value);
+                break;
+            case 6:
+                $this->setPassword($value);
+                break;
+            case 7:
+                $this->setSalt($value);
+                break;
+            case 8:
                 $this->setIsActive($value);
+                break;
+            case 9:
+                $this->setCreatedAt($value);
+                break;
+            case 10:
+                $this->setUpdatedAt($value);
                 break;
         } // switch()
     }
@@ -960,10 +1308,15 @@ abstract class BaseUser extends BaseObject implements Persistent
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setRole($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setEmail($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setPassword($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setSalt($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setIsActive($arr[$keys[5]]);
+        if (array_key_exists($keys[2], $arr)) $this->setFirstName($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setLastName($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setSalutation($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setEmail($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setPassword($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setSalt($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setIsActive($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setCreatedAt($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setUpdatedAt($arr[$keys[10]]);
     }
 
     /**
@@ -977,10 +1330,15 @@ abstract class BaseUser extends BaseObject implements Persistent
 
         if ($this->isColumnModified(UserPeer::ID)) $criteria->add(UserPeer::ID, $this->id);
         if ($this->isColumnModified(UserPeer::ROLE)) $criteria->add(UserPeer::ROLE, $this->role);
+        if ($this->isColumnModified(UserPeer::FIRST_NAME)) $criteria->add(UserPeer::FIRST_NAME, $this->first_name);
+        if ($this->isColumnModified(UserPeer::LAST_NAME)) $criteria->add(UserPeer::LAST_NAME, $this->last_name);
+        if ($this->isColumnModified(UserPeer::SALUTATION)) $criteria->add(UserPeer::SALUTATION, $this->salutation);
         if ($this->isColumnModified(UserPeer::EMAIL)) $criteria->add(UserPeer::EMAIL, $this->email);
         if ($this->isColumnModified(UserPeer::PASSWORD)) $criteria->add(UserPeer::PASSWORD, $this->password);
         if ($this->isColumnModified(UserPeer::SALT)) $criteria->add(UserPeer::SALT, $this->salt);
         if ($this->isColumnModified(UserPeer::IS_ACTIVE)) $criteria->add(UserPeer::IS_ACTIVE, $this->is_active);
+        if ($this->isColumnModified(UserPeer::CREATED_AT)) $criteria->add(UserPeer::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(UserPeer::UPDATED_AT)) $criteria->add(UserPeer::UPDATED_AT, $this->updated_at);
 
         return $criteria;
     }
@@ -1045,10 +1403,15 @@ abstract class BaseUser extends BaseObject implements Persistent
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setRole($this->getRole());
+        $copyObj->setFirstName($this->getFirstName());
+        $copyObj->setLastName($this->getLastName());
+        $copyObj->setSalutation($this->getSalutation());
         $copyObj->setEmail($this->getEmail());
         $copyObj->setPassword($this->getPassword());
         $copyObj->setSalt($this->getSalt());
         $copyObj->setIsActive($this->getIsActive());
+        $copyObj->setCreatedAt($this->getCreatedAt());
+        $copyObj->setUpdatedAt($this->getUpdatedAt());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1575,13 +1938,19 @@ abstract class BaseUser extends BaseObject implements Persistent
     {
         $this->id = null;
         $this->role = null;
+        $this->first_name = null;
+        $this->last_name = null;
+        $this->salutation = null;
         $this->email = null;
         $this->password = null;
         $this->salt = null;
         $this->is_active = null;
+        $this->created_at = null;
+        $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);

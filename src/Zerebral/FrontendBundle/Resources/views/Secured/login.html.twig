@@ -1,43 +1,26 @@
-{#{% extends 'SeoFrontendBundle::clearLayout.html.twig' %}#}
+{% extends 'ZerebralFrontendBundle::blueLayout.html.twig' %}
 
 
-{#{% block content %}#}
-    <div class="welcome-screen">
-        <div class="block">
-            <div class="head">
-                <h2>Zerebral <small>login</small></h2>
-            </div>
-            <div class="block-content">
-                <form class="login form-vertical" action="{{ path("_security_check") }}" method="post">
-                    <fieldset>
-                    <div class="control-group">
-                        <label for="username">Login</label>
-                        <div class="controls">
-                            <input type="text" id="username" placeholder="Login..."  name="_username" value="{{ last_username }}">
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label for="password">Password</label>
-                        <div class="controls">
-                            <input type="password" placeholder="Password" name="_password" id="password">
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        {% if error %}
-                            <div class="alert alert-error">{{ error.message }}</div>
-                        {% endif %}
-                        {% if passwordRestored %}
-                            <div class="alert alert-success">Password successfully changed! You can now access your account.</div>
-                        {% endif %}
-                    </div>
+{% block content %}
+    <div class="container top-center signin-container">
+        <form class="form-signin" action="{{ path("_security_check") }}" method="post">
+            <label>Email Address:</label>
+            <input type="text" placeholder="Email Adress" name="_username" value="{{ last_username }}"/>
 
-                    <div class="row">
-                        {#<div class="span2"><a href="{{ path('password_reset') }}">Forgot password?</a></div>#}
-                        <div class="span1"><button type="submit" class="btn btn-primary">Login</button></div>
-                    </div>
-                    </fieldset>
-                </form>
-            </div>
+            <label>Password: <a href="#" class="pull-right"> Forget your password?</a></label>
+            <input type="password" placeholder="Password" name="_password"/>
+
+            <div class="clearfix"></div>
+            {% if error %}
+                <div class="alert alert-error">{{ error.message }}</div>
+            {% endif %}
+            {% if passwordRestored %}
+                <div class="alert alert-success">Password successfully changed! You can now access your account.</div>
+            {% endif %}
+            <input class="btn btn-primary span12" type="submit"  value="Sign in" />
+        </form>
+        <div class="text-center">
+            <h3><strong>Ze</strong>rebral</h3>
         </div>
     </div>
-{#{% endblock %}#}
+{% endblock %}

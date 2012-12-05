@@ -1,19 +1,20 @@
-@import "/less/bootstrap/bootstrap.less";
-@import "/less/bootstrap/responsive.less";
+@import "./bootstrap/bootstrap.less";
+@import "./bootstrap/responsive.less";
 
-@import "/less/variables.less";
-@import "/less/fonts.less";
-@import "/less/tables.less";
-@import "/less/icons.less";
-@import "/less/pagination.less";
-@import "/less/forms.less";
-@import "/less/buttons.less";
-@import "/less/navigation-top.less";
-@import "/less/signup.less";
+@import "./variables.less";
+@import "./utilities.less";
+@import "./fonts.less";
+@import "./tables.less";
+@import "./icons.less";
+@import "./pagination.less";
+@import "./forms.less";
+@import "./buttons.less";
+@import "./navigation-top.less";
+@import "./signup.less";
+@import "./course.less";
 
 body {
     padding-top: 60px;
-    padding-bottom: 40px;
 //    background-color:rgb(251,251,251);
     background: #f1f1f1;
 
@@ -34,11 +35,15 @@ body {
             margin-left: 0;
             width: 93.5%;
             min-height: 665px;
+
+            h2 small {
+                text-transform: uppercase;
+            }
         }
     }
 
     .sidebar-nav {
-
+        margin-left: -25px;
         ul{
             text-align: center;
 
@@ -142,7 +147,31 @@ body {
     ::-webkit-scrollbar-thumb:hover{background-color:rgba(0,175,219,0.7);}
 }
 
-.blue{
+body.blue{
     background: #5884a7;
     padding-top: 0px;
+    padding-bottom: 40px;
+}
+
+footer {
+    line-height: 22px;
+    margin-top: 10px;
+    margin-left: -35px;
+    color: #797979;
+
+    .rss {
+        text-indent: -9999px;
+        height: 24px;
+        width: 24px;
+        background-position: 0 0;
+        margin: 0 7px;
+    }
+
+    .twitter {
+        text-indent: -9999px;
+        height: 24px;
+        width: 25px;
+        background-position: 0 0;
+        margin: 0 7px;
+    }
 }

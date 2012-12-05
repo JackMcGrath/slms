@@ -9,22 +9,43 @@
 			<!--<inheritance key="teacher" class="Teacher" extends="User"/>-->
 			<!--<inheritance key="student" class="Student" extends="User"/>-->
 		</column>
-		<column name="email" phpName="Email" type="VARCHAR" size="100" required="true"/>
-		<column name="password" phpName="Password" type="VARCHAR" size="40" required="true"/>
-		<column name="salt" phpName="Salt" type="VARCHAR" size="32" required="true"/>
-		<column name="is_active" type="BOOLEAN" size="1" sqlType="tinyint(1) unsigned" required="true"/>
-		<validator column="role">
-			<rule name="required" message="The field role is required."/>
-			<rule name="type" value="string" message="The column role must be an string value."/>
-		</validator>
-		<validator column="email">
-			<rule name="required" message="The field email is required."/>
-			<rule name="type" value="string" message="The column email must be an string value."/>
-		</validator>
-		<validator column="password">
-			<rule name="required" message="The field password is required."/>
-			<rule name="type" value="string" message="The column password must be an string value."/>
-		</validator>
+        <column name="first_name" phpName="FirstName" type="VARCHAR" size="100" required="true"/>
+        <column name="last_name" phpName="LastName" type="VARCHAR" size="100" required="true"/>
+        <column name="salutation" phpName="Salutation" type="VARCHAR" size="5" required="false"/>
+        <column name="email" phpName="Email" type="VARCHAR" size="100" required="true"/>
+        <column name="password" phpName="Password" type="VARCHAR" size="40" required="true"/>
+        <column name="salt" phpName="Salt" type="VARCHAR" size="32" required="true"/>
+        <column name="is_active" phpName="IsActive" type="BOOLEAN" size="1" sqlType="tinyint(1) unsigned" required="true" defaultValue="true"/>
+        <column name="created_at" phpName="CreatedAt" type="TIMESTAMP" required="false"/>
+        <column name="updated_at" phpName="UpdatedAt" type="TIMESTAMP" required="true"/>
+        <validator column="id">
+            <rule name="required" message="The field id is required."/>
+            <rule name="maxValue" value="REPLACEME" message="The field id must be not greater than REPLACEME."/>
+            <rule name="type" value="int" message="The column id must be an int value."/>
+        </validator>
+        <validator column="first_name">
+            <rule name="required" message="The field first_name is required."/>
+            <rule name="type" value="string" message="The column first_name must be an string value."/>
+        </validator>
+        <validator column="last_name">
+            <rule name="required" message="The field last_name is required."/>
+            <rule name="type" value="string" message="The column last_name must be an string value."/>
+        </validator>
+        <validator column="salutation">
+            <rule name="type" value="string" message="The column salutation must be an string value."/>
+        </validator>
+        <validator column="email">
+            <rule name="required" message="The field email is required."/>
+            <rule name="type" value="string" message="The column email must be an string value."/>
+        </validator>
+        <validator column="salt">
+            <rule name="required" message="The field salt is required."/>
+            <rule name="type" value="string" message="The column salt must be an string value."/>
+        </validator>
+        <validator column="is_active">
+            <rule name="required" message="The field is_active is required."/>
+            <rule name="type" value="boolean" message="The column is_active must be an boolean value."/>
+        </validator>
 	</table>
 	<table name="students" phpName="Student" idMethod="native">
 		<column name="id" phpName="Id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
