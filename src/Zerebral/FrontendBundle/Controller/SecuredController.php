@@ -62,25 +62,44 @@ class SecuredController extends Controller
      */
     public function signupAction()
     {
-        $user = new User\Teacher();
-        $error = '';
+        $user = new User\User();
         if ($this->getRequest()->isMethod('post')) {
+            $user = $this->getModelByRole($this->getRequest()->get('role', 'teacher'));
+
             try {
                 $user->setPasswordEncoder($this->getPasswordEncoder($user));
                 $user->setEmail($this->getRequest()->get('email'));
                 $user->setPlainPassword($this->getRequest()->get('password'));
-                $user->save();
+                $user->setFirstName($this->getRequest()->get('first_name'));
+                $user->setLastName($this->getRequest()->get('last_name'));
 
-                return $this->redirect($this->generateUrl('_login'));
+                if($user->validate())
+                {
+                    $user->save();
+                    return $this->redirect($this->generateUrl('_login'));
+                }
+
             } catch (\Exception $e) {
-                $error = $e->getMessage();
+//               $e->getMessage();
             }
         }
 
         return array(
-            'user' => $user,
-            'error' => $error
+            'user' => $user
         );
+    }
+
+    protected function getModelByRole($role){
+        switch($role){
+            case User\User::ROLE_STUDENT :
+                return new User\Student();
+            break;
+            case User\User::ROLE_TEACHER :
+                return new User\Teacher();
+            break;
+            default:
+                return null;
+        }
     }
 
     /**

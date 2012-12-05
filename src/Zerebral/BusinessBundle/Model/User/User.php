@@ -122,10 +122,21 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
      */
     public function preSave(\PropelPDO $con = null)
     {
-
+        //@todo fix it
+        $this->setUpdatedAt(date("Y-m-d H:i:s", time()));
         $this->encodePassword();
-        return true;
+        return parent::preSave();
     }
+
+    public function preInsert(\PropelPDO $con = null)
+    {
+        //@todo fix it
+        $this->setCreatedAt(date("Y-m-d H:i:s", time()));
+        return parent::preInsert($con);
+    }
+
+
+
 
     /**
      * Encode plain-text password using encoder

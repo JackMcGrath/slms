@@ -54,13 +54,6 @@
             <rule name="required" message="The field is_active is required."/>
             <rule name="type" value="boolean" message="The column is_active must be an boolean value."/>
         </validator>
-        <validator column="created_at">
-            <rule name="type" value="string" message="The column created_at must be an string value."/>
-        </validator>
-        <validator column="updated_at">
-            <rule name="required" message="The field updated_at is required."/>
-            <rule name="type" value="string" message="The column updated_at must be an string value."/>
-        </validator>
 	</table>
 	<table name="students" phpName="Student" idMethod="native">
 		<column name="id" phpName="Id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
