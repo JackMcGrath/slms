@@ -1,0 +1,148 @@
+@import "bootstrap/bootstrap.less";
+@import "bootstrap/responsive.less";
+
+@import "variables.less";
+@import "fonts.less";
+@import "tables.less";
+@import "icons.less";
+@import "pagination.less";
+@import "forms.less";
+@import "buttons.less";
+@import "navigation-top.less";
+@import "signup.less";
+
+body {
+    padding-top: 60px;
+    padding-bottom: 40px;
+//    background-color:rgb(251,251,251);
+    background: #f1f1f1;
+
+    #main{
+        margin-top: 15px;
+    }
+
+//    .navbar .container-fluid, #main {
+//        padding-left: 0;
+//        padding-right: 0;
+//    }
+
+    .primary{
+        background: @white;
+        padding: 10px 40px;
+
+        &.span11{
+            margin-left: 0;
+            width: 93.5%;
+            min-height: 665px;
+        }
+    }
+
+    .sidebar-nav {
+
+        ul{
+            text-align: center;
+
+            &.nav-list{
+                padding: 0;
+
+                li{
+                    color: @btnInverseBackground;
+                    cursor: pointer;
+                    font-size: 11px;
+                    margin-bottom: 2px;
+
+                    figure{
+                        padding: 6px 0px 6px 0px;
+                        margin: 0;
+                        position: relative;
+
+                        &.active{
+                            i{
+                                opacity: 1;
+                            }
+
+                            color: #4d789d;
+
+                            &::after{
+                                @rowSize: 8px;
+                                content: '';
+                                display: inline-block;
+                                border-left: @rowSize solid transparent;
+                                border-right: @rowSize solid white;
+                                border-bottom: @rowSize solid transparent;
+                                border-top: @rowSize solid transparent;
+                                position: absolute;
+                                top: 22px;
+                                right: 0;
+                            }
+                        }
+
+                        &.notice{
+                            color: @red;
+                        }
+
+                        &:hover{
+                            .active;
+                        }
+
+                    }
+
+                    i{
+                        opacity: 0.5;
+                        margin-top: 4px;
+                        margin-left: auto;
+                        margin-right: auto;
+                        display: block;
+                        position: relative;
+//                        overflow: visible;
+
+                        small{
+                            position: absolute;
+                            top: -3px;
+                            right: 0px;
+                            background: @red;
+                            color: @white;
+                            padding: 2px 4px;
+                            text-align: center;
+//                            border: 1px solid @pink;
+                            .border-radius(1px);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    h1,h2,h3,h4,h5,h6{
+        margin-top: 3px;
+        margin-bottom: 3px;
+    }
+
+    hr{
+        margin-top: @baseLineHeight - 5;
+        margin-bottom: @baseLineHeight + 10;
+    }
+
+    .alert {
+        margin-bottom: @baseLineHeight + 25;
+    }
+
+    .text-center{
+        text-align: center;
+    }
+
+    .top-center{
+        margin-top: 6%;
+    }
+
+    ::-webkit-scrollbar{width:7px;height:7px;}
+    ::-webkit-scrollbar-track{background-color:rgba(0,0,0,0.0);}
+    ::-webkit-scrollbar-track:hover{background-color:rgba(0,0,0,0.05);}
+    ::-webkit-scrollbar-thumb{background-color:rgba(0,175,219,0.4);}
+    ::-webkit-scrollbar-thumb:hover{background-color:rgba(0,175,219,0.7);}
+}
+
+.blue{
+    background: #5884a7;
+    padding-top: 0px;
+}

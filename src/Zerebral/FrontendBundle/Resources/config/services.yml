@@ -2,6 +2,8 @@ parameters:
 #    zerebral_frontend.example.class: Zerebral\FrontendBundle\Example
 
 services:
+    twig.extension:
+        class: Assetic\Extension\Twig
 #    zerebral_frontend.example:
 #        class: %zerebral_frontend.example.class%
 #        arguments: [@service_id, "plain_value", %parameter%]
