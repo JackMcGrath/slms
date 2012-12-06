@@ -55,9 +55,44 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function addAction()
     {
-        throw new \Exception('Not implemented!');
+        $request = $this->getRequest();
+        /**
+         * @var \Zerebral\BusinessBundle\Model\User\User $user
+         */
+        $user = $this->getUser();
+        $course = new Model\Course\Course();
+        $grades = Model\Course\GradeLevelQuery::create()->find();
+        $disciplines = Model\Course\DisciplineQuery::create()->find();
+
+        if ($request->isMethod('post')) {
+            try {
+                $course->setName($request->get('name'));
+                $course->setDescription($request->get('description'));
+                $course->setGradeLevelId($request->get('grade_level_id'));
+                $course->setDisciplineId($request->get('discipline_id'));
+                $course->setCreatedBy($user->getTeacher()->getId());
+
+                if ($course->validate()) {
+                    $course->save();
+                    return $this->redirect(
+                        $this->generateUrl(
+                            'course_view',
+                            array(
+                                'id' => $course->getId()
+                            )
+                        )
+                    );
+                }
+            } catch (\Exception $e) {
+                var_dump($e->getMessage());
+                die;
+            }
+        }
+
         return array(
-            'course' => new Model\Course\Course()
+            'course' => $course,
+            'grades' => $grades,
+            'disciplines' => $disciplines
         );
     }
 

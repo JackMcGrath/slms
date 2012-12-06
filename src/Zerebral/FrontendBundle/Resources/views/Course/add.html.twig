@@ -1,0 +1,68 @@
+{% extends 'ZerebralFrontendBundle::layout.html.twig' %}
+
+{% macro getError(model, key) %}
+{% if key in model.getValidationFailures|keys %}
+    {{ 'error' }}
+{% endif %}
+{% endmacro %}
+
+{% import _self as error %}
+
+{% block content %}
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="row-fluid">
+                <h2 class="span6 pull-left">Create New Course</h2>
+            </div>
+            <hr/>
+
+            <form class="form-horizontal span10 create-form no-left-margin" method="post" action="{{ path("course_add") }}">
+                {% for error in course.getValidationFailures  %}
+                    <div class="alert alert-danger">
+                        <a href="#" class="close" data-dismiss="alert">×</a>
+                        <strong>Warning!</strong> {{ error.message }}
+                    </div>
+                {% endfor %}
+
+                <div class="control-group {{ error.getError(course, 'courses.name') }}">
+                    <label class="control-label">Course Name</label>
+                    <div class="controls">
+                        <input type="text" placeholder="Name..." class="input-xlarge" value="{{ course.getName }}" name="name">
+                        <span class="help-inline">e.g. History</span>
+                    </div>
+                </div>
+                <div class="control-group {{ error.getError(course, 'courses.description') }}">
+                    <label class="control-label">Description</label>
+                    <div class="controls">
+                        <textarea rows="6" class="input-block-level" name="description">{{ course.getDescription }}</textarea>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Subject Area</label>
+                    <div class="controls">
+                        <select class="input-xlarge" name="discipline_id">
+                            {% for discipline in disciplines %}
+                                <option value="{{  discipline.getId }}" {{ course.getdisciplineId == discipline.getId ? 'selected' : '' }}>{{  discipline.getName }}</option>
+                            {% endfor %}
+                        </select>
+                        <a href="#">Create new</a>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Grade Level</label>
+                    <div class="controls">
+                        <select class="input-xlarge" name="grade_level_id">
+                            {% for grade in grades %}
+                                <option value="{{  grade.getId }}" {{ course.getGradeLevelId == grade.getId ? 'selected' : '' }}>{{  grade.getName }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <input type="submit" class="btn btn-danger" value="Create" />
+                    <input type="submit" class="btn" value="Cancel" />
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

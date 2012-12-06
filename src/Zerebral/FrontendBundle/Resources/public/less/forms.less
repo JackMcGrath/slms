@@ -16,7 +16,7 @@ input[type="search"],
 input[type="tel"],
 input[type="color"],
 .uneditable-input {
-    padding: 10px 6px;
+    padding: 6px 10px;
 }
 
 select, textarea{
@@ -39,6 +39,42 @@ select, textarea{
 
         a{
             margin-left: 10px;
+        }
+    }
+
+    div.form-actions {
+        padding-left: @formControlLeftMargin;
+    }
+}
+
+.input-micro {
+    width: 40px;
+}
+
+.form-inline {
+    .control-group:first-child {
+        margin-left: 0px;
+    }
+
+    .control-group {
+        float: left;
+        margin-left: 40px;
+    }
+}
+.help-block {
+    span {
+        color: #9e9e9e;
+    }
+}
+.radio-control-group {
+    .controls {
+        margin-top:3px;
+        label {
+            line-height: 20px;
+            margin-right: 20px;
+            a {
+                margin-left: 0;
+            }
         }
     }
 }
