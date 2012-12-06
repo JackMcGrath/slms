@@ -21,6 +21,9 @@ framework:
 twig:
     debug:            "%kernel.debug%"
     strict_variables: "%kernel.debug%"
+    form:
+        resources:
+            - ":Form:form_bootstrap.html.twig"
 
 # Assetic Configuration
 assetic:
@@ -59,6 +62,7 @@ propel:
         propel.mysql.tableType: "InnoDB"
         propel.schema.dir: "%kernel.root_dir%/schemas/"
         propel.php.dir: %kernel.root_dir%/../src
+        propel.samePhpName: true
 
 
 # Swiftmailer Configuration

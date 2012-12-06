@@ -79,8 +79,8 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
     public function unserialize($serialized)
     {
         list (
-            $this->id,
-        ) = unserialize($serialized);
+                $this->id,
+                ) = unserialize($serialized);
     }
 
     /**
@@ -159,8 +159,6 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
     }
 
 
-
-
     /**
      * Encode plain-text password using encoder
      */
@@ -196,5 +194,29 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
         if ($this->getPasswordConfirmation() != $this->getPlainPassword()) {
             $this->validationFailures['users.password_confirmation'] = new \ValidationFailed('users.password_confirmation', "Password confirmation didn't match with password");
         }
+    }
+
+    /**
+     * Transit user to role-specific model like Teacher or Student
+     *
+     * @return null|Student|Teacher
+     */
+    public function transitToRoleModel()
+    {
+        $model = null;
+        switch ($this->getRole()) {
+            case self::ROLE_TEACHER:
+                $model = new Teacher();
+                break;
+            case self::ROLE_STUDENT:
+                $model = new Student();
+                break;
+        }
+
+        if (!is_null($model)) {
+            $model->setUser($this);
+        }
+
+        return $model;
     }
 } 
