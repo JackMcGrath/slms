@@ -9251,6 +9251,10 @@ textarea {
 .navbar-fixed-top .nav.profile > li {
   float: right;
 }
+.blue .navbar-fixed-top .navbar-inner {
+  background: #4d789d;
+  border-bottom-color: #446b8c;
+}
 .form-signin {
   width: 50%;
   max-width: 620px;
@@ -9275,14 +9279,13 @@ textarea {
 }
 .form-signin input[type=text]:focus,
 .form-signin input[type=password]:focus {
-  border: 2px solid #49708f;
+  outline: 2px solid #49708f;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
-  padding: 17px 10px;
 }
 .form-signin label,
 .form-signin input[type=submit] {
