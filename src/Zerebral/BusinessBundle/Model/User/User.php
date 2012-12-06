@@ -199,10 +199,33 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
     }
 
     /**
-     * get teacher model for user instance
      * @return Teacher
      */
     public function getTeacher(){
         return $this->getTeachers()->getFirst();
+    }
+
+    /**
+     * Transit user to role-specific model like Teacher or Student
+     *
+     * @return null|Student|Teacher
+     */
+    public function transitToRoleModel()
+    {
+        $model = null;
+        switch ($this->getRole()) {
+            case self::ROLE_TEACHER:
+                $model = new Teacher();
+                break;
+            case self::ROLE_STUDENT:
+                $model = new Student();
+                break;
+        }
+
+        if (!is_null($model)) {
+            $model->setUser($this);
+        }
+
+        return $model;
     }
 } 
