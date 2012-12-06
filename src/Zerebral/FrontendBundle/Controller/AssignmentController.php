@@ -9,7 +9,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Zerebral\BusinessBundle\Model as Model;
 
 /**
- * @Route("/courses")
+ * @Route("/assignments")
  */
 class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
 {
@@ -21,7 +21,8 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
     public function addAction()
     {
         $request = $this->getRequest();
-        $assigment = new Model\Assignment\Assignment();
+        $assignment = new Model\Assignment\Assignment();
+        $categories = Model\Assignment\AssignmentCategoryQuery::create()->find();
         /**
          * @var \Zerebral\BusinessBundle\Model\User\User $user
          */
@@ -32,7 +33,9 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
         }
 
         return array(
-            'target' => 'assigments'
+            'target' => 'assigments',
+            'assignment' => $assignment,
+            'categories' => $categories
         );
     }
 }
