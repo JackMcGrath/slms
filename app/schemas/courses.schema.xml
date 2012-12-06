@@ -16,12 +16,10 @@
         </validator>
         <validator column="discipline_id">
             <rule name="required" message="The field discipline_id is required."/>
-            <rule name="maxValue" value="REPLACEME" message="The field discipline_id must be not greater than REPLACEME."/>
             <rule name="type" value="int" message="The column discipline_id must be an int value."/>
         </validator>
         <validator column="grade_level_id">
             <rule name="required" message="The field grade_level_id is required."/>
-            <rule name="maxValue" value="REPLACEME" message="The field grade_level_id must be not greater than REPLACEME."/>
             <rule name="type" value="int" message="The column grade_level_id must be an int value."/>
         </validator>
         <validator column="name">
@@ -33,15 +31,7 @@
         </validator>
         <validator column="created_by">
             <rule name="required" message="The field created_by is required."/>
-            <rule name="maxValue" value="REPLACEME" message="The field created_by must be not greater than REPLACEME."/>
             <rule name="type" value="int" message="The column created_by must be an int value."/>
-        </validator>
-        <validator column="created_at">
-            <rule name="required" message="The field created_at is required."/>
-            <rule name="type" value="string" message="The column created_at must be an string value."/>
-        </validator>
-        <validator column="updated_at">
-            <rule name="type" value="string" message="The column updated_at must be an string value."/>
         </validator>
         <foreign-key foreignTable="teachers" name="courses_teachers" onUpdate="CASCADE">
             <reference local="created_by" foreign="id"/>

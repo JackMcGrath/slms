@@ -197,4 +197,12 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
             $this->validationFailures['users.password_confirmation'] = new \ValidationFailed('users.password_confirmation', "Password confirmation didn't match with password");
         }
     }
+
+    /**
+     * get teacher model for user instance
+     * @return Teacher
+     */
+    public function getTeacher(){
+        return $this->getTeachers()->getFirst();
+    }
 } 

@@ -63,7 +63,7 @@ class SecuredController extends Controller
     public function signupAction()
     {
         $request = $this->getRequest();
-        
+
         $user = new User\User();
         if ($request->isMethod('post')) {
             $user = $this->getModelByRole($request->get('role', User\User::ROLE_TEACHER));
@@ -77,8 +77,7 @@ class SecuredController extends Controller
                 $user->setLastName($request->get('last_name'));
                 $user->setRole($request->get('role'));
 
-                if($user->validate())
-                {
+                if ($user->validate()) {
                     $user->save();
                     return $this->redirect($this->generateUrl('_login'));
                 }
@@ -98,14 +97,15 @@ class SecuredController extends Controller
      * @return \Zerebral\BusinessBundle\Model\User\User
      * @throws \Exception
      */
-    protected function getModelByRole($role){
-        switch($role){
+    protected function getModelByRole($role)
+    {
+        switch ($role) {
             case User\User::ROLE_STUDENT :
                 return new User\Student();
-            break;
+                break;
             case User\User::ROLE_TEACHER :
                 return new User\Teacher();
-            break;
+                break;
             default:
                 throw new \Exception('role');
         }
