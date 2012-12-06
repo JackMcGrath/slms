@@ -1,0 +1,16 @@
+Zerebral\BusinessBundle\Model\User\User:
+    properties:
+        first_name:
+            - NotBlank: ~
+        last_name:
+            - NotBlank: ~
+        email:
+            - NotBlank: ~
+            - Email: ~
+        plainPassword:
+            - NotBlank: ~
+        passwordConfirmation:
+            - NotBlank: ~
+        role:
+            - Choice:
+                choices: [teacher, student]

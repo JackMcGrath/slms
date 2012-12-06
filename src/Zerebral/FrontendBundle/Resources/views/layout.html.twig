@@ -10,6 +10,7 @@
         '@ZerebralFrontendBundle/Resources/public/js/vendors/jquery/jquery-1.8.3.min.js'
         '@ZerebralFrontendBundle/Resources/public/js/vendors/bootstrap/bootstrap-button.js'
         '@ZerebralFrontendBundle/Resources/public/js/vendors/bootstrap/bootstrap-dropdown.js'
+        '@ZerebralFrontendBundle/Resources/public/js/vendors/bootstrap/bootstrap-alert.js'
         output='js/compiled/main.js' %}
         <script type="text/javascript" src="{{ asset_url }}"></script>
     {% endjavascripts %}
@@ -27,7 +28,87 @@
 </head>
 
 <body>
-    {% block content %}
+    {% block header %}
+        <div class="navbar navbar-inverse navbar-fixed-top">
+            <div class="navbar-inner">
+                <div class="container-fluid">
+                    <div class="span1">
+                    </div>
+                    <div class="span6 pull-left">
+                        <a class="brand" href="/"></a>
+                        <i class="icon-bell pull-left"><small>7</small></i>
+                        <form class="navbar-search pull-left" _lpchecked="1">
+                            <input type="text" class="search-query" placeholder="Search">
+                        </form>
+                    </div>
+                    <ul class="nav menu span3 pull-right profile">
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-white icon-user"></i> &nbsp; Slava Belokurski &nbsp; <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#"><i class="icon-user"></i> Profile</a></li>
+                                <li><a href="#" data-target="settingsModal"><i class="icon-cog"></i> Settings</a></li>
+                                <li class="divider"></li>
+                                <li><a href="#" data-target="loginModal"><i class="icon-share-alt"></i> Log In</a></li>
+                                <li><a href="#" data-target="registerModal"><i class="icon-bookmark"></i> Register</a></li>
+                                <li class="divider"></li>
+                                <li><a href="#"><i class="icon-question-sign"></i> Help</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     {% endblock %}
+
+    <div class="container-fluid" id="main">
+        <div class="row-fluid">
+            <div class="span1">
+                <div class="sidebar-nav">
+                    <ul class="nav nav-list">
+                        <li class=""><figure class="{{ target is defined and target == 'home' ? 'active' : ''}}"><div class="menuText"><i class="icon-big-home"></i>Home</div></figure></li>
+                        <li class="">
+                            <figure class="notice class="{{ target is defined and target == 'notifications' ? 'active' : ''}}">
+                                <div class="menuText">
+                                    <i class="icon-big-bell"> <small>7</small></i>
+                                    Notifications
+                                </div>
+                            </figure>
+                        </li>
+                        <li class="">
+                            <a href="{{ path("courses") }}">
+                                <figure class="{{ target is defined and target == 'courses' ? 'active' : ''}}">
+                                    <div class="menuText"><i class="icon-big-notepad"></i>Courses</div>
+                                </figure>
+                            </a>
+                        </li>
+                        <li class=""><figure class="{{ target is defined and target == 'assigments' ? 'active' : ''}}"><div class="menuText"><i class="icon-big-bookmark"></i>Assigments</div></figure></li>
+                        <li class=""><figure class="{{ target is defined and target == 'messages' ? 'active' : ''}}"><div class="menuText"><i class="icon-big-mail"></i>Messages</div></figure></li>
+                        <li class=""><figure class="{{ target is defined and target == 'calendar' ? 'active' : ''}}"><div class="menuText"><i class="icon-big-calendar"></i>Calendar</div></figure></li>
+                        <li class=""><figure class="{{ target is defined and target == 'members' ? 'active' : ''}}"><div class="menuText"><i class="icon-big-members"></i>Members</div></figure></li>
+                        <li class=""><figure class="{{ target is defined and target == 'files' ? 'active' : ''}}"><div class="menuText"><i class="icon-big-folder"></i>Files</div></figure></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="span11 primary edit-course">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <footer>
+                    <div class="span1"></div>
+                    <div class="span3">
+                        <p>Copyright &copy; 2012 Zerebral LLC</p>
+                    </div>
+                    <div class="span2 offset2">
+                        <a href="#" class="rss icon-new-rss-gray">Zerebral RSS</a>
+                        <a href="#" class="twitter icon-new-twitter-gray">Zerebral Twitter</a>
+                    </div>
+                </footer>
+            </div>
+        </div>
+
+    </div>
 </body>
 </html>

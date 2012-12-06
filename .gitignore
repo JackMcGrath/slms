@@ -1,5 +1,7 @@
 .idea
 web/bundles/
+web/css/
+web/js/compiled/
 web/.htaccess
 app/bootstrap.php.cache
 app/cache/*

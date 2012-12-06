@@ -1,0 +1,35 @@
+
+.right-navbar {
+    margin-top: 50px;
+    ul.nav {
+        widtn: 80%;
+        li {
+            padding: 19px 0;
+            margin: 5px 0;
+            a {
+                color: #898989;
+                font-size: 16px;
+                background: none;
+                i {
+                    margin-right: 12px;
+                }
+            }
+            &.active {
+                border-top: 1px solid #dddddd;
+                border-bottom: 1px solid #dddddd;
+                a {
+                    color: #222222;
+                }
+                i.icon-new-user {
+                    .icon-new-user-active();
+                }
+                i.icon-new-gears {
+                    .icon-new-gears-active();
+                }
+                i.icon-new-mail {
+                    .icon-new-mail-active();
+                }
+            }
+        }
+    }
+}

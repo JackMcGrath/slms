@@ -45,22 +45,27 @@ select, textarea{
     div.form-actions {
         padding-left: @formControlLeftMargin;
     }
+    .form-inline {
+        .control-group:first-child {
+            margin-left: 0px;
+        }
+
+        .control-group {
+            float: left;
+            margin-left: 30px;
+
+            .controls {
+                margin-left: @formControlLeftMargin - 30;
+            }
+        }
+    }
 }
 
 .input-micro {
     width: 40px;
 }
 
-.form-inline {
-    .control-group:first-child {
-        margin-left: 0px;
-    }
 
-    .control-group {
-        float: left;
-        margin-left: 40px;
-    }
-}
 .help-block {
     span {
         color: #9e9e9e;
@@ -76,5 +81,13 @@ select, textarea{
                 margin-left: 0;
             }
         }
+    }
+}
+
+.controls {
+    .image-background {
+        width: 78px;
+        background-position: 7px;
+        padding-left: 32px;
     }
 }

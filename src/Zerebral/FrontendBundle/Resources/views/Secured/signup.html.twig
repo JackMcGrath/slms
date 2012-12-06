@@ -1,64 +1,56 @@
 {% extends 'ZerebralFrontendBundle::blueLayout.html.twig' %}
 
+{% form_theme form _self %}
+
+{% block choice_widget_expanded %}
+{% spaceless %}
+    {% set child_vars = {'attr': attr, 'label_attr': {'class': 'inline'}, 'disabledOptions': disabledOptions|default([])} %}
+    {% for child in form %}
+        <div class="span2">
+            {{ form_label(child, label, child_vars) }}
+        </div>
+    {% endfor %}
+{% endspaceless %}
+{% endblock choice_widget_expanded %}
+
+{% block header %}
+    <div class="navbar navbar-inverse navbar-fixed-top signup">
+        <div class="navbar-inner">
+            <div class="container">
+                <a class="brand" href="#"></a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
 {% block content %}
-
-    {% macro getError(model, key) %}
-        {% if key in model.getValidationFailures|keys %}
-            {{ 'error' }}
-        {% endif %}
-    {% endmacro %}
-
-    {% import _self as error %}
 
     <div class="container top-center">
         <div class="row">
             <div class="span7">
-                <form class="form-signin" action="{{ path("signup") }}" method="post">
+                <form action="{{ path('signup') }}" method="post" {{ form_enctype(form) }} novalidate  class="form-signin">
+
                     <div class="row radiobox">
-                        <div class="span2">
-                            <label class="radio inline">
-                                <input type="radio" value="teacher" name="role" {{ user.getRole == 'teacher' ? 'checked' : '' }} /> Teacher
-                            </label>
-                        </div>
-                        <div class="span2">
-                            <label class="radio inline">
-                                <input type="radio" value="student" name="role" {{ user.getRole == 'student' ? 'checked' : '' }} /> Student
-                            </label>
-                        </div>
-                        <div class="span2">
-                            <label class="radio inline">
-                                <input type="radio" value="parent" name="role" disabled="disabled"> Parent
-                            </label>
-                        </div>
+                        {{ form_row(form.role, {'label': '', 'form_type': 'inline', 'disabledOptions': ['parent'] }) }}
                     </div>
 
-                    <div class="control-group {{ error.getError(user, 'users.email') }}">
-                        <label>What is your email adress?</label>
-                        <input type="text" placeholder="Email" name="email" value="{{ user.getEmail }}" />
+                    {{ form_row(form.email, {'label': 'What is your email address?', 'form_type': 'horizontal', 'placeholder': 'Email'}) }}
+
+                    <div class="row">
+                        {{ form_row(form.first_name, {'label': 'First Name:', 'placeholder': 'First Name', 'form_type': 'horizontal', 'group_size': 3}) }}
+                        {{ form_row(form.last_name, {'label': 'Last Name:', 'placeholder': 'Last Name', 'form_type': 'horizontal', 'group_size': 3}) }}
                     </div>
 
                     <div class="row">
-                        <div class="span3 control-group {{ error.getError(user, 'users.first_name') }}">
-                            <label>Fitst Name:</label>
-                            <input type="text" id="inputEmail" placeholder="Fitst Name" name="first_name" value="{{ user.getFirstName }}" />
-                        </div>
-                        <div class="span3 control-group control-group {{ error.getError(user, 'users.last_name') }}">
-                            <label>Last Name:</label>
-                            <input type="text" placeholder="Last Name" name="last_name" value="{{ user.getLastName }}" />
-                        </div>
+                        {{ form_row(form.plainPassword, {'label': 'Choose a Password:', 'placeholder': 'Choose a Password', 'form_type': 'horizontal', 'group_size': 3}) }}
+                        {{ form_row(form.passwordConfirmation, {'label': 'Confirm Password:', 'placeholder': 'Confirm Password', 'form_type': 'horizontal', 'group_size': 3}) }}
                     </div>
 
-                    <div class="row">
-                        <div class="span3 control-group {{ error.getError(user, 'users.password') }}">
-                            <label>Choose a Password:</label>
-                            <input type="password" placeholder="Choose a Password" name="password" value="{{ user.getPlainPassword }}" />
-                        </div>
-                        <div class="span3 control-group {{ error.getError(user, 'users.password_confirmation') }}">
-                            <label>Confirm Password:</label>
-                            <input type="password" placeholder="Confirm Password" name="password_confirmation" value="{{ user.getPasswordConfirmation }}" />
-                        </div>
-                    </div>
+                    {{ form_rest(form) }}
+
                     <input class="btn btn-primary" type="submit" value="Create an account" />
+
                 </form>
             </div>
             <div class="span4 signup-subpane">
