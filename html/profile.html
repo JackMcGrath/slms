@@ -70,10 +70,9 @@
                     <li class="">
                         <figure class="active notice">
                             <div class="menuText">
-                             <i class="icon-big-bell"> <small>7</small></i>
-                            Notifications
-
-                        </div>
+                                <i class="icon-big-bell"> <small>7</small></i>
+                                Notifications
+                            </div>
                         </figure>
                     </li>
                     <li class=""><figure class="active"><div class="menuText"><i class="icon-big-notepad"></i>Courses</div></figure></li>
@@ -85,62 +84,79 @@
                 </ul>
             </div>
         </div>
-        <div class="span11 primary edit-course">
+        <div class="span11 primary profile">
             <div class="row-fluid">
-                <div class="span12">
+                <div class="span9">
                     <div class="row-fluid">
-                        <h2 class="span6 pull-left">Create New Course</h2>
+                        <h2 class="span6 pull-left">Profile <small>edit</small></h2>
                     </div>
                     <hr/>
 
-                    <form class="form-horizontal span10 create-form no-left-margin">
-                        <div class="alert alert-danger">
-                            <button type="button" class="close" data-dismiss="alert">×</button>
-                            <strong>Warning!</strong> Best check yo self, you're not looking too good.
-                        </div>
-                        <div class="control-group error">
-                            <label class="control-label">Course Name</label>
-                            <div class="controls">
-                                <input type="text" id="inputEmail" placeholder="Name..." class="input-xlarge">
-                                <span class="help-inline">e.g. History</span>
-                            </div>
-                        </div>
+                    <form class="form-horizontal span9 create-form no-left-margin">
                         <div class="control-group">
                             <label class="control-label">Description</label>
                             <div class="controls">
                                 <textarea rows="6" class="input-block-level"></textarea>
+                                <div class="help-block">About you in <b>160</b> characters</div>
                             </div>
                         </div>
+
                         <div class="control-group">
-                            <label class="control-label">Subject Area</label>
+                            <label class="control-label">Birthday</label>
                             <div class="controls">
-                                <select class="input-xlarge">
-                                    <option>Mathematics</option>
-                                    <option>Mathematics</option>
-                                    <option>Mathematics</option>
-                                    <option>Mathematics</option>
-                                    <option>Mathematics</option>
-                                </select>
-                                <a href="#">Create new</a>
+                                <input type="text" class="icon-new-calendar image-background input-small"/>
                             </div>
                         </div>
+
                         <div class="control-group">
-                            <label class="control-label">Grade Level</label>
+                            <label class="control-label">Gender</label>
                             <div class="controls">
-                                <select class="input-xlarge">
-                                    <option>Pre-K</option>
-                                    <option>Pre-K</option>
-                                    <option>Pre-K</option>
-                                    <option>Pre-K</option>
-                                    <option>Pre-K</option>
+                                <select class="input-small">
+                                    <option>Male</option>
+                                    <option>Female</option>
                                 </select>
                             </div>
                         </div>
+
+                        <div class="control-group">
+                            <label class="control-label">Activities</label>
+                            <div class="controls">
+                                <textarea rows="6" class="input-block-level"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label">Interests</label>
+                            <div class="controls">
+                                <textarea rows="6" class="input-block-level"></textarea>
+                            </div>
+                        </div>
+
                         <div class="form-actions">
                             <input type="submit" class="btn btn-danger" value="Create" />
                             <input type="submit" class="btn" value="Cancel" />
                         </div>
+
+
                     </form>
+                    <div class="span3 pull-right">
+                        <div class="profile-avatar pull-right">
+                            <img class="span12" src="http://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?s=200"/>
+                            <div class="">
+                                <p>Change your avatar as</p>
+                                <a href="">Gravatar.com</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="span3 right-navbar">
+                    <hr/>
+                    <ul class="nav">
+                        <li class="active"><a href="#"><i class="icon-search"></i> Profile</a></li>
+                        <li><a href="#"><i></i>Account Settings</a></li>
+                        <li><a href="#"><i></i>Notifications</a></li>
+                    </ul>
+
                 </div>
             </div>
         </div>
