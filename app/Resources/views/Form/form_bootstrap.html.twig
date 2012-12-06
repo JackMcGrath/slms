@@ -111,9 +111,15 @@
 
 {% block choice_widget_collapsed %}
 {% spaceless %}
-    <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
+    <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %} placeholder="hoho">
         {% if empty_value is not none %}
-            <option value="">{{ empty_value|trans({}, translation_domain) }}</option>
+            <option value=""
+                {% if empty_disabled is defined and empty_disabled %}
+                    disabled="disabled"
+                    {#{% if value == empty_data %}#}
+                        selected="selected"
+                    {#{% endif %}#}
+                {% endif %}>{{ empty_value|trans({}, translation_domain) }}</option>
         {% endif %}
         {% if preferred_choices|length > 0 %}
             {% set options = preferred_choices %}
@@ -456,7 +462,7 @@
 
 {% block help_inline %}
 {% spaceless %}
-    {% if attr.help is defined %}
+    {% if attr.help is defined and errors|length == 0 %}
     <span class="help-inline">{{ attr.help|trans({}, translation_domain) }}</span>
     {% endif %}
 {% endspaceless %}
