@@ -1,7 +1,12 @@
-<h3>Courses</h3>
-<p><a href="{{ path('course_add') }}">Create course</a></p>
-<ol>
-{% for course in courses %}
-    <li><a href="{{ path('course_view', {id: course.id}) }}">{{ course.name }}</a></li>
-{% endfor %}
-</ol>
+{% extends 'ZerebralFrontendBundle::layout.html.twig' %}
+
+{% block content %}
+
+    <h3>Courses</h3>
+    <p><a href="{{ path('course_add') }}">Create course</a></p>
+    <ol>
+    {% for course in courses %}
+        <li><a href="{{ path('course_view', {id: course.id}) }}">{{ course.name }}</a></li>
+    {% endfor %}
+    </ol>
+{% endblock %}

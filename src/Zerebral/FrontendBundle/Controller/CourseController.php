@@ -20,7 +20,8 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     public function indexAction()
     {
         return array(
-            'courses' => Model\Course\CourseQuery::create()->find()
+            'courses' => Model\Course\CourseQuery::create()->find(),
+            'target' => 'courses'
         );
     }
 
@@ -45,7 +46,8 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     {
         throw new \Exception('Not implemented!');
         return array(
-            'course' => $course
+            'course' => $course,
+            'target' => 'courses'
         );
     }
 
@@ -92,7 +94,8 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
         return array(
             'course' => $course,
             'grades' => $grades,
-            'disciplines' => $disciplines
+            'disciplines' => $disciplines,
+            'target' => 'courses'
         );
     }
 

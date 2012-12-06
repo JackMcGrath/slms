@@ -1,9 +1,9 @@
 {% extends 'ZerebralFrontendBundle::layout.html.twig' %}
 
 {% macro getError(model, key) %}
-{% if key in model.getValidationFailures|keys %}
-    {{ 'error' }}
-{% endif %}
+    {% if key in model.getValidationFailures|keys %}
+        {{ 'error' }}
+    {% endif %}
 {% endmacro %}
 
 {% import _self as error %}
@@ -60,7 +60,7 @@
                 </div>
                 <div class="form-actions">
                     <input type="submit" class="btn btn-danger" value="Create" />
-                    <input type="submit" class="btn" value="Cancel" />
+                    <input type="reset" class="btn" value="Cancel" />
                 </div>
             </form>
         </div>

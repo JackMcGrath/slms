@@ -35,7 +35,7 @@
                     <div class="span1">
                     </div>
                     <div class="span6 pull-left">
-                        <a class="brand" href="#"></a>
+                        <a class="brand" href="/"></a>
                         <i class="icon-bell pull-left"><small>7</small></i>
                         <form class="navbar-search pull-left" _lpchecked="1">
                             <input type="text" class="search-query" placeholder="Search">
@@ -65,22 +65,27 @@
             <div class="span1">
                 <div class="sidebar-nav">
                     <ul class="nav nav-list">
-                        <li class=""><figure><div class="menuText"><i class="icon-big-home"></i>Home</div></figure></li>
+                        <li class=""><figure class="{{ target is defined and target == 'home' ? 'active' : ''}}"><div class="menuText"><i class="icon-big-home"></i>Home</div></figure></li>
                         <li class="">
-                            <figure class="active notice">
+                            <figure class="notice class="{{ target is defined and target == 'notifications' ? 'active' : ''}}">
                                 <div class="menuText">
                                     <i class="icon-big-bell"> <small>7</small></i>
                                     Notifications
-
                                 </div>
                             </figure>
                         </li>
-                        <li class=""><figure class="active"><div class="menuText"><i class="icon-big-notepad"></i>Courses</div></figure></li>
-                        <li class=""><figure><div class="menuText"><i class="icon-big-bookmark"></i>Assigments</div></figure></li>
-                        <li class=""><figure><div class="menuText"><i class="icon-big-mail"></i>Messages</div></figure></li>
-                        <li class=""><figure><div class="menuText"><i class="icon-big-calendar"></i>Calendar</div></figure></li>
-                        <li class=""><figure><div class="menuText"><i class="icon-big-members"></i>Members</div></figure></li>
-                        <li class=""><figure><div class="menuText"><i class="icon-big-folder"></i>Files</div></figure></li>
+                        <li class="">
+                            <a href="{{ path("courses") }}">
+                                <figure class="{{ target is defined and target == 'courses' ? 'active' : ''}}">
+                                    <div class="menuText"><i class="icon-big-notepad"></i>Courses</div>
+                                </figure>
+                            </a>
+                        </li>
+                        <li class=""><figure class="{{ target is defined and target == 'assigments' ? 'active' : ''}}"><div class="menuText"><i class="icon-big-bookmark"></i>Assigments</div></figure></li>
+                        <li class=""><figure class="{{ target is defined and target == 'messages' ? 'active' : ''}}"><div class="menuText"><i class="icon-big-mail"></i>Messages</div></figure></li>
+                        <li class=""><figure class="{{ target is defined and target == 'calendar' ? 'active' : ''}}"><div class="menuText"><i class="icon-big-calendar"></i>Calendar</div></figure></li>
+                        <li class=""><figure class="{{ target is defined and target == 'members' ? 'active' : ''}}"><div class="menuText"><i class="icon-big-members"></i>Members</div></figure></li>
+                        <li class=""><figure class="{{ target is defined and target == 'files' ? 'active' : ''}}"><div class="menuText"><i class="icon-big-folder"></i>Files</div></figure></li>
                     </ul>
                 </div>
             </div>

@@ -14,6 +14,9 @@ class DefaultController extends \Zerebral\CommonBundle\Component\Controller
     public function indexAction()
     {
 
-        return array('name' => 'dev');
+        return array(
+            'name' => 'dev',
+            'target' => 'home'
+        );
     }
 }

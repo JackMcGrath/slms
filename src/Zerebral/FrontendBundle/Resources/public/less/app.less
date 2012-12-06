@@ -12,6 +12,7 @@
 @import "./navigation-top.less";
 @import "./signup.less";
 @import "./course.less";
+@import "./assignment.less";
 
 body {
     padding-top: 60px;
@@ -56,30 +57,34 @@ body {
                     font-size: 11px;
                     margin-bottom: 2px;
 
+                    .active-item{
+                        i{
+                            opacity: 1;
+                        }
+
+                        color: #4d789d;
+
+                        &::after{
+                            @rowSize: 8px;
+                            content: '';
+                            display: inline-block;
+                            border-left: @rowSize solid transparent;
+                            border-right: @rowSize solid white;
+                            border-bottom: @rowSize solid transparent;
+                            border-top: @rowSize solid transparent;
+                            position: absolute;
+                            top: 22px;
+                            right: 0;
+                        }
+                    }
+
                     figure{
                         padding: 6px 0px 6px 0px;
                         margin: 0;
                         position: relative;
 
                         &.active{
-                            i{
-                                opacity: 1;
-                            }
-
-                            color: #4d789d;
-
-                            &::after{
-                                @rowSize: 8px;
-                                content: '';
-                                display: inline-block;
-                                border-left: @rowSize solid transparent;
-                                border-right: @rowSize solid white;
-                                border-bottom: @rowSize solid transparent;
-                                border-top: @rowSize solid transparent;
-                                position: absolute;
-                                top: 22px;
-                                right: 0;
-                            }
+                            .active-item;
                         }
 
                         &.notice{
@@ -90,6 +95,10 @@ body {
                             .active;
                         }
 
+                    }
+
+                    figure:hover{
+                        .active-item;
                     }
 
                     i{
