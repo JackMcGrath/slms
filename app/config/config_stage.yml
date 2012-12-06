@@ -1,0 +1,29 @@
+imports:
+    - { resource: config.yml }
+
+monolog:
+    handlers:
+        main:
+            type:         fingers_crossed
+            action_level: error
+            handler:      nested
+        nested:
+            type:  stream
+            path:  "%kernel.logs_dir%/%kernel.environment%.log"
+            level: debug
+
+propel:
+    dbal:
+        driver:               mysql
+        user:                 dev
+        password:             dev
+        dsn:                  mysql:host=weavora-2;dbname=zerebral;charset=UTF8
+        options:              {}
+        attributes:           {}
+
+#swiftmailer:
+#    transport: "%mailer_transport%"
+#    host:      "%mailer_host%"
+#    username:  "%mailer_user%"
+#    password:  "%mailer_password%"
+#    spool:     { type: memory }
