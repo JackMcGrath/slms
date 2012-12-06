@@ -62,53 +62,22 @@ class SecuredController extends Controller
      */
     public function signupAction()
     {
-        $request = $this->getRequest();
-
-        $user = new User\User();
-        if ($request->isMethod('post')) {
-            $user = $this->getModelByRole($request->get('role', User\User::ROLE_TEACHER));
-
-            try {
+        $form = $this->createForm(new \Zerebral\FrontendBundle\Form\Type\UserSignupType());
+        if ($this->getRequest()->isMethod('POST')) {
+            $form->bind($this->getRequest());
+            if ($form->isValid()) {
+                /** @var $user User\User */
+                $user = $form->getData();
                 $user->setPasswordEncoder($this->getPasswordEncoder($user));
-                $user->setEmail($request->get('email'));
-                $user->setPlainPassword($request->get('password'));
-                $user->setPasswordConfirmation($request->get('password_confirmation'));
-                $user->setFirstName($request->get('first_name'));
-                $user->setLastName($request->get('last_name'));
-                $user->setRole($request->get('role'));
+                $user->transitToRoleModel()->save();
 
-                if ($user->validate()) {
-                    $user->save();
-                    return $this->redirect($this->generateUrl('_login'));
-                }
-
-            } catch (\Exception $e) {
-//               $e->getMessage();
+                return $this->redirect($this->generateUrl('courses'));
             }
         }
 
         return array(
-            'user' => $user
+            'form' => $form->createView(),
         );
-    }
-
-    /**
-     * @param $role
-     * @return \Zerebral\BusinessBundle\Model\User\User
-     * @throws \Exception
-     */
-    protected function getModelByRole($role)
-    {
-        switch ($role) {
-            case User\User::ROLE_STUDENT :
-                return new User\Student();
-                break;
-            case User\User::ROLE_TEACHER :
-                return new User\Teacher();
-                break;
-            default:
-                throw new \Exception('role');
-        }
     }
 
     /**
