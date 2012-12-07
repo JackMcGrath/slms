@@ -42,7 +42,6 @@ class CourseType extends AbstractType
     {
         $resolver->setDefaults(array(
             'data_class' => 'Zerebral\BusinessBundle\Model\Course\Course',
-            'invalid_message' => 'Hohoho',
         ));
     }
 }
