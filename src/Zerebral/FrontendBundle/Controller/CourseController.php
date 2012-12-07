@@ -6,6 +6,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
+use Zerebral\FrontendBundle\Form\Type as FormType;
 use Zerebral\BusinessBundle\Model as Model;
 
 /**
@@ -38,63 +39,28 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     }
 
     /**
+     * @Route("/add", name="course_add")
      * @Route("/edit/{id}", name="course_edit")
      * @ParamConverter("course")
      * @Template()
      */
-    public function editAction(Model\Course\Course $course)
+    public function addAction(Model\Course\Course $course = null)
     {
-        throw new \Exception('Not implemented!');
-        return array(
-            'course' => $course,
-            'target' => 'courses'
-        );
-    }
+        $form = $this->createForm(new FormType\CourseType(), $course);
+        if ($this->getRequest()->isMethod('POST')) {
+            $form->bind($this->getRequest());
+            if ($form->isValid()) {
+                /** @var $course Model\Course\Course */
+                $course = $form->getData();
+                $course->setCreatedBy($this->getUser()->getTeacher()->getId());
+                $course->save();
 
-    /**
-     * @Route("/add", name="course_add")
-     * @Template()
-     */
-    public function addAction()
-    {
-        $request = $this->getRequest();
-        /**
-         * @var \Zerebral\BusinessBundle\Model\User\User $user
-         */
-        $user = $this->getUser();
-        $course = new Model\Course\Course();
-        $grades = Model\Course\GradeLevelQuery::create()->find();
-        $disciplines = Model\Course\DisciplineQuery::create()->find();
-
-        if ($request->isMethod('post')) {
-            try {
-                $course->setName($request->get('name'));
-                $course->setDescription($request->get('description'));
-                $course->setGradeLevelId($request->get('grade_level_id'));
-                $course->setDisciplineId($request->get('discipline_id'));
-                $course->setCreatedBy($user->getTeacher()->getId());
-
-                if ($course->validate()) {
-                    $course->save();
-                    return $this->redirect(
-                        $this->generateUrl(
-                            'course_view',
-                            array(
-                                'id' => $course->getId()
-                            )
-                        )
-                    );
-                }
-            } catch (\Exception $e) {
-                var_dump($e->getMessage());
-                die;
+                return $this->redirect($this->generateUrl('course_view', array('id' => $course->getId())));
             }
         }
 
         return array(
-            'course' => $course,
-            'grades' => $grades,
-            'disciplines' => $disciplines,
+            'form' => $form->createView(),
             'target' => 'courses'
         );
     }

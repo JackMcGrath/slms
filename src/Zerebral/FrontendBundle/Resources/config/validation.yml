@@ -14,3 +14,15 @@ Zerebral\BusinessBundle\Model\User\User:
         role:
             - Choice:
                 choices: [teacher, student]
+
+Zerebral\BusinessBundle\Model\Course\Course:
+    properties:
+        name:
+            - NotBlank: ~
+        description:
+            - NotBlank:
+                message: Please, put few lines about your course.
+        aDiscipline:
+            - Valid: ~
+        aGradeLevel:
+            - Valid: ~
