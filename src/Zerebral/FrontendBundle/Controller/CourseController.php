@@ -21,7 +21,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     public function indexAction()
     {
         return array(
-            'courses' => Model\Course\CourseQuery::create()->find(),
+            'courses' => Model\Course\CourseQuery::create()->findByTeacher($this->getUser()->getTeacher()->getId()),
             'target' => 'courses'
         );
     }

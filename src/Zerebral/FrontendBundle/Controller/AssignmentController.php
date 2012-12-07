@@ -21,7 +21,7 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
     public function indexAction()
     {
         return array(
-            'assignments' => Model\Assignment\AssignmentQuery::create()->find(),
+            'assignments' => Model\Assignment\AssignmentQuery::create()->findByTeacherId($this->getUser()->getTeacher()->getId()),
             'target' => 'assignments'
         );
     }
