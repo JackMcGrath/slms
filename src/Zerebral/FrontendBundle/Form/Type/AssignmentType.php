@@ -21,10 +21,11 @@ class AssignmentType extends AbstractType
             'required' => false,
             'empty_value' => "What's assignment category?",
             'empty_data' => 0,
+            'invalid_message' => 'Category is required.',
 //          'empty_disabled' => true,
         ));
 
-        $builder->add('max_points', 'text', array('required' => false));
+        $builder->add('max_points', 'text', array('required' => false, 'data' => 100,));
         $builder->add('due_at_date', 'text', array('required' => false));
         $builder->add('due_at_time', 'text', array('required' => false));
 
