@@ -36,7 +36,7 @@
                     <div class="span1">
                     </div>
                     <div class="span6 pull-left">
-                        <a class="brand" href="#"></a>
+                        <a class="brand" href="{{ path('dashboard') }}"></a>
                         <ul class="nav">
                             <li class="divider-vertical"></li>
                         </ul>
@@ -75,7 +75,7 @@
                     <ul class="nav nav-list">
                         <li class="{{ target is defined and target == 'home' ? 'active' : ''}}">
                             <div class="menu-item">
-                                <a href="#"><i class="icon-big-home"></i>Home</a>
+                                <a href="{{ path('dashboard') }}"><i class="icon-big-home"></i>Home</a>
                             </div>
                         </li>
                         <li class="{{ target is defined and target == 'notifications' ? 'active' : ''}}">
