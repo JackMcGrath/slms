@@ -34,7 +34,8 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     public function viewAction(Model\Course\Course $course)
     {
         return array(
-            'course' => $course
+            'course' => $course,
+            'target' => 'courses'
         );
     }
 
