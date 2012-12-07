@@ -194,7 +194,7 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
     private function validatePasswordConfirmation()
     {
         if ($this->getPasswordConfirmation() != $this->getPlainPassword()) {
-            $this->validationFailures['users.password_confirmation'] = new \ValidationFailed('users.password_confirmation', "Password confirmation didn't match with password");
+            $this->validationFailures['users.password_confirmation'] = new \ValidationFailed('users.password_confirmation', "Looks like you mistype. The two passwords must match.");
         }
     }
 

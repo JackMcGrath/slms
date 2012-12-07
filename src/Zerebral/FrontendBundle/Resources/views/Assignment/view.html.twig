@@ -1,0 +1,11 @@
+{% extends 'ZerebralFrontendBundle::layout.html.twig' %}
+
+{% block content %}
+    <h1>{{ assignment.name }}</h1>
+
+    <p>#{{ assignment.id }}</p>
+
+    <br><br>
+    <p><a href="{{ path('assignment_edit', {id: assignment.id}) }}">Edit</a></p>
+    <p><a href="{{ path('assignment_delete', {id: assignment.id}) }}">Delete</a></p>
+{% endblock %}

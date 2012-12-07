@@ -21,7 +21,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     public function indexAction()
     {
         return array(
-            'courses' => Model\Course\CourseQuery::create()->find(),
+            'courses' => Model\Course\CourseQuery::create()->findByTeacher($this->getUser()->getTeacher()->getId()),
             'target' => 'courses'
         );
     }
@@ -34,7 +34,8 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     public function viewAction(Model\Course\Course $course)
     {
         return array(
-            'course' => $course
+            'course' => $course,
+            'target' => 'courses'
         );
     }
 
@@ -49,6 +50,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
         $form = $this->createForm(new FormType\CourseType(), $course);
         if ($this->getRequest()->isMethod('POST')) {
             $form->bind($this->getRequest());
+//            var_dump($form);die();
             if ($form->isValid()) {
                 /** @var $course Model\Course\Course */
                 $course = $form->getData();
