@@ -32,3 +32,17 @@ Zerebral\BusinessBundle\Model\Course\Course:
             - Valid: ~
         aGradeLevel:
             - Valid: ~
+
+Zerebral\BusinessBundle\Model\Assignment\Assignment:
+    properties:
+        name:
+            - NotBlank:
+                message: Enter your assignment name. You can change it later.
+        description:
+            - NotBlank:
+                message: Enter assignment description. Any useful information from the student point of view.
+        max_points:
+            - NotBlank:
+                message: Max ponts is required.
+        aAssignmentCategory:
+            - Valid: ~
