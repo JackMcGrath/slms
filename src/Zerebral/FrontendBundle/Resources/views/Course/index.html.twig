@@ -2,11 +2,16 @@
 
 {% block content %}
 
-    <h3>Courses</h3>
-    <p><a href="{{ path('course_add') }}">Create course</a></p>
-    <ol>
+    <h2>Courses</h2>
+    <a href="{{ path('course_add') }}" class="btn btn-small btn-success">Create course</a>
+
+
     {% for course in courses %}
-        <li><a href="{{ path('course_view', {id: course.id}) }}">{{ course.name }}</a></li>
+        <div style="margin: 20px 0; border-bottom: 1px dashed #ccc;">
+            <h4><a href="{{ path('course_view', {id: course.id}) }}" style="color: #555;">{{ course.name }}</a></h4>
+            <a href="{{ path('course_edit', {id: course.id}) }}">Edit</a>
+            <a href="{{ path('course_delete', {id: course.id}) }}" onclick="return confirm('Are you sure?');">Remove</a>
+        </div>
+
     {% endfor %}
-    </ol>
 {% endblock %}
