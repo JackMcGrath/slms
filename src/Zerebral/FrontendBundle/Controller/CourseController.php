@@ -50,6 +50,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
         $form = $this->createForm(new FormType\CourseType(), $course);
         if ($this->getRequest()->isMethod('POST')) {
             $form->bind($this->getRequest());
+//            var_dump($form);die();
             if ($form->isValid()) {
                 /** @var $course Model\Course\Course */
                 $course = $form->getData();

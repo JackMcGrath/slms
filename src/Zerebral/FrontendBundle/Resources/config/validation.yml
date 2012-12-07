@@ -1,14 +1,19 @@
 Zerebral\BusinessBundle\Model\User\User:
     properties:
         first_name:
-            - NotBlank: ~
+            - NotBlank:
+                message: Enter your first name.
         last_name:
-            - NotBlank: ~
+            - NotBlank:
+                message: Enter your last name.
         email:
-            - NotBlank: ~
-            - Email: ~
+            - NotBlank:
+                message: Email is required.
+            - Email:
+                message: Doesn't look like a valid email.
         plainPassword:
-            - NotBlank: ~
+            - NotBlank:
+                message: Password is required! You can change it later.
         passwordConfirmation:
             - NotBlank: ~
         role:
@@ -18,10 +23,11 @@ Zerebral\BusinessBundle\Model\User\User:
 Zerebral\BusinessBundle\Model\Course\Course:
     properties:
         name:
-            - NotBlank: ~
+            - NotBlank:
+                message: Enter your course name. You can change it later.
         description:
             - NotBlank:
-                message: Please, put few lines about your course.
+                message: Enter course description. Any useful information from the student point of view.
         aDiscipline:
             - Valid: ~
         aGradeLevel:

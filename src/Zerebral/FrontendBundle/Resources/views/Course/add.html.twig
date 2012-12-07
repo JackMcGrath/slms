@@ -15,6 +15,14 @@
             <hr/>
 
             <form method="post" {{ form_enctype(form) }} novalidate  class="form-horizontal span10 create-form no-left-margin">
+
+                {% if not form.vars.value.id is defined %}
+                <div class="alert alert-success">
+                    <button type="button" class="close" data-dismiss="alert">×</button>
+                    <strong>Woohoo!</strong> You are only one step away from start inviting students. Fill out this form to get started.
+                </div>
+                {% endif %}
+
                 {{ form_row(form.name, {
                     label: 'Course Name',
                     form_type: 'horizontal',

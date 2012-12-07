@@ -8,6 +8,10 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Zerebral\BusinessBundle\Model\User\User;
 
+use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\Collection;
+
 class UserSignupType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
