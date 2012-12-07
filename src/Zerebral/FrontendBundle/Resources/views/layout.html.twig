@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/html">
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="utf-8">
     <title>{% block title %}Zerebral{% endblock %}</title>
@@ -69,33 +69,30 @@
             <div class="span1 left-sidebar">
                 <div class="sidebar-nav">
                     <ul class="nav nav-list">
-                        <li class=""><figure class="{{ target is defined and target == 'home' ? 'active' : ''}}"><div class="menuText"><i class="icon-big-home"></i>Home</div></figure></li>
-                        <li class="">
-                            <figure class="notice class="{{ target is defined and target == 'notifications' ? 'active' : ''}}">
-                                <div class="menuText">
-                                    <i class="icon-big-bell"> <small>7</small></i>
-                                    Notifications
-                                </div>
-                            </figure>
+                        <li class="{{ target is defined and target == 'home' ? 'active' : ''}}">
+                            <div class="menu-item">
+                                <a href="#"><i class="icon-big-home"></i>Home</a>
+                            </div>
                         </li>
-                        <li class="">
-                            <a href="{{ path("courses") }}">
-                                <figure class="{{ target is defined and target == 'courses' ? 'active' : ''}}">
-                                    <div class="menuText"><i class="icon-big-notepad"></i>Courses</div>
-                                </figure>
-                            </a>
+                        <li class="{{ target is defined and target == 'notifications' ? 'active' : ''}}">
+                            <div class="menu-item notice">
+                                <a href="#"><i class="icon-big-bell"> <small>7</small></i>Notifications</a>
+                            </div>
                         </li>
-                        <li class="">
-                            <a href="{{ path("assignments") }}">
-                                <figure class="{{ target is defined and target == 'assignments' ? 'active' : ''}}">
-                                    <div class="menuText"><i class="icon-big-bookmark"></i>Assignments</div>
-                                </figure>
-                            </a>
+                        <li class="{{ target is defined and target == 'courses' ? 'active' : ''}}">
+                            <div class="menu-item">
+                                <a href="{{ path("courses") }}"><i class="icon-big-notepad"></i>Courses</a>
+                            </div>
                         </li>
-                        <li class=""><figure class="{{ target is defined and target == 'messages' ? 'active' : ''}}"><div class="menuText"><i class="icon-big-mail"></i>Messages</div></figure></li>
-                        <li class=""><figure class="{{ target is defined and target == 'calendar' ? 'active' : ''}}"><div class="menuText"><i class="icon-big-calendar"></i>Calendar</div></figure></li>
-                        <li class=""><figure class="{{ target is defined and target == 'members' ? 'active' : ''}}"><div class="menuText"><i class="icon-big-members"></i>Members</div></figure></li>
-                        <li class=""><figure class="{{ target is defined and target == 'files' ? 'active' : ''}}"><div class="menuText"><i class="icon-big-folder"></i>Files</div></figure></li>
+                        <li class="{{ target is defined and target == 'assignments' ? 'active' : ''}}">
+                            <div class="menu-item">
+                                <a href="{{ path("assignments") }}"><i class="icon-big-bookmark"></i>Assignments</a>
+                            </div>
+                        </li>
+                        <li class="{{ target is defined and target == 'messages' ? 'active' : ''}}"><div class="menu-item"><i class="icon-big-mail"></i>Messages</div></li>
+                        <li class="{{ target is defined and target == 'calendar' ? 'active' : ''}}"><div class="menu-item"><i class="icon-big-calendar"></i>Calendar</div></li>
+                        <li class="{{ target is defined and target == 'members' ? 'active' : ''}}"><div class="menu-item"><i class="icon-big-members"></i>Members</div></li>
+                        <li class="{{ target is defined and target == 'files' ? 'active' : ''}}"><div class="menu-item"><i class="icon-big-folder"></i>Files</div></li>
                     </ul>
                 </div>
             </div>
