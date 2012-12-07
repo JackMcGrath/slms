@@ -42,7 +42,7 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
      */
     public function getRoles()
     {
-        return array('ROLE_USER');
+        return array('ROLE_USER', 'ROLE_TEACHER');
     }
 
     /**

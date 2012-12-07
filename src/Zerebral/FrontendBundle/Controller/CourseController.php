@@ -5,6 +5,8 @@ namespace Zerebral\FrontendBundle\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use JMS\SecurityExtraBundle\Annotation\Secure;
+use JMS\SecurityExtraBundle\Annotation\SecureParam;
 
 use Zerebral\FrontendBundle\Form\Type as FormType;
 use Zerebral\BusinessBundle\Model as Model;
@@ -29,6 +31,10 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     /**
      * @Route("/view/{id}", name="course_view")
      * @ParamConverter("course")
+     *
+     * @Secure(roles="ROLE_TEACHER")
+     * @SecureParam(name="course", permissions="VIEW")
+     *
      * @Template()
      */
     public function viewAction(Model\Course\Course $course)
@@ -43,6 +49,10 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      * @Route("/add", name="course_add")
      * @Route("/edit/{id}", name="course_edit")
      * @ParamConverter("course")
+     *
+     * @Secure(roles="ROLE_TEACHER")
+     * @SecureParam(name="course", permissions="EDIT")
+     *
      * @Template()
      */
     public function addAction(Model\Course\Course $course = null)
@@ -50,7 +60,6 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
         $form = $this->createForm(new FormType\CourseType(), $course);
         if ($this->getRequest()->isMethod('POST')) {
             $form->bind($this->getRequest());
-//            var_dump($form);die();
             if ($form->isValid()) {
                 /** @var $course Model\Course\Course */
                 $course = $form->getData();
@@ -70,6 +79,10 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     /**
      * @Route("/delete/{id}", name="course_delete")
      * @ParamConverter("course")
+     *
+     * @Secure(roles="ROLE_TEACHER")
+     * @SecureParam(name="course", permissions="DELETE")
+     *
      * @Template()
      */
     public function deleteAction(Model\Course\Course $course)
