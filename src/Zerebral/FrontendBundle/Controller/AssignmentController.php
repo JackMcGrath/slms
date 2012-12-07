@@ -51,16 +51,14 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
         if ($this->getRequest()->isMethod('POST')) {
             $form->bind($this->getRequest());
             if ($form->isValid()) {
-                $courseId = $this->getUser()->getTeacher()->getCourses()->getFirst()->getId();
                 /**
                  * @var \Zerebral\BusinessBundle\Model\Assignment\Assignment $assignment
                  */
                 $assignment = $form->getData();
                 $assignment->setTeacherId($this->getUser()->getTeacher()->getId());
-                $assignment->setCourseId($courseId);
                 $assignment->save();
 
-                return $this->redirect($this->generateUrl('course_view', array('id' => $courseId)));
+                return $this->redirect($this->generateUrl('course_view', array('id' => $assignment->getCourseId())));
             }
         }
 
