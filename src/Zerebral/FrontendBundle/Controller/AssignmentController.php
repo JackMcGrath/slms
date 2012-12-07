@@ -14,9 +14,35 @@ use Zerebral\BusinessBundle\Model as Model;
  */
 class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
 {
+    /**
+     * @Route("/", name="assignments")
+     * @Template()
+     */
+    public function indexAction()
+    {
+        return array(
+            'assignments' => Model\Assignment\AssignmentQuery::create()->find(),
+            'target' => 'assignments'
+        );
+    }
+
+    /**
+     * @Route("/view/{id}", name="assignment_view")
+     * @ParamConverter("assignment")
+     * @Template()
+     */
+    public function viewAction(Model\Assignment\Assignment $assignment = null)
+    {
+        return array(
+            'assignment' => $assignment,
+            'target' => 'assignments'
+        );
+    }
 
    /**
      * @Route("/add", name="assignment_add")
+     * @Route("/edit/{id}", name="assignment_edit")
+     * @ParamConverter("assignment")
      * @Template()
      */
     public function addAction(Model\Assignment\Assignment $assignment = null)
@@ -40,7 +66,18 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
 
         return array(
             'form' => $form->createView(),
-            'target' => 'courses'
+            'target' => 'assignments'
         );
+    }
+
+    /**
+     * @Route("/delete/{id}", name="assignment_delete")
+     * @ParamConverter("assignment")
+     * @Template()
+     */
+    public function deleteAction(Model\Assignment\Assignment $assignment = null)
+    {
+        $assignment->delete();
+        return $this->redirect($this->generateUrl('assignments'));
     }
 }

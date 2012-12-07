@@ -82,7 +82,13 @@
                                 </figure>
                             </a>
                         </li>
-                        <li class=""><figure class="{{ target is defined and target == 'assigments' ? 'active' : ''}}"><div class="menuText"><i class="icon-big-bookmark"></i>Assigments</div></figure></li>
+                        <li class="">
+                            <a href="{{ path("assignments") }}">
+                                <figure class="{{ target is defined and target == 'assignments' ? 'active' : ''}}">
+                                    <div class="menuText"><i class="icon-big-bookmark"></i>Assignments</div>
+                                </figure>
+                            </a>
+                        </li>
                         <li class=""><figure class="{{ target is defined and target == 'messages' ? 'active' : ''}}"><div class="menuText"><i class="icon-big-mail"></i>Messages</div></figure></li>
                         <li class=""><figure class="{{ target is defined and target == 'calendar' ? 'active' : ''}}"><div class="menuText"><i class="icon-big-calendar"></i>Calendar</div></figure></li>
                         <li class=""><figure class="{{ target is defined and target == 'members' ? 'active' : ''}}"><div class="menuText"><i class="icon-big-members"></i>Members</div></figure></li>

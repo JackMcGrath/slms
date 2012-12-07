@@ -8,7 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 class DashboardController extends \Zerebral\CommonBundle\Component\Controller
 {
     /**
-     * @Route("/")
+     * @Route("/", name="dashboard")
      * @Template()
      */
     public function indexAction()
