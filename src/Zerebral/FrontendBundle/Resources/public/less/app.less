@@ -86,27 +86,38 @@ body {
                         }
                     }
 
-                    figure{
+                    .menu-item{
                         padding: 6px 0px 6px 0px;
                         margin: 0;
                         position: relative;
 
                         &.active{
                             .active-item;
+                            a {
+                                color: @red;
+                            }
                         }
 
                         &.notice{
-                            color: @red;
+                            a {
+                                color: @red;
+                            }
                         }
 
                         &:hover{
                             .active;
                         }
-
+                        a {
+                            text-decoration: none;
+                            color: #444444;
+                        }
                     }
+                    .menu-item:hover {
+                        i{
+                            opacity: 1;
+                        }
 
-                    figure:hover{
-                        .active-item;
+
                     }
 
                     i{
