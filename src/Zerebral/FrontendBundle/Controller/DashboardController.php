@@ -5,15 +5,14 @@ namespace Zerebral\FrontendBundle\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
-class DefaultController extends \Zerebral\CommonBundle\Component\Controller
+class DashboardController extends \Zerebral\CommonBundle\Component\Controller
 {
     /**
-     * @Route("/")
+     * @Route("/", name="dashboard")
      * @Template()
      */
     public function indexAction()
     {
-
         return array(
             'name' => 'dev',
             'target' => 'home'

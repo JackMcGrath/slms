@@ -1,0 +1,17 @@
+{% extends 'ZerebralFrontendBundle::layout.html.twig' %}
+
+{% block content %}
+
+    <h2>Assignments</h2>
+    <a href="{{ path('assignment_add') }}" class="btn btn-small btn-success">Create assignment</a>
+
+
+    {% for assignment in assignments %}
+        <div style="margin: 20px 0; border-bottom: 1px dashed #ccc;">
+            <h4><a href="{{ path('assignment_view', {id: assignment.id}) }}" style="color: #555;">{{ assignment.name }}</a></h4>
+            <a href="{{ path('assignment_edit', {id: assignment.id}) }}">Edit</a>
+            <a href="{{ path('assignment_delete', {id: assignment.id}) }}" onclick="return confirm('Are you sure?');">Remove</a>
+        </div>
+
+    {% endfor %}
+{% endblock %}

@@ -1,8 +1,12 @@
-<h1>{{ course.name }}</h1>
+{% extends 'ZerebralFrontendBundle::layout.html.twig' %}
 
-<p>#{{ course.id }}</p>
-{#<p>Is Active: {{ course.isActive }}</p>#}
+{% block content %}
+    <h1>{{ course.name }}</h1>
 
-<br><br>
-<p><a href="{{ path('course_edit', {id: course.id}) }}">Edit</a></p>
-<p><a href="{{ path('course_delete', {id: course.id}) }}">Delete</a></p>
+    <p>#{{ course.id }}</p>
+    {#<p>Is Active: {{ course.isActive }}</p>#}
+
+    <br><br>
+    <p><a href="{{ path('course_edit', {id: course.id}) }}">Edit</a></p>
+    <p><a href="{{ path('course_delete', {id: course.id}) }}">Delete</a></p>
+{% endblock %}
