@@ -73,6 +73,7 @@ class SecuredController extends Controller
                 $user->transitToRoleModel()->save();
 
                 //automatic log in user.
+                #TODO set correct role as 4th argument
                 $token = new UsernamePasswordToken($user, null, 'secured_area');
                 $this->get('security.context')->setToken($token);
 

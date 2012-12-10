@@ -25,10 +25,14 @@ use Zerebral\BusinessBundle\Model\User\User;
  * @method StudentQuery orderById($order = Criteria::ASC) Order by the id column
  * @method StudentQuery orderByUserId($order = Criteria::ASC) Order by the user_id column
  * @method StudentQuery orderByBio($order = Criteria::ASC) Order by the bio column
+ * @method StudentQuery orderByActivities($order = Criteria::ASC) Order by the activities column
+ * @method StudentQuery orderByInterests($order = Criteria::ASC) Order by the interests column
  *
  * @method StudentQuery groupById() Group by the id column
  * @method StudentQuery groupByUserId() Group by the user_id column
  * @method StudentQuery groupByBio() Group by the bio column
+ * @method StudentQuery groupByActivities() Group by the activities column
+ * @method StudentQuery groupByInterests() Group by the interests column
  *
  * @method StudentQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method StudentQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -51,10 +55,14 @@ use Zerebral\BusinessBundle\Model\User\User;
  *
  * @method Student findOneByUserId(int $user_id) Return the first Student filtered by the user_id column
  * @method Student findOneByBio(string $bio) Return the first Student filtered by the bio column
+ * @method Student findOneByActivities(string $activities) Return the first Student filtered by the activities column
+ * @method Student findOneByInterests(string $interests) Return the first Student filtered by the interests column
  *
  * @method array findById(int $id) Return Student objects filtered by the id column
  * @method array findByUserId(int $user_id) Return Student objects filtered by the user_id column
  * @method array findByBio(string $bio) Return Student objects filtered by the bio column
+ * @method array findByActivities(string $activities) Return Student objects filtered by the activities column
+ * @method array findByInterests(string $interests) Return Student objects filtered by the interests column
  */
 abstract class BaseStudentQuery extends ModelCriteria
 {
@@ -157,7 +165,7 @@ abstract class BaseStudentQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `user_id`, `bio` FROM `students` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `user_id`, `bio`, `activities`, `interests` FROM `students` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -343,6 +351,64 @@ abstract class BaseStudentQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(StudentPeer::BIO, $bio, $comparison);
+    }
+
+    /**
+     * Filter the query on the activities column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByActivities('fooValue');   // WHERE activities = 'fooValue'
+     * $query->filterByActivities('%fooValue%'); // WHERE activities LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $activities The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return StudentQuery The current query, for fluid interface
+     */
+    public function filterByActivities($activities = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($activities)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $activities)) {
+                $activities = str_replace('*', '%', $activities);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(StudentPeer::ACTIVITIES, $activities, $comparison);
+    }
+
+    /**
+     * Filter the query on the interests column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByInterests('fooValue');   // WHERE interests = 'fooValue'
+     * $query->filterByInterests('%fooValue%'); // WHERE interests LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $interests The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return StudentQuery The current query, for fluid interface
+     */
+    public function filterByInterests($interests = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($interests)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $interests)) {
+                $interests = str_replace('*', '%', $interests);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(StudentPeer::INTERESTS, $interests, $comparison);
     }
 
     /**

@@ -1722,12 +1722,6 @@ abstract class BaseCoursePeer
         if ($obj->isNew() || $obj->isColumnModified(CoursePeer::CREATED_BY))
             $columns[CoursePeer::CREATED_BY] = $obj->getCreatedBy();
 
-        if ($obj->isNew() || $obj->isColumnModified(CoursePeer::CREATED_AT))
-            $columns[CoursePeer::CREATED_AT] = $obj->getCreatedAt();
-
-        if ($obj->isNew() || $obj->isColumnModified(CoursePeer::UPDATED_AT))
-            $columns[CoursePeer::UPDATED_AT] = $obj->getUpdatedAt();
-
         }
 
         return BasePeer::doValidate(CoursePeer::DATABASE_NAME, CoursePeer::TABLE_NAME, $columns);

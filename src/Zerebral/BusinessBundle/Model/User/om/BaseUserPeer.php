@@ -31,13 +31,13 @@ abstract class BaseUserPeer
     const TM_CLASS = 'UserTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 11;
+    const NUM_COLUMNS = 13;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 11;
+    const NUM_HYDRATE_COLUMNS = 13;
 
     /** the column name for the id field */
     const ID = 'users.id';
@@ -53,6 +53,12 @@ abstract class BaseUserPeer
 
     /** the column name for the salutation field */
     const SALUTATION = 'users.salutation';
+
+    /** the column name for the birthday field */
+    const BIRTHDAY = 'users.birthday';
+
+    /** the column name for the gender field */
+    const GENDER = 'users.gender';
 
     /** the column name for the email field */
     const EMAIL = 'users.email';
@@ -91,12 +97,12 @@ abstract class BaseUserPeer
      * e.g. UserPeer::$fieldNames[UserPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Role', 'FirstName', 'LastName', 'Salutation', 'Email', 'Password', 'Salt', 'IsActive', 'CreatedAt', 'UpdatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'role', 'firstName', 'lastName', 'salutation', 'email', 'password', 'salt', 'isActive', 'createdAt', 'updatedAt', ),
-        BasePeer::TYPE_COLNAME => array (UserPeer::ID, UserPeer::ROLE, UserPeer::FIRST_NAME, UserPeer::LAST_NAME, UserPeer::SALUTATION, UserPeer::EMAIL, UserPeer::PASSWORD, UserPeer::SALT, UserPeer::IS_ACTIVE, UserPeer::CREATED_AT, UserPeer::UPDATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'ROLE', 'FIRST_NAME', 'LAST_NAME', 'SALUTATION', 'EMAIL', 'PASSWORD', 'SALT', 'IS_ACTIVE', 'CREATED_AT', 'UPDATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'role', 'first_name', 'last_name', 'salutation', 'email', 'password', 'salt', 'is_active', 'created_at', 'updated_at', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Role', 'FirstName', 'LastName', 'Salutation', 'Birthday', 'Gender', 'Email', 'Password', 'Salt', 'IsActive', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'role', 'firstName', 'lastName', 'salutation', 'birthday', 'gender', 'email', 'password', 'salt', 'isActive', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (UserPeer::ID, UserPeer::ROLE, UserPeer::FIRST_NAME, UserPeer::LAST_NAME, UserPeer::SALUTATION, UserPeer::BIRTHDAY, UserPeer::GENDER, UserPeer::EMAIL, UserPeer::PASSWORD, UserPeer::SALT, UserPeer::IS_ACTIVE, UserPeer::CREATED_AT, UserPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'ROLE', 'FIRST_NAME', 'LAST_NAME', 'SALUTATION', 'BIRTHDAY', 'GENDER', 'EMAIL', 'PASSWORD', 'SALT', 'IS_ACTIVE', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'role', 'first_name', 'last_name', 'salutation', 'birthday', 'gender', 'email', 'password', 'salt', 'is_active', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, )
     );
 
     /**
@@ -106,12 +112,12 @@ abstract class BaseUserPeer
      * e.g. UserPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Role' => 1, 'FirstName' => 2, 'LastName' => 3, 'Salutation' => 4, 'Email' => 5, 'Password' => 6, 'Salt' => 7, 'IsActive' => 8, 'CreatedAt' => 9, 'UpdatedAt' => 10, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'role' => 1, 'firstName' => 2, 'lastName' => 3, 'salutation' => 4, 'email' => 5, 'password' => 6, 'salt' => 7, 'isActive' => 8, 'createdAt' => 9, 'updatedAt' => 10, ),
-        BasePeer::TYPE_COLNAME => array (UserPeer::ID => 0, UserPeer::ROLE => 1, UserPeer::FIRST_NAME => 2, UserPeer::LAST_NAME => 3, UserPeer::SALUTATION => 4, UserPeer::EMAIL => 5, UserPeer::PASSWORD => 6, UserPeer::SALT => 7, UserPeer::IS_ACTIVE => 8, UserPeer::CREATED_AT => 9, UserPeer::UPDATED_AT => 10, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'ROLE' => 1, 'FIRST_NAME' => 2, 'LAST_NAME' => 3, 'SALUTATION' => 4, 'EMAIL' => 5, 'PASSWORD' => 6, 'SALT' => 7, 'IS_ACTIVE' => 8, 'CREATED_AT' => 9, 'UPDATED_AT' => 10, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'role' => 1, 'first_name' => 2, 'last_name' => 3, 'salutation' => 4, 'email' => 5, 'password' => 6, 'salt' => 7, 'is_active' => 8, 'created_at' => 9, 'updated_at' => 10, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Role' => 1, 'FirstName' => 2, 'LastName' => 3, 'Salutation' => 4, 'Birthday' => 5, 'Gender' => 6, 'Email' => 7, 'Password' => 8, 'Salt' => 9, 'IsActive' => 10, 'CreatedAt' => 11, 'UpdatedAt' => 12, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'role' => 1, 'firstName' => 2, 'lastName' => 3, 'salutation' => 4, 'birthday' => 5, 'gender' => 6, 'email' => 7, 'password' => 8, 'salt' => 9, 'isActive' => 10, 'createdAt' => 11, 'updatedAt' => 12, ),
+        BasePeer::TYPE_COLNAME => array (UserPeer::ID => 0, UserPeer::ROLE => 1, UserPeer::FIRST_NAME => 2, UserPeer::LAST_NAME => 3, UserPeer::SALUTATION => 4, UserPeer::BIRTHDAY => 5, UserPeer::GENDER => 6, UserPeer::EMAIL => 7, UserPeer::PASSWORD => 8, UserPeer::SALT => 9, UserPeer::IS_ACTIVE => 10, UserPeer::CREATED_AT => 11, UserPeer::UPDATED_AT => 12, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'ROLE' => 1, 'FIRST_NAME' => 2, 'LAST_NAME' => 3, 'SALUTATION' => 4, 'BIRTHDAY' => 5, 'GENDER' => 6, 'EMAIL' => 7, 'PASSWORD' => 8, 'SALT' => 9, 'IS_ACTIVE' => 10, 'CREATED_AT' => 11, 'UPDATED_AT' => 12, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'role' => 1, 'first_name' => 2, 'last_name' => 3, 'salutation' => 4, 'birthday' => 5, 'gender' => 6, 'email' => 7, 'password' => 8, 'salt' => 9, 'is_active' => 10, 'created_at' => 11, 'updated_at' => 12, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, )
     );
 
     /**
@@ -190,6 +196,8 @@ abstract class BaseUserPeer
             $criteria->addSelectColumn(UserPeer::FIRST_NAME);
             $criteria->addSelectColumn(UserPeer::LAST_NAME);
             $criteria->addSelectColumn(UserPeer::SALUTATION);
+            $criteria->addSelectColumn(UserPeer::BIRTHDAY);
+            $criteria->addSelectColumn(UserPeer::GENDER);
             $criteria->addSelectColumn(UserPeer::EMAIL);
             $criteria->addSelectColumn(UserPeer::PASSWORD);
             $criteria->addSelectColumn(UserPeer::SALT);
@@ -202,6 +210,8 @@ abstract class BaseUserPeer
             $criteria->addSelectColumn($alias . '.first_name');
             $criteria->addSelectColumn($alias . '.last_name');
             $criteria->addSelectColumn($alias . '.salutation');
+            $criteria->addSelectColumn($alias . '.birthday');
+            $criteria->addSelectColumn($alias . '.gender');
             $criteria->addSelectColumn($alias . '.email');
             $criteria->addSelectColumn($alias . '.password');
             $criteria->addSelectColumn($alias . '.salt');
@@ -742,9 +752,6 @@ abstract class BaseUserPeer
             }
         } else {
 
-        if ($obj->isNew() || $obj->isColumnModified(UserPeer::ROLE))
-            $columns[UserPeer::ROLE] = $obj->getRole();
-
         if ($obj->isNew() || $obj->isColumnModified(UserPeer::FIRST_NAME))
             $columns[UserPeer::FIRST_NAME] = $obj->getFirstName();
 
@@ -754,23 +761,20 @@ abstract class BaseUserPeer
         if ($obj->isNew() || $obj->isColumnModified(UserPeer::SALUTATION))
             $columns[UserPeer::SALUTATION] = $obj->getSalutation();
 
+        if ($obj->isNew() || $obj->isColumnModified(UserPeer::BIRTHDAY))
+            $columns[UserPeer::BIRTHDAY] = $obj->getBirthday();
+
+        if ($obj->isNew() || $obj->isColumnModified(UserPeer::GENDER))
+            $columns[UserPeer::GENDER] = $obj->getGender();
+
         if ($obj->isNew() || $obj->isColumnModified(UserPeer::EMAIL))
             $columns[UserPeer::EMAIL] = $obj->getEmail();
-
-        if ($obj->isNew() || $obj->isColumnModified(UserPeer::PASSWORD))
-            $columns[UserPeer::PASSWORD] = $obj->getPassword();
 
         if ($obj->isNew() || $obj->isColumnModified(UserPeer::SALT))
             $columns[UserPeer::SALT] = $obj->getSalt();
 
         if ($obj->isNew() || $obj->isColumnModified(UserPeer::IS_ACTIVE))
             $columns[UserPeer::IS_ACTIVE] = $obj->getIsActive();
-
-        if ($obj->isNew() || $obj->isColumnModified(UserPeer::CREATED_AT))
-            $columns[UserPeer::CREATED_AT] = $obj->getCreatedAt();
-
-        if ($obj->isNew() || $obj->isColumnModified(UserPeer::UPDATED_AT))
-            $columns[UserPeer::UPDATED_AT] = $obj->getUpdatedAt();
 
         }
 

@@ -44,8 +44,13 @@ class StudentTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('user_id', 'UserId', 'INTEGER', 'users', 'id', true, null, null);
-        $this->addColumn('bio', 'Bio', 'VARCHAR', false, 200, null);
+        $this->addColumn('bio', 'Bio', 'VARCHAR', false, 160, null);
+        $this->addColumn('activities', 'Activities', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('interests', 'Interests', 'LONGVARCHAR', false, null, null);
         // validators
+        $this->addValidator('bio', 'type', 'propel.validator.TypeValidator', 'string', 'The column bio must be an string value.');
+        $this->addValidator('activities', 'type', 'propel.validator.TypeValidator', 'string', 'The column activities must be an string value.');
+        $this->addValidator('interests', 'type', 'propel.validator.TypeValidator', 'string', 'The column interests must be an string value.');
     } // initialize()
 
     /**

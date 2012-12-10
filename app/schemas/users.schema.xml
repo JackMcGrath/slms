@@ -12,6 +12,8 @@
         <column name="first_name" phpName="FirstName" type="VARCHAR" size="100" required="true"/>
         <column name="last_name" phpName="LastName" type="VARCHAR" size="100" required="true"/>
         <column name="salutation" phpName="Salutation" type="VARCHAR" size="5" required="false"/>
+        <column name="birthday" phpName="Birthday" type="DATE" required="false"/>
+        <column name="gender" phpName="Gender" type="CHAR" valueSet="male,female" sqlType="enum('male','female')" required="false"/>
         <column name="email" phpName="Email" type="VARCHAR" size="100" required="true"/>
         <column name="password" phpName="Password" type="VARCHAR" size="40" required="true"/>
         <column name="salt" phpName="Salt" type="VARCHAR" size="32" required="true"/>
@@ -34,6 +36,12 @@
         <validator column="salutation">
             <rule name="type" value="string" message="The column salutation must be an string value."/>
         </validator>
+        <validator column="birthday">
+            <rule name="type" value="string" message="The column birthday must be an string value."/>
+        </validator>
+        <validator column="gender">
+            <rule name="type" value="string" message="The column gender must be an string value."/>
+        </validator>
         <validator column="email">
             <rule name="required" message="The field email is required."/>
             <rule name="type" value="string" message="The column email must be an string value."/>
@@ -50,7 +58,10 @@
 	<table name="students" phpName="Student" idMethod="native">
 		<column name="id" phpName="Id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
 		<column name="user_id" phpName="UserId" type="INTEGER" sqlType="int(11) unsigned" required="true"/>
-		<column name="bio" phpName="Bio" type="VARCHAR" size="200" required="false"/>
+        <column name="bio" phpName="Bio" type="VARCHAR" size="160" required="false"/>
+        <column name="activities" phpName="Activities" type="LONGVARCHAR" required="false"/>
+        <column name="interests" phpName="Interests" type="LONGVARCHAR" required="false"/>
+
 		<foreign-key foreignTable="users">
 			<reference local="user_id" foreign="id"/>
 		</foreign-key>
@@ -58,6 +69,15 @@
 			<parameter name="to" value="users"/>
 		</behavior>
 
+        <validator column="bio">
+            <rule name="type" value="string" message="The column bio must be an string value."/>
+        </validator>
+        <validator column="activities">
+            <rule name="type" value="string" message="The column activities must be an string value."/>
+        </validator>
+        <validator column="interests">
+            <rule name="type" value="string" message="The column interests must be an string value."/>
+        </validator>
 	</table>
 	<table name="teachers" phpName="Teacher" idMethod="native">
 		<column name="id" phpName="Id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
