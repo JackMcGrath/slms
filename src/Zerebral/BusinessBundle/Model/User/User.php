@@ -42,7 +42,14 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
      */
     public function getRoles()
     {
-        return array('ROLE_USER');
+        $roles = array('ROLE_USER');
+        if ($this->getRole() == self::ROLE_TEACHER) {
+            $roles[] = 'ROLE_TEACHER';
+        }
+        if ($this->getRole() == self::ROLE_STUDENT) {
+            $roles[] = 'ROLE_STUDENT';
+        }
+        return $roles;
     }
 
     /**
@@ -79,8 +86,8 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
     public function unserialize($serialized)
     {
         list (
-            $this->id,
-        ) = unserialize($serialized);
+                $this->id,
+                ) = unserialize($serialized);
     }
 
     /**
@@ -159,8 +166,6 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
     }
 
 
-
-
     /**
      * Encode plain-text password using encoder
      */
@@ -201,8 +206,17 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
     /**
      * @return Teacher
      */
-    public function getTeacher(){
+    public function getTeacher()
+    {
         return $this->getTeachers()->getFirst();
+    }
+
+    /**
+     * @return Student
+     */
+    public function getStudent()
+    {
+        return $this->getStudents()->getFirst();
     }
 
     /**
@@ -227,5 +241,23 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
         }
 
         return $model;
+    }
+
+    public function getRoleModel()
+    {
+        if ($this->isNew()) {
+            return $this->transitToRoleModel();
+        }
+
+        switch ($this->getRole()) {
+            case self::ROLE_TEACHER:
+                return $this->getTeacher();
+                break;
+            case self::ROLE_STUDENT:
+                return $this->getStudent();
+                break;
+        }
+
+        return null;
     }
 } 

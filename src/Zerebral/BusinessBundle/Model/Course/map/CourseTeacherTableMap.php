@@ -41,18 +41,12 @@ class CourseTeacherTableMap extends TableMap
         $this->setClassname('Zerebral\\BusinessBundle\\Model\\Course\\CourseTeacher');
         $this->setPackage('Zerebral.BusinessBundle.Model.Course');
         $this->setUseIdGenerator(false);
+        $this->setIsCrossRef(true);
         // columns
         $this->addForeignPrimaryKey('course_id', 'CourseId', 'INTEGER' , 'courses', 'id', true, null, null);
         $this->addForeignPrimaryKey('teacher_id', 'TeacherId', 'INTEGER' , 'teachers', 'id', true, null, null);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         // validators
-        $this->addValidator('course_id', 'required', 'propel.validator.RequiredValidator', '', 'The field course_id is required.');
-        $this->addValidator('course_id', 'maxValue', 'propel.validator.MaxValueValidator', 'REPLACEME', 'The field course_id must be not greater than REPLACEME.');
-        $this->addValidator('course_id', 'type', 'propel.validator.TypeValidator', 'int', 'The column course_id must be an int value.');
-        $this->addValidator('teacher_id', 'required', 'propel.validator.RequiredValidator', '', 'The field teacher_id is required.');
-        $this->addValidator('teacher_id', 'maxValue', 'propel.validator.MaxValueValidator', 'REPLACEME', 'The field teacher_id must be not greater than REPLACEME.');
-        $this->addValidator('teacher_id', 'type', 'propel.validator.TypeValidator', 'int', 'The column teacher_id must be an int value.');
-        $this->addValidator('created_at', 'type', 'propel.validator.TypeValidator', 'string', 'The column created_at must be an string value.');
     } // initialize()
 
     /**

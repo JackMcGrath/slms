@@ -24,19 +24,6 @@ class AssignmentType extends AbstractType
             'invalid_message' => 'Category is required.',
         ));
 
-//        $query = \Zerebral\BusinessBundle\Model\Course\CourseQuery::create();
-//        $query->findByCreatedBy(6);
-
-        $builder->add('course', 'model', array(
-            'class' => 'Zerebral\BusinessBundle\Model\Course\Course',
-//            'query' => $query,
-            'property' => 'name',
-            'required' => false,
-            'empty_value' => "What's course?",
-            'empty_data' => 0,
-            'invalid_message' => 'Course is required.',
-        ));
-
         $builder->add('max_points', 'text', array('required' => false, 'data' => 100,));
         $builder->add('due_at_date', 'text', array('required' => false));
         $builder->add('due_at_time', 'text', array('required' => false));

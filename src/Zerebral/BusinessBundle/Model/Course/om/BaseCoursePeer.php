@@ -493,7 +493,7 @@ abstract class BaseCoursePeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related Teacher table
+     * Returns the number of rows matching criteria, joining the related CreatedByTeacher table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -501,7 +501,7 @@ abstract class BaseCoursePeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinTeacher(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinCreatedByTeacher(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -654,7 +654,7 @@ abstract class BaseCoursePeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinTeacher(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinCreatedByTeacher(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -700,7 +700,7 @@ abstract class BaseCoursePeer
                 } // if obj2 already loaded
 
                 // Add the $obj1 (Course) to $obj2 (Teacher)
-                $obj2->addCourse($obj1);
+                $obj2->addCreatedByTeacher($obj1);
 
             } // if joined row was not null
 
@@ -969,7 +969,7 @@ abstract class BaseCoursePeer
                 } // if obj2 loaded
 
                 // Add the $obj1 (Course) to the collection in $obj2 (Teacher)
-                $obj2->addCourse($obj1);
+                $obj2->addCreatedByTeacher($obj1);
             } // if joined row not null
 
             // Add objects for joined Discipline rows
@@ -1017,7 +1017,7 @@ abstract class BaseCoursePeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related Teacher table
+     * Returns the number of rows matching criteria, joining the related CreatedByTeacher table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -1025,7 +1025,7 @@ abstract class BaseCoursePeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinAllExceptTeacher(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinAllExceptCreatedByTeacher(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -1176,7 +1176,7 @@ abstract class BaseCoursePeer
 
 
     /**
-     * Selects a collection of Course objects pre-filled with all related objects except Teacher.
+     * Selects a collection of Course objects pre-filled with all related objects except CreatedByTeacher.
      *
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
@@ -1185,7 +1185,7 @@ abstract class BaseCoursePeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinAllExceptTeacher(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinAllExceptCreatedByTeacher(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -1340,7 +1340,7 @@ abstract class BaseCoursePeer
                 } // if $obj2 already loaded
 
                 // Add the $obj1 (Course) to the collection in $obj2 (Teacher)
-                $obj2->addCourse($obj1);
+                $obj2->addCreatedByTeacher($obj1);
 
             } // if joined row is not null
 
@@ -1438,7 +1438,7 @@ abstract class BaseCoursePeer
                 } // if $obj2 already loaded
 
                 // Add the $obj1 (Course) to the collection in $obj2 (Teacher)
-                $obj2->addCourse($obj1);
+                $obj2->addCreatedByTeacher($obj1);
 
             } // if joined row is not null
 

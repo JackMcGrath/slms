@@ -92,7 +92,7 @@
             <index-column name="assignment_category_id"/>
         </index>
     </table>
-    <table name="student_assignments" phpName="StudentAssignment" idMethod="native">
+    <table name="student_assignments" phpName="StudentAssignment" idMethod="native" isCrossRef="true">
         <column name="id" phpName="Id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="student_id" phpName="StudentId" type="INTEGER" sqlType="int(11) unsigned" required="true"/>
         <column name="assignment_id" phpName="AssignmentId" type="INTEGER" sqlType="int(11) unsigned" required="true"/>

@@ -33,7 +33,7 @@
             <rule name="required" message="The field created_by is required."/>
             <rule name="type" value="int" message="The column created_by must be an int value."/>
         </validator>
-        <foreign-key foreignTable="teachers" name="courses_teachers" onUpdate="CASCADE">
+        <foreign-key foreignTable="teachers" name="courses_teachers" phpName="CreatedByTeacher" refPhpName="CreatedByTeacher" onUpdate="CASCADE">
             <reference local="created_by" foreign="id"/>
         </foreign-key>
         <foreign-key foreignTable="disciplines" name="courses_disciplines" onUpdate="CASCADE">
@@ -78,7 +78,7 @@
             <rule name="type" value="string" message="The column name must be an string value."/>
         </validator>
     </table>
-    <table name="course_students" phpName="CourseStudent" idMethod="native">
+    <table name="course_students" phpName="CourseStudent" idMethod="native" isCrossRef="true">
         <column name="course_id" phpName="CourseId" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" required="true"/>
         <column name="student_id" phpName="StudentId" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" required="true"/>
         <column name="created_at" phpName="CreatedAt" type="TIMESTAMP" required="true"/>
@@ -106,23 +106,10 @@
             <index-column name="student_id"/>
         </index>
     </table>
-    <table name="course_teachers" phpName="CourseTeacher" idMethod="native">
+    <table name="course_teachers" phpName="CourseTeacher" idMethod="native" isCrossRef="true">
         <column name="course_id" phpName="CourseId" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" required="true"/>
         <column name="teacher_id" phpName="TeacherId" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" required="true"/>
         <column name="created_at" phpName="CreatedAt" type="TIMESTAMP" required="false"/>
-        <validator column="course_id">
-            <rule name="required" message="The field course_id is required."/>
-            <rule name="maxValue" value="REPLACEME" message="The field course_id must be not greater than REPLACEME."/>
-            <rule name="type" value="int" message="The column course_id must be an int value."/>
-        </validator>
-        <validator column="teacher_id">
-            <rule name="required" message="The field teacher_id is required."/>
-            <rule name="maxValue" value="REPLACEME" message="The field teacher_id must be not greater than REPLACEME."/>
-            <rule name="type" value="int" message="The column teacher_id must be an int value."/>
-        </validator>
-        <validator column="created_at">
-            <rule name="type" value="string" message="The column created_at must be an string value."/>
-        </validator>
         <foreign-key foreignTable="courses" name="course_teachers_course" onUpdate="CASCADE">
             <reference local="course_id" foreign="id"/>
         </foreign-key>

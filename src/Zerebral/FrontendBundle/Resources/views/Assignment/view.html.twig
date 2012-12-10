@@ -6,6 +6,12 @@
     <p>#{{ assignment.id }}</p>
 
     <br><br>
-    <p><a href="{{ path('assignment_edit', {id: assignment.id}) }}">Edit</a></p>
-    <p><a href="{{ path('assignment_delete', {id: assignment.id}) }}">Delete</a></p>
+
+    {% if is_granted('EDIT', assignment) %}
+        <p><a href="{{ path('assignment_edit', {id: assignment.id, courseId: assignment.course.id}) }}">Edit</a></p>
+    {% endif %}
+
+    {% if is_granted('DELETE', assignment) %}
+        <p><a href="{{ path('assignment_delete', {id: assignment.id}) }}">Delete</a></p>
+    {% endif %}
 {% endblock %}

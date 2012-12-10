@@ -5,8 +5,16 @@
 
     <p>#{{ course.id }}</p>
     {#<p>Is Active: {{ course.isActive }}</p>#}
+    {% if is_granted('ADD_ASSIGNMENT', course) %}
+        <p><a href="{{ path('assignment_add', {courseId: course.id}) }}">Add Assignment</a></p>
+    {% endif %}
 
     <br><br>
-    <p><a href="{{ path('course_edit', {id: course.id}) }}">Edit</a></p>
-    <p><a href="{{ path('course_delete', {id: course.id}) }}">Delete</a></p>
+    {% if is_granted('EDIT', course) %}
+        <p><a href="{{ path('course_edit', {id: course.id}) }}">Edit</a></p>
+    {% endif %}
+
+    {% if is_granted('EDIT', course) %}
+        <p><a href="{{ path('course_delete', {id: course.id}) }}">Delete</a></p>
+    {% endif %}
 {% endblock %}

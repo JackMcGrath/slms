@@ -14,7 +14,9 @@ use \PropelObjectCollection;
 use \PropelPDO;
 use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\QueryEvent;
+use Zerebral\BusinessBundle\Model\Assignment\Assignment;
 use Zerebral\BusinessBundle\Model\Assignment\StudentAssignment;
+use Zerebral\BusinessBundle\Model\Course\Course;
 use Zerebral\BusinessBundle\Model\Course\CourseStudent;
 use Zerebral\BusinessBundle\Model\User\Student;
 use Zerebral\BusinessBundle\Model\User\StudentPeer;
@@ -633,6 +635,40 @@ abstract class BaseStudentQuery extends ModelCriteria
         return $this
             ->joinCourseStudent($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'CourseStudent', '\Zerebral\BusinessBundle\Model\Course\CourseStudentQuery');
+    }
+
+    /**
+     * Filter the query by a related Assignment object
+     * using the student_assignments table as cross reference
+     *
+     * @param   Assignment $assignment the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   StudentQuery The current query, for fluid interface
+     */
+    public function filterByAssignment($assignment, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useStudentAssignmentQuery()
+            ->filterByAssignment($assignment, $comparison)
+            ->endUse();
+    }
+
+    /**
+     * Filter the query by a related Course object
+     * using the course_students table as cross reference
+     *
+     * @param   Course $course the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   StudentQuery The current query, for fluid interface
+     */
+    public function filterByCourse($course, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useCourseStudentQuery()
+            ->filterByCourse($course, $comparison)
+            ->endUse();
     }
 
     /**
