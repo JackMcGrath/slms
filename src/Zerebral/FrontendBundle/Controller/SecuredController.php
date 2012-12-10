@@ -71,7 +71,7 @@ class SecuredController extends Controller
                 $user->setPasswordEncoder($this->getPasswordEncoder($user));
                 $user->transitToRoleModel()->save();
 
-                return $this->redirect($this->generateUrl('courses'));
+                return $this->redirect($this->generateUrl('dashboard'));
             }
         }
 
