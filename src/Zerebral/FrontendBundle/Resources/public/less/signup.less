@@ -20,7 +20,7 @@
         }
     }
 
-    input[type=text], input[type=password]{
+    input[type=text], input[type=password], input[type=email] {
         &:focus{
             outline: 2px solid #49708f;
             .box-shadow(none);
@@ -72,6 +72,10 @@
             text-transform: uppercase;
             font-weight: bold;
         }
+    }
+
+    hr.separator {
+        margin: 13px -29px 15px -29px;
     }
 }
 .form-signin .form-signin-heading,
