@@ -23,6 +23,7 @@ use Zerebral\BusinessBundle\Model\Course\CourseStudent;
 use Zerebral\BusinessBundle\Model\Course\CourseTeacher;
 use Zerebral\BusinessBundle\Model\Course\Discipline;
 use Zerebral\BusinessBundle\Model\Course\GradeLevel;
+use Zerebral\BusinessBundle\Model\User\Student;
 use Zerebral\BusinessBundle\Model\User\Teacher;
 
 /**
@@ -48,9 +49,9 @@ use Zerebral\BusinessBundle\Model\User\Teacher;
  * @method CourseQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method CourseQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method CourseQuery leftJoinTeacher($relationAlias = null) Adds a LEFT JOIN clause to the query using the Teacher relation
- * @method CourseQuery rightJoinTeacher($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Teacher relation
- * @method CourseQuery innerJoinTeacher($relationAlias = null) Adds a INNER JOIN clause to the query using the Teacher relation
+ * @method CourseQuery leftJoinCreatedByTeacher($relationAlias = null) Adds a LEFT JOIN clause to the query using the CreatedByTeacher relation
+ * @method CourseQuery rightJoinCreatedByTeacher($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CreatedByTeacher relation
+ * @method CourseQuery innerJoinCreatedByTeacher($relationAlias = null) Adds a INNER JOIN clause to the query using the CreatedByTeacher relation
  *
  * @method CourseQuery leftJoinDiscipline($relationAlias = null) Adds a LEFT JOIN clause to the query using the Discipline relation
  * @method CourseQuery rightJoinDiscipline($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Discipline relation
@@ -467,7 +468,7 @@ abstract class BaseCourseQuery extends ModelCriteria
      * $query->filterByCreatedBy(array('min' => 12)); // WHERE created_by > 12
      * </code>
      *
-     * @see       filterByTeacher()
+     * @see       filterByCreatedByTeacher()
      *
      * @param     mixed $createdBy The value to use as filter.
      *              Use scalar values for equality.
@@ -595,7 +596,7 @@ abstract class BaseCourseQuery extends ModelCriteria
      * @return   CourseQuery The current query, for fluid interface
      * @throws   PropelException - if the provided filter is invalid.
      */
-    public function filterByTeacher($teacher, $comparison = null)
+    public function filterByCreatedByTeacher($teacher, $comparison = null)
     {
         if ($teacher instanceof Teacher) {
             return $this
@@ -608,22 +609,22 @@ abstract class BaseCourseQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(CoursePeer::CREATED_BY, $teacher->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByTeacher() only accepts arguments of type Teacher or PropelCollection');
+            throw new PropelException('filterByCreatedByTeacher() only accepts arguments of type Teacher or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Teacher relation
+     * Adds a JOIN clause to the query using the CreatedByTeacher relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return CourseQuery The current query, for fluid interface
      */
-    public function joinTeacher($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinCreatedByTeacher($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Teacher');
+        $relationMap = $tableMap->getRelation('CreatedByTeacher');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -638,14 +639,14 @@ abstract class BaseCourseQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Teacher');
+            $this->addJoinObject($join, 'CreatedByTeacher');
         }
 
         return $this;
     }
 
     /**
-     * Use the Teacher relation Teacher object
+     * Use the CreatedByTeacher relation Teacher object
      *
      * @see       useQuery()
      *
@@ -655,11 +656,11 @@ abstract class BaseCourseQuery extends ModelCriteria
      *
      * @return   \Zerebral\BusinessBundle\Model\User\TeacherQuery A secondary query class using the current class as primary query
      */
-    public function useTeacherQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useCreatedByTeacherQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinTeacher($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Teacher', '\Zerebral\BusinessBundle\Model\User\TeacherQuery');
+            ->joinCreatedByTeacher($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CreatedByTeacher', '\Zerebral\BusinessBundle\Model\User\TeacherQuery');
     }
 
     /**
@@ -1108,6 +1109,40 @@ abstract class BaseCourseQuery extends ModelCriteria
         return $this
             ->joinCourseTeacher($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'CourseTeacher', '\Zerebral\BusinessBundle\Model\Course\CourseTeacherQuery');
+    }
+
+    /**
+     * Filter the query by a related Student object
+     * using the course_students table as cross reference
+     *
+     * @param   Student $student the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   CourseQuery The current query, for fluid interface
+     */
+    public function filterByStudent($student, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useCourseStudentQuery()
+            ->filterByStudent($student, $comparison)
+            ->endUse();
+    }
+
+    /**
+     * Filter the query by a related Teacher object
+     * using the course_teachers table as cross reference
+     *
+     * @param   Teacher $teacher the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   CourseQuery The current query, for fluid interface
+     */
+    public function filterByTeacher($teacher, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useCourseTeacherQuery()
+            ->filterByTeacher($teacher, $comparison)
+            ->endUse();
     }
 
     /**

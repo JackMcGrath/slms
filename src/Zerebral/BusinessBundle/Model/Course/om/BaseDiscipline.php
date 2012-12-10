@@ -1093,10 +1093,10 @@ abstract class BaseDiscipline extends BaseObject implements Persistent
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Course[] List of Course objects
      */
-    public function getCoursesJoinTeacher($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getCoursesJoinCreatedByTeacher($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = CourseQuery::create(null, $criteria);
-        $query->joinWith('Teacher', $join_behavior);
+        $query->joinWith('CreatedByTeacher', $join_behavior);
 
         return $this->getCourses($query, $con);
     }

@@ -26,6 +26,8 @@ use Zerebral\BusinessBundle\Model\Assignment\StudentAssignment;
 use Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentQuery;
 use Zerebral\BusinessBundle\Model\Course\Course;
 use Zerebral\BusinessBundle\Model\Course\CourseQuery;
+use Zerebral\BusinessBundle\Model\User\Student;
+use Zerebral\BusinessBundle\Model\User\StudentQuery;
 use Zerebral\BusinessBundle\Model\User\Teacher;
 use Zerebral\BusinessBundle\Model\User\TeacherQuery;
 
@@ -120,6 +122,11 @@ abstract class BaseAssignment extends BaseObject implements Persistent
     protected $collStudentAssignmentsPartial;
 
     /**
+     * @var        PropelObjectCollection|Student[] Collection to store aggregation of Student objects.
+     */
+    protected $collStudents;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      * @var        boolean
@@ -132,6 +139,12 @@ abstract class BaseAssignment extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $studentsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -555,6 +568,7 @@ abstract class BaseAssignment extends BaseObject implements Persistent
             $this->aAssignmentCategory = null;
             $this->collStudentAssignments = null;
 
+            $this->collStudents = null;
         } // if (deep)
     }
 
@@ -719,6 +733,26 @@ abstract class BaseAssignment extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->studentsScheduledForDeletion !== null) {
+                if (!$this->studentsScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk = $this->getPrimaryKey();
+                    foreach ($this->studentsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($remotePk, $pk);
+                    }
+                    StudentAssignmentQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->studentsScheduledForDeletion = null;
+                }
+
+                foreach ($this->getStudents() as $student) {
+                    if ($student->isModified()) {
+                        $student->save($con);
+                    }
+                }
             }
 
             if ($this->studentAssignmentsScheduledForDeletion !== null) {
@@ -1720,6 +1754,183 @@ abstract class BaseAssignment extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collStudents collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Assignment The current object (for fluent API support)
+     * @see        addStudents()
+     */
+    public function clearStudents()
+    {
+        $this->collStudents = null; // important to set this to null since that means it is uninitialized
+        $this->collStudentsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * Initializes the collStudents collection.
+     *
+     * By default this just sets the collStudents collection to an empty collection (like clearStudents());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initStudents()
+    {
+        $this->collStudents = new PropelObjectCollection();
+        $this->collStudents->setModel('Student');
+    }
+
+    /**
+     * Gets a collection of Student objects related by a many-to-many relationship
+     * to the current object by way of the student_assignments cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Assignment is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return PropelObjectCollection|Student[] List of Student objects
+     */
+    public function getStudents($criteria = null, PropelPDO $con = null)
+    {
+        if (null === $this->collStudents || null !== $criteria) {
+            if ($this->isNew() && null === $this->collStudents) {
+                // return empty collection
+                $this->initStudents();
+            } else {
+                $collStudents = StudentQuery::create(null, $criteria)
+                    ->filterByAssignment($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collStudents;
+                }
+                $this->collStudents = $collStudents;
+            }
+        }
+
+        return $this->collStudents;
+    }
+
+    /**
+     * Sets a collection of Student objects related by a many-to-many relationship
+     * to the current object by way of the student_assignments cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $students A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Assignment The current object (for fluent API support)
+     */
+    public function setStudents(PropelCollection $students, PropelPDO $con = null)
+    {
+        $this->clearStudents();
+        $currentStudents = $this->getStudents();
+
+        $this->studentsScheduledForDeletion = $currentStudents->diff($students);
+
+        foreach ($students as $student) {
+            if (!$currentStudents->contains($student)) {
+                $this->doAddStudent($student);
+            }
+        }
+
+        $this->collStudents = $students;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of Student objects related by a many-to-many relationship
+     * to the current object by way of the student_assignments cross-reference table.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param boolean $distinct Set to true to force count distinct
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return int the number of related Student objects
+     */
+    public function countStudents($criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        if (null === $this->collStudents || null !== $criteria) {
+            if ($this->isNew() && null === $this->collStudents) {
+                return 0;
+            } else {
+                $query = StudentQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByAssignment($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collStudents);
+        }
+    }
+
+    /**
+     * Associate a Student object to this object
+     * through the student_assignments cross reference table.
+     *
+     * @param  Student $student The StudentAssignment object to relate
+     * @return Assignment The current object (for fluent API support)
+     */
+    public function addStudent(Student $student)
+    {
+        if ($this->collStudents === null) {
+            $this->initStudents();
+        }
+        if (!$this->collStudents->contains($student)) { // only add it if the **same** object is not already associated
+            $this->doAddStudent($student);
+
+            $this->collStudents[]= $student;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Student $student The student object to add.
+     */
+    protected function doAddStudent($student)
+    {
+        $studentAssignment = new StudentAssignment();
+        $studentAssignment->setStudent($student);
+        $this->addStudentAssignment($studentAssignment);
+    }
+
+    /**
+     * Remove a Student object to this object
+     * through the student_assignments cross reference table.
+     *
+     * @param Student $student The StudentAssignment object to relate
+     * @return Assignment The current object (for fluent API support)
+     */
+    public function removeStudent(Student $student)
+    {
+        if ($this->getStudents()->contains($student)) {
+            $this->collStudents->remove($this->collStudents->search($student));
+            if (null === $this->studentsScheduledForDeletion) {
+                $this->studentsScheduledForDeletion = clone $this->collStudents;
+                $this->studentsScheduledForDeletion->clear();
+            }
+            $this->studentsScheduledForDeletion[]= $student;
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -1757,12 +1968,21 @@ abstract class BaseAssignment extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collStudents) {
+                foreach ($this->collStudents as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
         if ($this->collStudentAssignments instanceof PropelCollection) {
             $this->collStudentAssignments->clearIterator();
         }
         $this->collStudentAssignments = null;
+        if ($this->collStudents instanceof PropelCollection) {
+            $this->collStudents->clearIterator();
+        }
+        $this->collStudents = null;
         $this->aTeacher = null;
         $this->aCourse = null;
         $this->aAssignmentCategory = null;

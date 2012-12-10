@@ -41,6 +41,7 @@ class CourseStudentTableMap extends TableMap
         $this->setClassname('Zerebral\\BusinessBundle\\Model\\Course\\CourseStudent');
         $this->setPackage('Zerebral.BusinessBundle.Model.Course');
         $this->setUseIdGenerator(false);
+        $this->setIsCrossRef(true);
         // columns
         $this->addForeignPrimaryKey('course_id', 'CourseId', 'INTEGER' , 'courses', 'id', true, null, null);
         $this->addForeignPrimaryKey('student_id', 'StudentId', 'INTEGER' , 'students', 'id', true, null, null);

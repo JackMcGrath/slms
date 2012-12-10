@@ -41,6 +41,7 @@ class StudentAssignmentTableMap extends TableMap
         $this->setClassname('Zerebral\\BusinessBundle\\Model\\Assignment\\StudentAssignment');
         $this->setPackage('Zerebral.BusinessBundle.Model.Assignment');
         $this->setUseIdGenerator(true);
+        $this->setIsCrossRef(true);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('student_id', 'StudentId', 'INTEGER', 'students', 'id', true, null, null);

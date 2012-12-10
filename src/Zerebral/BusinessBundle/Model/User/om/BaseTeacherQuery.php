@@ -41,9 +41,9 @@ use Zerebral\BusinessBundle\Model\User\User;
  * @method TeacherQuery rightJoinAssignment($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Assignment relation
  * @method TeacherQuery innerJoinAssignment($relationAlias = null) Adds a INNER JOIN clause to the query using the Assignment relation
  *
- * @method TeacherQuery leftJoinCourse($relationAlias = null) Adds a LEFT JOIN clause to the query using the Course relation
- * @method TeacherQuery rightJoinCourse($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Course relation
- * @method TeacherQuery innerJoinCourse($relationAlias = null) Adds a INNER JOIN clause to the query using the Course relation
+ * @method TeacherQuery leftJoinCreatedByTeacher($relationAlias = null) Adds a LEFT JOIN clause to the query using the CreatedByTeacher relation
+ * @method TeacherQuery rightJoinCreatedByTeacher($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CreatedByTeacher relation
+ * @method TeacherQuery innerJoinCreatedByTeacher($relationAlias = null) Adds a INNER JOIN clause to the query using the CreatedByTeacher relation
  *
  * @method TeacherQuery leftJoinCourseTeacher($relationAlias = null) Adds a LEFT JOIN clause to the query using the CourseTeacher relation
  * @method TeacherQuery rightJoinCourseTeacher($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CourseTeacher relation
@@ -476,33 +476,33 @@ abstract class BaseTeacherQuery extends ModelCriteria
      * @return   TeacherQuery The current query, for fluid interface
      * @throws   PropelException - if the provided filter is invalid.
      */
-    public function filterByCourse($course, $comparison = null)
+    public function filterByCreatedByTeacher($course, $comparison = null)
     {
         if ($course instanceof Course) {
             return $this
                 ->addUsingAlias(TeacherPeer::ID, $course->getCreatedBy(), $comparison);
         } elseif ($course instanceof PropelObjectCollection) {
             return $this
-                ->useCourseQuery()
+                ->useCreatedByTeacherQuery()
                 ->filterByPrimaryKeys($course->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByCourse() only accepts arguments of type Course or PropelCollection');
+            throw new PropelException('filterByCreatedByTeacher() only accepts arguments of type Course or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Course relation
+     * Adds a JOIN clause to the query using the CreatedByTeacher relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return TeacherQuery The current query, for fluid interface
      */
-    public function joinCourse($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinCreatedByTeacher($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Course');
+        $relationMap = $tableMap->getRelation('CreatedByTeacher');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -517,14 +517,14 @@ abstract class BaseTeacherQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Course');
+            $this->addJoinObject($join, 'CreatedByTeacher');
         }
 
         return $this;
     }
 
     /**
-     * Use the Course relation Course object
+     * Use the CreatedByTeacher relation Course object
      *
      * @see       useQuery()
      *
@@ -534,11 +534,11 @@ abstract class BaseTeacherQuery extends ModelCriteria
      *
      * @return   \Zerebral\BusinessBundle\Model\Course\CourseQuery A secondary query class using the current class as primary query
      */
-    public function useCourseQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useCreatedByTeacherQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinCourse($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Course', '\Zerebral\BusinessBundle\Model\Course\CourseQuery');
+            ->joinCreatedByTeacher($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CreatedByTeacher', '\Zerebral\BusinessBundle\Model\Course\CourseQuery');
     }
 
     /**
@@ -613,6 +613,23 @@ abstract class BaseTeacherQuery extends ModelCriteria
         return $this
             ->joinCourseTeacher($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'CourseTeacher', '\Zerebral\BusinessBundle\Model\Course\CourseTeacherQuery');
+    }
+
+    /**
+     * Filter the query by a related Course object
+     * using the course_teachers table as cross reference
+     *
+     * @param   Course $course the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   TeacherQuery The current query, for fluid interface
+     */
+    public function filterByCourse($course, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useCourseTeacherQuery()
+            ->filterByCourse($course, $comparison)
+            ->endUse();
     }
 
     /**

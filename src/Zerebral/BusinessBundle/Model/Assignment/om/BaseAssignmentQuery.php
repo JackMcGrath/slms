@@ -20,6 +20,7 @@ use Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery;
 use Zerebral\BusinessBundle\Model\Assignment\StudentAssignment;
 use Zerebral\BusinessBundle\Model\Course\Course;
+use Zerebral\BusinessBundle\Model\User\Student;
 use Zerebral\BusinessBundle\Model\User\Teacher;
 
 /**
@@ -869,6 +870,23 @@ abstract class BaseAssignmentQuery extends ModelCriteria
         return $this
             ->joinStudentAssignment($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'StudentAssignment', '\Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentQuery');
+    }
+
+    /**
+     * Filter the query by a related Student object
+     * using the student_assignments table as cross reference
+     *
+     * @param   Student $student the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   AssignmentQuery The current query, for fluid interface
+     */
+    public function filterByStudent($student, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useStudentAssignmentQuery()
+            ->filterByStudent($student, $comparison)
+            ->endUse();
     }
 
     /**

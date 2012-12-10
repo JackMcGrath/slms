@@ -63,5 +63,5 @@ abstract class ModelAccessVoter implements VoterInterface
         return VoterInterface::ACCESS_ABSTAIN;
     }
 
-    abstract protected function isGranted(TokenInterface $token, $object, $attribute);
+    abstract public function isGranted(TokenInterface $token, $object, $attribute);
 }

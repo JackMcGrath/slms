@@ -742,9 +742,6 @@ abstract class BaseUserPeer
             }
         } else {
 
-        if ($obj->isNew() || $obj->isColumnModified(UserPeer::ROLE))
-            $columns[UserPeer::ROLE] = $obj->getRole();
-
         if ($obj->isNew() || $obj->isColumnModified(UserPeer::FIRST_NAME))
             $columns[UserPeer::FIRST_NAME] = $obj->getFirstName();
 
@@ -757,20 +754,11 @@ abstract class BaseUserPeer
         if ($obj->isNew() || $obj->isColumnModified(UserPeer::EMAIL))
             $columns[UserPeer::EMAIL] = $obj->getEmail();
 
-        if ($obj->isNew() || $obj->isColumnModified(UserPeer::PASSWORD))
-            $columns[UserPeer::PASSWORD] = $obj->getPassword();
-
         if ($obj->isNew() || $obj->isColumnModified(UserPeer::SALT))
             $columns[UserPeer::SALT] = $obj->getSalt();
 
         if ($obj->isNew() || $obj->isColumnModified(UserPeer::IS_ACTIVE))
             $columns[UserPeer::IS_ACTIVE] = $obj->getIsActive();
-
-        if ($obj->isNew() || $obj->isColumnModified(UserPeer::CREATED_AT))
-            $columns[UserPeer::CREATED_AT] = $obj->getCreatedAt();
-
-        if ($obj->isNew() || $obj->isColumnModified(UserPeer::UPDATED_AT))
-            $columns[UserPeer::UPDATED_AT] = $obj->getUpdatedAt();
 
         }
 
