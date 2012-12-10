@@ -74,14 +74,19 @@ abstract class BaseTeacher extends BaseObject implements Persistent
     /**
      * @var        PropelObjectCollection|Course[] Collection to store aggregation of Course objects.
      */
-    protected $collCourses;
-    protected $collCoursesPartial;
+    protected $collCreatedByTeachers;
+    protected $collCreatedByTeachersPartial;
 
     /**
      * @var        PropelObjectCollection|CourseTeacher[] Collection to store aggregation of CourseTeacher objects.
      */
     protected $collCourseTeachers;
     protected $collCourseTeachersPartial;
+
+    /**
+     * @var        PropelObjectCollection|Course[] Collection to store aggregation of Course objects.
+     */
+    protected $collCourses;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -101,13 +106,19 @@ abstract class BaseTeacher extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
+    protected $coursesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
     protected $assignmentsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $coursesScheduledForDeletion = null;
+    protected $createdByTeachersScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -291,10 +302,11 @@ abstract class BaseTeacher extends BaseObject implements Persistent
             $this->aUser = null;
             $this->collAssignments = null;
 
-            $this->collCourses = null;
+            $this->collCreatedByTeachers = null;
 
             $this->collCourseTeachers = null;
 
+            $this->collCourses = null;
         } // if (deep)
     }
 
@@ -447,6 +459,26 @@ abstract class BaseTeacher extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
+            if ($this->coursesScheduledForDeletion !== null) {
+                if (!$this->coursesScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk = $this->getPrimaryKey();
+                    foreach ($this->coursesScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($remotePk, $pk);
+                    }
+                    CourseTeacherQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->coursesScheduledForDeletion = null;
+                }
+
+                foreach ($this->getCourses() as $course) {
+                    if ($course->isModified()) {
+                        $course->save($con);
+                    }
+                }
+            }
+
             if ($this->assignmentsScheduledForDeletion !== null) {
                 if (!$this->assignmentsScheduledForDeletion->isEmpty()) {
                     AssignmentQuery::create()
@@ -464,17 +496,17 @@ abstract class BaseTeacher extends BaseObject implements Persistent
                 }
             }
 
-            if ($this->coursesScheduledForDeletion !== null) {
-                if (!$this->coursesScheduledForDeletion->isEmpty()) {
+            if ($this->createdByTeachersScheduledForDeletion !== null) {
+                if (!$this->createdByTeachersScheduledForDeletion->isEmpty()) {
                     CourseQuery::create()
-                        ->filterByPrimaryKeys($this->coursesScheduledForDeletion->getPrimaryKeys(false))
+                        ->filterByPrimaryKeys($this->createdByTeachersScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->coursesScheduledForDeletion = null;
+                    $this->createdByTeachersScheduledForDeletion = null;
                 }
             }
 
-            if ($this->collCourses !== null) {
-                foreach ($this->collCourses as $referrerFK) {
+            if ($this->collCreatedByTeachers !== null) {
+                foreach ($this->collCreatedByTeachers as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -666,8 +698,8 @@ abstract class BaseTeacher extends BaseObject implements Persistent
                     }
                 }
 
-                if ($this->collCourses !== null) {
-                    foreach ($this->collCourses as $referrerFK) {
+                if ($this->collCreatedByTeachers !== null) {
+                    foreach ($this->collCreatedByTeachers as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -762,8 +794,8 @@ abstract class BaseTeacher extends BaseObject implements Persistent
             if (null !== $this->collAssignments) {
                 $result['Assignments'] = $this->collAssignments->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->collCourses) {
-                $result['Courses'] = $this->collCourses->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collCreatedByTeachers) {
+                $result['CreatedByTeachers'] = $this->collCreatedByTeachers->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collCourseTeachers) {
                 $result['CourseTeachers'] = $this->collCourseTeachers->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -925,9 +957,9 @@ abstract class BaseTeacher extends BaseObject implements Persistent
                 }
             }
 
-            foreach ($this->getCourses() as $relObj) {
+            foreach ($this->getCreatedByTeachers() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addCourse($relObj->copy($deepCopy));
+                    $copyObj->addCreatedByTeacher($relObj->copy($deepCopy));
                 }
             }
 
@@ -1053,8 +1085,8 @@ abstract class BaseTeacher extends BaseObject implements Persistent
         if ('Assignment' == $relationName) {
             $this->initAssignments();
         }
-        if ('Course' == $relationName) {
-            $this->initCourses();
+        if ('CreatedByTeacher' == $relationName) {
+            $this->initCreatedByTeachers();
         }
         if ('CourseTeacher' == $relationName) {
             $this->initCourseTeachers();
@@ -1327,36 +1359,36 @@ abstract class BaseTeacher extends BaseObject implements Persistent
     }
 
     /**
-     * Clears out the collCourses collection
+     * Clears out the collCreatedByTeachers collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return Teacher The current object (for fluent API support)
-     * @see        addCourses()
+     * @see        addCreatedByTeachers()
      */
-    public function clearCourses()
+    public function clearCreatedByTeachers()
     {
-        $this->collCourses = null; // important to set this to null since that means it is uninitialized
-        $this->collCoursesPartial = null;
+        $this->collCreatedByTeachers = null; // important to set this to null since that means it is uninitialized
+        $this->collCreatedByTeachersPartial = null;
 
         return $this;
     }
 
     /**
-     * reset is the collCourses collection loaded partially
+     * reset is the collCreatedByTeachers collection loaded partially
      *
      * @return void
      */
-    public function resetPartialCourses($v = true)
+    public function resetPartialCreatedByTeachers($v = true)
     {
-        $this->collCoursesPartial = $v;
+        $this->collCreatedByTeachersPartial = $v;
     }
 
     /**
-     * Initializes the collCourses collection.
+     * Initializes the collCreatedByTeachers collection.
      *
-     * By default this just sets the collCourses collection to an empty array (like clearcollCourses());
+     * By default this just sets the collCreatedByTeachers collection to an empty array (like clearcollCreatedByTeachers());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1365,13 +1397,13 @@ abstract class BaseTeacher extends BaseObject implements Persistent
      *
      * @return void
      */
-    public function initCourses($overrideExisting = true)
+    public function initCreatedByTeachers($overrideExisting = true)
     {
-        if (null !== $this->collCourses && !$overrideExisting) {
+        if (null !== $this->collCreatedByTeachers && !$overrideExisting) {
             return;
         }
-        $this->collCourses = new PropelObjectCollection();
-        $this->collCourses->setModel('Course');
+        $this->collCreatedByTeachers = new PropelObjectCollection();
+        $this->collCreatedByTeachers->setModel('Course');
     }
 
     /**
@@ -1388,74 +1420,74 @@ abstract class BaseTeacher extends BaseObject implements Persistent
      * @return PropelObjectCollection|Course[] List of Course objects
      * @throws PropelException
      */
-    public function getCourses($criteria = null, PropelPDO $con = null)
+    public function getCreatedByTeachers($criteria = null, PropelPDO $con = null)
     {
-        $partial = $this->collCoursesPartial && !$this->isNew();
-        if (null === $this->collCourses || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collCourses) {
+        $partial = $this->collCreatedByTeachersPartial && !$this->isNew();
+        if (null === $this->collCreatedByTeachers || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCreatedByTeachers) {
                 // return empty collection
-                $this->initCourses();
+                $this->initCreatedByTeachers();
             } else {
-                $collCourses = CourseQuery::create(null, $criteria)
-                    ->filterByTeacher($this)
+                $collCreatedByTeachers = CourseQuery::create(null, $criteria)
+                    ->filterByCreatedByTeacher($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    if (false !== $this->collCoursesPartial && count($collCourses)) {
-                      $this->initCourses(false);
+                    if (false !== $this->collCreatedByTeachersPartial && count($collCreatedByTeachers)) {
+                      $this->initCreatedByTeachers(false);
 
-                      foreach($collCourses as $obj) {
-                        if (false == $this->collCourses->contains($obj)) {
-                          $this->collCourses->append($obj);
+                      foreach($collCreatedByTeachers as $obj) {
+                        if (false == $this->collCreatedByTeachers->contains($obj)) {
+                          $this->collCreatedByTeachers->append($obj);
                         }
                       }
 
-                      $this->collCoursesPartial = true;
+                      $this->collCreatedByTeachersPartial = true;
                     }
 
-                    return $collCourses;
+                    return $collCreatedByTeachers;
                 }
 
-                if($partial && $this->collCourses) {
-                    foreach($this->collCourses as $obj) {
+                if($partial && $this->collCreatedByTeachers) {
+                    foreach($this->collCreatedByTeachers as $obj) {
                         if($obj->isNew()) {
-                            $collCourses[] = $obj;
+                            $collCreatedByTeachers[] = $obj;
                         }
                     }
                 }
 
-                $this->collCourses = $collCourses;
-                $this->collCoursesPartial = false;
+                $this->collCreatedByTeachers = $collCreatedByTeachers;
+                $this->collCreatedByTeachersPartial = false;
             }
         }
 
-        return $this->collCourses;
+        return $this->collCreatedByTeachers;
     }
 
     /**
-     * Sets a collection of Course objects related by a one-to-many relationship
+     * Sets a collection of CreatedByTeacher objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param PropelCollection $courses A Propel collection.
+     * @param PropelCollection $createdByTeachers A Propel collection.
      * @param PropelPDO $con Optional connection object
      * @return Teacher The current object (for fluent API support)
      */
-    public function setCourses(PropelCollection $courses, PropelPDO $con = null)
+    public function setCreatedByTeachers(PropelCollection $createdByTeachers, PropelPDO $con = null)
     {
-        $this->coursesScheduledForDeletion = $this->getCourses(new Criteria(), $con)->diff($courses);
+        $this->createdByTeachersScheduledForDeletion = $this->getCreatedByTeachers(new Criteria(), $con)->diff($createdByTeachers);
 
-        foreach ($this->coursesScheduledForDeletion as $courseRemoved) {
-            $courseRemoved->setTeacher(null);
+        foreach ($this->createdByTeachersScheduledForDeletion as $createdByTeacherRemoved) {
+            $createdByTeacherRemoved->setCreatedByTeacher(null);
         }
 
-        $this->collCourses = null;
-        foreach ($courses as $course) {
-            $this->addCourse($course);
+        $this->collCreatedByTeachers = null;
+        foreach ($createdByTeachers as $createdByTeacher) {
+            $this->addCreatedByTeacher($createdByTeacher);
         }
 
-        $this->collCourses = $courses;
-        $this->collCoursesPartial = false;
+        $this->collCreatedByTeachers = $createdByTeachers;
+        $this->collCreatedByTeachersPartial = false;
 
         return $this;
     }
@@ -1469,16 +1501,16 @@ abstract class BaseTeacher extends BaseObject implements Persistent
      * @return int             Count of related Course objects.
      * @throws PropelException
      */
-    public function countCourses(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function countCreatedByTeachers(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        $partial = $this->collCoursesPartial && !$this->isNew();
-        if (null === $this->collCourses || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collCourses) {
+        $partial = $this->collCreatedByTeachersPartial && !$this->isNew();
+        if (null === $this->collCreatedByTeachers || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCreatedByTeachers) {
                 return 0;
             }
 
             if($partial && !$criteria) {
-                return count($this->getCourses());
+                return count($this->getCreatedByTeachers());
             }
             $query = CourseQuery::create(null, $criteria);
             if ($distinct) {
@@ -1486,11 +1518,11 @@ abstract class BaseTeacher extends BaseObject implements Persistent
             }
 
             return $query
-                ->filterByTeacher($this)
+                ->filterByCreatedByTeacher($this)
                 ->count($con);
         }
 
-        return count($this->collCourses);
+        return count($this->collCreatedByTeachers);
     }
 
     /**
@@ -1500,42 +1532,42 @@ abstract class BaseTeacher extends BaseObject implements Persistent
      * @param    Course $l Course
      * @return Teacher The current object (for fluent API support)
      */
-    public function addCourse(Course $l)
+    public function addCreatedByTeacher(Course $l)
     {
-        if ($this->collCourses === null) {
-            $this->initCourses();
-            $this->collCoursesPartial = true;
+        if ($this->collCreatedByTeachers === null) {
+            $this->initCreatedByTeachers();
+            $this->collCreatedByTeachersPartial = true;
         }
-        if (!in_array($l, $this->collCourses->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddCourse($l);
+        if (!in_array($l, $this->collCreatedByTeachers->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddCreatedByTeacher($l);
         }
 
         return $this;
     }
 
     /**
-     * @param	Course $course The course object to add.
+     * @param	CreatedByTeacher $createdByTeacher The createdByTeacher object to add.
      */
-    protected function doAddCourse($course)
+    protected function doAddCreatedByTeacher($createdByTeacher)
     {
-        $this->collCourses[]= $course;
-        $course->setTeacher($this);
+        $this->collCreatedByTeachers[]= $createdByTeacher;
+        $createdByTeacher->setCreatedByTeacher($this);
     }
 
     /**
-     * @param	Course $course The course object to remove.
+     * @param	CreatedByTeacher $createdByTeacher The createdByTeacher object to remove.
      * @return Teacher The current object (for fluent API support)
      */
-    public function removeCourse($course)
+    public function removeCreatedByTeacher($createdByTeacher)
     {
-        if ($this->getCourses()->contains($course)) {
-            $this->collCourses->remove($this->collCourses->search($course));
-            if (null === $this->coursesScheduledForDeletion) {
-                $this->coursesScheduledForDeletion = clone $this->collCourses;
-                $this->coursesScheduledForDeletion->clear();
+        if ($this->getCreatedByTeachers()->contains($createdByTeacher)) {
+            $this->collCreatedByTeachers->remove($this->collCreatedByTeachers->search($createdByTeacher));
+            if (null === $this->createdByTeachersScheduledForDeletion) {
+                $this->createdByTeachersScheduledForDeletion = clone $this->collCreatedByTeachers;
+                $this->createdByTeachersScheduledForDeletion->clear();
             }
-            $this->coursesScheduledForDeletion[]= $course;
-            $course->setTeacher(null);
+            $this->createdByTeachersScheduledForDeletion[]= $createdByTeacher;
+            $createdByTeacher->setCreatedByTeacher(null);
         }
 
         return $this;
@@ -1547,7 +1579,7 @@ abstract class BaseTeacher extends BaseObject implements Persistent
      * an identical criteria, it returns the collection.
      * Otherwise if this Teacher is new, it will return
      * an empty collection; or if this Teacher has previously
-     * been saved, it will retrieve related Courses from storage.
+     * been saved, it will retrieve related CreatedByTeachers from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -1558,12 +1590,12 @@ abstract class BaseTeacher extends BaseObject implements Persistent
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Course[] List of Course objects
      */
-    public function getCoursesJoinDiscipline($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getCreatedByTeachersJoinDiscipline($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = CourseQuery::create(null, $criteria);
         $query->joinWith('Discipline', $join_behavior);
 
-        return $this->getCourses($query, $con);
+        return $this->getCreatedByTeachers($query, $con);
     }
 
 
@@ -1572,7 +1604,7 @@ abstract class BaseTeacher extends BaseObject implements Persistent
      * an identical criteria, it returns the collection.
      * Otherwise if this Teacher is new, it will return
      * an empty collection; or if this Teacher has previously
-     * been saved, it will retrieve related Courses from storage.
+     * been saved, it will retrieve related CreatedByTeachers from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -1583,12 +1615,12 @@ abstract class BaseTeacher extends BaseObject implements Persistent
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Course[] List of Course objects
      */
-    public function getCoursesJoinGradeLevel($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getCreatedByTeachersJoinGradeLevel($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = CourseQuery::create(null, $criteria);
         $query->joinWith('GradeLevel', $join_behavior);
 
-        return $this->getCourses($query, $con);
+        return $this->getCreatedByTeachers($query, $con);
     }
 
     /**
@@ -1832,6 +1864,183 @@ abstract class BaseTeacher extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collCourses collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Teacher The current object (for fluent API support)
+     * @see        addCourses()
+     */
+    public function clearCourses()
+    {
+        $this->collCourses = null; // important to set this to null since that means it is uninitialized
+        $this->collCoursesPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * Initializes the collCourses collection.
+     *
+     * By default this just sets the collCourses collection to an empty collection (like clearCourses());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initCourses()
+    {
+        $this->collCourses = new PropelObjectCollection();
+        $this->collCourses->setModel('Course');
+    }
+
+    /**
+     * Gets a collection of Course objects related by a many-to-many relationship
+     * to the current object by way of the course_teachers cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Teacher is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return PropelObjectCollection|Course[] List of Course objects
+     */
+    public function getCourses($criteria = null, PropelPDO $con = null)
+    {
+        if (null === $this->collCourses || null !== $criteria) {
+            if ($this->isNew() && null === $this->collCourses) {
+                // return empty collection
+                $this->initCourses();
+            } else {
+                $collCourses = CourseQuery::create(null, $criteria)
+                    ->filterByTeacher($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collCourses;
+                }
+                $this->collCourses = $collCourses;
+            }
+        }
+
+        return $this->collCourses;
+    }
+
+    /**
+     * Sets a collection of Course objects related by a many-to-many relationship
+     * to the current object by way of the course_teachers cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $courses A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Teacher The current object (for fluent API support)
+     */
+    public function setCourses(PropelCollection $courses, PropelPDO $con = null)
+    {
+        $this->clearCourses();
+        $currentCourses = $this->getCourses();
+
+        $this->coursesScheduledForDeletion = $currentCourses->diff($courses);
+
+        foreach ($courses as $course) {
+            if (!$currentCourses->contains($course)) {
+                $this->doAddCourse($course);
+            }
+        }
+
+        $this->collCourses = $courses;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of Course objects related by a many-to-many relationship
+     * to the current object by way of the course_teachers cross-reference table.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param boolean $distinct Set to true to force count distinct
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return int the number of related Course objects
+     */
+    public function countCourses($criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        if (null === $this->collCourses || null !== $criteria) {
+            if ($this->isNew() && null === $this->collCourses) {
+                return 0;
+            } else {
+                $query = CourseQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByTeacher($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collCourses);
+        }
+    }
+
+    /**
+     * Associate a Course object to this object
+     * through the course_teachers cross reference table.
+     *
+     * @param  Course $course The CourseTeacher object to relate
+     * @return Teacher The current object (for fluent API support)
+     */
+    public function addCourse(Course $course)
+    {
+        if ($this->collCourses === null) {
+            $this->initCourses();
+        }
+        if (!$this->collCourses->contains($course)) { // only add it if the **same** object is not already associated
+            $this->doAddCourse($course);
+
+            $this->collCourses[]= $course;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Course $course The course object to add.
+     */
+    protected function doAddCourse($course)
+    {
+        $courseTeacher = new CourseTeacher();
+        $courseTeacher->setCourse($course);
+        $this->addCourseTeacher($courseTeacher);
+    }
+
+    /**
+     * Remove a Course object to this object
+     * through the course_teachers cross reference table.
+     *
+     * @param Course $course The CourseTeacher object to relate
+     * @return Teacher The current object (for fluent API support)
+     */
+    public function removeCourse(Course $course)
+    {
+        if ($this->getCourses()->contains($course)) {
+            $this->collCourses->remove($this->collCourses->search($course));
+            if (null === $this->coursesScheduledForDeletion) {
+                $this->coursesScheduledForDeletion = clone $this->collCourses;
+                $this->coursesScheduledForDeletion->clear();
+            }
+            $this->coursesScheduledForDeletion[]= $course;
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -1863,13 +2072,18 @@ abstract class BaseTeacher extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collCourses) {
-                foreach ($this->collCourses as $o) {
+            if ($this->collCreatedByTeachers) {
+                foreach ($this->collCreatedByTeachers as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
             if ($this->collCourseTeachers) {
                 foreach ($this->collCourseTeachers as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collCourses) {
+                foreach ($this->collCourses as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -1879,14 +2093,18 @@ abstract class BaseTeacher extends BaseObject implements Persistent
             $this->collAssignments->clearIterator();
         }
         $this->collAssignments = null;
-        if ($this->collCourses instanceof PropelCollection) {
-            $this->collCourses->clearIterator();
+        if ($this->collCreatedByTeachers instanceof PropelCollection) {
+            $this->collCreatedByTeachers->clearIterator();
         }
-        $this->collCourses = null;
+        $this->collCreatedByTeachers = null;
         if ($this->collCourseTeachers instanceof PropelCollection) {
             $this->collCourseTeachers->clearIterator();
         }
         $this->collCourseTeachers = null;
+        if ($this->collCourses instanceof PropelCollection) {
+            $this->collCourses->clearIterator();
+        }
+        $this->collCourses = null;
         $this->aUser = null;
     }
 

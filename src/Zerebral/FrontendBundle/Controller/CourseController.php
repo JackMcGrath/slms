@@ -5,6 +5,9 @@ namespace Zerebral\FrontendBundle\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use JMS\SecurityExtraBundle\Annotation\Secure;
+use JMS\SecurityExtraBundle\Annotation\SecureParam;
+use JMS\SecurityExtraBundle\Annotation\PreAuthorize;
 
 use Zerebral\FrontendBundle\Form\Type as FormType;
 use Zerebral\BusinessBundle\Model as Model;
@@ -16,12 +19,13 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
 {
     /**
      * @Route("/", name="courses")
+     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @Template()
      */
     public function indexAction()
     {
         return array(
-            'courses' => Model\Course\CourseQuery::create()->findByTeacher($this->getUser()->getTeacher()->getId()),
+            'courses' => $this->getRoleUser()->getCourses(),
             'target' => 'courses'
         );
     }
@@ -29,6 +33,9 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     /**
      * @Route("/view/{id}", name="course_view")
      * @ParamConverter("course")
+     *
+     * @SecureParam(name="course", permissions="VIEW")
+     *
      * @Template()
      */
     public function viewAction(Model\Course\Course $course)
@@ -43,6 +50,9 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      * @Route("/add", name="course_add")
      * @Route("/edit/{id}", name="course_edit")
      * @ParamConverter("course")
+     *
+     * @SecureParam(name="course", permissions="EDIT")
+     *
      * @Template()
      */
     public function addAction(Model\Course\Course $course = null)
@@ -50,11 +60,12 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
         $form = $this->createForm(new FormType\CourseType(), $course);
         if ($this->getRequest()->isMethod('POST')) {
             $form->bind($this->getRequest());
-//            var_dump($form);die();
             if ($form->isValid()) {
                 /** @var $course Model\Course\Course */
                 $course = $form->getData();
-                $course->setCreatedBy($this->getUser()->getTeacher()->getId());
+                $course->setCreatedBy($this->getRoleUser()->getId());
+                $course->clearTeachers();
+                $course->addTeacher($this->getRoleUser());
                 $course->save();
 
                 return $this->redirect($this->generateUrl('course_view', array('id' => $course->getId())));
@@ -70,6 +81,9 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     /**
      * @Route("/delete/{id}", name="course_delete")
      * @ParamConverter("course")
+     *
+     * @SecureParam(name="course", permissions="DELETE")
+     *
      * @Template()
      */
     public function deleteAction(Model\Course\Course $course)
