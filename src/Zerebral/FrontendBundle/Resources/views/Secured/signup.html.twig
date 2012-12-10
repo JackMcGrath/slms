@@ -14,7 +14,7 @@
 {% endblock choice_widget_expanded %}
 
 {% block header %}
-    <div class="navbar navbar-inverse navbar-fixed-top signup">
+    <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="navbar-inner">
             <div class="container">
                 <a class="brand" href="{{ path('dashboard') }}"></a>
@@ -25,7 +25,11 @@
 
 
 {% block content %}
-
+    {% javascripts
+        '@ZerebralFrontendBundle/Resources/public/js/controllers/user/signup.js'
+        output='js/compiled/main.js' %}
+        <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
     <div class="container top-center">
         <div class="row">
             <div class="span7">
