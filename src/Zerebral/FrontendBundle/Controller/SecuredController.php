@@ -77,7 +77,11 @@ class SecuredController extends Controller
                 $token = new UsernamePasswordToken($user, null, 'secured_area', $user->getRoles());
                 $this->get('security.context')->setToken($token);
 
-                return $this->redirect($this->generateUrl('dashboard'));
+                if ($user->getRole() == \Zerebral\BusinessBundle\Model\User\User::ROLE_TEACHER) {
+                    return $this->redirect($this->generateUrl('course_add'));
+                }
+
+                return $this->redirect($this->generateUrl('courses'));
             }
         }
 
