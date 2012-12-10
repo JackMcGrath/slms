@@ -4,7 +4,7 @@
     <div class="row-fluid">
         <div class="span12">
             <div class="row-fluid">
-                <h2 class="span6 pull-left">
+                <h2 class="span6 pull-left form-title">
                     {% if form.vars.value.id is defined and form.vars.value.id > 0 %}
                         {{ form.vars.value.name }}
                     {% else %}
@@ -28,7 +28,7 @@
                     form_type: 'horizontal',
                     placeholder: 'Course Name',
                     attr: {
-                        class: 'input-xlarge',
+                        class: 'input-xlarge course-name',
                         help: 'e.g. Algebra'
                     }
                 }) }}
