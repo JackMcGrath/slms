@@ -4,5 +4,4 @@ $(document).ready(function(){
         $(e.target).parents('.radiobox').find('label').removeClass('selected');
         $(e.target).closest('label').addClass('selected');
     });
-
 });
