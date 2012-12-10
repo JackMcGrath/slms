@@ -42,6 +42,7 @@ class SecuredController extends Controller
 
 
     /**
+     *
      * @Route("/login_check", name="_security_check")
      */
     public function securityCheckAction()
@@ -54,7 +55,7 @@ class SecuredController extends Controller
      */
     public function logoutAction()
     {
-        // The security layer will intercept this request
+        return $this->redirect($this->generateUrl('login'));
     }
 
     /**
@@ -73,7 +74,7 @@ class SecuredController extends Controller
                 $user->transitToRoleModel()->save();
 
                 //automatic log in user.
-                $token = new UsernamePasswordToken($user, null, 'secured_area');
+                $token = new UsernamePasswordToken($user, null, 'secured_area', $user->getRoles());
                 $this->get('security.context')->setToken($token);
 
                 return $this->redirect($this->generateUrl('dashboard'));
