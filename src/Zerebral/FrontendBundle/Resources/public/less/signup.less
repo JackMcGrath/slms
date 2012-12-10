@@ -3,7 +3,7 @@
     max-width: 620px;
     min-width: 300px;
     padding: 29px 29px 39px;
-    margin: 0 auto 20px;
+    margin: 40px auto 20px;
     background-color: @white;
     border: 10px solid #49708f;
 
@@ -20,7 +20,7 @@
         }
     }
 
-    input[type=text], input[type=password]{
+    input[type=text], input[type=password], input[type=email] {
         &:focus{
             outline: 2px solid #49708f;
             .box-shadow(none);
@@ -37,10 +37,11 @@
         margin-top: 20px;
         background: #f9ce35;
         color: #987e3c;
-        border: 1px solid #987e3c;
+        border: 1px solid #c9ae4f;
         text-transform: uppercase;
-        font-weight: bold;
-        font-size: 15px;
+        font-weight: 500;
+        font-size: 14px;
+
     }
 
     label{
@@ -63,19 +64,34 @@
             margin-top: 2px;
         }
     }
-
-    .row.radiobox{
-        label{
-            color: #d4d5d7;
-            font-size: 14px;
-            text-transform: uppercase;
-            font-weight: bold;
-        }
-    }
 }
 .form-signin .form-signin-heading,
 .form-signin .checkbox {
     margin-bottom: 10px;
+}
+
+.form-signup {
+    margin-top: 0;
+
+    .row.radiobox{
+        label{
+            color: #d4d5d7;
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: bold;
+            input {
+                margin-right: 10px;
+            }
+        }
+        label.selected {
+            color: #49708f;
+        }
+    }
+
+    hr.separator {
+        margin: 13px -28px 15px -29px;
+        border: 1px solid #ebebeb;
+    }
 }
 
 .signin-container{
@@ -94,6 +110,7 @@
 .signup-subpane{
     margin-left: 50px;
     width: 420px;
+    margin-top: 15px;
 
     h4{
         color: @white;

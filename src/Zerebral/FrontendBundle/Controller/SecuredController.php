@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Zerebral\BusinessBundle\Model\User as User;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 class SecuredController extends Controller
 {
@@ -71,7 +72,11 @@ class SecuredController extends Controller
                 $user->setPasswordEncoder($this->getPasswordEncoder($user));
                 $user->transitToRoleModel()->save();
 
-                return $this->redirect($this->generateUrl('courses'));
+                //automatic log in user.
+                $token = new UsernamePasswordToken($user, null, 'secured_area');
+                $this->get('security.context')->setToken($token);
+
+                return $this->redirect($this->generateUrl('dashboard'));
             }
         }
 

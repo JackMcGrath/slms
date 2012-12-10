@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/html">
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="utf-8">
     <title>{% block title %}Zerebral{% endblock %}</title>
@@ -36,25 +36,26 @@
                     <div class="span1">
                     </div>
                     <div class="span6 pull-left">
-                        <a class="brand" href="/"></a>
+                        <a class="brand" href="{{ path('dashboard') }}"></a>
+                        <ul class="nav">
+                            <li class="divider-vertical"></li>
+                        </ul>
                         <i class="icon-bell pull-left"><small>7</small></i>
                         <form class="navbar-search pull-left" _lpchecked="1">
-                            <input type="text" class="search-query" placeholder="Search">
+                            <input type="text" class="search-query icon-search-glass" placeholder="Search">
                         </form>
                     </div>
                     <ul class="nav menu span3 pull-right profile">
+                        {% if is_granted('ROLE_USER') %}
                         <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-white icon-user"></i> &nbsp; Slava Belokurski &nbsp; <b class="caret"></b></a>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-white icon-user"></i> &nbsp; {{ app.user.firstName }} {{ app.user.lastName }} &nbsp; <b class="caret"></b></a>
                             <ul class="dropdown-menu">
                                 <li><a href="#"><i class="icon-user"></i> Profile</a></li>
-                                <li><a href="#" data-target="settingsModal"><i class="icon-cog"></i> Settings</a></li>
                                 <li class="divider"></li>
-                                <li><a href="#" data-target="loginModal"><i class="icon-share-alt"></i> Log In</a></li>
-                                <li><a href="#" data-target="registerModal"><i class="icon-bookmark"></i> Register</a></li>
-                                <li class="divider"></li>
-                                <li><a href="#"><i class="icon-question-sign"></i> Help</a></li>
+                                <li><a href="{{ path('_logout') }}" data-target="loginModal"><i class="icon-share-alt"></i> Sign Out</a></li>
                             </ul>
                         </li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
@@ -63,36 +64,33 @@
 
     <div class="container-fluid" id="main">
         <div class="row-fluid">
-            <div class="span1">
+            <div class="span1 left-sidebar">
                 <div class="sidebar-nav">
                     <ul class="nav nav-list">
-                        <li class=""><figure class="{{ target is defined and target == 'home' ? 'active' : ''}}"><div class="menuText"><i class="icon-big-home"></i>Home</div></figure></li>
-                        <li class="">
-                            <figure class="notice class="{{ target is defined and target == 'notifications' ? 'active' : ''}}">
-                                <div class="menuText">
-                                    <i class="icon-big-bell"> <small>7</small></i>
-                                    Notifications
-                                </div>
-                            </figure>
+                        <li class="{{ target is defined and target == 'home' ? 'active' : ''}}">
+                            <div class="menu-item">
+                                <a href="{{ path('dashboard') }}"><i class="icon-big-home"></i>Home</a>
+                            </div>
                         </li>
-                        <li class="">
-                            <a href="{{ path("courses") }}">
-                                <figure class="{{ target is defined and target == 'courses' ? 'active' : ''}}">
-                                    <div class="menuText"><i class="icon-big-notepad"></i>Courses</div>
-                                </figure>
-                            </a>
+                        <li class="{{ target is defined and target == 'notifications' ? 'active' : ''}}">
+                            <div class="menu-item notice">
+                                <a href="#"><i class="icon-big-bell"> <small>7</small></i>Notifications</a>
+                            </div>
                         </li>
-                        <li class="">
-                            <a href="{{ path("assignments") }}">
-                                <figure class="{{ target is defined and target == 'assignments' ? 'active' : ''}}">
-                                    <div class="menuText"><i class="icon-big-bookmark"></i>Assignments</div>
-                                </figure>
-                            </a>
+                        <li class="{{ target is defined and target == 'courses' ? 'active' : ''}}">
+                            <div class="menu-item">
+                                <a href="{{ path("courses") }}"><i class="icon-big-notepad"></i>Courses</a>
+                            </div>
                         </li>
-                        <li class=""><figure class="{{ target is defined and target == 'messages' ? 'active' : ''}}"><div class="menuText"><i class="icon-big-mail"></i>Messages</div></figure></li>
-                        <li class=""><figure class="{{ target is defined and target == 'calendar' ? 'active' : ''}}"><div class="menuText"><i class="icon-big-calendar"></i>Calendar</div></figure></li>
-                        <li class=""><figure class="{{ target is defined and target == 'members' ? 'active' : ''}}"><div class="menuText"><i class="icon-big-members"></i>Members</div></figure></li>
-                        <li class=""><figure class="{{ target is defined and target == 'files' ? 'active' : ''}}"><div class="menuText"><i class="icon-big-folder"></i>Files</div></figure></li>
+                        <li class="{{ target is defined and target == 'assignments' ? 'active' : ''}}">
+                            <div class="menu-item">
+                                <a href="{{ path("assignments") }}"><i class="icon-big-bookmark"></i>Assignments</a>
+                            </div>
+                        </li>
+                        <li class="{{ target is defined and target == 'messages' ? 'active' : ''}}"><div class="menu-item"><i class="icon-big-mail"></i>Messages</div></li>
+                        <li class="{{ target is defined and target == 'calendar' ? 'active' : ''}}"><div class="menu-item"><i class="icon-big-calendar"></i>Calendar</div></li>
+                        <li class="{{ target is defined and target == 'members' ? 'active' : ''}}"><div class="menu-item"><i class="icon-big-members"></i>Members</div></li>
+                        <li class="{{ target is defined and target == 'files' ? 'active' : ''}}"><div class="menu-item"><i class="icon-big-folder"></i>Files</div></li>
                     </ul>
                 </div>
             </div>
