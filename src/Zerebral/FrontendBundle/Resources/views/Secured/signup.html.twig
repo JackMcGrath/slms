@@ -29,7 +29,7 @@
     <div class="container top-center">
         <div class="row">
             <div class="span7">
-                <form action="{{ path('signup') }}" method="post" {{ form_enctype(form) }} novalidate  class="form-signin">
+                <form action="{{ path('signup') }}" method="post" {{ form_enctype(form) }} novalidate  class="form-signin form-signup">
                     <div class="row radiobox">
                         {{ form_row(form.role, {'label': '', 'form_type': 'inline', 'disabledOptions': ['parent'] }) }}
                     </div>
