@@ -74,6 +74,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
 
         return array(
             'form' => $form->createView(),
+            'isFirstCourse' => $this->getRoleUser()->countCourses() == 0,
             'target' => 'courses'
         );
     }
