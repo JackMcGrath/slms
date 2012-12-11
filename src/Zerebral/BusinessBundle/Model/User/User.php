@@ -260,4 +260,13 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
 
         return null;
     }
+
+    /**
+     * Full name of user with salutation prefix
+     * @return string
+     */
+    public function getFullName()
+    {
+        return $this->getSalutation() . ' ' . $this->getLastName();
+    }
 } 
