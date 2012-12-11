@@ -1,0 +1,8 @@
+{% macro show(name, level, title) %}
+    {% if app.session.hasFlash(name)%}
+        <div class="alert {%if level == 'warning'%}alert-info{%elseif level == 'success'%}alert-success{%endif%}">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            <strong>{{title}}</strong> {{app.session.getFlash(name) | raw}}
+        </div>
+    {% endif%}
+{% endmacro %}

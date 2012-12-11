@@ -47,6 +47,8 @@ class UserTableMap extends TableMap
         $this->addColumn('first_name', 'FirstName', 'VARCHAR', true, 100, null);
         $this->addColumn('last_name', 'LastName', 'VARCHAR', true, 100, null);
         $this->addColumn('salutation', 'Salutation', 'VARCHAR', false, 5, null);
+        $this->addColumn('birthday', 'Birthday', 'DATE', false, null, null);
+        $this->addColumn('gender', 'Gender', 'CHAR', false, null, null);
         $this->addColumn('email', 'Email', 'VARCHAR', true, 100, null);
         $this->addColumn('password', 'Password', 'VARCHAR', true, 40, null);
         $this->addColumn('salt', 'Salt', 'VARCHAR', true, 32, null);
@@ -62,6 +64,8 @@ class UserTableMap extends TableMap
         $this->addValidator('last_name', 'required', 'propel.validator.RequiredValidator', '', 'The field last_name is required.');
         $this->addValidator('last_name', 'type', 'propel.validator.TypeValidator', 'string', 'The column last_name must be an string value.');
         $this->addValidator('salutation', 'type', 'propel.validator.TypeValidator', 'string', 'The column salutation must be an string value.');
+        $this->addValidator('birthday', 'type', 'propel.validator.TypeValidator', 'string', 'The column birthday must be an string value.');
+        $this->addValidator('gender', 'type', 'propel.validator.TypeValidator', 'string', 'The column gender must be an string value.');
         $this->addValidator('email', 'required', 'propel.validator.RequiredValidator', '', 'The field email is required.');
         $this->addValidator('email', 'type', 'propel.validator.TypeValidator', 'string', 'The column email must be an string value.');
         $this->addValidator('salt', 'required', 'propel.validator.RequiredValidator', '', 'The field salt is required.');

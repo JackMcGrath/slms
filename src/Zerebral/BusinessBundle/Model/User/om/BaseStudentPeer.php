@@ -32,13 +32,13 @@ abstract class BaseStudentPeer
     const TM_CLASS = 'StudentTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 3;
+    const NUM_COLUMNS = 5;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 3;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /** the column name for the id field */
     const ID = 'students.id';
@@ -48,6 +48,12 @@ abstract class BaseStudentPeer
 
     /** the column name for the bio field */
     const BIO = 'students.bio';
+
+    /** the column name for the activities field */
+    const ACTIVITIES = 'students.activities';
+
+    /** the column name for the interests field */
+    const INTERESTS = 'students.interests';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -68,12 +74,12 @@ abstract class BaseStudentPeer
      * e.g. StudentPeer::$fieldNames[StudentPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'UserId', 'Bio', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'userId', 'bio', ),
-        BasePeer::TYPE_COLNAME => array (StudentPeer::ID, StudentPeer::USER_ID, StudentPeer::BIO, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'USER_ID', 'BIO', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'user_id', 'bio', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'UserId', 'Bio', 'Activities', 'Interests', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'userId', 'bio', 'activities', 'interests', ),
+        BasePeer::TYPE_COLNAME => array (StudentPeer::ID, StudentPeer::USER_ID, StudentPeer::BIO, StudentPeer::ACTIVITIES, StudentPeer::INTERESTS, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'USER_ID', 'BIO', 'ACTIVITIES', 'INTERESTS', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'user_id', 'bio', 'activities', 'interests', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
     /**
@@ -83,12 +89,12 @@ abstract class BaseStudentPeer
      * e.g. StudentPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'UserId' => 1, 'Bio' => 2, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'userId' => 1, 'bio' => 2, ),
-        BasePeer::TYPE_COLNAME => array (StudentPeer::ID => 0, StudentPeer::USER_ID => 1, StudentPeer::BIO => 2, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'USER_ID' => 1, 'BIO' => 2, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'user_id' => 1, 'bio' => 2, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'UserId' => 1, 'Bio' => 2, 'Activities' => 3, 'Interests' => 4, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'userId' => 1, 'bio' => 2, 'activities' => 3, 'interests' => 4, ),
+        BasePeer::TYPE_COLNAME => array (StudentPeer::ID => 0, StudentPeer::USER_ID => 1, StudentPeer::BIO => 2, StudentPeer::ACTIVITIES => 3, StudentPeer::INTERESTS => 4, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'USER_ID' => 1, 'BIO' => 2, 'ACTIVITIES' => 3, 'INTERESTS' => 4, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'user_id' => 1, 'bio' => 2, 'activities' => 3, 'interests' => 4, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
     /**
@@ -165,10 +171,14 @@ abstract class BaseStudentPeer
             $criteria->addSelectColumn(StudentPeer::ID);
             $criteria->addSelectColumn(StudentPeer::USER_ID);
             $criteria->addSelectColumn(StudentPeer::BIO);
+            $criteria->addSelectColumn(StudentPeer::ACTIVITIES);
+            $criteria->addSelectColumn(StudentPeer::INTERESTS);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.user_id');
             $criteria->addSelectColumn($alias . '.bio');
+            $criteria->addSelectColumn($alias . '.activities');
+            $criteria->addSelectColumn($alias . '.interests');
         }
     }
 
@@ -940,6 +950,15 @@ abstract class BaseStudentPeer
                 }
             }
         } else {
+
+        if ($obj->isNew() || $obj->isColumnModified(StudentPeer::BIO))
+            $columns[StudentPeer::BIO] = $obj->getBio();
+
+        if ($obj->isNew() || $obj->isColumnModified(StudentPeer::ACTIVITIES))
+            $columns[StudentPeer::ACTIVITIES] = $obj->getActivities();
+
+        if ($obj->isNew() || $obj->isColumnModified(StudentPeer::INTERESTS))
+            $columns[StudentPeer::INTERESTS] = $obj->getInterests();
 
         }
 

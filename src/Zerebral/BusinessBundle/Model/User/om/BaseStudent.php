@@ -69,6 +69,18 @@ abstract class BaseStudent extends BaseObject implements Persistent
     protected $bio;
 
     /**
+     * The value for the activities field.
+     * @var        string
+     */
+    protected $activities;
+
+    /**
+     * The value for the interests field.
+     * @var        string
+     */
+    protected $interests;
+
+    /**
      * @var        User
      */
     protected $aUser;
@@ -164,6 +176,26 @@ abstract class BaseStudent extends BaseObject implements Persistent
     }
 
     /**
+     * Get the [activities] column value.
+     *
+     * @return string
+     */
+    public function getActivities()
+    {
+        return $this->activities;
+    }
+
+    /**
+     * Get the [interests] column value.
+     *
+     * @return string
+     */
+    public function getInterests()
+    {
+        return $this->interests;
+    }
+
+    /**
      * Set the value of [id] column.
      *
      * @param int $v new value
@@ -231,6 +263,48 @@ abstract class BaseStudent extends BaseObject implements Persistent
     } // setBio()
 
     /**
+     * Set the value of [activities] column.
+     *
+     * @param string $v new value
+     * @return Student The current object (for fluent API support)
+     */
+    public function setActivities($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->activities !== $v) {
+            $this->activities = $v;
+            $this->modifiedColumns[] = StudentPeer::ACTIVITIES;
+        }
+
+
+        return $this;
+    } // setActivities()
+
+    /**
+     * Set the value of [interests] column.
+     *
+     * @param string $v new value
+     * @return Student The current object (for fluent API support)
+     */
+    public function setInterests($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->interests !== $v) {
+            $this->interests = $v;
+            $this->modifiedColumns[] = StudentPeer::INTERESTS;
+        }
+
+
+        return $this;
+    } // setInterests()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -265,6 +339,8 @@ abstract class BaseStudent extends BaseObject implements Persistent
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->user_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
             $this->bio = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+            $this->activities = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+            $this->interests = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -273,7 +349,7 @@ abstract class BaseStudent extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 3; // 3 = StudentPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = StudentPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Student object", $e);
@@ -606,6 +682,12 @@ abstract class BaseStudent extends BaseObject implements Persistent
         if ($this->isColumnModified(StudentPeer::BIO)) {
             $modifiedColumns[':p' . $index++]  = '`bio`';
         }
+        if ($this->isColumnModified(StudentPeer::ACTIVITIES)) {
+            $modifiedColumns[':p' . $index++]  = '`activities`';
+        }
+        if ($this->isColumnModified(StudentPeer::INTERESTS)) {
+            $modifiedColumns[':p' . $index++]  = '`interests`';
+        }
 
         $sql = sprintf(
             'INSERT INTO `students` (%s) VALUES (%s)',
@@ -625,6 +707,12 @@ abstract class BaseStudent extends BaseObject implements Persistent
                         break;
                     case '`bio`':
                         $stmt->bindValue($identifier, $this->bio, PDO::PARAM_STR);
+                        break;
+                    case '`activities`':
+                        $stmt->bindValue($identifier, $this->activities, PDO::PARAM_STR);
+                        break;
+                    case '`interests`':
+                        $stmt->bindValue($identifier, $this->interests, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -797,6 +885,12 @@ abstract class BaseStudent extends BaseObject implements Persistent
             case 2:
                 return $this->getBio();
                 break;
+            case 3:
+                return $this->getActivities();
+                break;
+            case 4:
+                return $this->getInterests();
+                break;
             default:
                 return null;
                 break;
@@ -829,6 +923,8 @@ abstract class BaseStudent extends BaseObject implements Persistent
             $keys[0] => $this->getId(),
             $keys[1] => $this->getUserId(),
             $keys[2] => $this->getBio(),
+            $keys[3] => $this->getActivities(),
+            $keys[4] => $this->getInterests(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aUser) {
@@ -883,6 +979,12 @@ abstract class BaseStudent extends BaseObject implements Persistent
             case 2:
                 $this->setBio($value);
                 break;
+            case 3:
+                $this->setActivities($value);
+                break;
+            case 4:
+                $this->setInterests($value);
+                break;
         } // switch()
     }
 
@@ -910,6 +1012,8 @@ abstract class BaseStudent extends BaseObject implements Persistent
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setUserId($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setBio($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setActivities($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setInterests($arr[$keys[4]]);
     }
 
     /**
@@ -924,6 +1028,8 @@ abstract class BaseStudent extends BaseObject implements Persistent
         if ($this->isColumnModified(StudentPeer::ID)) $criteria->add(StudentPeer::ID, $this->id);
         if ($this->isColumnModified(StudentPeer::USER_ID)) $criteria->add(StudentPeer::USER_ID, $this->user_id);
         if ($this->isColumnModified(StudentPeer::BIO)) $criteria->add(StudentPeer::BIO, $this->bio);
+        if ($this->isColumnModified(StudentPeer::ACTIVITIES)) $criteria->add(StudentPeer::ACTIVITIES, $this->activities);
+        if ($this->isColumnModified(StudentPeer::INTERESTS)) $criteria->add(StudentPeer::INTERESTS, $this->interests);
 
         return $criteria;
     }
@@ -989,6 +1095,8 @@ abstract class BaseStudent extends BaseObject implements Persistent
     {
         $copyObj->setUserId($this->getUserId());
         $copyObj->setBio($this->getBio());
+        $copyObj->setActivities($this->getActivities());
+        $copyObj->setInterests($this->getInterests());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1972,6 +2080,8 @@ abstract class BaseStudent extends BaseObject implements Persistent
         $this->id = null;
         $this->user_id = null;
         $this->bio = null;
+        $this->activities = null;
+        $this->interests = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->clearAllReferences();

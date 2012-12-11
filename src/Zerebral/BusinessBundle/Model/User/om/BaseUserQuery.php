@@ -26,6 +26,8 @@ use Zerebral\BusinessBundle\Model\User\UserQuery;
  * @method UserQuery orderByFirstName($order = Criteria::ASC) Order by the first_name column
  * @method UserQuery orderByLastName($order = Criteria::ASC) Order by the last_name column
  * @method UserQuery orderBySalutation($order = Criteria::ASC) Order by the salutation column
+ * @method UserQuery orderByBirthday($order = Criteria::ASC) Order by the birthday column
+ * @method UserQuery orderByGender($order = Criteria::ASC) Order by the gender column
  * @method UserQuery orderByEmail($order = Criteria::ASC) Order by the email column
  * @method UserQuery orderByPassword($order = Criteria::ASC) Order by the password column
  * @method UserQuery orderBySalt($order = Criteria::ASC) Order by the salt column
@@ -38,6 +40,8 @@ use Zerebral\BusinessBundle\Model\User\UserQuery;
  * @method UserQuery groupByFirstName() Group by the first_name column
  * @method UserQuery groupByLastName() Group by the last_name column
  * @method UserQuery groupBySalutation() Group by the salutation column
+ * @method UserQuery groupByBirthday() Group by the birthday column
+ * @method UserQuery groupByGender() Group by the gender column
  * @method UserQuery groupByEmail() Group by the email column
  * @method UserQuery groupByPassword() Group by the password column
  * @method UserQuery groupBySalt() Group by the salt column
@@ -64,6 +68,8 @@ use Zerebral\BusinessBundle\Model\User\UserQuery;
  * @method User findOneByFirstName(string $first_name) Return the first User filtered by the first_name column
  * @method User findOneByLastName(string $last_name) Return the first User filtered by the last_name column
  * @method User findOneBySalutation(string $salutation) Return the first User filtered by the salutation column
+ * @method User findOneByBirthday(string $birthday) Return the first User filtered by the birthday column
+ * @method User findOneByGender(string $gender) Return the first User filtered by the gender column
  * @method User findOneByEmail(string $email) Return the first User filtered by the email column
  * @method User findOneByPassword(string $password) Return the first User filtered by the password column
  * @method User findOneBySalt(string $salt) Return the first User filtered by the salt column
@@ -76,6 +82,8 @@ use Zerebral\BusinessBundle\Model\User\UserQuery;
  * @method array findByFirstName(string $first_name) Return User objects filtered by the first_name column
  * @method array findByLastName(string $last_name) Return User objects filtered by the last_name column
  * @method array findBySalutation(string $salutation) Return User objects filtered by the salutation column
+ * @method array findByBirthday(string $birthday) Return User objects filtered by the birthday column
+ * @method array findByGender(string $gender) Return User objects filtered by the gender column
  * @method array findByEmail(string $email) Return User objects filtered by the email column
  * @method array findByPassword(string $password) Return User objects filtered by the password column
  * @method array findBySalt(string $salt) Return User objects filtered by the salt column
@@ -184,7 +192,7 @@ abstract class BaseUserQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `role`, `first_name`, `last_name`, `salutation`, `email`, `password`, `salt`, `is_active`, `created_at`, `updated_at` FROM `users` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `role`, `first_name`, `last_name`, `salutation`, `birthday`, `gender`, `email`, `password`, `salt`, `is_active`, `created_at`, `updated_at` FROM `users` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -414,6 +422,78 @@ abstract class BaseUserQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(UserPeer::SALUTATION, $salutation, $comparison);
+    }
+
+    /**
+     * Filter the query on the birthday column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByBirthday('2011-03-14'); // WHERE birthday = '2011-03-14'
+     * $query->filterByBirthday('now'); // WHERE birthday = '2011-03-14'
+     * $query->filterByBirthday(array('max' => 'yesterday')); // WHERE birthday > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $birthday The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return UserQuery The current query, for fluid interface
+     */
+    public function filterByBirthday($birthday = null, $comparison = null)
+    {
+        if (is_array($birthday)) {
+            $useMinMax = false;
+            if (isset($birthday['min'])) {
+                $this->addUsingAlias(UserPeer::BIRTHDAY, $birthday['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($birthday['max'])) {
+                $this->addUsingAlias(UserPeer::BIRTHDAY, $birthday['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(UserPeer::BIRTHDAY, $birthday, $comparison);
+    }
+
+    /**
+     * Filter the query on the gender column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByGender('fooValue');   // WHERE gender = 'fooValue'
+     * $query->filterByGender('%fooValue%'); // WHERE gender LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $gender The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return UserQuery The current query, for fluid interface
+     */
+    public function filterByGender($gender = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($gender)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $gender)) {
+                $gender = str_replace('*', '%', $gender);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(UserPeer::GENDER, $gender, $comparison);
     }
 
     /**

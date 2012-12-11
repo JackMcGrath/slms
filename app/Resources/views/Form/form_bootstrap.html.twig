@@ -87,6 +87,15 @@
 {% block textarea_widget %}
 {% spaceless %}
     <textarea {{ block('widget_attributes') }}>{{ value }}</textarea>
+
+
+    {% if attr.help_block is defined %}
+        {{ block('help_block') }}
+    {% endif %}
+    {% if attr.help is defined %}
+        {{ block('help_inline') }}
+    {% endif %}
+
 {% endspaceless %}
 {% endblock textarea_widget %}
 
@@ -455,7 +464,7 @@
 {% block help_block %}
 {% spaceless %}
     {% if attr.help_block is defined %}
-    <span class="help-block">{{ attr.help_block|trans({}, translation_domain) }}</span>
+    <span class="help-block">{{ attr.help_block|trans({}, translation_domain)|raw }}</span>
     {% endif %}
 {% endspaceless %}
 {% endblock help_block %}

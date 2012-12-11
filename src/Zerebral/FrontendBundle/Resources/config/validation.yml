@@ -2,22 +2,28 @@ Zerebral\BusinessBundle\Model\User\User:
     properties:
         first_name:
             - NotBlank:
+                groups: [signup]
                 message: Enter your first name.
         last_name:
             - NotBlank:
+                groups: [signup]
                 message: Enter your last name.
         email:
             - NotBlank:
+                groups: [signup]
                 message: Email is required.
             - Email:
+                groups: [signup]
                 message: Doesn't look like a valid email.
         plainPassword:
             - NotBlank:
+                groups: [signup]
                 message: Password is required! You can change it later.
         passwordConfirmation:
             - NotBlank: ~
         role:
             - Choice:
+                groups: [signup]
                 choices: [teacher, student]
 
 Zerebral\BusinessBundle\Model\Course\Course:
