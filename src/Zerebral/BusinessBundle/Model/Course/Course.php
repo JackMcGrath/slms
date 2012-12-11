@@ -22,4 +22,9 @@ class Course extends BaseCourse
         $this->setCreatedAt(date("Y-m-d H:i:s", time()));
         return parent::preInsert($con);
     }
+
+    public function getTeacher()
+    {
+        return $this->getTeachers()->getFirst();
+    }
 }
