@@ -61,15 +61,17 @@
     <div class="right-navbar pull-left">
         {% if is_granted('ROLE_TEACHER') %}
             <a href="{{ path('course_add') }}" class="btn create-course">create course</a>
+        {% else %}
+            <a href="#" class="btn use-access-code">use access code</a>
         {% endif %}
 
         <div class="upcoming-assignments">
             <h4>Upcoming assignments</h4>
             <ul>
-                <li><span class="label label-inverse">Quize</span> <a href="">Welcome to Algebra</a> <span class="new">(Due in 2 days)</span></li>
-                <li><span class="label label-info">Test</span> <a href="">Getting started</a> (Due in 2 days)</li>
-                <li><span class="label label-important">Milestone</span> <a href="">Addition Session</a> (Due in 2 days)</li>
-                <li><span class="label label-warning">Home</span> <a href="">Division Session</a> (Due in 2 days)</li>
+                <li><div class="assignment-label"><span class="label label-inverse">Quize</span></div> <a href="">Welcome to Algebra</a> <span class="new">(Due in 2 days)</span></li>
+                <li><div class="assignment-label"><span class="label label-info">Test</span></div> <a href="">Getting started</a> (Due in 2 days)</li>
+                <li><div class="assignment-label"><span class="label label-important">Milestone</span></div> <a href="">Addition Session</a> (Due in 2 days)</li>
+                <li><div class="assignment-label"><span class="label label-warning">Home</span></div> <a href="">Division Session</a> (Due in 2 days)</li>
             </ul>
         </div>
     </div>
