@@ -65,6 +65,17 @@ body {
                     font-size: 11px;
                     margin-bottom: 2px;
 
+                    &.active {
+                        .menu-item {
+                            .active-item;
+                        }
+
+                        .menu-item {
+                            a {
+                                color: @red;
+                            }
+                        }
+                    }
                     .active-item{
                         i{
                             opacity: 1;
@@ -90,19 +101,6 @@ body {
                         padding: 6px 0px 6px 0px;
                         margin: 0;
                         position: relative;
-
-                        &.active{
-                            .active-item;
-                            a {
-                                color: @red;
-                            }
-                        }
-
-                        &.notice{
-                            a {
-                                color: @red;
-                            }
-                        }
 
                         &:hover{
                             .active;
