@@ -8,11 +8,14 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Zerebral\BusinessBundle\Model\User\Student;
 
-class ProfileType extends AbstractType
+class StudentProfileType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('bio', new UserType());
+        $builder->add('user', new UserProfileType());
+        $builder->add('bio', 'textarea', array('required' => false, 'max_length' => 160));
+        $builder->add('activities', 'textarea', array('required' => false));
+        $builder->add('interests', 'textarea', array('required' => false));
     }
 
     public function getName()
@@ -25,6 +28,7 @@ class ProfileType extends AbstractType
         $resolver->setDefaults(array(
             'data_class' => 'Zerebral\BusinessBundle\Model\User\Student',
             'cascade_validation' => true,
+            'validation_groups' => array('profile')
         ));
     }
 }

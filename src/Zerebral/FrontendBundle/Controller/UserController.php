@@ -17,20 +17,24 @@ class UserController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function myProfileAction()
     {
-        $form = $this->createForm(new FormType\ProfileType(), $this->getUser());
+        $form = $this->createForm(new FormType\StudentProfileType(), $this->getRoleUser());
         if ($this->getRequest()->isMethod('POST')) {
             $form->bind($this->getRequest());
+
             if ($form->isValid()) {
                 /** @var $course Model\User\User */
                 $user = $form->getData();
                 $user->save();
 
-                return $this->redirect($this->generateUrl('my-profile'));
+                $this->getRequest()->getSession()->setFlash('profile_save_success', 'Profile has been saved!');
+                return $this->redirect($this->generateUrl('myprofile'));
+            } else {
+                var_dump($form->getErrors());
             }
         }
 
         return array(
-            'user' => $form->createView(),
+            'form' => $form->createView(),
             'target' => 'my-profile'
         );
     }
