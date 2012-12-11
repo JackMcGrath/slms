@@ -36,3 +36,34 @@ div.right-navbar {
         }
     }
 }
+
+.top-second-navbar {
+    border: 1px solid #dadada;
+    display: inline-block;
+    ul {
+        line-height: 20px;
+        margin: 0;
+        li {
+            width: 75px;
+            padding: 5px 0;
+            text-align: center;
+            border-left: 1px solid #dadada;
+            list-style: none;
+            float: left;
+            background-color: #f4f4f4;
+            &:first-child {
+                border: none;
+            }
+            &.active {
+                background-color: #e9e9e9;
+            }
+            a {
+                text-shadow: 0 1px 0 rgba(255,255,255,.5);
+                color: #4c4c4c;
+                &:hover {
+                    text-decoration: none;
+                }
+            }
+        }
+    }
+}
