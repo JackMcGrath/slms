@@ -1,6 +1,12 @@
 {% extends 'ZerebralFrontendBundle::layout.html.twig' %}
 
 {% block content %}
+    {% javascripts
+        '@ZerebralFrontendBundle/Resources/public/js/controllers/course/index.js'
+        output='js/compiled/course.js' %}
+        <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+
     <div class="row-fluid courses-list" xmlns="http://www.w3.org/1999/html">
     <div class="span6 main-course-block">
         <div class="row-fluid">
@@ -10,7 +16,7 @@
         </div>
         <hr/>
 
-        <div class="span9 user-courses">
+        <div class="span9 user-courses{% if is_granted('ROLE_TEACHER') %} teacher-role{% endif %}">
             {% for course in courses %}
                 <div class="course span12">
                     <div class="symbol pull-left">
@@ -22,7 +28,7 @@
                     </div>
                     <div class="details pull-left">
                         {% if is_granted('ROLE_TEACHER') %}
-                            <div class="manage-buttons">
+                            <div class="manage-buttons invisible">
                                 {% if is_granted('EDIT', course) %}<a href="{{ path('course_edit', {id: course.id}) }}"><i class="icon-small-pencil"></i>Edit</a>{% endif %}
                                 {% if is_granted('DELETE', course) %}<a href="{{ path('course_delete', {id: course.id}) }}"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
                                 <a href=""><i class="icon-small-people"></i>Edit members</a>
@@ -41,10 +47,13 @@
                         </div>
 
                         <div class="timetable">
-                            <div class="duration"><i class="icon-small-calendar"></i> <b>From:</b> 14/02 &nbsp;&nbsp; <b>Due:</b> 05/06</div>
-                            <div class="time">
+                            <div class="duration span4"><i class="icon-small-calendar"></i> <b>From:</b> 14/02 &nbsp;&nbsp; <b>Due:</b> 05/06</div>
+                            <div class="time span8">
                                 <i class="icon-small-clipboard pull-left"></i>
                                 <ul>
+                                    <li><b>Mon:</b> 09:00 - 14:00</li>
+                                    <li><b>Tue:</b> 14:10 - 19:00</li>
+                                    <li><b>Wed:</b> 05:00 - 15:45</li>
                                     <li><b>Mon:</b> 09:00 - 14:00</li>
                                     <li><b>Tue:</b> 14:10 - 19:00</li>
                                     <li><b>Wed:</b> 05:00 - 15:45</li>
