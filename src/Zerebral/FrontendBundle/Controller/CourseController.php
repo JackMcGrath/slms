@@ -92,4 +92,20 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
         $course->delete();
         return $this->redirect($this->generateUrl('courses'));
     }
+
+
+    /**
+     * @Route("/assignments/{id}", name="course_assignments")
+     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @ParamConverter("course")
+     * @Template()
+     */
+    public function assignmentsAction(Model\Course\Course $course)
+    {
+        return array(
+            'assignments' => $course->getAssignments(),
+            'course' => $course,
+            'target' => 'courses'
+        );
+    }
 }
