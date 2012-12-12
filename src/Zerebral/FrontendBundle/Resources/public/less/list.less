@@ -1,0 +1,102 @@
+//
+// This style for base application lists
+//
+
+.primary .main-list-block {
+    width: 650px;
+    hr {
+        margin-bottom: 10px;
+    }
+
+    .items-list {
+        min-width: 675px;
+        margin-left: 0;
+        margin-top: 15px;
+
+        &.teacher-role {
+            margin-top: 0;
+            .symbol {
+                margin-top: 30px;
+            }
+            .list-item {
+                padding-top: 0;
+            }
+        }
+
+        .list-item {
+            margin-left:0;
+            padding: 30px 0px 5px 10px;
+            border-bottom: 1px solid @borderColor;
+
+            &:first-child {
+                padding-top: 10px;
+            }
+            .details {
+                i[class*="icon-"] {
+                    background-position: 0;
+                }
+                margin-left: 20px;
+                max-width: 570px;
+                h4 {
+                    margin-bottom: 7px;
+                    small {
+
+                        color: #9a9a9a;
+                        font-size: 12px;
+                        margin-left: 15px;
+                    }
+                }
+
+                .manage-buttons {
+                    margin-top: 7px;
+                    margin-bottom: 5px;
+                    text-align: right;
+                    a {
+                        color: #8c8c8c;
+                        margin-left: 8px;
+                        i {
+                            margin-right: 3px;
+                        }
+                    }
+                }
+                a {
+                    color: #b74a47;
+                }
+            }
+
+            .stat {
+                .instructor-name {
+                    color: #8c8c8c;
+                    b {
+                        color: #464646;
+                    }
+                }
+                div {
+                    display: inline-block;
+                    margin-right: 7px;
+                    a {
+                        color: #2d2d2d;
+                    }
+
+                    .badge {
+                        margin-right: 8px;
+                    }
+                }
+            }
+
+            .symbol {
+                .count-badge {
+                    background-color: #f4f4f4;
+                    font-weight: bold;
+                    color: #b74a47;
+                    width: 50px;
+                    height: 50px;
+                    font-size: 18px;
+                    vertical-align: middle;
+                    text-align: center;
+                    line-height: 50px;
+                }
+            }
+        }
+    }
+}

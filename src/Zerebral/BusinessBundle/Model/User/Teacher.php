@@ -13,4 +13,9 @@ class Teacher extends BaseTeacher
         }
         return parent::preSave($con);
     }
+
+    public function getFullName()
+    {
+        return $this->getUser()->getFullName();
+    }
 }

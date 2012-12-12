@@ -33,7 +33,7 @@ Zerebral\BusinessBundle\Model\Course\Course:
                 message: Enter your course name. You can change it later.
         description:
             - NotBlank:
-                message: Enter course description. Any tips useful for students when selecting a course.
+                message: Enter course description.Provide any useful information for students enrolled in this course.
         aDiscipline:
             - Valid: ~
         aGradeLevel:

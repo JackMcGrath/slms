@@ -1,18 +1,90 @@
 {% extends 'ZerebralFrontendBundle::layout.html.twig' %}
 
 {% block content %}
+{% javascripts
+    '@ZerebralFrontendBundle/Resources/public/js/controllers/course/index.js'
+    output='js/compiled/course.js' %}
+    <script type="text/javascript" src="{{ asset_url }}"></script>
+{% endjavascripts %}
 
-    <h2>Courses</h2>
-
-    {% if is_granted('ROLE_TEACHER') %}
-        <a href="{{ path('course_add') }}" class="btn btn-small btn-success">Create course</a>
-    {% endif %}
-
-    {% for course in courses %}
-        <div style="margin: 20px 0; border-bottom: 1px dashed #ccc;">
-            <h4><a href="{{ path('course_view', {id: course.id}) }}" style="color: #555;">{{ course.name }}</a></h4>
-            {% if is_granted('EDIT', course) %}<a href="{{ path('course_edit', {id: course.id}) }}">Edit</a>{% endif %}
-            {% if is_granted('DELETE', course) %}<a href="{{ path('course_delete', {id: course.id}) }}" onclick="return confirm('Are you sure?');">Remove</a>{% endif %}
+<div class="row-fluid courses-list">
+    <div class="span6 main-list-block">
+        <div class="row-fluid">
+            <h2 class="span6 pull-left form-title">
+                My Courses <small>all</small>
+            </h2>
         </div>
-    {% endfor %}
+        <hr/>
+
+        <div class="span9 items-list{% if is_granted('ROLE_TEACHER') %} teacher-role{% endif %}">
+            {% for course in courses %}
+                <div class="list-item span12">
+                    <div class="symbol pull-left">
+                        {% if is_granted('ROLE_STUDENT') %}
+                            <img class="rounded" src="http://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?s=48"/>
+                        {% else %}
+                            <div class="rounded count-badge">{{ course.courseStudents.count }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="details pull-left">
+                        {% if is_granted('ROLE_TEACHER') %}
+                            <div class="manage-buttons invisible">
+                                {% if is_granted('EDIT', course) %}<a href="{{ path('course_edit', {id: course.id}) }}"><i class="icon-small-pencil"></i>Edit</a>{% endif %}
+                                {% if is_granted('DELETE', course) %}<a href="{{ path('course_delete', {id: course.id}) }}"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
+                                <a href=""><i class="icon-small-people"></i>Edit members</a>
+                            </div>
+                        {% endif %}
+                        <h4><a href="{{ path('course_view', {id: course.id}) }}">{{ course.name }}</a> <small><i class="icon-small-clock"></i> last updated {{ time_diff(course.updatedAt) }}</small></h4>
+                        <div class="stat">
+                            {% if is_granted('ROLE_STUDENT') %}
+                                <div class="instructor-name">Instructor <b>{{ course.teacher.fullName }}</b></div>
+                            {% endif %}
+                            <div><span class="badge badge-important">{{ course.assignments.count }}</span><a href="{{ path('course_assignments', {id: course.id}) }}">Assignments</a></div>
+                            <div><span class="badge badge-inverse">-</span><a href="#">New discussions</a></span></div>
+                            {% if is_granted('ROLE_STUDENT') %}
+                                <div><span class="badge badge-info">-</span><a href="">New materials</a></div>
+                            {% endif %}
+                        </div>
+
+                        <div class="timetable">
+                            <div class="duration span4"><i class="icon-small-calendar"></i> <b>From:</b> 14/02 &nbsp;&nbsp; <b>Due:</b> 05/06</div>
+                            <div class="time span8">
+                                <i class="icon-small-clipboard pull-left"></i>
+                                <ul>
+                                    <li><b>Mon:</b> 09:00 - 14:00</li>
+                                    <li><b>Tue:</b> 14:10 - 19:00</li>
+                                    <li><b>Wed:</b> 05:00 - 15:45</li>
+                                    <li><b>Mon:</b> 09:00 - 14:00</li>
+                                    <li><b>Tue:</b> 14:10 - 19:00</li>
+                                    <li><b>Wed:</b> 05:00 - 15:45</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="right-navbar pull-left">
+        {% if is_granted('ROLE_TEACHER') %}
+            <a href="{{ path('course_add') }}" class="btn create-course create-new-item">create course</a>
+        {% else %}
+            <a href="#" class="btn use-access-code">use access code</a>
+        {% endif %}
+
+        <div class="upcoming-assignments">
+            <h4>Upcoming assignments</h4>
+            <ul>
+                <li><div class="assignment-label"><span class="label label-inverse">Quize</span></div> <a href="">Welcome to Algebra</a> <span class="new">(Due in 2 days)</span></li>
+                <li><div class="assignment-label"><span class="label label-info">Test</span></div> <a href="">Getting started</a> (Due in 2 days)</li>
+                <li><div class="assignment-label"><span class="label label-important">Milestone</span></div> <a href="">Addition Session</a> (Due in 2 days)</li>
+                <li><div class="assignment-label"><span class="label label-warning">Home</span></div> <a href="">Division Session</a> (Due in 2 days)</li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+
 {% endblock %}

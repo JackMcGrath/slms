@@ -11,6 +11,7 @@
 @import "./buttons.less";
 @import "./navigation-top.less";
 @import "./navbar.less";
+@import "./list.less";
 @import "./signup.less";
 @import "./course.less";
 @import "./datepicker.less";
@@ -22,13 +23,21 @@ body {
 //    background-color:rgb(251,251,251);
     background: #f1f1f1;
     min-width: 1024px;
+    font-size: 12px;
 
     #main{
         margin-top: 15px;
+        padding-right: 0px;
+        .main-content {
+            background: white;
+            margin-left: 80px;
+            width: auto;
+        }
     }
 
     .left-sidebar {
         width: 80px !important;
+        background: #f1f1f1;
     }
 
 //    .navbar .container-fluid, #main {
@@ -39,15 +48,17 @@ body {
     .primary{
         background: @white;
         padding: 10px 40px;
+        min-height: 665px;
+        width: 93%;
+
+        h2 small {
+            text-transform: uppercase;
+        }
 
         &.span11{
             margin-left: 0;
             width: 93%;
-            min-height: 665px;
 
-            h2 small {
-                text-transform: uppercase;
-            }
         }
     }
 
@@ -65,6 +76,17 @@ body {
                     font-size: 11px;
                     margin-bottom: 2px;
 
+                    &.active {
+                        .menu-item {
+                            .active-item;
+                        }
+
+                        .menu-item {
+                            a {
+                                color: @red;
+                            }
+                        }
+                    }
                     .active-item{
                         i{
                             opacity: 1;
@@ -90,19 +112,6 @@ body {
                         padding: 6px 0px 6px 0px;
                         margin: 0;
                         position: relative;
-
-                        &.active{
-                            .active-item;
-                            a {
-                                color: @red;
-                            }
-                        }
-
-                        &.notice{
-                            a {
-                                color: @red;
-                            }
-                        }
 
                         &:hover{
                             .active;
@@ -223,4 +232,8 @@ h2.form-title {
     font-size: 28px;
     font-weight: normal;
     margin-top: 10px;
+}
+
+.rounded {
+    border-radius: 50%;
 }
