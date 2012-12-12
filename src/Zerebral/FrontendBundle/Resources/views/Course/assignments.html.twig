@@ -38,15 +38,15 @@
                         <div class="details pull-left">
                             {% if is_granted('ROLE_TEACHER') %}
                                 <div class="manage-buttons invisible">
-                                    {% if is_granted('EDIT', course) %}<a href="{{ path('course_edit', {id: course.id}) }}"><i class="icon-small-pencil"></i>Edit</a>{% endif %}
-                                    {% if is_granted('DELETE', course) %}<a href="{{ path('course_delete', {id: course.id}) }}"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
+                                    {% if is_granted('EDIT', assignment) %}<a href="{{ path('assignment_edit', {id: assignment.id, courseId: course.id}) }}"><i class="icon-small-pencil"></i>Edit</a>{% endif %}
+                                    {% if is_granted('DELETE', assignment) %}<a href="{{ path('assignment_delete', {id: assignment.id}) }}"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
                                     <a href=""><i class="icon-small-people"></i>Edit members</a>
                                 </div>
                             {% endif %}
-                            <h4><a href="{{ path('course_view', {id: course.id}) }}">{{ assignment.name }}</a></h4>
+                            <h4><a href="{{ path('assignment_view', {id: assignment.id}) }}">{{ assignment.name }}</a></h4>
                             <div class="stat">
                                 {% if is_granted('ROLE_STUDENT') %}
-                                    <div class="instructor-name">Instructor <b>{{ course.teacher.fullName }}</b></div>
+                                    <div class="instructor-name">Instructor <b>{{ assignment.teacher.fullName }}</b></div>
                                     <div class="due-at"><i class="icon-small-clock"></i> Due <small>{{ assignment.dueAt | date('D, M d') }}</small></div>
                                     <div><span class="badge">-</span><a href="#">Comments</a></span></div>
                                 {% else %}
@@ -74,7 +74,7 @@
 
         <div class="right-navbar pull-left">
             {% if is_granted('ROLE_TEACHER') %}
-                <a href="{{ path('course_add') }}" class="btn create-new-item create-course">create course</a>
+                <a href="{{ path('assignment_add', {courseId: course.id}) }}" class="btn create-new-item create-course">create assignment</a>
                 <a href="{{ path('assignments') }}" class="btn create-new-item use-access-code">view all</a>
             {% endif %}
         </div>
