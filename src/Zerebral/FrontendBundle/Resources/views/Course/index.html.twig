@@ -2,7 +2,7 @@
 
 {% block content %}
     <div class="row-fluid courses-list" xmlns="http://www.w3.org/1999/html">
-    <div class="span7">
+    <div class="span6 main-course-block">
         <div class="row-fluid">
             <h2 class="span6 pull-left form-title">
                 My Courses <small>all</small>
@@ -21,6 +21,13 @@
                         {% endif %}
                     </div>
                     <div class="details pull-left">
+                        {% if is_granted('ROLE_TEACHER') %}
+                            <div class="manage-buttons">
+                                {% if is_granted('EDIT', course) %}<a href="{{ path('course_edit', {id: course.id}) }}"><i class="icon-small-pencil"></i>Edit</a>{% endif %}
+                                {% if is_granted('DELETE', course) %}<a href="{{ path('course_delete', {id: course.id}) }}"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
+                                <a href=""><i class="icon-small-people"></i>Edit members</a>
+                            </div>
+                        {% endif %}
                         <h4><a href="{{ path('course_view', {id: course.id}) }}">{{ course.name }}</a> <small><i class="icon-small-clock"></i> last updated {{ time_diff(course.updatedAt) }}</small></h4>
                         <div class="stat">
                             {% if is_granted('ROLE_STUDENT') %}
@@ -32,26 +39,18 @@
                                 <div><span class="badge badge-info">-</span><a href="">New materials</a></div>
                             {% endif %}
                         </div>
-                        {% if is_granted('ROLE_TEACHER') %}
-                            <div class="manage-buttons">
-                                {% if is_granted('EDIT', course) %}<a href="{{ path('course_edit', {id: course.id}) }}"><i class="icon-small-pencil"></i>Edit</a>{% endif %}
-                                {% if is_granted('DELETE', course) %}<a href="{{ path('course_delete', {id: course.id}) }}"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
-                                <a href=""><i class="icon-small-people"></i>Edit members</a>
+
+                        <div class="timetable">
+                            <div class="duration"><i class="icon-small-calendar"></i> <b>From:</b> 14/02 &nbsp;&nbsp; <b>Due:</b> 05/06</div>
+                            <div class="time">
+                                <i class="icon-small-clipboard pull-left"></i>
+                                <ul>
+                                    <li><b>Mon:</b> 09:00 - 14:00</li>
+                                    <li><b>Tue:</b> 14:10 - 19:00</li>
+                                    <li><b>Wed:</b> 05:00 - 15:45</li>
+                                </ul>
                             </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="timetable pull-right">
-                        <div class="duration"><i class="icon-small-calendar"></i> From: 14/02 &nbsp;&nbsp; Due: 05/06</div>
-                        <div class="time">
-                            <i class="icon-small-clipboard pull-left"></i>
-                            <ul>
-                                <li>Mon: 09:00 - 14:00</li>
-                                <li>Tue: 14:10 - 19:00</li>
-                                <li>Wed: 05:00 - 15:45</li>
-                            </ul>
                         </div>
-
                     </div>
                 </div>
             {% endfor %}

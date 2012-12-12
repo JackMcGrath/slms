@@ -80,8 +80,11 @@
 }
 
 .courses-list {
+    .main-course-block {
+        width: 650px;
+    }
     .user-courses {
-        min-width: 750px;
+        min-width: 700px;
         margin-left: 0;
     }
     .course {
@@ -89,9 +92,12 @@
         padding: 30px 10px 5px;
         border-bottom: 1px solid @borderColor;
 
+        &:first-child {
+            padding-top: 10px;
+        }
         .details {
             margin-left: 20px;
-            max-width: 500px;
+            max-width: 625px;
             h4 {
                 margin-bottom: 7px;
                 small {
@@ -154,17 +160,29 @@
         }
 
         .timetable {
+            margin-left: -10px;
             color: #908e8e;
             font-size: 12px;
+            padding: 4px 10px;
+            margin-top: 5px;
+            background: #fcfbeb;
             .duration {
+                display: inline-block;
                 i { margin-right:10px; }
+                color: #333333;
             }
             .time {
-                margin-top: 15px;
+                margin-left: 15px;
+                display: inline-block;
+                vertical-align: bottom;
                 ul {
                     margin-left: 25px;
                     margin-bottom: 0px;
                     list-style: none outside none;
+                    li {
+                        display: inline-block;
+                        color: #333333;
+                    }
                 }
             }
         }
