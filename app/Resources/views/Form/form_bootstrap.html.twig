@@ -517,3 +517,27 @@
 {% block field_errors %}{{ block('form_errors') }}{% endblock %}
 {% block field_rest %}{{ block('form_rest') }}{% endblock %}
 {% block field_rows %}{{ block('form_rows') }}{% endblock %}
+
+
+{# custom Fields #}
+
+{% block choice_optional_widget %}
+    {% spaceless %}
+
+        {{ form_widget(form.dropdown) }}
+        {{ form_widget(form.input, {
+            attr: {
+                class: 'hide',
+                disabled: true
+            }
+        }) }}
+
+        <div class="span4 pull-right">
+            <a href="#" class="create-discipline show-input">Create New</a>
+            <a href="#" class="create-discipline show-dropdown hide">Show Dropdown</a>
+        </div>
+
+        {{ form_errors(form.dropdown) }}
+        {{ form_errors(form.input) }}
+    {% endspaceless %}
+{% endblock choice_optional_widget %}

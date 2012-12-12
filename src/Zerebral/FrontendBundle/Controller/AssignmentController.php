@@ -57,10 +57,14 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function addAction(Model\Course\Course $course, Model\Assignment\Assignment $assignment = null)
     {
-        $form = $this->createForm(new FormType\AssignmentType(), $assignment);
+        $assignmentType = new FormType\AssignmentType();
+        $assignmentType->setTeacher($this->getRoleUser());
+        $form = $this->createForm($assignmentType, $assignment);
+
         if ($this->getRequest()->isMethod('POST')) {
             $form->bind($this->getRequest());
             if ($form->isValid()) {
+                die('valid');
                 /**
                  * @var \Zerebral\BusinessBundle\Model\Assignment\Assignment $assignment
                  */
@@ -69,7 +73,10 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
                 $assignment->setTeacherId($this->getRoleUser()->getId());
                 $assignment->save();
 
-                return $this->redirect($this->generateUrl('course_view', array('id' => $assignment->getCourseId())));
+                return $this->redirect($this->generateUrl('assignment_view', array('id' => $assignment->getId())));
+            }else{
+//                var_dump($form->getErrorsAsString());
+//                die;
             }
         }
 
