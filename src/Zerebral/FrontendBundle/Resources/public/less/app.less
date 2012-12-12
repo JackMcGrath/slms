@@ -25,10 +25,17 @@ body {
 
     #main{
         margin-top: 15px;
+        padding-right: 0px;
+        .main-content {
+            background: white;
+            margin-left: 80px;
+            width: auto;
+        }
     }
 
     .left-sidebar {
         width: 80px !important;
+        background: #f1f1f1;
     }
 
 //    .navbar .container-fluid, #main {
@@ -39,15 +46,16 @@ body {
     .primary{
         background: @white;
         padding: 10px 40px;
+        min-height: 665px;
+
+        h2 small {
+            text-transform: uppercase;
+        }
 
         &.span11{
             margin-left: 0;
             width: 93%;
-            min-height: 665px;
 
-            h2 small {
-                text-transform: uppercase;
-            }
         }
     }
 
