@@ -108,4 +108,20 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
             'target' => 'courses'
         );
     }
+
+    /**
+     * @Route("/members/{id}", name="course_members")
+     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @ParamConverter("course")
+     * @Template()
+     */
+    public function membersAction(Model\Course\Course $course)
+    {
+        return array(
+            'students' => $course->getStudents(),
+            'teachers' => $course->getTeachers(),
+            'course' => $course,
+            'target' => 'members'
+        );
+    }
 }
