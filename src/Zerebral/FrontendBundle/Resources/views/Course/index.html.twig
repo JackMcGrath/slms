@@ -28,6 +28,7 @@
                     </div>
                     <div class="details pull-left">
                         {% if is_granted('ROLE_TEACHER') %}
+                            <i class="manage-buttons-gears icon-small-gears"></i>
                             <div class="manage-buttons invisible">
                                 {% if is_granted('EDIT', course) %}<a href="{{ path('course_edit', {id: course.id}) }}"><i class="icon-small-pencil"></i>Edit</a>{% endif %}
                                 {% if is_granted('DELETE', course) %}<a href="{{ path('course_delete', {id: course.id}) }}"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
@@ -70,7 +71,7 @@
         {% if is_granted('ROLE_TEACHER') %}
             <a href="{{ path('course_add') }}" class="btn create-course create-new-item">create course</a>
         {% else %}
-            <a href="#" class="btn use-access-code">use access code</a>
+            <a href="#" class="btn create-new-item use-access-code">use access code</a>
         {% endif %}
 
         <div class="upcoming-assignments">

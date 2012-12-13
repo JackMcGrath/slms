@@ -52,7 +52,8 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
      * @ParamConverter("course", options={"mapping": {"courseId": "id"}})
      *
      * @SecureParam(name="assignment", permissions="EDIT")
-     * @SecureParam(name="course", permissions="ADD_ASSIGNMENT")
+     * @SecureParam(name="course", permissions="ADD_ASSIGNMENT
+")
      * @Template()
      */
     public function addAction(Model\Course\Course $course, Model\Assignment\Assignment $assignment = null)
