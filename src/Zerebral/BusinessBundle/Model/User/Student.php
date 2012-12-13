@@ -13,4 +13,9 @@ class Student extends BaseStudent
         }
         return parent::preSave($con);
     }
+
+    public function getFullName()
+    {
+        return $this->getUser()->getFullName();
+    }
 }

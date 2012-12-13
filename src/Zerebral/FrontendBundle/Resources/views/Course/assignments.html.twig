@@ -10,10 +10,10 @@
     <div class="top-second-navbar">
         <ul>
             <li><a href="#">Feed</a></li>
-            <li class="active"><a href="#">Assignments</a></li>
+            <li class="active"><a href="{{ path('course_assignments', {id: course.id}) }}">Assignments</a></li>
             <li><a href="#">Details</a></li>
             <li><a href="#">Materials</a></li>
-            <li><a href="#">Members</a></li>
+            <li><a href="{{ path('course_members', {id: course.id}) }}">Members</a></li>
         </ul>
     </div>
     <div class="row-fluid assignments-list">

@@ -57,7 +57,10 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function addAction(Model\Course\Course $course = null)
     {
-        $form = $this->createForm(new FormType\CourseType(), $course);
+        $courseType = new FormType\CourseType();
+        $courseType->setTeacher($this->getRoleUser());
+        $form = $this->createForm($courseType, $course);
+
         if ($this->getRequest()->isMethod('POST')) {
             $form->bind($this->getRequest());
             if ($form->isValid()) {
@@ -106,6 +109,22 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
             'assignments' => $course->getAssignments(),
             'course' => $course,
             'target' => 'courses'
+        );
+    }
+
+    /**
+     * @Route("/members/{id}", name="course_members")
+     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @ParamConverter("course")
+     * @Template()
+     */
+    public function membersAction(Model\Course\Course $course)
+    {
+        return array(
+            'students' => $course->getStudents(),
+            'teachers' => $course->getTeachers(),
+            'course' => $course,
+            'target' => 'members'
         );
     }
 }

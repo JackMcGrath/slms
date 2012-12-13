@@ -54,16 +54,28 @@
     </table>
     <table name="disciplines" phpName="Discipline" idMethod="native">
         <column name="id" phpName="Id" type="TINYINT" size="2" sqlType="tinyint(2) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="teacher_id" phpName="TeacherId" type="INTEGER" sqlType="int(11) unsigned" required="false"/>
         <column name="name" phpName="Name" type="VARCHAR" size="50" required="true"/>
         <validator column="id">
             <rule name="required" message="The field id is required."/>
             <rule name="maxValue" value="REPLACEME" message="The field id must be not greater than REPLACEME."/>
             <rule name="type" value="int" message="The column id must be an int value."/>
         </validator>
+        <validator column="teacher_id">
+            <rule name="required" message="The field teacher_id is required."/>
+            <rule name="maxValue" value="REPLACEME" message="The field teacher_id must be not greater than REPLACEME."/>
+            <rule name="type" value="int" message="The column teacher_id must be an int value."/>
+        </validator>
         <validator column="name">
             <rule name="required" message="The field name is required."/>
             <rule name="type" value="string" message="The column name must be an string value."/>
         </validator>
+        <foreign-key foreignTable="teachers" name="disciplines_teachers" onUpdate="CASCADE">
+            <reference local="teacher_id" foreign="id"/>
+        </foreign-key>
+        <index name="disciplines_teachers">
+            <index-column name="teacher_id"/>
+        </index>
     </table>
     <table name="grade_levels" phpName="GradeLevel" idMethod="native">
         <column name="id" phpName="Id" type="TINYINT" size="2" sqlType="tinyint(2) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
