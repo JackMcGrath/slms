@@ -65,7 +65,6 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
         if ($this->getRequest()->isMethod('POST')) {
             $form->bind($this->getRequest());
             if ($form->isValid()) {
-                die('valid');
                 /**
                  * @var \Zerebral\BusinessBundle\Model\Assignment\Assignment $assignment
                  */
@@ -75,9 +74,6 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
                 $assignment->save();
 
                 return $this->redirect($this->generateUrl('assignment_view', array('id' => $assignment->getId())));
-            }else{
-//                var_dump($form->getErrorsAsString());
-//                die;
             }
         }
 
