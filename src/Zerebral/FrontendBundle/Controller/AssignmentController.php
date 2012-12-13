@@ -74,9 +74,6 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
                 $assignment->save();
 
                 return $this->redirect($this->generateUrl('assignment_view', array('id' => $assignment->getId())));
-            }else{
-//                var_dump($form->getErrorsAsString());
-//                die;
             }
         }
 

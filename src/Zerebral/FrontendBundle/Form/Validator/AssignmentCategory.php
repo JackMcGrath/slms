@@ -5,7 +5,7 @@ namespace Zerebral\FrontendBundle\Form\Validator;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * @Annotation
+ * Validator for assignment_category field
  */
 class AssignmentCategory extends Constraint
 {

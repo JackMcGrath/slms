@@ -3,9 +3,9 @@
 namespace Zerebral\FrontendBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Zerebral\CommonBundle\Form\Type\OptionalModelType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Zerebral\FrontendBundle\Form\Validator\AssignmentCategory;
 use Symfony\Component\Validator\Constraints\Collection;
 
 class AssignmentType extends AbstractType
@@ -13,6 +13,10 @@ class AssignmentType extends AbstractType
 
     protected $teacher;
 
+    /**
+     * Set teacher model to class instance for using it in callback function
+     * @param \Zerebral\BusinessBundle\Model\User\Teacher $teacher
+     */
     public function setTeacher($teacher)
     {
         $this->teacher = $teacher;
@@ -35,7 +39,7 @@ class AssignmentType extends AbstractType
             'property' => 'name',
             'required' => false,
 
-            'callback' => function($model, $value) use ($teacher) {
+            'buildModel' => function(Zerebral\BusinessBundle\Model\Assignment\AssignmentCategory $model, string $value) use ($teacher) {
                 $model->setTeacher($teacher);
                 $model->setName($value);
                 return $model;
@@ -56,14 +60,15 @@ class AssignmentType extends AbstractType
 
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $collectionConstraint = array(
-            'assignment_category' => new AssignmentCategory(),
-        );
+//@todo fix validation, now work incorrect
+//        $collectionConstraint = array(
+//            'assignment_category' => new AssignmentCategory(),
+//        );
 
         $resolver->setDefaults(
             array(
                 'data_class' => 'Zerebral\BusinessBundle\Model\Assignment\Assignment',
-                'constraints' => $collectionConstraint
+//                'constraints' => $collectionConstraint
             )
         );
     }
