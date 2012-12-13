@@ -27,11 +27,13 @@
                     {{ block('member') }}
                 {% endfor %}
 
+                {% if is_granted('ROLE_TEACHER') %}
                 <div class="form-actions">
                     <a href="" class="btn btn-danger invite">Invite someone by email</a>
                     or share an access code: <b>JWBGN-9KX1X5</b>
                     <a href="#" class="reset">reset</a>
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>
