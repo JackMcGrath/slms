@@ -3,6 +3,7 @@
     <table name="assignment_categories" phpName="AssignmentCategory" idMethod="native">
         <column name="id" phpName="Id" type="TINYINT" size="2" sqlType="tinyint(2) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="course_id" phpName="CourseId" type="INTEGER" sqlType="int(11) unsigned" required="false"/>
+        <column name="teacher_id" phpName="TeacherId" type="INTEGER" sqlType="int(11) unsigned" required="false"/>
         <column name="name" phpName="Name" type="VARCHAR" size="50" required="true"/>
         <column name="created_at" phpName="CreatedAt" type="TIMESTAMP" required="true"/>
         <validator column="id">
@@ -13,6 +14,11 @@
         <validator column="course_id">
             <rule name="maxValue" value="REPLACEME" message="The field course_id must be not greater than REPLACEME."/>
             <rule name="type" value="int" message="The column course_id must be an int value."/>
+        </validator>
+        <validator column="teacher_id">
+            <rule name="required" message="The field teacher_id is required."/>
+            <rule name="maxValue" value="REPLACEME" message="The field teacher_id must be not greater than REPLACEME."/>
+            <rule name="type" value="int" message="The column teacher_id must be an int value."/>
         </validator>
         <validator column="name">
             <rule name="required" message="The field name is required."/>
@@ -25,8 +31,14 @@
         <foreign-key foreignTable="courses" name="assignment_categories_courses" onUpdate="CASCADE">
             <reference local="course_id" foreign="id"/>
         </foreign-key>
+        <foreign-key foreignTable="teachers" name="assignment_categories_teachers" onUpdate="CASCADE">
+            <reference local="teacher_id" foreign="id"/>
+        </foreign-key>
         <index name="assignment_categories_courses">
             <index-column name="course_id"/>
+        </index>
+        <index name="assignment_categories_teachers">
+            <index-column name="teacher_id"/>
         </index>
     </table>
     <table name="assignments" phpName="Assignment" idMethod="native">

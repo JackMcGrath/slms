@@ -267,6 +267,10 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
      */
     public function getFullName()
     {
-        return $this->getSalutation() . ' ' . $this->getLastName();
+        if (strlen($this->getSalutation())) {
+            return $this->getSalutation() . ' ' . $this->getLastName();
+        }
+
+        return $this->getFirstName() . ' ' . $this->getLastName();
     }
 } 
