@@ -48,19 +48,24 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
    /**
      * @Route("/add/{courseId}", name="assignment_add")
      * @Route("/edit/{courseId}/{id}", name="assignment_edit")
-     * @ParamConverter("assignment", options={"mapping": {"courseId" = "course_id", "id" = "id"}})
+     * @ParamConverter("assignment", options={"mapping": {"id": "id"}})
      * @ParamConverter("course", options={"mapping": {"courseId": "id"}})
      *
      * @SecureParam(name="assignment", permissions="EDIT")
-     * @SecureParam(name="course", permissions="ADD_ASSIGNMENT")
+     * @SecureParam(name="course", permissions="ADD_ASSIGNMENT
+")
      * @Template()
      */
     public function addAction(Model\Course\Course $course, Model\Assignment\Assignment $assignment = null)
     {
-        $form = $this->createForm(new FormType\AssignmentType(), $assignment);
+        $assignmentType = new FormType\AssignmentType();
+        $assignmentType->setTeacher($this->getRoleUser());
+        $form = $this->createForm($assignmentType, $assignment);
+
         if ($this->getRequest()->isMethod('POST')) {
             $form->bind($this->getRequest());
             if ($form->isValid()) {
+                die('valid');
                 /**
                  * @var \Zerebral\BusinessBundle\Model\Assignment\Assignment $assignment
                  */
@@ -69,7 +74,10 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
                 $assignment->setTeacherId($this->getRoleUser()->getId());
                 $assignment->save();
 
-                return $this->redirect($this->generateUrl('course_view', array('id' => $assignment->getCourseId())));
+                return $this->redirect($this->generateUrl('assignment_view', array('id' => $assignment->getId())));
+            }else{
+//                var_dump($form->getErrorsAsString());
+//                die;
             }
         }
 
