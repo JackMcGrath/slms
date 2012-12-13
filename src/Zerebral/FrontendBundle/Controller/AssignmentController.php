@@ -48,7 +48,7 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
    /**
      * @Route("/add/{courseId}", name="assignment_add")
      * @Route("/edit/{courseId}/{id}", name="assignment_edit")
-     * @ParamConverter("assignment", options={"mapping": {"courseId": "course_id", "id": "id"}})
+     * @ParamConverter("assignment", options={"mapping": {"courseId" = "course_id", "id" = "id"}})
      * @ParamConverter("course", options={"mapping": {"courseId": "id"}})
      *
      * @SecureParam(name="assignment", permissions="EDIT")

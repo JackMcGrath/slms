@@ -1,7 +1,7 @@
 $(document).ready(function(){
     $('.items-list .list-item').hover(function(e) {
-        $(e.target).closest('.list-item').find('.manage-buttons').css('visibility', 'visible');
+        $(e.target).closest('.list-item').find('.manage-buttons').css('visibility', 'visible').prev().hide();
     },function(e) {
-        $(e.target).closest('.list-item').find('.manage-buttons').css('visibility', 'hidden');
+        $(e.target).closest('.list-item').find('.manage-buttons').css('visibility', 'hidden').prev().show()
     });
 });
