@@ -57,7 +57,10 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function addAction(Model\Course\Course $course = null)
     {
-        $form = $this->createForm(new FormType\CourseType(), $course);
+        $courseType = new FormType\CourseType();
+        $courseType->setTeacher($this->getRoleUser());
+        $form = $this->createForm($courseType, $course);
+
         if ($this->getRequest()->isMethod('POST')) {
             $form->bind($this->getRequest());
             if ($form->isValid()) {

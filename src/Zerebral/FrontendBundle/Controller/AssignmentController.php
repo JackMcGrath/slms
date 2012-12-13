@@ -64,7 +64,6 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
         if ($this->getRequest()->isMethod('POST')) {
             $form->bind($this->getRequest());
             if ($form->isValid()) {
-                die('valid');
                 /**
                  * @var \Zerebral\BusinessBundle\Model\Assignment\Assignment $assignment
                  */

@@ -39,7 +39,7 @@ class AssignmentType extends AbstractType
             'property' => 'name',
             'required' => false,
 
-            'buildModel' => function(Zerebral\BusinessBundle\Model\Assignment\AssignmentCategory $model, string $value) use ($teacher) {
+            'buildModel' => function(\Zerebral\BusinessBundle\Model\Assignment\AssignmentCategory $model, $value) use ($teacher) {
                 $model->setTeacher($teacher);
                 $model->setName($value);
                 return $model;

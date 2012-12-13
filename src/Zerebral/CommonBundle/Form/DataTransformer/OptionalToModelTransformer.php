@@ -11,12 +11,12 @@ class OptionalToModelTransformer implements DataTransformerInterface
     /**
      * @var \Closure
      */
-    private $callback;
+    private $buildModel;
 
-    public function __construct($className, \Closure $callback = null)
+    public function __construct($className, \Closure $buildModel = null)
     {
         $this->className = (string)$className;
-        $this->callback = $callback;
+        $this->buildModel = $buildModel;
     }
 
     public function transform($value)
