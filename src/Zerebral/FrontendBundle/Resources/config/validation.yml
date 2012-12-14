@@ -20,7 +20,10 @@ Zerebral\BusinessBundle\Model\User\User:
                 groups: [signup]
                 message: Password is required! You can change it later.
         passwordConfirmation:
-            - NotBlank: ~
+            - NotBlank:
+                groups: [signup]
+            - Zerebral\FrontendBundle\Form\Validator\SignupConfirmPassword:
+                groups: [signup]
         role:
             - Choice:
                 groups: [signup]
