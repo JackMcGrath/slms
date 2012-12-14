@@ -20,6 +20,18 @@ $(document).ready(function(){
         });
     });
 
+    $('.student-list tr').on('click', function(e){
+        if($(e.target).prop("tagName") != "INPUT"){
+            var checkbox = $(this).find('input');
+            if(checkbox.is(':checked')){
+                checkbox.removeAttr('checked');
+            }else{
+                checkbox.attr('checked', 1);
+            }
+        }
+
+    })
+
     $('.toggle_selection input').on('change', function(e){
         if($(this).is(':checked')){
             $('.student-list input[type=checkbox]').each(function(index, element){
