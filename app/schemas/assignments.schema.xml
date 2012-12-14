@@ -28,10 +28,10 @@
             <rule name="required" message="The field created_at is required."/>
             <rule name="type" value="string" message="The column created_at must be an string value."/>
         </validator>
-        <foreign-key foreignTable="courses" name="assignment_categories_courses" onUpdate="CASCADE">
+        <foreign-key foreignTable="courses" name="assignment_categories_courses" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="course_id" foreign="id"/>
         </foreign-key>
-        <foreign-key foreignTable="teachers" name="assignment_categories_teachers" onUpdate="CASCADE">
+        <foreign-key foreignTable="teachers" name="assignment_categories_teachers" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="teacher_id" foreign="id"/>
         </foreign-key>
         <index name="assignment_categories_courses">
@@ -85,13 +85,13 @@
         <validator column="due_at">
             <rule name="type" value="string" message="The column due_at must be an string value."/>
         </validator>
-        <foreign-key foreignTable="teachers" name="assignments_teachers" onUpdate="CASCADE">
+        <foreign-key foreignTable="teachers" name="assignments_teachers" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="teacher_id" foreign="id"/>
         </foreign-key>
-        <foreign-key foreignTable="courses" name="assignments_courses" onUpdate="CASCADE">
+        <foreign-key foreignTable="courses" name="assignments_courses" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="course_id" foreign="id"/>
         </foreign-key>
-        <foreign-key foreignTable="assignment_categories" name="assignments_assignment_categories" onUpdate="CASCADE">
+        <foreign-key foreignTable="assignment_categories" name="assignments_assignment_categories" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="assignment_category_id" foreign="id"/>
         </foreign-key>
         <index name="assignments_teachers">
@@ -128,10 +128,10 @@
             <rule name="required" message="The field created_at is required."/>
             <rule name="type" value="string" message="The column created_at must be an string value."/>
         </validator>
-        <foreign-key foreignTable="students" name="student_assignments_student" onUpdate="CASCADE">
+        <foreign-key foreignTable="students" name="student_assignments_student" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="student_id" foreign="id"/>
         </foreign-key>
-        <foreign-key foreignTable="assignments" name="student_assignments_assignments" onUpdate="CASCADE">
+        <foreign-key foreignTable="assignments" name="student_assignments_assignments" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="assignment_id" foreign="id"/>
         </foreign-key>
         <index name="student_assignments_student">

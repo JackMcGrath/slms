@@ -13,6 +13,7 @@ use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\PeerEvent;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentCategory;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentCategoryPeer;
+use Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer;
 use Zerebral\BusinessBundle\Model\Assignment\map\AssignmentCategoryTableMap;
 use Zerebral\BusinessBundle\Model\Course\CoursePeer;
 use Zerebral\BusinessBundle\Model\User\TeacherPeer;
@@ -379,6 +380,9 @@ abstract class BaseAssignmentCategoryPeer
      */
     public static function clearRelatedInstancePool()
     {
+        // Invalidate objects in AssignmentPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        AssignmentPeer::clearInstancePool();
     }
 
     /**
