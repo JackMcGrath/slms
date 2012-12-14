@@ -49,10 +49,10 @@
                             <div class="stat">
                                 {% if is_granted('ROLE_STUDENT') %}
                                     <div class="instructor-name">Instructor <b>{{ assignment.teacher.fullName }}</b></div>
-                                    <div class="due-at"><i class="icon-small-clock"></i> Due <small>{{ assignment.dueAt | date('D, M d H:i') }}</small></div>
+                                    <div class="due-at"><i class="icon-small-clock"></i> Due <small>{{ assignment.dueAt | date('Hi') == '0000' ? assignment.dueAt | date('D, M d') : assignment.dueAt | date('D, M d H:i') }}</small></div>
                                     <div><span class="badge">-</span><a href="#">Comments</a></span></div>
                                 {% else %}
-                                    <div class="due-at"><i class="icon-small-clock"></i> Due <small>{{ assignment.dueAt | date('D, M d H:i') }}</small></div>
+                                    <div class="due-at"><i class="icon-small-clock"></i> Due <small>{{ assignment.dueAt | date('Hi') == '0000' ? assignment.dueAt | date('D, M d') : assignment.dueAt | date('D, M d H:i') }}</small></div>
                                     <div><span class="badge">-</span><a href="">Assignments</a></div>
                                     <div><span class="badge">-</span><a href="">Solutions</a></div>
                                     <div><span class="badge badge-inverse">-</span><a href="">Promises</a></div>
