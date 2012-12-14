@@ -57,7 +57,7 @@ class GradeLevelTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Course', 'Zerebral\\BusinessBundle\\Model\\Course\\Course', RelationMap::ONE_TO_MANY, array('id' => 'grade_level_id', ), null, 'CASCADE', 'Courses');
+        $this->addRelation('Course', 'Zerebral\\BusinessBundle\\Model\\Course\\Course', RelationMap::ONE_TO_MANY, array('id' => 'grade_level_id', ), 'CASCADE', 'CASCADE', 'Courses');
     } // buildRelations()
 
     /**
