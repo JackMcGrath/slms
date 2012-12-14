@@ -99,10 +99,10 @@
                         <table class="table table-bordered table-striped table-condensed student-list">
                         {% for student in students %}
                             <tr>
-                                <td>{{ student.getUser.getFirstName }} {{ student.getUser.getLastName }}</td>
                                 <td>
                                     <input type="checkbox" value="{{ student.getId }}" name="students[]" {% if student.getId in assignedStudents %} checked="" {% endif %}/>
                                 </td>
+                                <td>{{ student.getUser.getFirstName }} {{ student.getUser.getLastName }}</td>
                             </tr>
                         {%  endfor %}
                         </table>
