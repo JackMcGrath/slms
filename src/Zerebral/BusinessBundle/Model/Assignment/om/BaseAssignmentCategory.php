@@ -24,6 +24,8 @@ use Zerebral\BusinessBundle\Model\Assignment\AssignmentCategoryQuery;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery;
 use Zerebral\BusinessBundle\Model\Course\Course;
 use Zerebral\BusinessBundle\Model\Course\CourseQuery;
+use Zerebral\BusinessBundle\Model\User\Teacher;
+use Zerebral\BusinessBundle\Model\User\TeacherQuery;
 
 abstract class BaseAssignmentCategory extends BaseObject implements Persistent
 {
@@ -59,6 +61,12 @@ abstract class BaseAssignmentCategory extends BaseObject implements Persistent
     protected $course_id;
 
     /**
+     * The value for the teacher_id field.
+     * @var        int
+     */
+    protected $teacher_id;
+
+    /**
      * The value for the name field.
      * @var        string
      */
@@ -74,6 +82,11 @@ abstract class BaseAssignmentCategory extends BaseObject implements Persistent
      * @var        Course
      */
     protected $aCourse;
+
+    /**
+     * @var        Teacher
+     */
+    protected $aTeacher;
 
     /**
      * @var        PropelObjectCollection|Assignment[] Collection to store aggregation of Assignment objects.
@@ -119,6 +132,16 @@ abstract class BaseAssignmentCategory extends BaseObject implements Persistent
     public function getCourseId()
     {
         return $this->course_id;
+    }
+
+    /**
+     * Get the [teacher_id] column value.
+     *
+     * @return int
+     */
+    public function getTeacherId()
+    {
+        return $this->teacher_id;
     }
 
     /**
@@ -218,6 +241,31 @@ abstract class BaseAssignmentCategory extends BaseObject implements Persistent
     } // setCourseId()
 
     /**
+     * Set the value of [teacher_id] column.
+     *
+     * @param int $v new value
+     * @return AssignmentCategory The current object (for fluent API support)
+     */
+    public function setTeacherId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->teacher_id !== $v) {
+            $this->teacher_id = $v;
+            $this->modifiedColumns[] = AssignmentCategoryPeer::TEACHER_ID;
+        }
+
+        if ($this->aTeacher !== null && $this->aTeacher->getId() !== $v) {
+            $this->aTeacher = null;
+        }
+
+
+        return $this;
+    } // setTeacherId()
+
+    /**
      * Set the value of [name] column.
      *
      * @param string $v new value
@@ -295,8 +343,9 @@ abstract class BaseAssignmentCategory extends BaseObject implements Persistent
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->course_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-            $this->name = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-            $this->created_at = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+            $this->teacher_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
+            $this->name = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+            $this->created_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -305,7 +354,7 @@ abstract class BaseAssignmentCategory extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 4; // 4 = AssignmentCategoryPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = AssignmentCategoryPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating AssignmentCategory object", $e);
@@ -330,6 +379,9 @@ abstract class BaseAssignmentCategory extends BaseObject implements Persistent
 
         if ($this->aCourse !== null && $this->course_id !== $this->aCourse->getId()) {
             $this->aCourse = null;
+        }
+        if ($this->aTeacher !== null && $this->teacher_id !== $this->aTeacher->getId()) {
+            $this->aTeacher = null;
         }
     } // ensureConsistency
 
@@ -371,6 +423,7 @@ abstract class BaseAssignmentCategory extends BaseObject implements Persistent
         if ($deep) {  // also de-associate any related objects?
 
             $this->aCourse = null;
+            $this->aTeacher = null;
             $this->collAssignments = null;
 
         } // if (deep)
@@ -514,6 +567,13 @@ abstract class BaseAssignmentCategory extends BaseObject implements Persistent
                 $this->setCourse($this->aCourse);
             }
 
+            if ($this->aTeacher !== null) {
+                if ($this->aTeacher->isModified() || $this->aTeacher->isNew()) {
+                    $affectedRows += $this->aTeacher->save($con);
+                }
+                $this->setTeacher($this->aTeacher);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -574,6 +634,9 @@ abstract class BaseAssignmentCategory extends BaseObject implements Persistent
         if ($this->isColumnModified(AssignmentCategoryPeer::COURSE_ID)) {
             $modifiedColumns[':p' . $index++]  = '`course_id`';
         }
+        if ($this->isColumnModified(AssignmentCategoryPeer::TEACHER_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`teacher_id`';
+        }
         if ($this->isColumnModified(AssignmentCategoryPeer::NAME)) {
             $modifiedColumns[':p' . $index++]  = '`name`';
         }
@@ -596,6 +659,9 @@ abstract class BaseAssignmentCategory extends BaseObject implements Persistent
                         break;
                     case '`course_id`':
                         $stmt->bindValue($identifier, $this->course_id, PDO::PARAM_INT);
+                        break;
+                    case '`teacher_id`':
+                        $stmt->bindValue($identifier, $this->teacher_id, PDO::PARAM_INT);
                         break;
                     case '`name`':
                         $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
@@ -708,6 +774,12 @@ abstract class BaseAssignmentCategory extends BaseObject implements Persistent
                 }
             }
 
+            if ($this->aTeacher !== null) {
+                if (!$this->aTeacher->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aTeacher->getValidationFailures());
+                }
+            }
+
 
             if (($retval = AssignmentCategoryPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
@@ -764,9 +836,12 @@ abstract class BaseAssignmentCategory extends BaseObject implements Persistent
                 return $this->getCourseId();
                 break;
             case 2:
-                return $this->getName();
+                return $this->getTeacherId();
                 break;
             case 3:
+                return $this->getName();
+                break;
+            case 4:
                 return $this->getCreatedAt();
                 break;
             default:
@@ -800,12 +875,16 @@ abstract class BaseAssignmentCategory extends BaseObject implements Persistent
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getCourseId(),
-            $keys[2] => $this->getName(),
-            $keys[3] => $this->getCreatedAt(),
+            $keys[2] => $this->getTeacherId(),
+            $keys[3] => $this->getName(),
+            $keys[4] => $this->getCreatedAt(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aCourse) {
                 $result['Course'] = $this->aCourse->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aTeacher) {
+                $result['Teacher'] = $this->aTeacher->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->collAssignments) {
                 $result['Assignments'] = $this->collAssignments->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -851,9 +930,12 @@ abstract class BaseAssignmentCategory extends BaseObject implements Persistent
                 $this->setCourseId($value);
                 break;
             case 2:
-                $this->setName($value);
+                $this->setTeacherId($value);
                 break;
             case 3:
+                $this->setName($value);
+                break;
+            case 4:
                 $this->setCreatedAt($value);
                 break;
         } // switch()
@@ -882,8 +964,9 @@ abstract class BaseAssignmentCategory extends BaseObject implements Persistent
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setCourseId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setName($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
+        if (array_key_exists($keys[2], $arr)) $this->setTeacherId($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setName($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
     }
 
     /**
@@ -897,6 +980,7 @@ abstract class BaseAssignmentCategory extends BaseObject implements Persistent
 
         if ($this->isColumnModified(AssignmentCategoryPeer::ID)) $criteria->add(AssignmentCategoryPeer::ID, $this->id);
         if ($this->isColumnModified(AssignmentCategoryPeer::COURSE_ID)) $criteria->add(AssignmentCategoryPeer::COURSE_ID, $this->course_id);
+        if ($this->isColumnModified(AssignmentCategoryPeer::TEACHER_ID)) $criteria->add(AssignmentCategoryPeer::TEACHER_ID, $this->teacher_id);
         if ($this->isColumnModified(AssignmentCategoryPeer::NAME)) $criteria->add(AssignmentCategoryPeer::NAME, $this->name);
         if ($this->isColumnModified(AssignmentCategoryPeer::CREATED_AT)) $criteria->add(AssignmentCategoryPeer::CREATED_AT, $this->created_at);
 
@@ -963,6 +1047,7 @@ abstract class BaseAssignmentCategory extends BaseObject implements Persistent
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setCourseId($this->getCourseId());
+        $copyObj->setTeacherId($this->getTeacherId());
         $copyObj->setName($this->getName());
         $copyObj->setCreatedAt($this->getCreatedAt());
 
@@ -1079,6 +1164,58 @@ abstract class BaseAssignmentCategory extends BaseObject implements Persistent
         }
 
         return $this->aCourse;
+    }
+
+    /**
+     * Declares an association between this object and a Teacher object.
+     *
+     * @param             Teacher $v
+     * @return AssignmentCategory The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setTeacher(Teacher $v = null)
+    {
+        if ($v === null) {
+            $this->setTeacherId(NULL);
+        } else {
+            $this->setTeacherId($v->getId());
+        }
+
+        $this->aTeacher = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Teacher object, it will not be re-added.
+        if ($v !== null) {
+            $v->addAssignmentCategory($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Teacher object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return Teacher The associated Teacher object.
+     * @throws PropelException
+     */
+    public function getTeacher(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->aTeacher === null && ($this->teacher_id !== null) && $doQuery) {
+            $this->aTeacher = TeacherQuery::create()->findPk($this->teacher_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aTeacher->addAssignmentCategories($this);
+             */
+        }
+
+        return $this->aTeacher;
     }
 
 
@@ -1214,9 +1351,11 @@ abstract class BaseAssignmentCategory extends BaseObject implements Persistent
      */
     public function setAssignments(PropelCollection $assignments, PropelPDO $con = null)
     {
-        $this->assignmentsScheduledForDeletion = $this->getAssignments(new Criteria(), $con)->diff($assignments);
+        $assignmentsToDelete = $this->getAssignments(new Criteria(), $con)->diff($assignments);
 
-        foreach ($this->assignmentsScheduledForDeletion as $assignmentRemoved) {
+        $this->assignmentsScheduledForDeletion = unserialize(serialize($assignmentsToDelete));
+
+        foreach ($assignmentsToDelete as $assignmentRemoved) {
             $assignmentRemoved->setAssignmentCategory(null);
         }
 
@@ -1305,7 +1444,7 @@ abstract class BaseAssignmentCategory extends BaseObject implements Persistent
                 $this->assignmentsScheduledForDeletion = clone $this->collAssignments;
                 $this->assignmentsScheduledForDeletion->clear();
             }
-            $this->assignmentsScheduledForDeletion[]= $assignment;
+            $this->assignmentsScheduledForDeletion[]= clone $assignment;
             $assignment->setAssignmentCategory(null);
         }
 
@@ -1369,6 +1508,7 @@ abstract class BaseAssignmentCategory extends BaseObject implements Persistent
     {
         $this->id = null;
         $this->course_id = null;
+        $this->teacher_id = null;
         $this->name = null;
         $this->created_at = null;
         $this->alreadyInSave = false;
@@ -1403,6 +1543,7 @@ abstract class BaseAssignmentCategory extends BaseObject implements Persistent
         }
         $this->collAssignments = null;
         $this->aCourse = null;
+        $this->aTeacher = null;
     }
 
     /**

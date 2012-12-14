@@ -14,6 +14,7 @@ use Glorpen\PropelEvent\PropelEventBundle\Events\PeerEvent;
 use Zerebral\BusinessBundle\Model\Course\Discipline;
 use Zerebral\BusinessBundle\Model\Course\DisciplinePeer;
 use Zerebral\BusinessBundle\Model\Course\map\DisciplineTableMap;
+use Zerebral\BusinessBundle\Model\User\TeacherPeer;
 
 abstract class BaseDisciplinePeer
 {
@@ -31,16 +32,19 @@ abstract class BaseDisciplinePeer
     const TM_CLASS = 'DisciplineTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 2;
+    const NUM_COLUMNS = 3;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 2;
+    const NUM_HYDRATE_COLUMNS = 3;
 
     /** the column name for the id field */
     const ID = 'disciplines.id';
+
+    /** the column name for the teacher_id field */
+    const TEACHER_ID = 'disciplines.teacher_id';
 
     /** the column name for the name field */
     const NAME = 'disciplines.name';
@@ -64,12 +68,12 @@ abstract class BaseDisciplinePeer
      * e.g. DisciplinePeer::$fieldNames[DisciplinePeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', ),
-        BasePeer::TYPE_COLNAME => array (DisciplinePeer::ID, DisciplinePeer::NAME, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'name', ),
-        BasePeer::TYPE_NUM => array (0, 1, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'TeacherId', 'Name', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'teacherId', 'name', ),
+        BasePeer::TYPE_COLNAME => array (DisciplinePeer::ID, DisciplinePeer::TEACHER_ID, DisciplinePeer::NAME, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TEACHER_ID', 'NAME', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'teacher_id', 'name', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, )
     );
 
     /**
@@ -79,12 +83,12 @@ abstract class BaseDisciplinePeer
      * e.g. DisciplinePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, ),
-        BasePeer::TYPE_COLNAME => array (DisciplinePeer::ID => 0, DisciplinePeer::NAME => 1, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, ),
-        BasePeer::TYPE_NUM => array (0, 1, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'TeacherId' => 1, 'Name' => 2, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'teacherId' => 1, 'name' => 2, ),
+        BasePeer::TYPE_COLNAME => array (DisciplinePeer::ID => 0, DisciplinePeer::TEACHER_ID => 1, DisciplinePeer::NAME => 2, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TEACHER_ID' => 1, 'NAME' => 2, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'teacher_id' => 1, 'name' => 2, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, )
     );
 
     /**
@@ -159,9 +163,11 @@ abstract class BaseDisciplinePeer
     {
         if (null === $alias) {
             $criteria->addSelectColumn(DisciplinePeer::ID);
+            $criteria->addSelectColumn(DisciplinePeer::TEACHER_ID);
             $criteria->addSelectColumn(DisciplinePeer::NAME);
         } else {
             $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.teacher_id');
             $criteria->addSelectColumn($alias . '.name');
         }
     }
@@ -458,6 +464,244 @@ abstract class BaseDisciplinePeer
         return array($obj, $col);
     }
 
+
+    /**
+     * Returns the number of rows matching criteria, joining the related Teacher table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinTeacher(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(DisciplinePeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            DisciplinePeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(DisciplinePeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(DisciplinePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(DisciplinePeer::TEACHER_ID, TeacherPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Selects a collection of Discipline objects pre-filled with their Teacher objects.
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of Discipline objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinTeacher(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(DisciplinePeer::DATABASE_NAME);
+        }
+
+        DisciplinePeer::addSelectColumns($criteria);
+        $startcol = DisciplinePeer::NUM_HYDRATE_COLUMNS;
+        TeacherPeer::addSelectColumns($criteria);
+
+        $criteria->addJoin(DisciplinePeer::TEACHER_ID, TeacherPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = DisciplinePeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = DisciplinePeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+
+                $cls = DisciplinePeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                DisciplinePeer::addInstanceToPool($obj1, $key1);
+            } // if $obj1 already loaded
+
+            $key2 = TeacherPeer::getPrimaryKeyHashFromRow($row, $startcol);
+            if ($key2 !== null) {
+                $obj2 = TeacherPeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = TeacherPeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol);
+                    TeacherPeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 already loaded
+
+                // Add the $obj1 (Discipline) to $obj2 (Teacher)
+                $obj2->addDiscipline($obj1);
+
+            } // if joined row was not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining all related tables
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAll(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(DisciplinePeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            DisciplinePeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(DisciplinePeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(DisciplinePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(DisciplinePeer::TEACHER_ID, TeacherPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+    /**
+     * Selects a collection of Discipline objects pre-filled with all related objects.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of Discipline objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAll(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(DisciplinePeer::DATABASE_NAME);
+        }
+
+        DisciplinePeer::addSelectColumns($criteria);
+        $startcol2 = DisciplinePeer::NUM_HYDRATE_COLUMNS;
+
+        TeacherPeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + TeacherPeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(DisciplinePeer::TEACHER_ID, TeacherPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = DisciplinePeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = DisciplinePeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = DisciplinePeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                DisciplinePeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+            // Add objects for joined Teacher rows
+
+            $key2 = TeacherPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+            if ($key2 !== null) {
+                $obj2 = TeacherPeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = TeacherPeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    TeacherPeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 loaded
+
+                // Add the $obj1 (Discipline) to the collection in $obj2 (Teacher)
+                $obj2->addDiscipline($obj1);
+            } // if joined row not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
     /**
      * Returns the TableMap related to this peer.
      * This method is not needed for general use but a specific application could have a need.
@@ -696,6 +940,9 @@ abstract class BaseDisciplinePeer
                 }
             }
         } else {
+
+        if ($obj->isNew() || $obj->isColumnModified(DisciplinePeer::TEACHER_ID))
+            $columns[DisciplinePeer::TEACHER_ID] = $obj->getTeacherId();
 
         if ($obj->isNew() || $obj->isColumnModified(DisciplinePeer::NAME))
             $columns[DisciplinePeer::NAME] = $obj->getName();

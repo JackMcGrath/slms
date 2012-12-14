@@ -44,6 +44,7 @@ class AssignmentCategoryTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'TINYINT', true, 2, null);
         $this->addForeignKey('course_id', 'CourseId', 'INTEGER', 'courses', 'id', false, null, null);
+        $this->addForeignKey('teacher_id', 'TeacherId', 'INTEGER', 'teachers', 'id', false, null, null);
         $this->addColumn('name', 'Name', 'VARCHAR', true, 50, null);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', true, null, null);
         // validators
@@ -52,6 +53,9 @@ class AssignmentCategoryTableMap extends TableMap
         $this->addValidator('id', 'type', 'propel.validator.TypeValidator', 'int', 'The column id must be an int value.');
         $this->addValidator('course_id', 'maxValue', 'propel.validator.MaxValueValidator', 'REPLACEME', 'The field course_id must be not greater than REPLACEME.');
         $this->addValidator('course_id', 'type', 'propel.validator.TypeValidator', 'int', 'The column course_id must be an int value.');
+        $this->addValidator('teacher_id', 'required', 'propel.validator.RequiredValidator', '', 'The field teacher_id is required.');
+        $this->addValidator('teacher_id', 'maxValue', 'propel.validator.MaxValueValidator', 'REPLACEME', 'The field teacher_id must be not greater than REPLACEME.');
+        $this->addValidator('teacher_id', 'type', 'propel.validator.TypeValidator', 'int', 'The column teacher_id must be an int value.');
         $this->addValidator('name', 'required', 'propel.validator.RequiredValidator', '', 'The field name is required.');
         $this->addValidator('name', 'type', 'propel.validator.TypeValidator', 'string', 'The column name must be an string value.');
         $this->addValidator('created_at', 'required', 'propel.validator.RequiredValidator', '', 'The field created_at is required.');
@@ -64,6 +68,7 @@ class AssignmentCategoryTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('Course', 'Zerebral\\BusinessBundle\\Model\\Course\\Course', RelationMap::MANY_TO_ONE, array('course_id' => 'id', ), null, 'CASCADE');
+        $this->addRelation('Teacher', 'Zerebral\\BusinessBundle\\Model\\User\\Teacher', RelationMap::MANY_TO_ONE, array('teacher_id' => 'id', ), null, 'CASCADE');
         $this->addRelation('Assignment', 'Zerebral\\BusinessBundle\\Model\\Assignment\\Assignment', RelationMap::ONE_TO_MANY, array('id' => 'assignment_category_id', ), null, 'CASCADE', 'Assignments');
     } // buildRelations()
 

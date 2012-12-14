@@ -1630,9 +1630,11 @@ abstract class BaseAssignment extends BaseObject implements Persistent
      */
     public function setStudentAssignments(PropelCollection $studentAssignments, PropelPDO $con = null)
     {
-        $this->studentAssignmentsScheduledForDeletion = $this->getStudentAssignments(new Criteria(), $con)->diff($studentAssignments);
+        $studentAssignmentsToDelete = $this->getStudentAssignments(new Criteria(), $con)->diff($studentAssignments);
 
-        foreach ($this->studentAssignmentsScheduledForDeletion as $studentAssignmentRemoved) {
+        $this->studentAssignmentsScheduledForDeletion = unserialize(serialize($studentAssignmentsToDelete));
+
+        foreach ($studentAssignmentsToDelete as $studentAssignmentRemoved) {
             $studentAssignmentRemoved->setAssignment(null);
         }
 
@@ -1721,7 +1723,7 @@ abstract class BaseAssignment extends BaseObject implements Persistent
                 $this->studentAssignmentsScheduledForDeletion = clone $this->collStudentAssignments;
                 $this->studentAssignmentsScheduledForDeletion->clear();
             }
-            $this->studentAssignmentsScheduledForDeletion[]= $studentAssignment;
+            $this->studentAssignmentsScheduledForDeletion[]= clone $studentAssignment;
             $studentAssignment->setAssignment(null);
         }
 
