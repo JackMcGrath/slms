@@ -19,15 +19,18 @@ use Zerebral\BusinessBundle\Model\Assignment\AssignmentCategory;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentCategoryPeer;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentCategoryQuery;
 use Zerebral\BusinessBundle\Model\Course\Course;
+use Zerebral\BusinessBundle\Model\User\Teacher;
 
 /**
  * @method AssignmentCategoryQuery orderById($order = Criteria::ASC) Order by the id column
  * @method AssignmentCategoryQuery orderByCourseId($order = Criteria::ASC) Order by the course_id column
+ * @method AssignmentCategoryQuery orderByTeacherId($order = Criteria::ASC) Order by the teacher_id column
  * @method AssignmentCategoryQuery orderByName($order = Criteria::ASC) Order by the name column
  * @method AssignmentCategoryQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  *
  * @method AssignmentCategoryQuery groupById() Group by the id column
  * @method AssignmentCategoryQuery groupByCourseId() Group by the course_id column
+ * @method AssignmentCategoryQuery groupByTeacherId() Group by the teacher_id column
  * @method AssignmentCategoryQuery groupByName() Group by the name column
  * @method AssignmentCategoryQuery groupByCreatedAt() Group by the created_at column
  *
@@ -39,6 +42,10 @@ use Zerebral\BusinessBundle\Model\Course\Course;
  * @method AssignmentCategoryQuery rightJoinCourse($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Course relation
  * @method AssignmentCategoryQuery innerJoinCourse($relationAlias = null) Adds a INNER JOIN clause to the query using the Course relation
  *
+ * @method AssignmentCategoryQuery leftJoinTeacher($relationAlias = null) Adds a LEFT JOIN clause to the query using the Teacher relation
+ * @method AssignmentCategoryQuery rightJoinTeacher($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Teacher relation
+ * @method AssignmentCategoryQuery innerJoinTeacher($relationAlias = null) Adds a INNER JOIN clause to the query using the Teacher relation
+ *
  * @method AssignmentCategoryQuery leftJoinAssignment($relationAlias = null) Adds a LEFT JOIN clause to the query using the Assignment relation
  * @method AssignmentCategoryQuery rightJoinAssignment($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Assignment relation
  * @method AssignmentCategoryQuery innerJoinAssignment($relationAlias = null) Adds a INNER JOIN clause to the query using the Assignment relation
@@ -47,11 +54,13 @@ use Zerebral\BusinessBundle\Model\Course\Course;
  * @method AssignmentCategory findOneOrCreate(PropelPDO $con = null) Return the first AssignmentCategory matching the query, or a new AssignmentCategory object populated from the query conditions when no match is found
  *
  * @method AssignmentCategory findOneByCourseId(int $course_id) Return the first AssignmentCategory filtered by the course_id column
+ * @method AssignmentCategory findOneByTeacherId(int $teacher_id) Return the first AssignmentCategory filtered by the teacher_id column
  * @method AssignmentCategory findOneByName(string $name) Return the first AssignmentCategory filtered by the name column
  * @method AssignmentCategory findOneByCreatedAt(string $created_at) Return the first AssignmentCategory filtered by the created_at column
  *
  * @method array findById(int $id) Return AssignmentCategory objects filtered by the id column
  * @method array findByCourseId(int $course_id) Return AssignmentCategory objects filtered by the course_id column
+ * @method array findByTeacherId(int $teacher_id) Return AssignmentCategory objects filtered by the teacher_id column
  * @method array findByName(string $name) Return AssignmentCategory objects filtered by the name column
  * @method array findByCreatedAt(string $created_at) Return AssignmentCategory objects filtered by the created_at column
  */
@@ -156,7 +165,7 @@ abstract class BaseAssignmentCategoryQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `course_id`, `name`, `created_at` FROM `assignment_categories` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `course_id`, `teacher_id`, `name`, `created_at` FROM `assignment_categories` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -330,6 +339,49 @@ abstract class BaseAssignmentCategoryQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the teacher_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByTeacherId(1234); // WHERE teacher_id = 1234
+     * $query->filterByTeacherId(array(12, 34)); // WHERE teacher_id IN (12, 34)
+     * $query->filterByTeacherId(array('min' => 12)); // WHERE teacher_id > 12
+     * </code>
+     *
+     * @see       filterByTeacher()
+     *
+     * @param     mixed $teacherId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return AssignmentCategoryQuery The current query, for fluid interface
+     */
+    public function filterByTeacherId($teacherId = null, $comparison = null)
+    {
+        if (is_array($teacherId)) {
+            $useMinMax = false;
+            if (isset($teacherId['min'])) {
+                $this->addUsingAlias(AssignmentCategoryPeer::TEACHER_ID, $teacherId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($teacherId['max'])) {
+                $this->addUsingAlias(AssignmentCategoryPeer::TEACHER_ID, $teacherId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(AssignmentCategoryPeer::TEACHER_ID, $teacherId, $comparison);
+    }
+
+    /**
      * Filter the query on the name column
      *
      * Example usage:
@@ -475,6 +527,82 @@ abstract class BaseAssignmentCategoryQuery extends ModelCriteria
         return $this
             ->joinCourse($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Course', '\Zerebral\BusinessBundle\Model\Course\CourseQuery');
+    }
+
+    /**
+     * Filter the query by a related Teacher object
+     *
+     * @param   Teacher|PropelObjectCollection $teacher The related object(s) to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   AssignmentCategoryQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByTeacher($teacher, $comparison = null)
+    {
+        if ($teacher instanceof Teacher) {
+            return $this
+                ->addUsingAlias(AssignmentCategoryPeer::TEACHER_ID, $teacher->getId(), $comparison);
+        } elseif ($teacher instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(AssignmentCategoryPeer::TEACHER_ID, $teacher->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByTeacher() only accepts arguments of type Teacher or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Teacher relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return AssignmentCategoryQuery The current query, for fluid interface
+     */
+    public function joinTeacher($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Teacher');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Teacher');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Teacher relation Teacher object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Zerebral\BusinessBundle\Model\User\TeacherQuery A secondary query class using the current class as primary query
+     */
+    public function useTeacherQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinTeacher($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Teacher', '\Zerebral\BusinessBundle\Model\User\TeacherQuery');
     }
 
     /**

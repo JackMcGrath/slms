@@ -15,6 +15,7 @@ use Zerebral\BusinessBundle\Model\Assignment\AssignmentCategory;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentCategoryPeer;
 use Zerebral\BusinessBundle\Model\Assignment\map\AssignmentCategoryTableMap;
 use Zerebral\BusinessBundle\Model\Course\CoursePeer;
+use Zerebral\BusinessBundle\Model\User\TeacherPeer;
 
 abstract class BaseAssignmentCategoryPeer
 {
@@ -32,19 +33,22 @@ abstract class BaseAssignmentCategoryPeer
     const TM_CLASS = 'AssignmentCategoryTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 5;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /** the column name for the id field */
     const ID = 'assignment_categories.id';
 
     /** the column name for the course_id field */
     const COURSE_ID = 'assignment_categories.course_id';
+
+    /** the column name for the teacher_id field */
+    const TEACHER_ID = 'assignment_categories.teacher_id';
 
     /** the column name for the name field */
     const NAME = 'assignment_categories.name';
@@ -71,12 +75,12 @@ abstract class BaseAssignmentCategoryPeer
      * e.g. AssignmentCategoryPeer::$fieldNames[AssignmentCategoryPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'CourseId', 'Name', 'CreatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'courseId', 'name', 'createdAt', ),
-        BasePeer::TYPE_COLNAME => array (AssignmentCategoryPeer::ID, AssignmentCategoryPeer::COURSE_ID, AssignmentCategoryPeer::NAME, AssignmentCategoryPeer::CREATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'COURSE_ID', 'NAME', 'CREATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'course_id', 'name', 'created_at', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'CourseId', 'TeacherId', 'Name', 'CreatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'courseId', 'teacherId', 'name', 'createdAt', ),
+        BasePeer::TYPE_COLNAME => array (AssignmentCategoryPeer::ID, AssignmentCategoryPeer::COURSE_ID, AssignmentCategoryPeer::TEACHER_ID, AssignmentCategoryPeer::NAME, AssignmentCategoryPeer::CREATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'COURSE_ID', 'TEACHER_ID', 'NAME', 'CREATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'course_id', 'teacher_id', 'name', 'created_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
     /**
@@ -86,12 +90,12 @@ abstract class BaseAssignmentCategoryPeer
      * e.g. AssignmentCategoryPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CourseId' => 1, 'Name' => 2, 'CreatedAt' => 3, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'courseId' => 1, 'name' => 2, 'createdAt' => 3, ),
-        BasePeer::TYPE_COLNAME => array (AssignmentCategoryPeer::ID => 0, AssignmentCategoryPeer::COURSE_ID => 1, AssignmentCategoryPeer::NAME => 2, AssignmentCategoryPeer::CREATED_AT => 3, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'COURSE_ID' => 1, 'NAME' => 2, 'CREATED_AT' => 3, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'course_id' => 1, 'name' => 2, 'created_at' => 3, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CourseId' => 1, 'TeacherId' => 2, 'Name' => 3, 'CreatedAt' => 4, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'courseId' => 1, 'teacherId' => 2, 'name' => 3, 'createdAt' => 4, ),
+        BasePeer::TYPE_COLNAME => array (AssignmentCategoryPeer::ID => 0, AssignmentCategoryPeer::COURSE_ID => 1, AssignmentCategoryPeer::TEACHER_ID => 2, AssignmentCategoryPeer::NAME => 3, AssignmentCategoryPeer::CREATED_AT => 4, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'COURSE_ID' => 1, 'TEACHER_ID' => 2, 'NAME' => 3, 'CREATED_AT' => 4, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'course_id' => 1, 'teacher_id' => 2, 'name' => 3, 'created_at' => 4, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
     /**
@@ -167,11 +171,13 @@ abstract class BaseAssignmentCategoryPeer
         if (null === $alias) {
             $criteria->addSelectColumn(AssignmentCategoryPeer::ID);
             $criteria->addSelectColumn(AssignmentCategoryPeer::COURSE_ID);
+            $criteria->addSelectColumn(AssignmentCategoryPeer::TEACHER_ID);
             $criteria->addSelectColumn(AssignmentCategoryPeer::NAME);
             $criteria->addSelectColumn(AssignmentCategoryPeer::CREATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.course_id');
+            $criteria->addSelectColumn($alias . '.teacher_id');
             $criteria->addSelectColumn($alias . '.name');
             $criteria->addSelectColumn($alias . '.created_at');
         }
@@ -522,6 +528,57 @@ abstract class BaseAssignmentCategoryPeer
 
 
     /**
+     * Returns the number of rows matching criteria, joining the related Teacher table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinTeacher(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(AssignmentCategoryPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            AssignmentCategoryPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(AssignmentCategoryPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(AssignmentCategoryPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(AssignmentCategoryPeer::TEACHER_ID, TeacherPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
      * Selects a collection of AssignmentCategory objects pre-filled with their Course objects.
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
@@ -589,6 +646,73 @@ abstract class BaseAssignmentCategoryPeer
 
 
     /**
+     * Selects a collection of AssignmentCategory objects pre-filled with their Teacher objects.
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of AssignmentCategory objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinTeacher(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(AssignmentCategoryPeer::DATABASE_NAME);
+        }
+
+        AssignmentCategoryPeer::addSelectColumns($criteria);
+        $startcol = AssignmentCategoryPeer::NUM_HYDRATE_COLUMNS;
+        TeacherPeer::addSelectColumns($criteria);
+
+        $criteria->addJoin(AssignmentCategoryPeer::TEACHER_ID, TeacherPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = AssignmentCategoryPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = AssignmentCategoryPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+
+                $cls = AssignmentCategoryPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                AssignmentCategoryPeer::addInstanceToPool($obj1, $key1);
+            } // if $obj1 already loaded
+
+            $key2 = TeacherPeer::getPrimaryKeyHashFromRow($row, $startcol);
+            if ($key2 !== null) {
+                $obj2 = TeacherPeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = TeacherPeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol);
+                    TeacherPeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 already loaded
+
+                // Add the $obj1 (AssignmentCategory) to $obj2 (Teacher)
+                $obj2->addAssignmentCategory($obj1);
+
+            } // if joined row was not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
      * Returns the number of rows matching criteria, joining all related tables
      *
      * @param      Criteria $criteria
@@ -625,6 +749,8 @@ abstract class BaseAssignmentCategoryPeer
         }
 
         $criteria->addJoin(AssignmentCategoryPeer::COURSE_ID, CoursePeer::ID, $join_behavior);
+
+        $criteria->addJoin(AssignmentCategoryPeer::TEACHER_ID, TeacherPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -663,7 +789,12 @@ abstract class BaseAssignmentCategoryPeer
         CoursePeer::addSelectColumns($criteria);
         $startcol3 = $startcol2 + CoursePeer::NUM_HYDRATE_COLUMNS;
 
+        TeacherPeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + TeacherPeer::NUM_HYDRATE_COLUMNS;
+
         $criteria->addJoin(AssignmentCategoryPeer::COURSE_ID, CoursePeer::ID, $join_behavior);
+
+        $criteria->addJoin(AssignmentCategoryPeer::TEACHER_ID, TeacherPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
@@ -699,6 +830,274 @@ abstract class BaseAssignmentCategoryPeer
                 // Add the $obj1 (AssignmentCategory) to the collection in $obj2 (Course)
                 $obj2->addAssignmentCategory($obj1);
             } // if joined row not null
+
+            // Add objects for joined Teacher rows
+
+            $key3 = TeacherPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+            if ($key3 !== null) {
+                $obj3 = TeacherPeer::getInstanceFromPool($key3);
+                if (!$obj3) {
+
+                    $cls = TeacherPeer::getOMClass();
+
+                    $obj3 = new $cls();
+                    $obj3->hydrate($row, $startcol3);
+                    TeacherPeer::addInstanceToPool($obj3, $key3);
+                } // if obj3 loaded
+
+                // Add the $obj1 (AssignmentCategory) to the collection in $obj3 (Teacher)
+                $obj3->addAssignmentCategory($obj1);
+            } // if joined row not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related Course table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAllExceptCourse(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(AssignmentCategoryPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            AssignmentCategoryPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
+
+        // Set the correct dbName
+        $criteria->setDbName(AssignmentCategoryPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(AssignmentCategoryPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(AssignmentCategoryPeer::TEACHER_ID, TeacherPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related Teacher table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAllExceptTeacher(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(AssignmentCategoryPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            AssignmentCategoryPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
+
+        // Set the correct dbName
+        $criteria->setDbName(AssignmentCategoryPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(AssignmentCategoryPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(AssignmentCategoryPeer::COURSE_ID, CoursePeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Selects a collection of AssignmentCategory objects pre-filled with all related objects except Course.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of AssignmentCategory objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAllExceptCourse(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        // $criteria->getDbName() will return the same object if not set to another value
+        // so == check is okay and faster
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(AssignmentCategoryPeer::DATABASE_NAME);
+        }
+
+        AssignmentCategoryPeer::addSelectColumns($criteria);
+        $startcol2 = AssignmentCategoryPeer::NUM_HYDRATE_COLUMNS;
+
+        TeacherPeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + TeacherPeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(AssignmentCategoryPeer::TEACHER_ID, TeacherPeer::ID, $join_behavior);
+
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = AssignmentCategoryPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = AssignmentCategoryPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = AssignmentCategoryPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                AssignmentCategoryPeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+                // Add objects for joined Teacher rows
+
+                $key2 = TeacherPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+                if ($key2 !== null) {
+                    $obj2 = TeacherPeer::getInstanceFromPool($key2);
+                    if (!$obj2) {
+
+                        $cls = TeacherPeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    TeacherPeer::addInstanceToPool($obj2, $key2);
+                } // if $obj2 already loaded
+
+                // Add the $obj1 (AssignmentCategory) to the collection in $obj2 (Teacher)
+                $obj2->addAssignmentCategory($obj1);
+
+            } // if joined row is not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Selects a collection of AssignmentCategory objects pre-filled with all related objects except Teacher.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of AssignmentCategory objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAllExceptTeacher(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        // $criteria->getDbName() will return the same object if not set to another value
+        // so == check is okay and faster
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(AssignmentCategoryPeer::DATABASE_NAME);
+        }
+
+        AssignmentCategoryPeer::addSelectColumns($criteria);
+        $startcol2 = AssignmentCategoryPeer::NUM_HYDRATE_COLUMNS;
+
+        CoursePeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + CoursePeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(AssignmentCategoryPeer::COURSE_ID, CoursePeer::ID, $join_behavior);
+
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = AssignmentCategoryPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = AssignmentCategoryPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = AssignmentCategoryPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                AssignmentCategoryPeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+                // Add objects for joined Course rows
+
+                $key2 = CoursePeer::getPrimaryKeyHashFromRow($row, $startcol2);
+                if ($key2 !== null) {
+                    $obj2 = CoursePeer::getInstanceFromPool($key2);
+                    if (!$obj2) {
+
+                        $cls = CoursePeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    CoursePeer::addInstanceToPool($obj2, $key2);
+                } // if $obj2 already loaded
+
+                // Add the $obj1 (AssignmentCategory) to the collection in $obj2 (Course)
+                $obj2->addAssignmentCategory($obj1);
+
+            } // if joined row is not null
 
             $results[] = $obj1;
         }
@@ -948,6 +1347,9 @@ abstract class BaseAssignmentCategoryPeer
 
         if ($obj->isNew() || $obj->isColumnModified(AssignmentCategoryPeer::COURSE_ID))
             $columns[AssignmentCategoryPeer::COURSE_ID] = $obj->getCourseId();
+
+        if ($obj->isNew() || $obj->isColumnModified(AssignmentCategoryPeer::TEACHER_ID))
+            $columns[AssignmentCategoryPeer::TEACHER_ID] = $obj->getTeacherId();
 
         if ($obj->isNew() || $obj->isColumnModified(AssignmentCategoryPeer::NAME))
             $columns[AssignmentCategoryPeer::NAME] = $obj->getName();

@@ -1854,9 +1854,11 @@ abstract class BaseCourse extends BaseObject implements Persistent
      */
     public function setAssignmentCategories(PropelCollection $assignmentCategories, PropelPDO $con = null)
     {
-        $this->assignmentCategoriesScheduledForDeletion = $this->getAssignmentCategories(new Criteria(), $con)->diff($assignmentCategories);
+        $assignmentCategoriesToDelete = $this->getAssignmentCategories(new Criteria(), $con)->diff($assignmentCategories);
 
-        foreach ($this->assignmentCategoriesScheduledForDeletion as $assignmentCategoryRemoved) {
+        $this->assignmentCategoriesScheduledForDeletion = unserialize(serialize($assignmentCategoriesToDelete));
+
+        foreach ($assignmentCategoriesToDelete as $assignmentCategoryRemoved) {
             $assignmentCategoryRemoved->setCourse(null);
         }
 
@@ -1950,6 +1952,31 @@ abstract class BaseCourse extends BaseObject implements Persistent
         }
 
         return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Course is new, it will return
+     * an empty collection; or if this Course has previously
+     * been saved, it will retrieve related AssignmentCategories from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Course.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|AssignmentCategory[] List of AssignmentCategory objects
+     */
+    public function getAssignmentCategoriesJoinTeacher($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = AssignmentCategoryQuery::create(null, $criteria);
+        $query->joinWith('Teacher', $join_behavior);
+
+        return $this->getAssignmentCategories($query, $con);
     }
 
     /**
@@ -2069,9 +2096,11 @@ abstract class BaseCourse extends BaseObject implements Persistent
      */
     public function setAssignments(PropelCollection $assignments, PropelPDO $con = null)
     {
-        $this->assignmentsScheduledForDeletion = $this->getAssignments(new Criteria(), $con)->diff($assignments);
+        $assignmentsToDelete = $this->getAssignments(new Criteria(), $con)->diff($assignments);
 
-        foreach ($this->assignmentsScheduledForDeletion as $assignmentRemoved) {
+        $this->assignmentsScheduledForDeletion = unserialize(serialize($assignmentsToDelete));
+
+        foreach ($assignmentsToDelete as $assignmentRemoved) {
             $assignmentRemoved->setCourse(null);
         }
 
@@ -2160,7 +2189,7 @@ abstract class BaseCourse extends BaseObject implements Persistent
                 $this->assignmentsScheduledForDeletion = clone $this->collAssignments;
                 $this->assignmentsScheduledForDeletion->clear();
             }
-            $this->assignmentsScheduledForDeletion[]= $assignment;
+            $this->assignmentsScheduledForDeletion[]= clone $assignment;
             $assignment->setCourse(null);
         }
 
@@ -2334,9 +2363,11 @@ abstract class BaseCourse extends BaseObject implements Persistent
      */
     public function setCourseStudents(PropelCollection $courseStudents, PropelPDO $con = null)
     {
-        $this->courseStudentsScheduledForDeletion = $this->getCourseStudents(new Criteria(), $con)->diff($courseStudents);
+        $courseStudentsToDelete = $this->getCourseStudents(new Criteria(), $con)->diff($courseStudents);
 
-        foreach ($this->courseStudentsScheduledForDeletion as $courseStudentRemoved) {
+        $this->courseStudentsScheduledForDeletion = unserialize(serialize($courseStudentsToDelete));
+
+        foreach ($courseStudentsToDelete as $courseStudentRemoved) {
             $courseStudentRemoved->setCourse(null);
         }
 
@@ -2425,7 +2456,7 @@ abstract class BaseCourse extends BaseObject implements Persistent
                 $this->courseStudentsScheduledForDeletion = clone $this->collCourseStudents;
                 $this->courseStudentsScheduledForDeletion->clear();
             }
-            $this->courseStudentsScheduledForDeletion[]= $courseStudent;
+            $this->courseStudentsScheduledForDeletion[]= clone $courseStudent;
             $courseStudent->setCourse(null);
         }
 
@@ -2574,9 +2605,11 @@ abstract class BaseCourse extends BaseObject implements Persistent
      */
     public function setCourseTeachers(PropelCollection $courseTeachers, PropelPDO $con = null)
     {
-        $this->courseTeachersScheduledForDeletion = $this->getCourseTeachers(new Criteria(), $con)->diff($courseTeachers);
+        $courseTeachersToDelete = $this->getCourseTeachers(new Criteria(), $con)->diff($courseTeachers);
 
-        foreach ($this->courseTeachersScheduledForDeletion as $courseTeacherRemoved) {
+        $this->courseTeachersScheduledForDeletion = unserialize(serialize($courseTeachersToDelete));
+
+        foreach ($courseTeachersToDelete as $courseTeacherRemoved) {
             $courseTeacherRemoved->setCourse(null);
         }
 
@@ -2665,7 +2698,7 @@ abstract class BaseCourse extends BaseObject implements Persistent
                 $this->courseTeachersScheduledForDeletion = clone $this->collCourseTeachers;
                 $this->courseTeachersScheduledForDeletion->clear();
             }
-            $this->courseTeachersScheduledForDeletion[]= $courseTeacher;
+            $this->courseTeachersScheduledForDeletion[]= clone $courseTeacher;
             $courseTeacher->setCourse(null);
         }
 
