@@ -10,12 +10,12 @@
     <div class="row-fluid edit-assignment">
         <div class="span12">
             <div class="row-fluid">
-                <h2 class="span6 pull-left">
-                    {{ course.name }} /
+                <h2 class="span6 pull-left form-title">
+                    {{ course.name }}
                     {% if form.vars.value.id is defined and form.vars.value.id > 0 %}
                         {{ form.vars.value.name }}
                     {% else %}
-                        Create New Assignment
+                        <small>Create New Assignment</small>
                     {% endif %}
                 </h2>
             </div>
@@ -116,7 +116,7 @@
                     <div class="controls">
                         <div class="form-inline ">
                             <label class="radio"><input type="radio" class="student_select_all" name="student_assignment"/> All</label>
-                            <label class="radio"><input type="radio" class="student_select" name="student_assignment" disabled="disabled"/> <a href="#myModal" data-toggle="modal" data-target="#myModal">
+                            <label class="radio"><input type="radio" class="student_select" name="student_assignment" {% if not assignedStudents %}disabled="disabled"{% endif %} {% if assignedStudents %}checked{% endif %}/> <a href="#myModal" data-toggle="modal" data-target="#myModal">
                                 {% if assignedStudents %}
                                     {{ assignedStudents|length }} / {{ students|length }} students selected
                                 {% else %}
