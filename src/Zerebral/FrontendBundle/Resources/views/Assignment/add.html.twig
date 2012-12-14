@@ -90,21 +90,25 @@
                 <div class="clearfix"></div>
 
 
-                <div class="modal hide fade" id="myModal">
+                <div class="modal hide fade" id="studentsModal">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                         <h3>Select students for assignment</h3>
                     </div>
                     <div class="modal-body">
-                        <table class="table table-bordered table-striped table-condensed student-list">
-                        {% for student in students %}
-                            <tr>
-                                <td>
-                                    <input type="checkbox" value="{{ student.getId }}" name="students[]" {% if student.getId in assignedStudents %} checked="" {% endif %}/>
-                                </td>
-                                <td>{{ student.getUser.getFirstName }} {{ student.getUser.getLastName }}</td>
-                            </tr>
-                        {%  endfor %}
+                        <label class="toggle_selection"><input type="checkbox" name="toggle_selection"/> all</label>
+                        <table class="table table-bordered table-striped student-list">
+                            {% for student in students %}
+                                <tr>
+                                    <td class="span1">
+                                        <input type="checkbox" value="{{ student.getId }}" name="students[]" {% if student.getId in assignedStudents %} checked="" {% endif %}/>
+                                    </td>
+                                    <td>
+                                        {{ student.getUser.getFirstName }} {{ student.getUser.getLastName }}
+                                        <img class="rounded pull-right" src="http://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?s=24"/>
+                                    </td>
+                                </tr>
+                            {%  endfor %}
                         </table>
 
                         <a href="#" class="btn btn-danger" data-dismiss="modal" aria-hidden="true">Assign</a>
@@ -116,7 +120,7 @@
                     <div class="controls">
                         <div class="form-inline ">
                             <label class="radio"><input type="radio" class="student_select_all" name="student_assignment"/> All</label>
-                            <label class="radio"><input type="radio" class="student_select" name="student_assignment" {% if not assignedStudents %}disabled="disabled"{% endif %} {% if assignedStudents %}checked{% endif %}/> <a href="#myModal" data-toggle="modal" data-target="#myModal">
+                            <label class="radio"><input type="radio" class="student_select" name="student_assignment" {% if not assignedStudents %}disabled="disabled"{% endif %} {% if assignedStudents %}checked{% endif %}/> <a href="#studentsModal" data-toggle="modal" data-target="#studentsModal">
                                 {% if assignedStudents %}
                                     {{ assignedStudents|length }} / {{ students|length }} students selected
                                 {% else %}
