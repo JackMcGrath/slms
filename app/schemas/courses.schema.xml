@@ -33,13 +33,13 @@
             <rule name="required" message="The field created_by is required."/>
             <rule name="type" value="int" message="The column created_by must be an int value."/>
         </validator>
-        <foreign-key foreignTable="teachers" name="courses_teachers" phpName="CreatedByTeacher" refPhpName="CreatedByTeacher" onUpdate="CASCADE">
+        <foreign-key foreignTable="teachers" name="courses_teachers" phpName="CreatedByTeacher" refPhpName="CreatedByTeacher" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="created_by" foreign="id"/>
         </foreign-key>
-        <foreign-key foreignTable="disciplines" name="courses_disciplines" onUpdate="CASCADE">
+        <foreign-key foreignTable="disciplines" name="courses_disciplines" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="discipline_id" foreign="id"/>
         </foreign-key>
-        <foreign-key foreignTable="grade_levels" name="courses_grade_levels" onUpdate="CASCADE">
+        <foreign-key foreignTable="grade_levels" name="courses_grade_levels" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="grade_level_id" foreign="id"/>
         </foreign-key>
         <index name="courses_disciplines">
@@ -70,7 +70,7 @@
             <rule name="required" message="The field name is required."/>
             <rule name="type" value="string" message="The column name must be an string value."/>
         </validator>
-        <foreign-key foreignTable="teachers" name="disciplines_teachers" onUpdate="CASCADE">
+        <foreign-key foreignTable="teachers" name="disciplines_teachers" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="teacher_id" foreign="id"/>
         </foreign-key>
         <index name="disciplines_teachers">
@@ -108,10 +108,10 @@
             <rule name="required" message="The field created_at is required."/>
             <rule name="type" value="string" message="The column created_at must be an string value."/>
         </validator>
-        <foreign-key foreignTable="courses" name="course_students_course" onUpdate="CASCADE">
+        <foreign-key foreignTable="courses" name="course_students_course" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="course_id" foreign="id"/>
         </foreign-key>
-        <foreign-key foreignTable="students" name="course_students_students" onUpdate="CASCADE">
+        <foreign-key foreignTable="students" name="course_students_students" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="student_id" foreign="id"/>
         </foreign-key>
         <index name="course_students_students">
@@ -122,10 +122,10 @@
         <column name="course_id" phpName="CourseId" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" required="true"/>
         <column name="teacher_id" phpName="TeacherId" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" required="true"/>
         <column name="created_at" phpName="CreatedAt" type="TIMESTAMP" required="false"/>
-        <foreign-key foreignTable="courses" name="course_teachers_course" onUpdate="CASCADE">
+        <foreign-key foreignTable="courses" name="course_teachers_course" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="course_id" foreign="id"/>
         </foreign-key>
-        <foreign-key foreignTable="teachers" name="course_teachers_teachers" onUpdate="CASCADE">
+        <foreign-key foreignTable="teachers" name="course_teachers_teachers" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="teacher_id" foreign="id"/>
         </foreign-key>
         <index name="course_teachers_teachers">
