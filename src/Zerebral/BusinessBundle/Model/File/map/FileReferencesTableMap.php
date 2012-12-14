@@ -44,7 +44,7 @@ class FileReferencesTableMap extends TableMap
         $this->setIsCrossRef(true);
         // columns
         $this->addForeignPrimaryKey('file_id', 'fileId', 'INTEGER' , 'files', 'id', true, null, null);
-        $this->addPrimaryKey('reference_id', 'referenceId', 'INTEGER', true, null, null);
+        $this->addForeignPrimaryKey('reference_id', 'referenceId', 'INTEGER' , 'assignments', 'id', true, null, null);
         $this->addPrimaryKey('reference_type', 'referenceType', 'CHAR', true, null, null);
         // validators
     } // initialize()
@@ -54,7 +54,8 @@ class FileReferencesTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('File', 'Zerebral\\BusinessBundle\\Model\\File\\File', RelationMap::MANY_TO_ONE, array('file_id' => 'id', ), null, null);
+        $this->addRelation('File', 'Zerebral\\BusinessBundle\\Model\\File\\File', RelationMap::MANY_TO_ONE, array('file_id' => 'id', ), 'CASCADE', 'CASCADE');
+        $this->addRelation('Assignment', 'Zerebral\\BusinessBundle\\Model\\Assignment\\Assignment', RelationMap::MANY_TO_ONE, array('reference_id' => 'id', ), 'CASCADE', 'CASCADE');
     } // buildRelations()
 
     /**

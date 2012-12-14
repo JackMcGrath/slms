@@ -56,7 +56,8 @@ class FileTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('FileReferences', 'Zerebral\\BusinessBundle\\Model\\File\\FileReferences', RelationMap::ONE_TO_MANY, array('id' => 'file_id', ), null, null, 'FileReferencess');
+        $this->addRelation('FileReferences', 'Zerebral\\BusinessBundle\\Model\\File\\FileReferences', RelationMap::ONE_TO_MANY, array('id' => 'file_id', ), 'CASCADE', 'CASCADE', 'FileReferencess');
+        $this->addRelation('Assignment', 'Zerebral\\BusinessBundle\\Model\\Assignment\\Assignment', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'CASCADE', 'Assignments');
     } // buildRelations()
 
     /**

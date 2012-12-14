@@ -11,6 +11,7 @@ use \PropelException;
 use \PropelPDO;
 use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\PeerEvent;
+use Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer;
 use Zerebral\BusinessBundle\Model\File\FilePeer;
 use Zerebral\BusinessBundle\Model\File\FileReferences;
 use Zerebral\BusinessBundle\Model\File\FileReferencesPeer;
@@ -517,6 +518,57 @@ abstract class BaseFileReferencesPeer
 
 
     /**
+     * Returns the number of rows matching criteria, joining the related Assignment table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAssignment(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(FileReferencesPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            FileReferencesPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(FileReferencesPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(FileReferencesPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(FileReferencesPeer::REFERENCE_ID, AssignmentPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
      * Selects a collection of FileReferences objects pre-filled with their File objects.
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
@@ -584,6 +636,73 @@ abstract class BaseFileReferencesPeer
 
 
     /**
+     * Selects a collection of FileReferences objects pre-filled with their Assignment objects.
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of FileReferences objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAssignment(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(FileReferencesPeer::DATABASE_NAME);
+        }
+
+        FileReferencesPeer::addSelectColumns($criteria);
+        $startcol = FileReferencesPeer::NUM_HYDRATE_COLUMNS;
+        AssignmentPeer::addSelectColumns($criteria);
+
+        $criteria->addJoin(FileReferencesPeer::REFERENCE_ID, AssignmentPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = FileReferencesPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = FileReferencesPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+
+                $cls = FileReferencesPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                FileReferencesPeer::addInstanceToPool($obj1, $key1);
+            } // if $obj1 already loaded
+
+            $key2 = AssignmentPeer::getPrimaryKeyHashFromRow($row, $startcol);
+            if ($key2 !== null) {
+                $obj2 = AssignmentPeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = AssignmentPeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol);
+                    AssignmentPeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 already loaded
+
+                // Add the $obj1 (FileReferences) to $obj2 (Assignment)
+                $obj2->addFileReferences($obj1);
+
+            } // if joined row was not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
      * Returns the number of rows matching criteria, joining all related tables
      *
      * @param      Criteria $criteria
@@ -620,6 +739,8 @@ abstract class BaseFileReferencesPeer
         }
 
         $criteria->addJoin(FileReferencesPeer::FILE_ID, FilePeer::ID, $join_behavior);
+
+        $criteria->addJoin(FileReferencesPeer::REFERENCE_ID, AssignmentPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -658,7 +779,12 @@ abstract class BaseFileReferencesPeer
         FilePeer::addSelectColumns($criteria);
         $startcol3 = $startcol2 + FilePeer::NUM_HYDRATE_COLUMNS;
 
+        AssignmentPeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + AssignmentPeer::NUM_HYDRATE_COLUMNS;
+
         $criteria->addJoin(FileReferencesPeer::FILE_ID, FilePeer::ID, $join_behavior);
+
+        $criteria->addJoin(FileReferencesPeer::REFERENCE_ID, AssignmentPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
@@ -694,6 +820,274 @@ abstract class BaseFileReferencesPeer
                 // Add the $obj1 (FileReferences) to the collection in $obj2 (File)
                 $obj2->addFileReferences($obj1);
             } // if joined row not null
+
+            // Add objects for joined Assignment rows
+
+            $key3 = AssignmentPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+            if ($key3 !== null) {
+                $obj3 = AssignmentPeer::getInstanceFromPool($key3);
+                if (!$obj3) {
+
+                    $cls = AssignmentPeer::getOMClass();
+
+                    $obj3 = new $cls();
+                    $obj3->hydrate($row, $startcol3);
+                    AssignmentPeer::addInstanceToPool($obj3, $key3);
+                } // if obj3 loaded
+
+                // Add the $obj1 (FileReferences) to the collection in $obj3 (Assignment)
+                $obj3->addFileReferences($obj1);
+            } // if joined row not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related File table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAllExceptFile(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(FileReferencesPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            FileReferencesPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
+
+        // Set the correct dbName
+        $criteria->setDbName(FileReferencesPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(FileReferencesPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(FileReferencesPeer::REFERENCE_ID, AssignmentPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related Assignment table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAllExceptAssignment(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(FileReferencesPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            FileReferencesPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
+
+        // Set the correct dbName
+        $criteria->setDbName(FileReferencesPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(FileReferencesPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(FileReferencesPeer::FILE_ID, FilePeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Selects a collection of FileReferences objects pre-filled with all related objects except File.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of FileReferences objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAllExceptFile(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        // $criteria->getDbName() will return the same object if not set to another value
+        // so == check is okay and faster
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(FileReferencesPeer::DATABASE_NAME);
+        }
+
+        FileReferencesPeer::addSelectColumns($criteria);
+        $startcol2 = FileReferencesPeer::NUM_HYDRATE_COLUMNS;
+
+        AssignmentPeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + AssignmentPeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(FileReferencesPeer::REFERENCE_ID, AssignmentPeer::ID, $join_behavior);
+
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = FileReferencesPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = FileReferencesPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = FileReferencesPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                FileReferencesPeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+                // Add objects for joined Assignment rows
+
+                $key2 = AssignmentPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+                if ($key2 !== null) {
+                    $obj2 = AssignmentPeer::getInstanceFromPool($key2);
+                    if (!$obj2) {
+
+                        $cls = AssignmentPeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    AssignmentPeer::addInstanceToPool($obj2, $key2);
+                } // if $obj2 already loaded
+
+                // Add the $obj1 (FileReferences) to the collection in $obj2 (Assignment)
+                $obj2->addFileReferences($obj1);
+
+            } // if joined row is not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Selects a collection of FileReferences objects pre-filled with all related objects except Assignment.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of FileReferences objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAllExceptAssignment(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        // $criteria->getDbName() will return the same object if not set to another value
+        // so == check is okay and faster
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(FileReferencesPeer::DATABASE_NAME);
+        }
+
+        FileReferencesPeer::addSelectColumns($criteria);
+        $startcol2 = FileReferencesPeer::NUM_HYDRATE_COLUMNS;
+
+        FilePeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + FilePeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(FileReferencesPeer::FILE_ID, FilePeer::ID, $join_behavior);
+
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = FileReferencesPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = FileReferencesPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = FileReferencesPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                FileReferencesPeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+                // Add objects for joined File rows
+
+                $key2 = FilePeer::getPrimaryKeyHashFromRow($row, $startcol2);
+                if ($key2 !== null) {
+                    $obj2 = FilePeer::getInstanceFromPool($key2);
+                    if (!$obj2) {
+
+                        $cls = FilePeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    FilePeer::addInstanceToPool($obj2, $key2);
+                } // if $obj2 already loaded
+
+                // Add the $obj1 (FileReferences) to the collection in $obj2 (File)
+                $obj2->addFileReferences($obj1);
+
+            } // if joined row is not null
 
             $results[] = $obj1;
         }

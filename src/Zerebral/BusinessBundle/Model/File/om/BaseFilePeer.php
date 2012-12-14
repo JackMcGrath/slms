@@ -13,6 +13,7 @@ use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\PeerEvent;
 use Zerebral\BusinessBundle\Model\File\File;
 use Zerebral\BusinessBundle\Model\File\FilePeer;
+use Zerebral\BusinessBundle\Model\File\FileReferencesPeer;
 use Zerebral\BusinessBundle\Model\File\map\FileTableMap;
 
 abstract class BaseFilePeer
@@ -382,6 +383,9 @@ abstract class BaseFilePeer
      */
     public static function clearRelatedInstancePool()
     {
+        // Invalidate objects in FileReferencesPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        FileReferencesPeer::clearInstancePool();
     }
 
     /**
