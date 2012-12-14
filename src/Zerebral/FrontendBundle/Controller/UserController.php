@@ -32,8 +32,6 @@ class UserController extends \Zerebral\CommonBundle\Component\Controller
 
                 $this->getRequest()->getSession()->setFlash('profile_save_success', 'Profile has been saved!');
                 return $this->redirect($this->generateUrl('myprofile'));
-            } else {
-                var_dump($form->getErrors());
             }
         }
 

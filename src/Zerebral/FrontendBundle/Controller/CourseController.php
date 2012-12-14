@@ -36,6 +36,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      *
      * @SecureParam(name="course", permissions="VIEW")
      *
+     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @Template()
      */
     public function viewAction(Model\Course\Course $course)
@@ -52,7 +53,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      * @ParamConverter("course")
      *
      * @SecureParam(name="course", permissions="EDIT")
-     *
+     * @PreAuthorize("hasRole('ROLE_TEACHER')")
      * @Template()
      */
     public function addAction(Model\Course\Course $course = null)
@@ -87,7 +88,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      * @ParamConverter("course")
      *
      * @SecureParam(name="course", permissions="DELETE")
-     *
+     * @PreAuthorize("hasRole('ROLE_TEACHER')")
      * @Template()
      */
     public function deleteAction(Model\Course\Course $course)
