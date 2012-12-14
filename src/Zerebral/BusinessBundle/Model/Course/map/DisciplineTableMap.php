@@ -61,8 +61,8 @@ class DisciplineTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Teacher', 'Zerebral\\BusinessBundle\\Model\\User\\Teacher', RelationMap::MANY_TO_ONE, array('teacher_id' => 'id', ), null, 'CASCADE');
-        $this->addRelation('Course', 'Zerebral\\BusinessBundle\\Model\\Course\\Course', RelationMap::ONE_TO_MANY, array('id' => 'discipline_id', ), null, 'CASCADE', 'Courses');
+        $this->addRelation('Teacher', 'Zerebral\\BusinessBundle\\Model\\User\\Teacher', RelationMap::MANY_TO_ONE, array('teacher_id' => 'id', ), 'CASCADE', 'CASCADE');
+        $this->addRelation('Course', 'Zerebral\\BusinessBundle\\Model\\Course\\Course', RelationMap::ONE_TO_MANY, array('id' => 'discipline_id', ), 'CASCADE', 'CASCADE', 'Courses');
     } // buildRelations()
 
     /**
