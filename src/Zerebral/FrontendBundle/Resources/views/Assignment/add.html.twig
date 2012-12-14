@@ -4,7 +4,7 @@
 {% block content %}
     {% javascripts
         '@ZerebralFrontendBundle/Resources/public/js/controllers/assignments/add.js'
-        output='js/compiled/assignment.js' %}
+        output='js/compiled/assignment_add.js' %}
         <script type="text/javascript" src="{{ asset_url }}"></script>
     {% endjavascripts %}
     <div class="row-fluid edit-assignment">
@@ -90,13 +90,39 @@
                 <div class="clearfix"></div>
 
 
+                <div class="modal hide fade" id="myModal">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h3>Select students for assignment</h3>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-bordered table-striped table-condensed student-list">
+                        {% for student in students %}
+                            <tr>
+                                <td>
+                                    <input type="checkbox" value="{{ student.getId }}" name="students[]" {% if student.getId in assignedStudents %} checked="" {% endif %}/>
+                                </td>
+                                <td>{{ student.getUser.getFirstName }} {{ student.getUser.getLastName }}</td>
+                            </tr>
+                        {%  endfor %}
+                        </table>
+
+                        <a href="#" class="btn btn-danger" data-dismiss="modal" aria-hidden="true">Assign</a>
+                    </div>
+                </div>
 
                 <div class="control-group radio-control-group">
                     <label class="control-label">Assign students</label>
                     <div class="controls">
                         <div class="form-inline ">
-                            <label class="radio"><input type="radio"/> All</label>
-                            <label class="radio"><input type="radio"/> <a href="">Choose from the list</a></label>
+                            <label class="radio"><input type="radio" class="student_select_all" name="student_assignment"/> All</label>
+                            <label class="radio"><input type="radio" class="student_select" name="student_assignment" disabled="disabled"/> <a href="#myModal" data-toggle="modal" data-target="#myModal">
+                                {% if assignedStudents %}
+                                    {{ assignedStudents|length }} / {{ students|length }} students selected
+                                {% else %}
+                                    Choose from the list
+                                {% endif %}
+                            </a></label>
                         </div>
                     </div>
                 </div>

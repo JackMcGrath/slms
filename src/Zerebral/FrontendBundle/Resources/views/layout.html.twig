@@ -8,11 +8,14 @@
 
     {% javascripts
         '@ZerebralFrontendBundle/Resources/public/js/vendors/jquery/jquery-1.8.3.min.js'
+        '@ZerebralFrontendBundle/Resources/public/js/vendors/bootstrap/bootstrap-modal.js'
         '@ZerebralFrontendBundle/Resources/public/js/vendors/bootstrap/bootstrap-button.js'
         '@ZerebralFrontendBundle/Resources/public/js/vendors/bootstrap/bootstrap-dropdown.js'
         '@ZerebralFrontendBundle/Resources/public/js/vendors/bootstrap/bootstrap-alert.js'
         '@ZerebralFrontendBundle/Resources/public/js/vendors/bootstrap/bootstrap-datepicker.js'
         '@ZerebralFrontendBundle/Resources/public/js/vendors/bootstrap/bootstrap-timepicker.js'
+        '@ZerebralFrontendBundle/Resources/public/js/vendors/wysihtml5/wysihtml5-0.3.0.js'
+        '@ZerebralFrontendBundle/Resources/public/js/vendors/bootstrap/bootstrap-wysihtml5-0.0.2.js'
         output='js/compiled/layout.js' %}
         <script type="text/javascript" src="{{ asset_url }}"></script>
     {% endjavascripts %}
@@ -21,6 +24,15 @@
         '@ZerebralFrontendBundle/Resources/public/less/app.less'
         filter='lessphp' output='css/all.css' debug=true %}
         <link href="{{ asset_url }}" type="text/css" rel="stylesheet" />
+    {% endstylesheets %}
+
+    {% stylesheets output="css/wysiwyg-color.css"
+    '@ZerebralFrontendBundle/Resources/public/css/wysiwyg-color.css' %}
+    <link href="{{ asset_url }}" rel="stylesheet" type="text/css"  media="screen" />
+    {% endstylesheets %}
+    {% stylesheets
+        '@ZerebralFrontendBundle/Resources/public/css/bootstrap-wysihtml5-0.0.2.css' %}
+        <link href="{{ asset_url }}" rel="stylesheet" type="text/css"  media="screen" />
     {% endstylesheets %}
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->

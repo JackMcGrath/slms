@@ -34,6 +34,8 @@ class OptionalToModelTransformer implements DataTransformerInterface
 
     public function reverseTransform($value)
     {
+        if($value)
+              return array($value);
         return $value;
     }
 }
