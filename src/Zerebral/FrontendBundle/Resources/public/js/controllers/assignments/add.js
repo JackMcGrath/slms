@@ -1,6 +1,7 @@
 $(document).ready(function(){
     $('.icon-new-calendar').datepicker();
     $('.icon-new-clock').timepicker();
+    $('textarea').wysihtml5();
 
     $('.show-input').on('click', showInput);
     $('.show-dropdown').on('click', showDropdown);
