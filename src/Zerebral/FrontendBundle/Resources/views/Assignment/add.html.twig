@@ -116,7 +116,13 @@
                     <div class="controls">
                         <div class="form-inline ">
                             <label class="radio"><input type="radio" class="student_select_all" name="student_assignment"/> All</label>
-                            <label class="radio"><input type="radio" class="student_select" name="student_assignment" disabled="disabled"/> <a href="#myModal" data-toggle="modal" data-target="#myModal">Choose from the list</a></label>
+                            <label class="radio"><input type="radio" class="student_select" name="student_assignment" disabled="disabled"/> <a href="#myModal" data-toggle="modal" data-target="#myModal">
+                                {% if assignedStudents %}
+                                    {{ assignedStudents|length }} / {{ students|length }} students selected
+                                {% else %}
+                                    Choose from the list
+                                {% endif %}
+                            </a></label>
                         </div>
                     </div>
                 </div>
