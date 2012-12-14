@@ -12,7 +12,7 @@
         <column name="file_id" phpName="fileId" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" required="true" />
         <column name="reference_id" phpName="referenceId" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" required="true" />
         <column name="reference_type" phpName="referenceType" type="CHAR" valueSet="assignment" primaryKey="true" sqlType="enum('assignment')" required="true" />
-        <foreign-key foreignTable="files">
+        <foreign-key foreignTable="files" name="file_references_files">
             <reference local="file_id" foreign="id"/>
         </foreign-key>
     </table>
