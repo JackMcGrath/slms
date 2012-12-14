@@ -7,7 +7,7 @@ use \TableMap;
 
 
 /**
- * This class defines the structure of the 'files' table.
+ * This class defines the structure of the 'file_references' table.
  *
  *
  *
@@ -18,13 +18,13 @@ use \TableMap;
  *
  * @package    propel.generator.Zerebral.BusinessBundle.Model.File.map
  */
-class FileTableMap extends TableMap
+class FileReferencesTableMap extends TableMap
 {
 
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Zerebral.BusinessBundle.Model.File.map.FileTableMap';
+    const CLASS_NAME = 'Zerebral.BusinessBundle.Model.File.map.FileReferencesTableMap';
 
     /**
      * Initialize the table attributes, columns and validators
@@ -36,18 +36,16 @@ class FileTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('files');
-        $this->setPhpName('File');
-        $this->setClassname('Zerebral\\BusinessBundle\\Model\\File\\File');
+        $this->setName('file_references');
+        $this->setPhpName('FileReferences');
+        $this->setClassname('Zerebral\\BusinessBundle\\Model\\File\\FileReferences');
         $this->setPackage('Zerebral.BusinessBundle.Model.File');
-        $this->setUseIdGenerator(true);
+        $this->setUseIdGenerator(false);
+        $this->setIsCrossRef(true);
         // columns
-        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('name', 'Name', 'VARCHAR', true, 255, null);
-        $this->addColumn('size', 'Size', 'INTEGER', true, null, null);
-        $this->addColumn('mime_type', 'MimeType', 'VARCHAR', true, 30, null);
-        $this->addColumn('storage', 'Storage', 'CHAR', true, null, 'local');
-        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', true, null, null);
+        $this->addForeignPrimaryKey('file_id', 'fileId', 'INTEGER' , 'files', 'id', true, null, null);
+        $this->addPrimaryKey('reference_id', 'referenceId', 'INTEGER', true, null, null);
+        $this->addPrimaryKey('reference_type', 'referenceType', 'CHAR', true, null, null);
         // validators
     } // initialize()
 
@@ -56,7 +54,7 @@ class FileTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('FileReferences', 'Zerebral\\BusinessBundle\\Model\\File\\FileReferences', RelationMap::ONE_TO_MANY, array('id' => 'file_id', ), null, null, 'FileReferencess');
+        $this->addRelation('File', 'Zerebral\\BusinessBundle\\Model\\File\\File', RelationMap::MANY_TO_ONE, array('file_id' => 'id', ), null, null);
     } // buildRelations()
 
     /**
@@ -73,4 +71,4 @@ class FileTableMap extends TableMap
         );
     } // getBehaviors()
 
-} // FileTableMap
+} // FileReferencesTableMap

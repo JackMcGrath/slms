@@ -5,8 +5,10 @@ namespace Zerebral\BusinessBundle\Model\File\om;
 use \Criteria;
 use \Exception;
 use \ModelCriteria;
+use \ModelJoin;
 use \PDO;
 use \Propel;
+use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
@@ -15,6 +17,7 @@ use Glorpen\PropelEvent\PropelEventBundle\Events\QueryEvent;
 use Zerebral\BusinessBundle\Model\File\File;
 use Zerebral\BusinessBundle\Model\File\FilePeer;
 use Zerebral\BusinessBundle\Model\File\FileQuery;
+use Zerebral\BusinessBundle\Model\File\FileReferences;
 
 /**
  * @method FileQuery orderById($order = Criteria::ASC) Order by the id column
@@ -34,6 +37,10 @@ use Zerebral\BusinessBundle\Model\File\FileQuery;
  * @method FileQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method FileQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method FileQuery innerJoin($relation) Adds a INNER JOIN clause to the query
+ *
+ * @method FileQuery leftJoinFileReferences($relationAlias = null) Adds a LEFT JOIN clause to the query using the FileReferences relation
+ * @method FileQuery rightJoinFileReferences($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FileReferences relation
+ * @method FileQuery innerJoinFileReferences($relationAlias = null) Adds a INNER JOIN clause to the query using the FileReferences relation
  *
  * @method File findOne(PropelPDO $con = null) Return the first File matching the query
  * @method File findOneOrCreate(PropelPDO $con = null) Return the first File matching the query, or a new File object populated from the query conditions when no match is found
@@ -437,6 +444,80 @@ abstract class BaseFileQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(FilePeer::CREATED_AT, $createdAt, $comparison);
+    }
+
+    /**
+     * Filter the query by a related FileReferences object
+     *
+     * @param   FileReferences|PropelObjectCollection $fileReferences  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   FileQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByFileReferences($fileReferences, $comparison = null)
+    {
+        if ($fileReferences instanceof FileReferences) {
+            return $this
+                ->addUsingAlias(FilePeer::ID, $fileReferences->getfileId(), $comparison);
+        } elseif ($fileReferences instanceof PropelObjectCollection) {
+            return $this
+                ->useFileReferencesQuery()
+                ->filterByPrimaryKeys($fileReferences->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByFileReferences() only accepts arguments of type FileReferences or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the FileReferences relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return FileQuery The current query, for fluid interface
+     */
+    public function joinFileReferences($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('FileReferences');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'FileReferences');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the FileReferences relation FileReferences object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Zerebral\BusinessBundle\Model\File\FileReferencesQuery A secondary query class using the current class as primary query
+     */
+    public function useFileReferencesQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinFileReferences($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'FileReferences', '\Zerebral\BusinessBundle\Model\File\FileReferencesQuery');
     }
 
     /**

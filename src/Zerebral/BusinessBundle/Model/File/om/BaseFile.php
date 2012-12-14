@@ -10,14 +10,18 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
+use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
+use \PropelObjectCollection;
 use \PropelPDO;
 use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\ModelEvent;
 use Zerebral\BusinessBundle\Model\File\File;
 use Zerebral\BusinessBundle\Model\File\FilePeer;
 use Zerebral\BusinessBundle\Model\File\FileQuery;
+use Zerebral\BusinessBundle\Model\File\FileReferences;
+use Zerebral\BusinessBundle\Model\File\FileReferencesQuery;
 
 abstract class BaseFile extends BaseObject implements Persistent
 {
@@ -78,6 +82,12 @@ abstract class BaseFile extends BaseObject implements Persistent
     protected $created_at;
 
     /**
+     * @var        PropelObjectCollection|FileReferences[] Collection to store aggregation of FileReferences objects.
+     */
+    protected $collFileReferencess;
+    protected $collFileReferencessPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      * @var        boolean
@@ -90,6 +100,12 @@ abstract class BaseFile extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $fileReferencessScheduledForDeletion = null;
 
     /**
      * Applies default values to this object.
@@ -443,6 +459,8 @@ abstract class BaseFile extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->collFileReferencess = null;
+
         } // if (deep)
     }
 
@@ -581,6 +599,23 @@ abstract class BaseFile extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->fileReferencessScheduledForDeletion !== null) {
+                if (!$this->fileReferencessScheduledForDeletion->isEmpty()) {
+                    FileReferencesQuery::create()
+                        ->filterByPrimaryKeys($this->fileReferencessScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->fileReferencessScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collFileReferencess !== null) {
+                foreach ($this->collFileReferencess as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             $this->alreadyInSave = false;
@@ -755,6 +790,14 @@ abstract class BaseFile extends BaseObject implements Persistent
             }
 
 
+                if ($this->collFileReferencess !== null) {
+                    foreach ($this->collFileReferencess as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
 
             $this->alreadyInValidation = false;
         }
@@ -825,10 +868,11 @@ abstract class BaseFile extends BaseObject implements Persistent
      *                    Defaults to BasePeer::TYPE_PHPNAME.
      * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to true.
      * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
+     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
-    public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array())
+    public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
         if (isset($alreadyDumpedObjects['File'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
@@ -843,6 +887,11 @@ abstract class BaseFile extends BaseObject implements Persistent
             $keys[4] => $this->getStorage(),
             $keys[5] => $this->getCreatedAt(),
         );
+        if ($includeForeignObjects) {
+            if (null !== $this->collFileReferencess) {
+                $result['FileReferencess'] = $this->collFileReferencess->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+        }
 
         return $result;
     }
@@ -1009,6 +1058,24 @@ abstract class BaseFile extends BaseObject implements Persistent
         $copyObj->setMimeType($this->getMimeType());
         $copyObj->setStorage($this->getStorage());
         $copyObj->setCreatedAt($this->getCreatedAt());
+
+        if ($deepCopy && !$this->startCopy) {
+            // important: temporarily setNew(false) because this affects the behavior of
+            // the getter/setter methods for fkey referrer objects.
+            $copyObj->setNew(false);
+            // store object hash to prevent cycle
+            $this->startCopy = true;
+
+            foreach ($this->getFileReferencess() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addFileReferences($relObj->copy($deepCopy));
+                }
+            }
+
+            //unflag object copy
+            $this->startCopy = false;
+        } // if ($deepCopy)
+
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -1055,6 +1122,239 @@ abstract class BaseFile extends BaseObject implements Persistent
         return self::$peer;
     }
 
+
+    /**
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
+     *
+     * @param string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('FileReferences' == $relationName) {
+            $this->initFileReferencess();
+        }
+    }
+
+    /**
+     * Clears out the collFileReferencess collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return File The current object (for fluent API support)
+     * @see        addFileReferencess()
+     */
+    public function clearFileReferencess()
+    {
+        $this->collFileReferencess = null; // important to set this to null since that means it is uninitialized
+        $this->collFileReferencessPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collFileReferencess collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialFileReferencess($v = true)
+    {
+        $this->collFileReferencessPartial = $v;
+    }
+
+    /**
+     * Initializes the collFileReferencess collection.
+     *
+     * By default this just sets the collFileReferencess collection to an empty array (like clearcollFileReferencess());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initFileReferencess($overrideExisting = true)
+    {
+        if (null !== $this->collFileReferencess && !$overrideExisting) {
+            return;
+        }
+        $this->collFileReferencess = new PropelObjectCollection();
+        $this->collFileReferencess->setModel('FileReferences');
+    }
+
+    /**
+     * Gets an array of FileReferences objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this File is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|FileReferences[] List of FileReferences objects
+     * @throws PropelException
+     */
+    public function getFileReferencess($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collFileReferencessPartial && !$this->isNew();
+        if (null === $this->collFileReferencess || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collFileReferencess) {
+                // return empty collection
+                $this->initFileReferencess();
+            } else {
+                $collFileReferencess = FileReferencesQuery::create(null, $criteria)
+                    ->filterByFile($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collFileReferencessPartial && count($collFileReferencess)) {
+                      $this->initFileReferencess(false);
+
+                      foreach($collFileReferencess as $obj) {
+                        if (false == $this->collFileReferencess->contains($obj)) {
+                          $this->collFileReferencess->append($obj);
+                        }
+                      }
+
+                      $this->collFileReferencessPartial = true;
+                    }
+
+                    return $collFileReferencess;
+                }
+
+                if($partial && $this->collFileReferencess) {
+                    foreach($this->collFileReferencess as $obj) {
+                        if($obj->isNew()) {
+                            $collFileReferencess[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collFileReferencess = $collFileReferencess;
+                $this->collFileReferencessPartial = false;
+            }
+        }
+
+        return $this->collFileReferencess;
+    }
+
+    /**
+     * Sets a collection of FileReferences objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $fileReferencess A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return File The current object (for fluent API support)
+     */
+    public function setFileReferencess(PropelCollection $fileReferencess, PropelPDO $con = null)
+    {
+        $fileReferencessToDelete = $this->getFileReferencess(new Criteria(), $con)->diff($fileReferencess);
+
+        $this->fileReferencessScheduledForDeletion = unserialize(serialize($fileReferencessToDelete));
+
+        foreach ($fileReferencessToDelete as $fileReferencesRemoved) {
+            $fileReferencesRemoved->setFile(null);
+        }
+
+        $this->collFileReferencess = null;
+        foreach ($fileReferencess as $fileReferences) {
+            $this->addFileReferences($fileReferences);
+        }
+
+        $this->collFileReferencess = $fileReferencess;
+        $this->collFileReferencessPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related FileReferences objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related FileReferences objects.
+     * @throws PropelException
+     */
+    public function countFileReferencess(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collFileReferencessPartial && !$this->isNew();
+        if (null === $this->collFileReferencess || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collFileReferencess) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getFileReferencess());
+            }
+            $query = FileReferencesQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByFile($this)
+                ->count($con);
+        }
+
+        return count($this->collFileReferencess);
+    }
+
+    /**
+     * Method called to associate a FileReferences object to this object
+     * through the FileReferences foreign key attribute.
+     *
+     * @param    FileReferences $l FileReferences
+     * @return File The current object (for fluent API support)
+     */
+    public function addFileReferences(FileReferences $l)
+    {
+        if ($this->collFileReferencess === null) {
+            $this->initFileReferencess();
+            $this->collFileReferencessPartial = true;
+        }
+        if (!in_array($l, $this->collFileReferencess->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddFileReferences($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	FileReferences $fileReferences The fileReferences object to add.
+     */
+    protected function doAddFileReferences($fileReferences)
+    {
+        $this->collFileReferencess[]= $fileReferences;
+        $fileReferences->setFile($this);
+    }
+
+    /**
+     * @param	FileReferences $fileReferences The fileReferences object to remove.
+     * @return File The current object (for fluent API support)
+     */
+    public function removeFileReferences($fileReferences)
+    {
+        if ($this->getFileReferencess()->contains($fileReferences)) {
+            $this->collFileReferencess->remove($this->collFileReferencess->search($fileReferences));
+            if (null === $this->fileReferencessScheduledForDeletion) {
+                $this->fileReferencessScheduledForDeletion = clone $this->collFileReferencess;
+                $this->fileReferencessScheduledForDeletion->clear();
+            }
+            $this->fileReferencessScheduledForDeletion[]= clone $fileReferences;
+            $fileReferences->setFile(null);
+        }
+
+        return $this;
+    }
+
     /**
      * Clears the current object and sets all attributes to their default values
      */
@@ -1087,8 +1387,17 @@ abstract class BaseFile extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collFileReferencess) {
+                foreach ($this->collFileReferencess as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
+        if ($this->collFileReferencess instanceof PropelCollection) {
+            $this->collFileReferencess->clearIterator();
+        }
+        $this->collFileReferencess = null;
     }
 
     /**
