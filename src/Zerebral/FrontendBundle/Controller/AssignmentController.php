@@ -35,6 +35,7 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
      * @ParamConverter("assignment")
      *
      * @SecureParam(name="assignment", permissions="VIEW")
+     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @Template()
      */
     public function viewAction(Model\Assignment\Assignment $assignment = null)
@@ -54,6 +55,7 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
      * @SecureParam(name="assignment", permissions="EDIT")
      * @SecureParam(name="course", permissions="ADD_ASSIGNMENT
 ")
+     * @PreAuthorize("hasRole('ROLE_TEACHER')")
      * @Template()
      */
     public function addAction(Model\Course\Course $course, Model\Assignment\Assignment $assignment = null)
@@ -104,6 +106,7 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
      * @ParamConverter("assignment")
      *
      * @SecureParam(name="assignment", permissions="DELETE")
+     * @PreAuthorize("hasRole('ROLE_TEACHER')")
      * @Template()
      */
     public function deleteAction(Model\Assignment\Assignment $assignment = null)
