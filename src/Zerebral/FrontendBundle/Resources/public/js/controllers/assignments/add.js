@@ -1,6 +1,8 @@
 $(document).ready(function(){
     $('.icon-new-calendar').datepicker();
-    $('.icon-new-clock').timepicker();
+    $('.icon-new-clock').timepicker({
+        defaultTime: 'value'
+    });
     $('textarea').wysihtml5();
 
     $('#studentsModal').on('hidden', function () {

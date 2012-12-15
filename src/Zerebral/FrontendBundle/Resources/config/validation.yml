@@ -1,10 +1,10 @@
 Zerebral\BusinessBundle\Model\User\User:
-    properties:
-        first_name:
+    getters:
+        firstName:
             - NotBlank:
                 groups: [signup]
                 message: Enter your first name.
-        last_name:
+        lastName:
             - NotBlank:
                 groups: [signup]
                 message: Enter your last name.
@@ -30,28 +30,34 @@ Zerebral\BusinessBundle\Model\User\User:
                 choices: [teacher, student]
 
 Zerebral\BusinessBundle\Model\Course\Course:
-    properties:
+    getters:
         name:
             - NotBlank:
                 message: Enter your course name. You can change it later.
         description:
             - NotBlank:
                 message: Enter course description.Provide any useful information for students enrolled in this course.
-        aDiscipline:
+        discipline:
             - Valid: ~
-        aGradeLevel:
+        gradeLevel:
             - Valid: ~
 
 Zerebral\BusinessBundle\Model\Assignment\Assignment:
-    properties:
+    getters:
         name:
             - NotBlank:
                 message: Enter your assignment name. You can change it later.
         description:
             - NotBlank:
                 message: Enter assignment description. Any useful information from the student point of view.
-        max_points:
+        maxPoints:
             - NotBlank:
                 message: Max ponts is required.
-        aAssignmentCategory:
-            - Valid: ~
+        assignmentCategory:
+            - NotNull: ~
+
+#Zerebral\BusinessBundle\Model\Assignment\AssignmentCategory:
+#    properties:
+#        name:
+#            - NotBlank:
+#                message: Enter your category name. You can change it later.

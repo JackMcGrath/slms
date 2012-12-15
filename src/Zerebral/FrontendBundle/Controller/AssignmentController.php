@@ -38,7 +38,7 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @Template()
      */
-    public function viewAction(Model\Assignment\Assignment $assignment = null)
+    public function viewAction(Model\Assignment\Assignment $assignment)
     {
         return array(
             'course' => $assignment->getCourse(),
@@ -78,6 +78,7 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
                 $assignment->setCourse($course);
                 $assignment->setTeacherId($this->getRoleUser()->getId());
 
+                // @todo redo with collection type
                 $studentAssignments = new \PropelCollection();
                 foreach($this->getRequest()->get('students', array()) as $studentId){
                     $studentAssignment = new \Zerebral\BusinessBundle\Model\Assignment\StudentAssignment();
