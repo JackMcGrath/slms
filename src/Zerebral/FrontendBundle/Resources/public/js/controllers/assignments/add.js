@@ -29,8 +29,7 @@ $(document).ready(function(){
                 checkbox.attr('checked', 1);
             }
         }
-
-    })
+    });
 
     $('.toggle_selection input').on('change', function(e){
         if($(this).is(':checked')){
