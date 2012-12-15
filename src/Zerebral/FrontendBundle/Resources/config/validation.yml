@@ -40,15 +40,21 @@ Zerebral\BusinessBundle\Model\Course\Course:
             - Valid: ~
 
 Zerebral\BusinessBundle\Model\Assignment\Assignment:
-    properties:
+    getters:
         name:
             - NotBlank:
                 message: Enter your assignment name. You can change it later.
         description:
             - NotBlank:
                 message: Enter assignment description. Any useful information from the student point of view.
-        max_points:
+        maxPoints:
             - NotBlank:
                 message: Max ponts is required.
-        aAssignmentCategory:
-            - Valid: ~
+        assignmentCategory:
+            - NotNull: ~
+
+#Zerebral\BusinessBundle\Model\Assignment\AssignmentCategory:
+#    properties:
+#        name:
+#            - NotBlank:
+#                message: Enter your category name. You can change it later.

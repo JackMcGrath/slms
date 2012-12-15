@@ -521,11 +521,13 @@
 
 {# custom Fields #}
 
-{% block choice_optional_widget %}
+{% block optional_model_widget %}
     {% spaceless %}
 
-        {{ form_widget(form.dropdown) }}
-        {{ form_widget(form.input, {
+        {#{{ form_widget(form) }}#}
+
+        {{ form_widget(form.model) }}
+        {{ form_widget(form.name, {
             attr: {
                 class: 'hide',
                 disabled: true
@@ -537,7 +539,7 @@
             <a href="#" class="create-discipline show-dropdown hide">Show Dropdown</a>
         </div>
 
-        {{ form_errors(form.dropdown) }}
-        {{ form_errors(form.input) }}
+        {#{{ form_errors(form.dropdown) }}#}
+        {#{{ form_errors(form) }}#}
     {% endspaceless %}
-{% endblock choice_optional_widget %}
+{% endblock optional_model_widget %}
