@@ -41,6 +41,7 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
     public function viewAction(Model\Assignment\Assignment $assignment = null)
     {
         return array(
+            'course' => $assignment->getCourse(),
             'assignment' => $assignment,
             'target' => 'assignments'
         );

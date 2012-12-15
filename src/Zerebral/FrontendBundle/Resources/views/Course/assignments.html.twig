@@ -32,7 +32,7 @@
                             {% if is_granted('ROLE_STUDENT') %}
                                 <img class="rounded" src="http://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?s=48"/>
                             {% else %}
-                                <div class="rounded count-badge">{{ assignment.students.count }}</div>
+                                <div class="rounded count-badge">-</div>
                             {% endif %}
                         </div>
                         <div class="details pull-left">
@@ -53,7 +53,7 @@
                                     <div><span class="badge">-</span><a href="#">Comments</a></span></div>
                                 {% else %}
                                     <div class="due-at"><i class="icon-small-clock"></i> Due <small>{{ assignment.dueAt | date('Hi') == '0000' ? assignment.dueAt | date('D, M d') : assignment.dueAt | date('D, M d H:i') }}</small></div>
-                                    <div><span class="badge">-</span><a href="">Assignments</a></div>
+                                    <div><span class="badge">{{ assignment.students.count }}</span><a href="">Assignments</a></div>
                                     <div><span class="badge">-</span><a href="">Solutions</a></div>
                                     <div><span class="badge badge-inverse">-</span><a href="">Promises</a></div>
                                 {% endif %}
