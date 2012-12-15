@@ -3,9 +3,6 @@ $(document).ready(function(){
     $('.icon-new-clock').timepicker();
     $('textarea').wysihtml5();
 
-    $('.show-input').on('click', showInput);
-    $('.show-dropdown').on('click', showDropdown);
-
     $('#studentsModal').on('hidden', function () {
         $('.student_select').removeAttr('disabled').attr('checked', '1');
         var selectedItemsCount = $('.student-list input[type=checkbox]:checked').length;
@@ -42,22 +39,6 @@ $(document).ready(function(){
             });
         }
     });
+
+    $('.optional-model').optionalModel();
 });
-
-var showInput = function(e){
-    e.preventDefault();
-
-    $(this).closest('.controls').find('input').removeAttr('disabled').show();
-    $(this).parent().find('.show-dropdown').show();
-    $(this).hide();
-    $(this).closest('.controls').find('select').attr('disabled', 'disabled').hide();
-};
-
-var showDropdown = function(e){
-    e.preventDefault();
-
-    $(this).closest('.controls').find('input').attr('disabled', 'disabled').hide();
-    $(this).parent().find('.show-input').show();
-    $(this).hide();
-    $(this).closest('.controls').find('select').removeAttr('disabled').show();
-};

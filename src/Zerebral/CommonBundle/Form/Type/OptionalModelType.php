@@ -3,10 +3,12 @@
 namespace Zerebral\CommonBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Zerebral\CommonBundle\Form\DataTransformer\OptionalToModelTransformer;
-use Symfony\Component\Form\ReversedTransformer;
+use Zerebral\CommonBundle\Form\DataTransformer\OptionalModelTransformer;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\Collection;
+
+use Zerebral\CommonBundle\Form\Validator\AssignmentCategory;
 
 class OptionalModelType extends AbstractType
 {
@@ -18,48 +20,55 @@ class OptionalModelType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('input', 'text', array('required' => false));
-        $builder->add(
-            'dropdown',
-            'model',
+
+        $builder->add('name', 'text', array('required' => false));
+        $builder->add('model', 'model',
             array(
                 'class' => $options['class'],
                 'property' => $options['property'],
                 'required' => false,
-                'empty_value' => $options['dropdown']['empty_value'],
-//                'empty_data' => $options['dropdown']['empty_data'],
+                'empty_value' => $options['empty_value'],
+                'empty_data' => $options['empty_data'],
+                'error_bubbling' => true,
+//                'invalid_message' => 'In',
 //                'invalid_message' => $options['dropdown']['invalid_message'],
             )
         );
 
-        $builder->addViewTransformer(
-            new ReversedTransformer(
-                new OptionalToModelTransformer($options['class'], $options['buildModel'])
-            )
-        );
+        $builder->addViewTransformer(new OptionalModelTransformer($options['class'], $options['property']), true);
+//        $builder->addModelTransformer(new OptionalModelTransformer($options['class'], $options['property']), true);
     }
 
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
             array(
-                'dropdown' => array(),
-                'input' => array(),
                 'class' => null,
                 'property' => 'name',
-                'buildModel' => null
+
+                'buildModel' => null,
+
+                'compound' => true,
+                'empty_value' => null,
+                'empty_data' => '',
+                'error_bubbling' => false,
+                'data_class'     => null,
+                'by_reference'      => false,
+
+                'allow_create' => false,
+                'cascade_validation' => false,
             )
         );
     }
 
     public function getParent()
     {
-        return 'field';
+        return 'form';
     }
 
     public function getName()
     {
-        return 'choice_optional';
+        return 'optional_model';
     }
 
 }

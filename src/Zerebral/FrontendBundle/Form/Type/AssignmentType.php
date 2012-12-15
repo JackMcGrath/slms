@@ -27,30 +27,18 @@ class AssignmentType extends AbstractType
         $builder->add('name', 'text', array('required' => false));
         $builder->add('description', 'textarea', array('required' => false));
 
-        $teacher = $this->teacher;
-
-        $builder->add('assignment_category', new OptionalModelType(), array(
-            'dropdown' => array(
-                'empty_value' => "What's assignment category?",
-                'empty_data' => 0,
-                'invalid_message' => 'Category is required.',
-            ),
+        $builder->add('assignmentCategory', 'model', array(
             'class' => 'Zerebral\BusinessBundle\Model\Assignment\AssignmentCategory',
             'property' => 'name',
             'required' => false,
-
-            'buildModel' => function(\Zerebral\BusinessBundle\Model\Assignment\AssignmentCategory $model, $value) use ($teacher) {
-                $model->setTeacher($teacher);
-                $model->setName($value);
-                return $model;
-            }
+            'empty_value' => "What's assignment category?",
+            'empty_data' => 0,
+            'invalid_message' => 'Category is required',
         ));
+
         $builder->add('max_points', 'text', array('required' => false, 'data' => 100,));
         $builder->add('due_at_date', 'text', array('required' => false));
         $builder->add('due_at_time', 'text', array('required' => false));
-
-
-//        $builder->add('attachment', 'file');
     }
 
     public function getName()
@@ -60,15 +48,9 @@ class AssignmentType extends AbstractType
 
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-//@todo fix validation, now work incorrect
-//        $collectionConstraint = array(
-//            'assignment_category' => new AssignmentCategory(),
-//        );
-
         $resolver->setDefaults(
             array(
                 'data_class' => 'Zerebral\BusinessBundle\Model\Assignment\Assignment',
-//                'constraints' => $collectionConstraint
             )
         );
     }
