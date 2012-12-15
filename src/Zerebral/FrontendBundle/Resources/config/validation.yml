@@ -1,4 +1,9 @@
 Zerebral\BusinessBundle\Model\User\User:
+    constraints:
+        - Propel\PropelBundle\Validator\Constraints\UniqueObject:
+            fields: email
+            groups: [signup]
+            message: This email is already taken!
     getters:
         firstName:
             - NotBlank:

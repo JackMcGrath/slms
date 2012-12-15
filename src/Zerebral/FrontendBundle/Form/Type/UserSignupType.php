@@ -43,7 +43,10 @@ class UserSignupType extends AbstractType
     {
         $resolver->setDefaults(array(
             'data_class' => 'Zerebral\BusinessBundle\Model\User\User',
-            'validation_groups' => array('signup')
+            'validation_groups' => array('signup'),
+            'error_mapping' => array(
+                '.' => 'email'
+            )
         ));
     }
 }
