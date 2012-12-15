@@ -1,5 +1,23 @@
 {% extends 'ZerebralFrontendBundle::layout.html.twig' %}
 
+{% form_theme form _self %}
+
+{% block form_rows %}
+    {% spaceless %}
+        {% for child in form %}
+            {{ form_widget(child) }}
+        {% endfor %}
+    {% endspaceless %}
+{% endblock form_rows %}
+{% block file_widget %}
+    {% spaceless %}
+        {% if value %}
+            <div {{ block('widget_container_attributes') }}><a href="#">x</a> {{ value.name }}</div>
+        {% else %}
+            <input type="file" {{ block('widget_attributes') }} />
+        {% endif %}
+    {% endspaceless %}
+{% endblock file_widget %}
 
 {% block content %}
     {% javascripts
@@ -131,8 +149,16 @@
                     </div>
                 </div>
 
+                <div class="control-group radio-control-group">
+                    <label class="control-label">Attachments</label>
+                    <a href="#" style="height: 18px; display: block; margin-bottom: 5px; padding-top: 5px; float: right;" class="add_file_link">Add attachment</a>
+                    <div class="add_files" data-prototype="{{ form_widget(form.files.vars.prototype)|e }}" style="clear: both; margin-left: 10px;"></div>
+                    <div class="controls" style="clear: both; margin-left: 10px;">
+                        {{ form_widget(form.files) }}
+                    </div>
+                </div>
 
-                <ul class="files" data-prototype="{{ form_widget(form.files.vars.prototype)|e }}"></ul>
+
 
                 {{ form_rest(form) }}
 

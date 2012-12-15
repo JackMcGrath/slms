@@ -1,19 +1,13 @@
 $(document).ready(function(){
     // Dynamic files fields creating
-    var collectionHolder = $('ul.files');
-    // setup an "add a file" link
-    var $addFileLink = $('<a href="#" class="add_file_link">Add a file</a>');
-    var $newLinkLi = $('<li></li>').append($addFileLink);
-    collectionHolder.append($newLinkLi);
-    $addFileLink.on('click', function(e) {
+    var collectionHolder = $('div.add_files');
+    $('.add_file_link').on('click', function(e) {
         e.preventDefault();
         var prototype = collectionHolder.attr('data-prototype');
-        // Replace '__name__' in the prototype's HTML to
-        // instead be a number based on the current collection's length.
-        var newForm = prototype.replace(/__name__/g, collectionHolder.children().length);
-        // Display the form in the page in an li, before the "Add a tag" link li
-        var $newFormLi = $('<li></li>').append(newForm);
-        $newLinkLi.before($newFormLi);
+        var $newForm = $(prototype.replace(/__name__/g, collectionHolder.children().length));
+        $newForm.attr('name', $newForm.attr('name') + '[uploadedFile]');
+
+        collectionHolder.append($('<div></div>').append($newForm));
     });
 
 
