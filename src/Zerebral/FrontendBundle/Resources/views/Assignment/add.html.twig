@@ -69,7 +69,7 @@
                 </div>
 
                 <div class="form-inline">
-                    {{ form_row(form.due_at_date, {
+                    {{ form_row(form.due_at.date, {
                         label: 'Due date',
                         form_type: 'horizontal',
                         placeholder: '',
@@ -77,14 +77,16 @@
                             class: 'icon-new-calendar image-background input-small'
                         }
                     }) }}
-                    {{ form_row(form.due_at_time, {
+                    {{ form_row(form.due_at.time, {
                         label: 'Due time',
                         form_type: 'horizontal',
                         placeholder: '',
                         attr: {
-                            class: 'icon-new-clock image-background input-small'
+                            class: 'icon-new-clock image-background input-small',
+                            type: 'text'
                         }
                     }) }}
+                    {{ form_errors(form.due_at) }}
                 </div>
 
                 <div class="clearfix"></div>
