@@ -30,14 +30,14 @@ security:
             security: false
 
         login:
-            pattern:  ^/login$
+            pattern:  ^/signin$
             security: false
 
         secured_area:
             pattern:    ^/
             anonymous: ~
             form_login:
-                login_path:  /login
+                login_path:  /signin
                 check_path:  /login_check
 #                always_use_default_target_path: true
 #                default_target_path: /courses
@@ -45,7 +45,7 @@ security:
 
             logout:
                 path:   /logout
-                target: /login
+                target: /signin
             #anonymous: ~
             #http_basic:
             #    realm: "Secured Demo Area"

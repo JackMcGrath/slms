@@ -32,28 +32,7 @@ class CourseType extends AbstractType
             'empty_value' => "Course subject area...",
             'empty_data' => 0,
             'invalid_message' => 'Course subject is required.',
-//            'empty_disabled' => true,
         ));
-
-
-        $teacher = $this->teacher;
-
-        $builder->add('discipline', new OptionalModelType(), array(
-                'dropdown' => array(
-                    'empty_value' => "Course subject area...?",
-                    'empty_data' => 0,
-                    'invalid_message' => 'Course subject is required.',
-                ),
-                'class' => 'Zerebral\BusinessBundle\Model\Course\Discipline',
-                'property' => 'name',
-                'required' => false,
-
-                'buildModel' => function(Discipline $model, $value) use ($teacher) {
-                    $model->setTeacher($teacher);
-                    $model->setName($value);
-                    return $model;
-                }
-            ));
 
         $builder->add('grade_level', 'model', array(
             'class' => 'Zerebral\BusinessBundle\Model\Course\GradeLevel',

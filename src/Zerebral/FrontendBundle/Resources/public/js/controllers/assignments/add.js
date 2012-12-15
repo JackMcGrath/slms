@@ -1,23 +1,25 @@
 $(document).ready(function(){
     // Dynamic files fields creating
     var collectionHolder = $('ul.files');
-
-    // setup an "add a tag" link
+    // setup an "add a file" link
     var $addFileLink = $('<a href="#" class="add_file_link">Add a file</a>');
     var $newLinkLi = $('<li></li>').append($addFileLink);
     collectionHolder.append($newLinkLi);
     $addFileLink.on('click', function(e) {
         e.preventDefault();
-        addFileForm(collectionHolder, $newLinkLi);
+        var prototype = collectionHolder.attr('data-prototype');
+        // Replace '__name__' in the prototype's HTML to
+        // instead be a number based on the current collection's length.
+        var newForm = prototype.replace(/__name__/g, collectionHolder.children().length);
+        // Display the form in the page in an li, before the "Add a tag" link li
+        var $newFormLi = $('<li></li>').append(newForm);
+        $newLinkLi.before($newFormLi);
     });
 
 
     $('.icon-new-calendar').datepicker();
     $('.icon-new-clock').timepicker();
     $('textarea').wysihtml5();
-
-    $('.show-input').on('click', showInput);
-    $('.show-dropdown').on('click', showDropdown);
 
     $('#studentsModal').on('hidden', function () {
         $('.student_select').removeAttr('disabled').attr('checked', '1');
@@ -42,8 +44,7 @@ $(document).ready(function(){
                 checkbox.attr('checked', 1);
             }
         }
-
-    })
+    });
 
     $('.toggle_selection input').on('change', function(e){
         if($(this).is(':checked')){
@@ -56,35 +57,6 @@ $(document).ready(function(){
             });
         }
     });
+
+    $('.optional-model').optionalModel();
 });
-
-var showInput = function(e){
-    e.preventDefault();
-
-    $(this).closest('.controls').find('input').removeAttr('disabled').show();
-    $(this).parent().find('.show-dropdown').show();
-    $(this).hide();
-    $(this).closest('.controls').find('select').attr('disabled', 'disabled').hide();
-};
-
-var showDropdown = function(e){
-    e.preventDefault();
-
-    $(this).closest('.controls').find('input').attr('disabled', 'disabled').hide();
-    $(this).parent().find('.show-input').show();
-    $(this).hide();
-    $(this).closest('.controls').find('select').removeAttr('disabled').show();
-};
-
-var addFileForm = function(collectionHolder, $newLinkLi) {
-    // Get the data-prototype explained earlier
-    var prototype = collectionHolder.attr('data-prototype');
-
-    // Replace '__name__' in the prototype's HTML to
-    // instead be a number based on the current collection's length.
-    var newForm = prototype.replace(/__name__/g, collectionHolder.children().length);
-
-    // Display the form in the page in an li, before the "Add a tag" link li
-    var $newFormLi = $('<li></li>').append(newForm);
-    $newLinkLi.before($newFormLi);
-}

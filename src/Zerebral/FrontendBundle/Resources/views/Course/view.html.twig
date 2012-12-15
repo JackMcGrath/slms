@@ -1,20 +1,95 @@
 {% extends 'ZerebralFrontendBundle::layout.html.twig' %}
 
 {% block content %}
-    <h1>{{ course.name }}</h1>
+    {% javascripts
+    '@ZerebralFrontendBundle/Resources/public/js/controllers/course/view.js'
+    output='js/compiled/course_view.js' %}
+    <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+    <div class="top-second-navbar">
+        <ul>
+            <li><a href="#">Feed</a></li>
+            <li class="active"><a href="#">Details</a></li>
+            <li><a href="#">Materials</a></li>
+            <li><a href="#">Members</a></li>
+        </ul>
+    </div>
 
-    <p>#{{ course.id }}</p>
-    {#<p>Is Active: {{ course.isActive }}</p>#}
-    {% if is_granted('ADD_ASSIGNMENT', course) %}
-        <p><a href="{{ path('assignment_add', {courseId: course.id}) }}">Add Assignment</a></p>
-    {% endif %}
+    <div class="row-fluid courses-list course-details">
+        <div class="span6 main-list-block">
+            <div class="row-fluid manage">
+                <h2 class="span6 pull-left form-title">
+                    {{ course.name }} <small>course details</small>
+                </h2>
+                {% if is_granted('ROLE_TEACHER') %}
+                    <i class="manage-buttons-gears icon-small-gears pull-right"></i>
+                    <div class="manage-buttons invisible pull-right">
+                        {% if is_granted('EDIT', course) %}<a href="{{ path('course_edit', {id: course.id}) }}"><i class="icon-small-pencil"></i>Edit</a>{% endif %}
+                        {% if is_granted('DELETE', course) %}<a href="{{ path('course_delete', {id: course.id}) }}"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
+                    </div>
+                {% endif %}
+            </div>
+            <hr/>
 
-    <br><br>
-    {% if is_granted('EDIT', course) %}
-        <p><a href="{{ path('course_edit', {id: course.id}) }}">Edit</a></p>
-    {% endif %}
+            <div class="timetable">
+                <div class="duration span4"><i class="icon-small-calendar"></i> <b>From:</b> 14/02 &nbsp;&nbsp; <b>Due:</b> 05/06</div>
+                <div class="time span8">
+                    <i class="icon-small-clipboard pull-left"></i>
+                    <ul>
+                        <li><b>Mon:</b> 09:00 - 14:00</li>
+                        <li><b>Tue:</b> 14:10 - 19:00</li>
+                        <li><b>Wed:</b> 05:00 - 15:45</li>
+                        <li><b>Mon:</b> 09:00 - 14:00</li>
+                        <li><b>Tue:</b> 14:10 - 19:00</li>
+                        <li><b>Wed:</b> 05:00 - 15:45</li>
+                    </ul>
+                </div>
+            </div>
 
-    {% if is_granted('EDIT', course) %}
-        <p><a href="{{ path('course_delete', {id: course.id}) }}">Delete</a></p>
-    {% endif %}
+            <div class="description">
+                {% autoescape false %}
+                    {{ course.description }}
+                {% endautoescape %}
+            </div>
+        </div>
+        <div class="right-navbar pull-left">
+            {% if is_granted('ADD_ASSIGNMENT', course) %}
+                <a href="{{ path('assignment_add', {courseId: course.id}) }}" class="btn create-course create-new-item">create asignment</a>
+            {% endif %}
+            <div class="upcoming-assignments">
+                <h4>Upcoming assignments</h4>
+                <ul>
+                    <li><div class="assignment-label"><span class="label label-inverse">Quize</span></div> <a href="">Welcome to Algebra</a> <span class="new">(Due in 2 days)</span></li>
+                    <li><div class="assignment-label"><span class="label label-info">Test</span></div> <a href="">Getting started</a> (Due in 2 days)</li>
+                    <li><div class="assignment-label"><span class="label label-important">Milestone</span></div> <a href="">Addition Session</a> (Due in 2 days)</li>
+                    <li><div class="assignment-label"><span class="label label-warning">Home</span></div> <a href="">Division Session</a> (Due in 2 days)</li>
+                </ul>
+            </div>
+
+            <div class="upcoming-assignments">
+                <h4>Recent materials</h4>
+                <ul>
+                    <li><i class="icon-file"></i> <a href="">Homework_1.doc</a></li>
+                    <li><i class="icon-file"></i> <a href="">Homework_2.doc</a></li>
+                    <li><i class="icon-file"></i> <a href="">Homework_3.doc</a></li>
+                    <li><i class="icon-file"></i> <a href="">Homework_4.doc</a></li>
+                </ul>
+            </div>
+
+            <div class="upcoming-assignments">
+                <h4>Teacher profile</h4>
+                <ul>
+                    <li>
+                        <a href="#" >{{ course.getTeacher.getUser.getFirstName }} {{ course.getTeacher.getUser.getLastName }}</a>
+                        <img class="rounded pull-right" src="http://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?s=48"/>
+                        <br/><a href="#">email: {{ course.getTeacher.getUser.getEmail }}</a>
+                        <div class="clearfix"></div>
+                    </li>
+                    <li>
+                        <a href="#" class="btn">Send mesasge</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
 {% endblock %}

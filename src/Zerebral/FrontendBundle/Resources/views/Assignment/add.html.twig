@@ -13,7 +13,7 @@
                 <h2 class="span6 pull-left form-title">
                     {{ course.name }}
                     {% if form.vars.value.id is defined and form.vars.value.id > 0 %}
-                        {{ form.vars.value.name }}
+                        <small>{{ form.vars.value.name }}</small>
                     {% else %}
                         <small>Create New Assignment</small>
                     {% endif %}
@@ -43,7 +43,7 @@
 
 
                 <div class="row-fluid">
-                    {{ form_row(form.assignment_category, {
+                    {{ form_row(form.assignmentCategory, {
                         label: 'Category',
                         form_type: 'horizontal',
                         empty_disabled: true,

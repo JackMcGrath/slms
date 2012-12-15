@@ -38,9 +38,10 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @Template()
      */
-    public function viewAction(Model\Assignment\Assignment $assignment = null)
+    public function viewAction(Model\Assignment\Assignment $assignment)
     {
         return array(
+            'course' => $assignment->getCourse(),
             'assignment' => $assignment,
             'target' => 'assignments'
         );
