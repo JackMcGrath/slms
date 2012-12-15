@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 class SecuredController extends Controller
 {
     /**
-     * @Route("/login", name="_login")
+     * @Route("/signin", name="_login")
      * @Template()
      */
     public function loginAction()
@@ -55,7 +55,7 @@ class SecuredController extends Controller
      */
     public function logoutAction()
     {
-        return $this->redirect($this->generateUrl('login'));
+        return $this->redirect($this->generateUrl('_login'));
     }
 
     /**
