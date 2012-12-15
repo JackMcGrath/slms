@@ -21,7 +21,13 @@
 
             <div class="clearfix"></div>
             {% if error %}
-                <div class="alert alert-error">{{ error.message }}</div>
+                <div class="alert alert-error">
+                    {% if last_username|length == 0 %}
+                        No username? That's not possible
+                    {% else %}
+                        Sorry, that username or password isn't right. But you can <a href="#">recover your password<a/>.
+                    {% endif %}
+                </div>
             {% endif %}
             {% if passwordRestored %}
                 <div class="alert alert-success">Password successfully changed! You can now access your account.</div>

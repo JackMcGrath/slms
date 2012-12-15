@@ -1,10 +1,15 @@
 Zerebral\BusinessBundle\Model\User\User:
-    properties:
-        first_name:
+    constraints:
+        - Propel\PropelBundle\Validator\Constraints\UniqueObject:
+            fields: email
+            groups: [signup]
+            message: This email is already taken!
+    getters:
+        firstName:
             - NotBlank:
                 groups: [signup]
                 message: Enter your first name.
-        last_name:
+        lastName:
             - NotBlank:
                 groups: [signup]
                 message: Enter your last name.
@@ -30,16 +35,16 @@ Zerebral\BusinessBundle\Model\User\User:
                 choices: [teacher, student]
 
 Zerebral\BusinessBundle\Model\Course\Course:
-    properties:
+    getters:
         name:
             - NotBlank:
                 message: Enter your course name. You can change it later.
         description:
             - NotBlank:
                 message: Enter course description.Provide any useful information for students enrolled in this course.
-        aDiscipline:
+        discipline:
             - Valid: ~
-        aGradeLevel:
+        gradeLevel:
             - Valid: ~
 
 Zerebral\BusinessBundle\Model\Assignment\Assignment:

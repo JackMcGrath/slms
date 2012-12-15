@@ -321,9 +321,11 @@
 
             if (this.showMeridian) {
                 if (this.hour > 12) {
-                    this.hour = 12;
+                    this.hour = this.hour - 12;
+                    this.meridian = 'pm';
                 } else if (this.hour < 1) {
-                    this.hour = 1;
+                    this.hour = 12;
+                    this.meridian = 'am';
                 }
 
                 if (this.meridian == 'am' || this.meridian == 'a') {

@@ -16,8 +16,8 @@ class UserSignupType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('first_name', 'text', array('required' => false));
-        $builder->add('last_name', 'text', array('required' => false));
+        $builder->add('firstName', 'text', array('required' => false));
+        $builder->add('lastName', 'text', array('required' => false));
         $builder->add('email', 'email', array('required' => false));
         $builder->add('plainPassword', 'password', array('required' => false));
         $builder->add('passwordConfirmation', 'password', array('required' => false));
@@ -43,7 +43,10 @@ class UserSignupType extends AbstractType
     {
         $resolver->setDefaults(array(
             'data_class' => 'Zerebral\BusinessBundle\Model\User\User',
-            'validation_groups' => array('signup')
+            'validation_groups' => array('signup'),
+            'error_mapping' => array(
+                '.' => 'email'
+            )
         ));
     }
 }
