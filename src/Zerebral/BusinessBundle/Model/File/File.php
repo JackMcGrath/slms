@@ -15,6 +15,9 @@ class File extends BaseFile
     /** @var null|string */
     protected $sourcePath = null;
 
+    /** @var UploadedFile null */
+    protected $uploadedFile= null;
+
     /**
      * Autofilling filename
      *
@@ -49,7 +52,7 @@ class File extends BaseFile
      * @param \Symfony\Component\HttpFoundation\File\UploadedFile $uploadedFile
      * @throws \Exception
      */
-    public function useUploadedFile(UploadedFile $uploadedFile) {
+    public function setUploadedFile(UploadedFile $uploadedFile) {
         if (!$this->isNew()) {
             throw new \Exception('Cannot set uploaded file on loaded entity');
         }
@@ -58,6 +61,12 @@ class File extends BaseFile
         $this->setName($uploadedFile->getClientOriginalName());
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\File\UploadedFile
+     */
+    public function getUploadedFile() {
+        return $this->uploadedFile;
+    }
 
 
     /**

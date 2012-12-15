@@ -1,4 +1,17 @@
 $(document).ready(function(){
+    // Dynamic files fields creating
+    var collectionHolder = $('ul.files');
+
+    // setup an "add a tag" link
+    var $addFileLink = $('<a href="#" class="add_file_link">Add a file</a>');
+    var $newLinkLi = $('<li></li>').append($addFileLink);
+    collectionHolder.append($newLinkLi);
+    $addFileLink.on('click', function(e) {
+        e.preventDefault();
+        addFileForm(collectionHolder, $newLinkLi);
+    });
+
+
     $('.icon-new-calendar').datepicker();
     $('.icon-new-clock').timepicker();
     $('textarea').wysihtml5();
@@ -62,3 +75,16 @@ var showDropdown = function(e){
     $(this).hide();
     $(this).closest('.controls').find('select').removeAttr('disabled').show();
 };
+
+var addFileForm = function(collectionHolder, $newLinkLi) {
+    // Get the data-prototype explained earlier
+    var prototype = collectionHolder.attr('data-prototype');
+
+    // Replace '__name__' in the prototype's HTML to
+    // instead be a number based on the current collection's length.
+    var newForm = prototype.replace(/__name__/g, collectionHolder.children().length);
+
+    // Display the form in the page in an li, before the "Add a tag" link li
+    var $newFormLi = $('<li></li>').append(newForm);
+    $newLinkLi.before($newFormLi);
+}
