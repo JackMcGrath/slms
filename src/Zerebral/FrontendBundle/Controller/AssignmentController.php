@@ -35,11 +35,13 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
      * @ParamConverter("assignment")
      *
      * @SecureParam(name="assignment", permissions="VIEW")
+     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @Template()
      */
     public function viewAction(Model\Assignment\Assignment $assignment = null)
     {
         return array(
+            'course' => $assignment->getCourse(),
             'assignment' => $assignment,
             'target' => 'assignments'
         );
@@ -54,6 +56,7 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
      * @SecureParam(name="assignment", permissions="EDIT")
      * @SecureParam(name="course", permissions="ADD_ASSIGNMENT
 ")
+     * @PreAuthorize("hasRole('ROLE_TEACHER')")
      * @Template()
      */
     public function addAction(Model\Course\Course $course, Model\Assignment\Assignment $assignment = null)
@@ -61,6 +64,9 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
         $assignmentType = new FormType\AssignmentType();
         $assignmentType->setTeacher($this->getRoleUser());
         $form = $this->createForm($assignmentType, $assignment);
+
+
+        $assignedStudents = $assignment ? $assignment->getStudents()->getPrimaryKeys() : array();
 
         if ($this->getRequest()->isMethod('POST')) {
             $form->bind($this->getRequest());
@@ -71,6 +77,16 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
                 $assignment = $form->getData();
                 $assignment->setCourse($course);
                 $assignment->setTeacherId($this->getRoleUser()->getId());
+
+                $studentAssignments = new \PropelCollection();
+                foreach($this->getRequest()->get('students', array()) as $studentId){
+                    $studentAssignment = new \Zerebral\BusinessBundle\Model\Assignment\StudentAssignment();
+                    $studentAssignment->setStudentId($studentId);
+                    $studentAssignment->setAssignment($assignment);
+                    $studentAssignments[] = $studentAssignment;
+                }
+                $assignment->setStudentAssignments($studentAssignments);
+
                 $assignment->save();
 
                 return $this->redirect($this->generateUrl('assignment_view', array('id' => $assignment->getId())));
@@ -80,6 +96,8 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
         return array(
             'form' => $form->createView(),
             'course' => $course,
+            'students' => $course->getStudents(),
+            'assignedStudents' => $assignedStudents,
             'target' => 'assignments'
         );
     }
@@ -89,6 +107,7 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
      * @ParamConverter("assignment")
      *
      * @SecureParam(name="assignment", permissions="DELETE")
+     * @PreAuthorize("hasRole('ROLE_TEACHER')")
      * @Template()
      */
     public function deleteAction(Model\Assignment\Assignment $assignment = null)

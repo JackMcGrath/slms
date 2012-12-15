@@ -58,4 +58,12 @@ class Assignment extends BaseAssignment
         return parent::preSave($con);
     }
 
+    public function preDelete(\PropelPDO $con = null)
+    {
+        foreach($this->getFileReferencess() as $reference) {
+            $reference->delete();
+        }
+        return parent::preDelete($con);
+    }
+
 }

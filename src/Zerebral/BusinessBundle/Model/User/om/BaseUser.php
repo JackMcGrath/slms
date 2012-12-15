@@ -1758,9 +1758,11 @@ abstract class BaseUser extends BaseObject implements Persistent
      */
     public function setStudents(PropelCollection $students, PropelPDO $con = null)
     {
-        $this->studentsScheduledForDeletion = $this->getStudents(new Criteria(), $con)->diff($students);
+        $studentsToDelete = $this->getStudents(new Criteria(), $con)->diff($students);
 
-        foreach ($this->studentsScheduledForDeletion as $studentRemoved) {
+        $this->studentsScheduledForDeletion = unserialize(serialize($studentsToDelete));
+
+        foreach ($studentsToDelete as $studentRemoved) {
             $studentRemoved->setUser(null);
         }
 
@@ -1849,7 +1851,7 @@ abstract class BaseUser extends BaseObject implements Persistent
                 $this->studentsScheduledForDeletion = clone $this->collStudents;
                 $this->studentsScheduledForDeletion->clear();
             }
-            $this->studentsScheduledForDeletion[]= $student;
+            $this->studentsScheduledForDeletion[]= clone $student;
             $student->setUser(null);
         }
 
@@ -1973,9 +1975,11 @@ abstract class BaseUser extends BaseObject implements Persistent
      */
     public function setTeachers(PropelCollection $teachers, PropelPDO $con = null)
     {
-        $this->teachersScheduledForDeletion = $this->getTeachers(new Criteria(), $con)->diff($teachers);
+        $teachersToDelete = $this->getTeachers(new Criteria(), $con)->diff($teachers);
 
-        foreach ($this->teachersScheduledForDeletion as $teacherRemoved) {
+        $this->teachersScheduledForDeletion = unserialize(serialize($teachersToDelete));
+
+        foreach ($teachersToDelete as $teacherRemoved) {
             $teacherRemoved->setUser(null);
         }
 
@@ -2064,7 +2068,7 @@ abstract class BaseUser extends BaseObject implements Persistent
                 $this->teachersScheduledForDeletion = clone $this->collTeachers;
                 $this->teachersScheduledForDeletion->clear();
             }
-            $this->teachersScheduledForDeletion[]= $teacher;
+            $this->teachersScheduledForDeletion[]= clone $teacher;
             $teacher->setUser(null);
         }
 

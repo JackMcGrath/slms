@@ -14,8 +14,10 @@ use Glorpen\PropelEvent\PropelEventBundle\Events\PeerEvent;
 use Zerebral\BusinessBundle\Model\Assignment\Assignment;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentCategoryPeer;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer;
+use Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentPeer;
 use Zerebral\BusinessBundle\Model\Assignment\map\AssignmentTableMap;
 use Zerebral\BusinessBundle\Model\Course\CoursePeer;
+use Zerebral\BusinessBundle\Model\File\FileReferencesPeer;
 use Zerebral\BusinessBundle\Model\User\TeacherPeer;
 
 abstract class BaseAssignmentPeer
@@ -395,6 +397,12 @@ abstract class BaseAssignmentPeer
      */
     public static function clearRelatedInstancePool()
     {
+        // Invalidate objects in StudentAssignmentPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        StudentAssignmentPeer::clearInstancePool();
+        // Invalidate objects in FileReferencesPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        FileReferencesPeer::clearInstancePool();
     }
 
     /**

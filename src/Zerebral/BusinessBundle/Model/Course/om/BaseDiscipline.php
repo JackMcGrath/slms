@@ -20,6 +20,8 @@ use Zerebral\BusinessBundle\Model\Course\CourseQuery;
 use Zerebral\BusinessBundle\Model\Course\Discipline;
 use Zerebral\BusinessBundle\Model\Course\DisciplinePeer;
 use Zerebral\BusinessBundle\Model\Course\DisciplineQuery;
+use Zerebral\BusinessBundle\Model\User\Teacher;
+use Zerebral\BusinessBundle\Model\User\TeacherQuery;
 
 abstract class BaseDiscipline extends BaseObject implements Persistent
 {
@@ -49,10 +51,21 @@ abstract class BaseDiscipline extends BaseObject implements Persistent
     protected $id;
 
     /**
+     * The value for the teacher_id field.
+     * @var        int
+     */
+    protected $teacher_id;
+
+    /**
      * The value for the name field.
      * @var        string
      */
     protected $name;
+
+    /**
+     * @var        Teacher
+     */
+    protected $aTeacher;
 
     /**
      * @var        PropelObjectCollection|Course[] Collection to store aggregation of Course objects.
@@ -91,6 +104,16 @@ abstract class BaseDiscipline extends BaseObject implements Persistent
     }
 
     /**
+     * Get the [teacher_id] column value.
+     *
+     * @return int
+     */
+    public function getTeacherId()
+    {
+        return $this->teacher_id;
+    }
+
+    /**
      * Get the [name] column value.
      *
      * @return string
@@ -120,6 +143,31 @@ abstract class BaseDiscipline extends BaseObject implements Persistent
 
         return $this;
     } // setId()
+
+    /**
+     * Set the value of [teacher_id] column.
+     *
+     * @param int $v new value
+     * @return Discipline The current object (for fluent API support)
+     */
+    public function setTeacherId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->teacher_id !== $v) {
+            $this->teacher_id = $v;
+            $this->modifiedColumns[] = DisciplinePeer::TEACHER_ID;
+        }
+
+        if ($this->aTeacher !== null && $this->aTeacher->getId() !== $v) {
+            $this->aTeacher = null;
+        }
+
+
+        return $this;
+    } // setTeacherId()
 
     /**
      * Set the value of [name] column.
@@ -175,7 +223,8 @@ abstract class BaseDiscipline extends BaseObject implements Persistent
         try {
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-            $this->name = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
+            $this->teacher_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
+            $this->name = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -184,7 +233,7 @@ abstract class BaseDiscipline extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 2; // 2 = DisciplinePeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 3; // 3 = DisciplinePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Discipline object", $e);
@@ -207,6 +256,9 @@ abstract class BaseDiscipline extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aTeacher !== null && $this->teacher_id !== $this->aTeacher->getId()) {
+            $this->aTeacher = null;
+        }
     } // ensureConsistency
 
     /**
@@ -246,6 +298,7 @@ abstract class BaseDiscipline extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->aTeacher = null;
             $this->collCourses = null;
 
         } // if (deep)
@@ -377,6 +430,18 @@ abstract class BaseDiscipline extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aTeacher !== null) {
+                if ($this->aTeacher->isModified() || $this->aTeacher->isNew()) {
+                    $affectedRows += $this->aTeacher->save($con);
+                }
+                $this->setTeacher($this->aTeacher);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -434,6 +499,9 @@ abstract class BaseDiscipline extends BaseObject implements Persistent
         if ($this->isColumnModified(DisciplinePeer::ID)) {
             $modifiedColumns[':p' . $index++]  = '`id`';
         }
+        if ($this->isColumnModified(DisciplinePeer::TEACHER_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`teacher_id`';
+        }
         if ($this->isColumnModified(DisciplinePeer::NAME)) {
             $modifiedColumns[':p' . $index++]  = '`name`';
         }
@@ -450,6 +518,9 @@ abstract class BaseDiscipline extends BaseObject implements Persistent
                 switch ($columnName) {
                     case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
+                        break;
+                    case '`teacher_id`':
+                        $stmt->bindValue($identifier, $this->teacher_id, PDO::PARAM_INT);
                         break;
                     case '`name`':
                         $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
@@ -548,6 +619,18 @@ abstract class BaseDiscipline extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aTeacher !== null) {
+                if (!$this->aTeacher->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aTeacher->getValidationFailures());
+                }
+            }
+
+
             if (($retval = DisciplinePeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
@@ -600,6 +683,9 @@ abstract class BaseDiscipline extends BaseObject implements Persistent
                 return $this->getId();
                 break;
             case 1:
+                return $this->getTeacherId();
+                break;
+            case 2:
                 return $this->getName();
                 break;
             default:
@@ -632,9 +718,13 @@ abstract class BaseDiscipline extends BaseObject implements Persistent
         $keys = DisciplinePeer::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getName(),
+            $keys[1] => $this->getTeacherId(),
+            $keys[2] => $this->getName(),
         );
         if ($includeForeignObjects) {
+            if (null !== $this->aTeacher) {
+                $result['Teacher'] = $this->aTeacher->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
             if (null !== $this->collCourses) {
                 $result['Courses'] = $this->collCourses->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -676,6 +766,9 @@ abstract class BaseDiscipline extends BaseObject implements Persistent
                 $this->setId($value);
                 break;
             case 1:
+                $this->setTeacherId($value);
+                break;
+            case 2:
                 $this->setName($value);
                 break;
         } // switch()
@@ -703,7 +796,8 @@ abstract class BaseDiscipline extends BaseObject implements Persistent
         $keys = DisciplinePeer::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setName($arr[$keys[1]]);
+        if (array_key_exists($keys[1], $arr)) $this->setTeacherId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setName($arr[$keys[2]]);
     }
 
     /**
@@ -716,6 +810,7 @@ abstract class BaseDiscipline extends BaseObject implements Persistent
         $criteria = new Criteria(DisciplinePeer::DATABASE_NAME);
 
         if ($this->isColumnModified(DisciplinePeer::ID)) $criteria->add(DisciplinePeer::ID, $this->id);
+        if ($this->isColumnModified(DisciplinePeer::TEACHER_ID)) $criteria->add(DisciplinePeer::TEACHER_ID, $this->teacher_id);
         if ($this->isColumnModified(DisciplinePeer::NAME)) $criteria->add(DisciplinePeer::NAME, $this->name);
 
         return $criteria;
@@ -780,6 +875,7 @@ abstract class BaseDiscipline extends BaseObject implements Persistent
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
+        $copyObj->setTeacherId($this->getTeacherId());
         $copyObj->setName($this->getName());
 
         if ($deepCopy && !$this->startCopy) {
@@ -843,6 +939,58 @@ abstract class BaseDiscipline extends BaseObject implements Persistent
         }
 
         return self::$peer;
+    }
+
+    /**
+     * Declares an association between this object and a Teacher object.
+     *
+     * @param             Teacher $v
+     * @return Discipline The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setTeacher(Teacher $v = null)
+    {
+        if ($v === null) {
+            $this->setTeacherId(NULL);
+        } else {
+            $this->setTeacherId($v->getId());
+        }
+
+        $this->aTeacher = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Teacher object, it will not be re-added.
+        if ($v !== null) {
+            $v->addDiscipline($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Teacher object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return Teacher The associated Teacher object.
+     * @throws PropelException
+     */
+    public function getTeacher(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->aTeacher === null && ($this->teacher_id !== null) && $doQuery) {
+            $this->aTeacher = TeacherQuery::create()->findPk($this->teacher_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aTeacher->addDisciplines($this);
+             */
+        }
+
+        return $this->aTeacher;
     }
 
 
@@ -978,9 +1126,11 @@ abstract class BaseDiscipline extends BaseObject implements Persistent
      */
     public function setCourses(PropelCollection $courses, PropelPDO $con = null)
     {
-        $this->coursesScheduledForDeletion = $this->getCourses(new Criteria(), $con)->diff($courses);
+        $coursesToDelete = $this->getCourses(new Criteria(), $con)->diff($courses);
 
-        foreach ($this->coursesScheduledForDeletion as $courseRemoved) {
+        $this->coursesScheduledForDeletion = unserialize(serialize($coursesToDelete));
+
+        foreach ($coursesToDelete as $courseRemoved) {
             $courseRemoved->setDiscipline(null);
         }
 
@@ -1069,7 +1219,7 @@ abstract class BaseDiscipline extends BaseObject implements Persistent
                 $this->coursesScheduledForDeletion = clone $this->collCourses;
                 $this->coursesScheduledForDeletion->clear();
             }
-            $this->coursesScheduledForDeletion[]= $course;
+            $this->coursesScheduledForDeletion[]= clone $course;
             $course->setDiscipline(null);
         }
 
@@ -1132,6 +1282,7 @@ abstract class BaseDiscipline extends BaseObject implements Persistent
     public function clear()
     {
         $this->id = null;
+        $this->teacher_id = null;
         $this->name = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
@@ -1164,6 +1315,7 @@ abstract class BaseDiscipline extends BaseObject implements Persistent
             $this->collCourses->clearIterator();
         }
         $this->collCourses = null;
+        $this->aTeacher = null;
     }
 
     /**

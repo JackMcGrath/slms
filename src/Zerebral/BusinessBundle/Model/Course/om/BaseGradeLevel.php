@@ -978,9 +978,11 @@ abstract class BaseGradeLevel extends BaseObject implements Persistent
      */
     public function setCourses(PropelCollection $courses, PropelPDO $con = null)
     {
-        $this->coursesScheduledForDeletion = $this->getCourses(new Criteria(), $con)->diff($courses);
+        $coursesToDelete = $this->getCourses(new Criteria(), $con)->diff($courses);
 
-        foreach ($this->coursesScheduledForDeletion as $courseRemoved) {
+        $this->coursesScheduledForDeletion = unserialize(serialize($coursesToDelete));
+
+        foreach ($coursesToDelete as $courseRemoved) {
             $courseRemoved->setGradeLevel(null);
         }
 
@@ -1069,7 +1071,7 @@ abstract class BaseGradeLevel extends BaseObject implements Persistent
                 $this->coursesScheduledForDeletion = clone $this->collCourses;
                 $this->coursesScheduledForDeletion->clear();
             }
-            $this->coursesScheduledForDeletion[]= $course;
+            $this->coursesScheduledForDeletion[]= clone $course;
             $course->setGradeLevel(null);
         }
 

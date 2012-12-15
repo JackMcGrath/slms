@@ -36,6 +36,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      *
      * @SecureParam(name="course", permissions="VIEW")
      *
+     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @Template()
      */
     public function viewAction(Model\Course\Course $course)
@@ -52,7 +53,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      * @ParamConverter("course")
      *
      * @SecureParam(name="course", permissions="EDIT")
-     *
+     * @PreAuthorize("hasRole('ROLE_TEACHER')")
      * @Template()
      */
     public function addAction(Model\Course\Course $course = null)
@@ -67,8 +68,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
                 /** @var $course Model\Course\Course */
                 $course = $form->getData();
                 $course->setCreatedBy($this->getRoleUser()->getId());
-                $course->clearTeachers();
-                $course->addTeacher($this->getRoleUser());
+                $course->setTeachers(new \PropelCollection(array($this->getRoleUser())));
                 $course->save();
 
                 return $this->redirect($this->generateUrl('course_view', array('id' => $course->getId())));
@@ -87,7 +87,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      * @ParamConverter("course")
      *
      * @SecureParam(name="course", permissions="DELETE")
-     *
+     * @PreAuthorize("hasRole('ROLE_TEACHER')")
      * @Template()
      */
     public function deleteAction(Model\Course\Course $course)

@@ -11,8 +11,12 @@ use \PropelException;
 use \PropelPDO;
 use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\PeerEvent;
+use Zerebral\BusinessBundle\Model\Assignment\AssignmentCategoryPeer;
+use Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer;
 use Zerebral\BusinessBundle\Model\Course\Course;
 use Zerebral\BusinessBundle\Model\Course\CoursePeer;
+use Zerebral\BusinessBundle\Model\Course\CourseStudentPeer;
+use Zerebral\BusinessBundle\Model\Course\CourseTeacherPeer;
 use Zerebral\BusinessBundle\Model\Course\DisciplinePeer;
 use Zerebral\BusinessBundle\Model\Course\GradeLevelPeer;
 use Zerebral\BusinessBundle\Model\Course\map\CourseTableMap;
@@ -395,6 +399,18 @@ abstract class BaseCoursePeer
      */
     public static function clearRelatedInstancePool()
     {
+        // Invalidate objects in AssignmentCategoryPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        AssignmentCategoryPeer::clearInstancePool();
+        // Invalidate objects in AssignmentPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        AssignmentPeer::clearInstancePool();
+        // Invalidate objects in CourseStudentPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        CourseStudentPeer::clearInstancePool();
+        // Invalidate objects in CourseTeacherPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        CourseTeacherPeer::clearInstancePool();
     }
 
     /**

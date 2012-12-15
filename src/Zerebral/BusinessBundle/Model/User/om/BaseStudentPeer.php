@@ -11,6 +11,8 @@ use \PropelException;
 use \PropelPDO;
 use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\PeerEvent;
+use Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentPeer;
+use Zerebral\BusinessBundle\Model\Course\CourseStudentPeer;
 use Zerebral\BusinessBundle\Model\User\Student;
 use Zerebral\BusinessBundle\Model\User\StudentPeer;
 use Zerebral\BusinessBundle\Model\User\UserPeer;
@@ -378,6 +380,12 @@ abstract class BaseStudentPeer
      */
     public static function clearRelatedInstancePool()
     {
+        // Invalidate objects in StudentAssignmentPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        StudentAssignmentPeer::clearInstancePool();
+        // Invalidate objects in CourseStudentPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        CourseStudentPeer::clearInstancePool();
     }
 
     /**

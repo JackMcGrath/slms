@@ -53,10 +53,12 @@ class TeacherTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('User', 'Zerebral\\BusinessBundle\\Model\\User\\User', RelationMap::MANY_TO_ONE, array('user_id' => 'id', ), null, null);
-        $this->addRelation('Assignment', 'Zerebral\\BusinessBundle\\Model\\Assignment\\Assignment', RelationMap::ONE_TO_MANY, array('id' => 'teacher_id', ), null, 'CASCADE', 'Assignments');
-        $this->addRelation('CreatedByTeacher', 'Zerebral\\BusinessBundle\\Model\\Course\\Course', RelationMap::ONE_TO_MANY, array('id' => 'created_by', ), null, 'CASCADE', 'CreatedByTeachers');
-        $this->addRelation('CourseTeacher', 'Zerebral\\BusinessBundle\\Model\\Course\\CourseTeacher', RelationMap::ONE_TO_MANY, array('id' => 'teacher_id', ), null, 'CASCADE', 'CourseTeachers');
-        $this->addRelation('Course', 'Zerebral\\BusinessBundle\\Model\\Course\\Course', RelationMap::MANY_TO_MANY, array(), null, 'CASCADE', 'Courses');
+        $this->addRelation('AssignmentCategory', 'Zerebral\\BusinessBundle\\Model\\Assignment\\AssignmentCategory', RelationMap::ONE_TO_MANY, array('id' => 'teacher_id', ), 'CASCADE', 'CASCADE', 'AssignmentCategories');
+        $this->addRelation('Assignment', 'Zerebral\\BusinessBundle\\Model\\Assignment\\Assignment', RelationMap::ONE_TO_MANY, array('id' => 'teacher_id', ), 'CASCADE', 'CASCADE', 'Assignments');
+        $this->addRelation('CreatedByTeacher', 'Zerebral\\BusinessBundle\\Model\\Course\\Course', RelationMap::ONE_TO_MANY, array('id' => 'created_by', ), 'CASCADE', 'CASCADE', 'CreatedByTeachers');
+        $this->addRelation('Discipline', 'Zerebral\\BusinessBundle\\Model\\Course\\Discipline', RelationMap::ONE_TO_MANY, array('id' => 'teacher_id', ), 'CASCADE', 'CASCADE', 'Disciplines');
+        $this->addRelation('CourseTeacher', 'Zerebral\\BusinessBundle\\Model\\Course\\CourseTeacher', RelationMap::ONE_TO_MANY, array('id' => 'teacher_id', ), 'CASCADE', 'CASCADE', 'CourseTeachers');
+        $this->addRelation('Course', 'Zerebral\\BusinessBundle\\Model\\Course\\Course', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'CASCADE', 'Courses');
     } // buildRelations()
 
     /**

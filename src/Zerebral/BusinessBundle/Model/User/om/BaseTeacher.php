@@ -16,11 +16,15 @@ use \PropelPDO;
 use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\ModelEvent;
 use Zerebral\BusinessBundle\Model\Assignment\Assignment;
+use Zerebral\BusinessBundle\Model\Assignment\AssignmentCategory;
+use Zerebral\BusinessBundle\Model\Assignment\AssignmentCategoryQuery;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery;
 use Zerebral\BusinessBundle\Model\Course\Course;
 use Zerebral\BusinessBundle\Model\Course\CourseQuery;
 use Zerebral\BusinessBundle\Model\Course\CourseTeacher;
 use Zerebral\BusinessBundle\Model\Course\CourseTeacherQuery;
+use Zerebral\BusinessBundle\Model\Course\Discipline;
+use Zerebral\BusinessBundle\Model\Course\DisciplineQuery;
 use Zerebral\BusinessBundle\Model\User\Teacher;
 use Zerebral\BusinessBundle\Model\User\TeacherPeer;
 use Zerebral\BusinessBundle\Model\User\TeacherQuery;
@@ -66,6 +70,12 @@ abstract class BaseTeacher extends BaseObject implements Persistent
     protected $aUser;
 
     /**
+     * @var        PropelObjectCollection|AssignmentCategory[] Collection to store aggregation of AssignmentCategory objects.
+     */
+    protected $collAssignmentCategories;
+    protected $collAssignmentCategoriesPartial;
+
+    /**
      * @var        PropelObjectCollection|Assignment[] Collection to store aggregation of Assignment objects.
      */
     protected $collAssignments;
@@ -76,6 +86,12 @@ abstract class BaseTeacher extends BaseObject implements Persistent
      */
     protected $collCreatedByTeachers;
     protected $collCreatedByTeachersPartial;
+
+    /**
+     * @var        PropelObjectCollection|Discipline[] Collection to store aggregation of Discipline objects.
+     */
+    protected $collDisciplines;
+    protected $collDisciplinesPartial;
 
     /**
      * @var        PropelObjectCollection|CourseTeacher[] Collection to store aggregation of CourseTeacher objects.
@@ -112,6 +128,12 @@ abstract class BaseTeacher extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
+    protected $assignmentCategoriesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
     protected $assignmentsScheduledForDeletion = null;
 
     /**
@@ -119,6 +141,12 @@ abstract class BaseTeacher extends BaseObject implements Persistent
      * @var		PropelObjectCollection
      */
     protected $createdByTeachersScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $disciplinesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -300,9 +328,13 @@ abstract class BaseTeacher extends BaseObject implements Persistent
         if ($deep) {  // also de-associate any related objects?
 
             $this->aUser = null;
+            $this->collAssignmentCategories = null;
+
             $this->collAssignments = null;
 
             $this->collCreatedByTeachers = null;
+
+            $this->collDisciplines = null;
 
             $this->collCourseTeachers = null;
 
@@ -479,6 +511,24 @@ abstract class BaseTeacher extends BaseObject implements Persistent
                 }
             }
 
+            if ($this->assignmentCategoriesScheduledForDeletion !== null) {
+                if (!$this->assignmentCategoriesScheduledForDeletion->isEmpty()) {
+                    foreach ($this->assignmentCategoriesScheduledForDeletion as $assignmentCategory) {
+                        // need to save related object because we set the relation to null
+                        $assignmentCategory->save($con);
+                    }
+                    $this->assignmentCategoriesScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collAssignmentCategories !== null) {
+                foreach ($this->collAssignmentCategories as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             if ($this->assignmentsScheduledForDeletion !== null) {
                 if (!$this->assignmentsScheduledForDeletion->isEmpty()) {
                     AssignmentQuery::create()
@@ -507,6 +557,24 @@ abstract class BaseTeacher extends BaseObject implements Persistent
 
             if ($this->collCreatedByTeachers !== null) {
                 foreach ($this->collCreatedByTeachers as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->disciplinesScheduledForDeletion !== null) {
+                if (!$this->disciplinesScheduledForDeletion->isEmpty()) {
+                    foreach ($this->disciplinesScheduledForDeletion as $discipline) {
+                        // need to save related object because we set the relation to null
+                        $discipline->save($con);
+                    }
+                    $this->disciplinesScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collDisciplines !== null) {
+                foreach ($this->collDisciplines as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -690,6 +758,14 @@ abstract class BaseTeacher extends BaseObject implements Persistent
             }
 
 
+                if ($this->collAssignmentCategories !== null) {
+                    foreach ($this->collAssignmentCategories as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
                 if ($this->collAssignments !== null) {
                     foreach ($this->collAssignments as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
@@ -700,6 +776,14 @@ abstract class BaseTeacher extends BaseObject implements Persistent
 
                 if ($this->collCreatedByTeachers !== null) {
                     foreach ($this->collCreatedByTeachers as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collDisciplines !== null) {
+                    foreach ($this->collDisciplines as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -791,11 +875,17 @@ abstract class BaseTeacher extends BaseObject implements Persistent
             if (null !== $this->aUser) {
                 $result['User'] = $this->aUser->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
+            if (null !== $this->collAssignmentCategories) {
+                $result['AssignmentCategories'] = $this->collAssignmentCategories->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collAssignments) {
                 $result['Assignments'] = $this->collAssignments->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collCreatedByTeachers) {
                 $result['CreatedByTeachers'] = $this->collCreatedByTeachers->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collDisciplines) {
+                $result['Disciplines'] = $this->collDisciplines->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collCourseTeachers) {
                 $result['CourseTeachers'] = $this->collCourseTeachers->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -951,6 +1041,12 @@ abstract class BaseTeacher extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
+            foreach ($this->getAssignmentCategories() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addAssignmentCategory($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getAssignments() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addAssignment($relObj->copy($deepCopy));
@@ -960,6 +1056,12 @@ abstract class BaseTeacher extends BaseObject implements Persistent
             foreach ($this->getCreatedByTeachers() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addCreatedByTeacher($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getDisciplines() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addDiscipline($relObj->copy($deepCopy));
                 }
             }
 
@@ -1082,15 +1184,263 @@ abstract class BaseTeacher extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
+        if ('AssignmentCategory' == $relationName) {
+            $this->initAssignmentCategories();
+        }
         if ('Assignment' == $relationName) {
             $this->initAssignments();
         }
         if ('CreatedByTeacher' == $relationName) {
             $this->initCreatedByTeachers();
         }
+        if ('Discipline' == $relationName) {
+            $this->initDisciplines();
+        }
         if ('CourseTeacher' == $relationName) {
             $this->initCourseTeachers();
         }
+    }
+
+    /**
+     * Clears out the collAssignmentCategories collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Teacher The current object (for fluent API support)
+     * @see        addAssignmentCategories()
+     */
+    public function clearAssignmentCategories()
+    {
+        $this->collAssignmentCategories = null; // important to set this to null since that means it is uninitialized
+        $this->collAssignmentCategoriesPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collAssignmentCategories collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialAssignmentCategories($v = true)
+    {
+        $this->collAssignmentCategoriesPartial = $v;
+    }
+
+    /**
+     * Initializes the collAssignmentCategories collection.
+     *
+     * By default this just sets the collAssignmentCategories collection to an empty array (like clearcollAssignmentCategories());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initAssignmentCategories($overrideExisting = true)
+    {
+        if (null !== $this->collAssignmentCategories && !$overrideExisting) {
+            return;
+        }
+        $this->collAssignmentCategories = new PropelObjectCollection();
+        $this->collAssignmentCategories->setModel('AssignmentCategory');
+    }
+
+    /**
+     * Gets an array of AssignmentCategory objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Teacher is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|AssignmentCategory[] List of AssignmentCategory objects
+     * @throws PropelException
+     */
+    public function getAssignmentCategories($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collAssignmentCategoriesPartial && !$this->isNew();
+        if (null === $this->collAssignmentCategories || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collAssignmentCategories) {
+                // return empty collection
+                $this->initAssignmentCategories();
+            } else {
+                $collAssignmentCategories = AssignmentCategoryQuery::create(null, $criteria)
+                    ->filterByTeacher($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collAssignmentCategoriesPartial && count($collAssignmentCategories)) {
+                      $this->initAssignmentCategories(false);
+
+                      foreach($collAssignmentCategories as $obj) {
+                        if (false == $this->collAssignmentCategories->contains($obj)) {
+                          $this->collAssignmentCategories->append($obj);
+                        }
+                      }
+
+                      $this->collAssignmentCategoriesPartial = true;
+                    }
+
+                    return $collAssignmentCategories;
+                }
+
+                if($partial && $this->collAssignmentCategories) {
+                    foreach($this->collAssignmentCategories as $obj) {
+                        if($obj->isNew()) {
+                            $collAssignmentCategories[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collAssignmentCategories = $collAssignmentCategories;
+                $this->collAssignmentCategoriesPartial = false;
+            }
+        }
+
+        return $this->collAssignmentCategories;
+    }
+
+    /**
+     * Sets a collection of AssignmentCategory objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $assignmentCategories A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Teacher The current object (for fluent API support)
+     */
+    public function setAssignmentCategories(PropelCollection $assignmentCategories, PropelPDO $con = null)
+    {
+        $assignmentCategoriesToDelete = $this->getAssignmentCategories(new Criteria(), $con)->diff($assignmentCategories);
+
+        $this->assignmentCategoriesScheduledForDeletion = unserialize(serialize($assignmentCategoriesToDelete));
+
+        foreach ($assignmentCategoriesToDelete as $assignmentCategoryRemoved) {
+            $assignmentCategoryRemoved->setTeacher(null);
+        }
+
+        $this->collAssignmentCategories = null;
+        foreach ($assignmentCategories as $assignmentCategory) {
+            $this->addAssignmentCategory($assignmentCategory);
+        }
+
+        $this->collAssignmentCategories = $assignmentCategories;
+        $this->collAssignmentCategoriesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related AssignmentCategory objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related AssignmentCategory objects.
+     * @throws PropelException
+     */
+    public function countAssignmentCategories(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collAssignmentCategoriesPartial && !$this->isNew();
+        if (null === $this->collAssignmentCategories || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collAssignmentCategories) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getAssignmentCategories());
+            }
+            $query = AssignmentCategoryQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByTeacher($this)
+                ->count($con);
+        }
+
+        return count($this->collAssignmentCategories);
+    }
+
+    /**
+     * Method called to associate a AssignmentCategory object to this object
+     * through the AssignmentCategory foreign key attribute.
+     *
+     * @param    AssignmentCategory $l AssignmentCategory
+     * @return Teacher The current object (for fluent API support)
+     */
+    public function addAssignmentCategory(AssignmentCategory $l)
+    {
+        if ($this->collAssignmentCategories === null) {
+            $this->initAssignmentCategories();
+            $this->collAssignmentCategoriesPartial = true;
+        }
+        if (!in_array($l, $this->collAssignmentCategories->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddAssignmentCategory($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	AssignmentCategory $assignmentCategory The assignmentCategory object to add.
+     */
+    protected function doAddAssignmentCategory($assignmentCategory)
+    {
+        $this->collAssignmentCategories[]= $assignmentCategory;
+        $assignmentCategory->setTeacher($this);
+    }
+
+    /**
+     * @param	AssignmentCategory $assignmentCategory The assignmentCategory object to remove.
+     * @return Teacher The current object (for fluent API support)
+     */
+    public function removeAssignmentCategory($assignmentCategory)
+    {
+        if ($this->getAssignmentCategories()->contains($assignmentCategory)) {
+            $this->collAssignmentCategories->remove($this->collAssignmentCategories->search($assignmentCategory));
+            if (null === $this->assignmentCategoriesScheduledForDeletion) {
+                $this->assignmentCategoriesScheduledForDeletion = clone $this->collAssignmentCategories;
+                $this->assignmentCategoriesScheduledForDeletion->clear();
+            }
+            $this->assignmentCategoriesScheduledForDeletion[]= $assignmentCategory;
+            $assignmentCategory->setTeacher(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Teacher is new, it will return
+     * an empty collection; or if this Teacher has previously
+     * been saved, it will retrieve related AssignmentCategories from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Teacher.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|AssignmentCategory[] List of AssignmentCategory objects
+     */
+    public function getAssignmentCategoriesJoinCourse($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = AssignmentCategoryQuery::create(null, $criteria);
+        $query->joinWith('Course', $join_behavior);
+
+        return $this->getAssignmentCategories($query, $con);
     }
 
     /**
@@ -1210,9 +1560,11 @@ abstract class BaseTeacher extends BaseObject implements Persistent
      */
     public function setAssignments(PropelCollection $assignments, PropelPDO $con = null)
     {
-        $this->assignmentsScheduledForDeletion = $this->getAssignments(new Criteria(), $con)->diff($assignments);
+        $assignmentsToDelete = $this->getAssignments(new Criteria(), $con)->diff($assignments);
 
-        foreach ($this->assignmentsScheduledForDeletion as $assignmentRemoved) {
+        $this->assignmentsScheduledForDeletion = unserialize(serialize($assignmentsToDelete));
+
+        foreach ($assignmentsToDelete as $assignmentRemoved) {
             $assignmentRemoved->setTeacher(null);
         }
 
@@ -1301,7 +1653,7 @@ abstract class BaseTeacher extends BaseObject implements Persistent
                 $this->assignmentsScheduledForDeletion = clone $this->collAssignments;
                 $this->assignmentsScheduledForDeletion->clear();
             }
-            $this->assignmentsScheduledForDeletion[]= $assignment;
+            $this->assignmentsScheduledForDeletion[]= clone $assignment;
             $assignment->setTeacher(null);
         }
 
@@ -1475,9 +1827,11 @@ abstract class BaseTeacher extends BaseObject implements Persistent
      */
     public function setCreatedByTeachers(PropelCollection $createdByTeachers, PropelPDO $con = null)
     {
-        $this->createdByTeachersScheduledForDeletion = $this->getCreatedByTeachers(new Criteria(), $con)->diff($createdByTeachers);
+        $createdByTeachersToDelete = $this->getCreatedByTeachers(new Criteria(), $con)->diff($createdByTeachers);
 
-        foreach ($this->createdByTeachersScheduledForDeletion as $createdByTeacherRemoved) {
+        $this->createdByTeachersScheduledForDeletion = unserialize(serialize($createdByTeachersToDelete));
+
+        foreach ($createdByTeachersToDelete as $createdByTeacherRemoved) {
             $createdByTeacherRemoved->setCreatedByTeacher(null);
         }
 
@@ -1566,7 +1920,7 @@ abstract class BaseTeacher extends BaseObject implements Persistent
                 $this->createdByTeachersScheduledForDeletion = clone $this->collCreatedByTeachers;
                 $this->createdByTeachersScheduledForDeletion->clear();
             }
-            $this->createdByTeachersScheduledForDeletion[]= $createdByTeacher;
+            $this->createdByTeachersScheduledForDeletion[]= clone $createdByTeacher;
             $createdByTeacher->setCreatedByTeacher(null);
         }
 
@@ -1621,6 +1975,223 @@ abstract class BaseTeacher extends BaseObject implements Persistent
         $query->joinWith('GradeLevel', $join_behavior);
 
         return $this->getCreatedByTeachers($query, $con);
+    }
+
+    /**
+     * Clears out the collDisciplines collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Teacher The current object (for fluent API support)
+     * @see        addDisciplines()
+     */
+    public function clearDisciplines()
+    {
+        $this->collDisciplines = null; // important to set this to null since that means it is uninitialized
+        $this->collDisciplinesPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collDisciplines collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialDisciplines($v = true)
+    {
+        $this->collDisciplinesPartial = $v;
+    }
+
+    /**
+     * Initializes the collDisciplines collection.
+     *
+     * By default this just sets the collDisciplines collection to an empty array (like clearcollDisciplines());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initDisciplines($overrideExisting = true)
+    {
+        if (null !== $this->collDisciplines && !$overrideExisting) {
+            return;
+        }
+        $this->collDisciplines = new PropelObjectCollection();
+        $this->collDisciplines->setModel('Discipline');
+    }
+
+    /**
+     * Gets an array of Discipline objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Teacher is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Discipline[] List of Discipline objects
+     * @throws PropelException
+     */
+    public function getDisciplines($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collDisciplinesPartial && !$this->isNew();
+        if (null === $this->collDisciplines || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collDisciplines) {
+                // return empty collection
+                $this->initDisciplines();
+            } else {
+                $collDisciplines = DisciplineQuery::create(null, $criteria)
+                    ->filterByTeacher($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collDisciplinesPartial && count($collDisciplines)) {
+                      $this->initDisciplines(false);
+
+                      foreach($collDisciplines as $obj) {
+                        if (false == $this->collDisciplines->contains($obj)) {
+                          $this->collDisciplines->append($obj);
+                        }
+                      }
+
+                      $this->collDisciplinesPartial = true;
+                    }
+
+                    return $collDisciplines;
+                }
+
+                if($partial && $this->collDisciplines) {
+                    foreach($this->collDisciplines as $obj) {
+                        if($obj->isNew()) {
+                            $collDisciplines[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collDisciplines = $collDisciplines;
+                $this->collDisciplinesPartial = false;
+            }
+        }
+
+        return $this->collDisciplines;
+    }
+
+    /**
+     * Sets a collection of Discipline objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $disciplines A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Teacher The current object (for fluent API support)
+     */
+    public function setDisciplines(PropelCollection $disciplines, PropelPDO $con = null)
+    {
+        $disciplinesToDelete = $this->getDisciplines(new Criteria(), $con)->diff($disciplines);
+
+        $this->disciplinesScheduledForDeletion = unserialize(serialize($disciplinesToDelete));
+
+        foreach ($disciplinesToDelete as $disciplineRemoved) {
+            $disciplineRemoved->setTeacher(null);
+        }
+
+        $this->collDisciplines = null;
+        foreach ($disciplines as $discipline) {
+            $this->addDiscipline($discipline);
+        }
+
+        $this->collDisciplines = $disciplines;
+        $this->collDisciplinesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Discipline objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Discipline objects.
+     * @throws PropelException
+     */
+    public function countDisciplines(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collDisciplinesPartial && !$this->isNew();
+        if (null === $this->collDisciplines || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collDisciplines) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getDisciplines());
+            }
+            $query = DisciplineQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByTeacher($this)
+                ->count($con);
+        }
+
+        return count($this->collDisciplines);
+    }
+
+    /**
+     * Method called to associate a Discipline object to this object
+     * through the Discipline foreign key attribute.
+     *
+     * @param    Discipline $l Discipline
+     * @return Teacher The current object (for fluent API support)
+     */
+    public function addDiscipline(Discipline $l)
+    {
+        if ($this->collDisciplines === null) {
+            $this->initDisciplines();
+            $this->collDisciplinesPartial = true;
+        }
+        if (!in_array($l, $this->collDisciplines->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddDiscipline($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Discipline $discipline The discipline object to add.
+     */
+    protected function doAddDiscipline($discipline)
+    {
+        $this->collDisciplines[]= $discipline;
+        $discipline->setTeacher($this);
+    }
+
+    /**
+     * @param	Discipline $discipline The discipline object to remove.
+     * @return Teacher The current object (for fluent API support)
+     */
+    public function removeDiscipline($discipline)
+    {
+        if ($this->getDisciplines()->contains($discipline)) {
+            $this->collDisciplines->remove($this->collDisciplines->search($discipline));
+            if (null === $this->disciplinesScheduledForDeletion) {
+                $this->disciplinesScheduledForDeletion = clone $this->collDisciplines;
+                $this->disciplinesScheduledForDeletion->clear();
+            }
+            $this->disciplinesScheduledForDeletion[]= $discipline;
+            $discipline->setTeacher(null);
+        }
+
+        return $this;
     }
 
     /**
@@ -1740,9 +2311,11 @@ abstract class BaseTeacher extends BaseObject implements Persistent
      */
     public function setCourseTeachers(PropelCollection $courseTeachers, PropelPDO $con = null)
     {
-        $this->courseTeachersScheduledForDeletion = $this->getCourseTeachers(new Criteria(), $con)->diff($courseTeachers);
+        $courseTeachersToDelete = $this->getCourseTeachers(new Criteria(), $con)->diff($courseTeachers);
 
-        foreach ($this->courseTeachersScheduledForDeletion as $courseTeacherRemoved) {
+        $this->courseTeachersScheduledForDeletion = unserialize(serialize($courseTeachersToDelete));
+
+        foreach ($courseTeachersToDelete as $courseTeacherRemoved) {
             $courseTeacherRemoved->setTeacher(null);
         }
 
@@ -1831,7 +2404,7 @@ abstract class BaseTeacher extends BaseObject implements Persistent
                 $this->courseTeachersScheduledForDeletion = clone $this->collCourseTeachers;
                 $this->courseTeachersScheduledForDeletion->clear();
             }
-            $this->courseTeachersScheduledForDeletion[]= $courseTeacher;
+            $this->courseTeachersScheduledForDeletion[]= clone $courseTeacher;
             $courseTeacher->setTeacher(null);
         }
 
@@ -2067,6 +2640,11 @@ abstract class BaseTeacher extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collAssignmentCategories) {
+                foreach ($this->collAssignmentCategories as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collAssignments) {
                 foreach ($this->collAssignments as $o) {
                     $o->clearAllReferences($deep);
@@ -2074,6 +2652,11 @@ abstract class BaseTeacher extends BaseObject implements Persistent
             }
             if ($this->collCreatedByTeachers) {
                 foreach ($this->collCreatedByTeachers as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collDisciplines) {
+                foreach ($this->collDisciplines as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -2089,6 +2672,10 @@ abstract class BaseTeacher extends BaseObject implements Persistent
             }
         } // if ($deep)
 
+        if ($this->collAssignmentCategories instanceof PropelCollection) {
+            $this->collAssignmentCategories->clearIterator();
+        }
+        $this->collAssignmentCategories = null;
         if ($this->collAssignments instanceof PropelCollection) {
             $this->collAssignments->clearIterator();
         }
@@ -2097,6 +2684,10 @@ abstract class BaseTeacher extends BaseObject implements Persistent
             $this->collCreatedByTeachers->clearIterator();
         }
         $this->collCreatedByTeachers = null;
+        if ($this->collDisciplines instanceof PropelCollection) {
+            $this->collDisciplines->clearIterator();
+        }
+        $this->collDisciplines = null;
         if ($this->collCourseTeachers instanceof PropelCollection) {
             $this->collCourseTeachers->clearIterator();
         }
