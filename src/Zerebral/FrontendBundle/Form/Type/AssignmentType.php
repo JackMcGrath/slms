@@ -36,9 +36,15 @@ class AssignmentType extends AbstractType
             'invalid_message' => 'Category is required',
         ));
 
-        $builder->add('max_points', 'text', array('required' => false, 'data' => 100,));
-        $builder->add('due_at_date', 'text', array('required' => false));
-        $builder->add('due_at_time', 'text', array('required' => false));
+        $builder->add('maxPoints', 'text', array('required' => false, 'data' => 100,));
+
+        $builder->add('dueAt', 'datetime', array(
+            'required' => false,
+            'date_widget' => 'single_text',
+            'date_format' => 'MM/dd/yyyy',
+            'time_widget' => 'single_text',
+
+        ));
     }
 
     public function getName()

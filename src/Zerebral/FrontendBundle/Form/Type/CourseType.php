@@ -34,7 +34,7 @@ class CourseType extends AbstractType
             'invalid_message' => 'Course subject is required.',
         ));
 
-        $builder->add('grade_level', 'model', array(
+        $builder->add('gradeLevel', 'model', array(
             'class' => 'Zerebral\BusinessBundle\Model\Course\GradeLevel',
             'property' => 'name',
             'required' => false,
