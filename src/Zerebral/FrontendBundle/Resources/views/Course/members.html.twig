@@ -6,7 +6,7 @@
             <ul>
                 <li><a href="#">Feed</a></li>
                 <li><a href="{{ path('course_assignments', {id: course.id}) }}">Assignments</a></li>
-                <li><a href="#">Details</a></li>
+                <li><a href="{{ path('course_view', {id: course.id}) }}">Details</a></li>
                 <li><a href="#">Materials</a></li>
                 <li class="active"><a href="{{ path('course_members', {id: course.id}) }}">Members</a></li>
             </ul>
@@ -29,7 +29,7 @@
 
                 {% if is_granted('ROLE_TEACHER') %}
                 <div class="form-actions">
-                    <a href="" class="btn btn-danger invite">Invite someone by email</a>
+                    <a href="#inviteModal" class="btn btn-danger invite" data-toggle="modal" data-target="#inviteModal">Invite someone by email</a>
                     or share an access code: <b>JWBGN-9KX1X5</b>
                     <a href="#" class="reset">reset</a>
                 </div>
@@ -37,6 +37,29 @@
             </div>
         </div>
     </div>
+
+    <div class="modal hide fade" id="inviteModal">
+        <form>
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3>Invite users</h3>
+            </div>
+            <div class="modal-body">
+                <p>
+                    To send invitations to join your course, enter one ore more email addresses into the text box, separated by space or new lines, and click "Send Invites" button.
+                </p>
+                <textarea rows="4 span12"></textarea>
+                <div class="clearfix"></div>
+                <p>
+                    Your course currently has {{ students|length + teachers|length }} of 50 available. Invite(s) remaining: {{ 50 - students|length - teachers|length }} for your current plan.
+                </p>
+
+                <input type="submit" class="btn btn-danger" value="Send Invites"/>
+                <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Cancel</a>
+            </div>
+        </form>
+    </div>
+
 {% endblock %}
 
 {% block member %}
