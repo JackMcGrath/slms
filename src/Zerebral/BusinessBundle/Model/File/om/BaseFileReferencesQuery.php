@@ -19,6 +19,7 @@ use Zerebral\BusinessBundle\Model\File\File;
 use Zerebral\BusinessBundle\Model\File\FileReferences;
 use Zerebral\BusinessBundle\Model\File\FileReferencesPeer;
 use Zerebral\BusinessBundle\Model\File\FileReferencesQuery;
+use Zerebral\BusinessBundle\Model\User\Student;
 
 /**
  * @method FileReferencesQuery orderByfileId($order = Criteria::ASC) Order by the file_id column
@@ -37,9 +38,13 @@ use Zerebral\BusinessBundle\Model\File\FileReferencesQuery;
  * @method FileReferencesQuery rightJoinFile($relationAlias = null) Adds a RIGHT JOIN clause to the query using the File relation
  * @method FileReferencesQuery innerJoinFile($relationAlias = null) Adds a INNER JOIN clause to the query using the File relation
  *
- * @method FileReferencesQuery leftJoinAssignment($relationAlias = null) Adds a LEFT JOIN clause to the query using the Assignment relation
- * @method FileReferencesQuery rightJoinAssignment($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Assignment relation
- * @method FileReferencesQuery innerJoinAssignment($relationAlias = null) Adds a INNER JOIN clause to the query using the Assignment relation
+ * @method FileReferencesQuery leftJoinassignmentReferenceId($relationAlias = null) Adds a LEFT JOIN clause to the query using the assignmentReferenceId relation
+ * @method FileReferencesQuery rightJoinassignmentReferenceId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the assignmentReferenceId relation
+ * @method FileReferencesQuery innerJoinassignmentReferenceId($relationAlias = null) Adds a INNER JOIN clause to the query using the assignmentReferenceId relation
+ *
+ * @method FileReferencesQuery leftJoinstudentsReferenceId($relationAlias = null) Adds a LEFT JOIN clause to the query using the studentsReferenceId relation
+ * @method FileReferencesQuery rightJoinstudentsReferenceId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the studentsReferenceId relation
+ * @method FileReferencesQuery innerJoinstudentsReferenceId($relationAlias = null) Adds a INNER JOIN clause to the query using the studentsReferenceId relation
  *
  * @method FileReferences findOne(PropelPDO $con = null) Return the first FileReferences matching the query
  * @method FileReferences findOneOrCreate(PropelPDO $con = null) Return the first FileReferences matching the query, or a new FileReferences object populated from the query conditions when no match is found
@@ -284,7 +289,9 @@ abstract class BaseFileReferencesQuery extends ModelCriteria
      * $query->filterByreferenceId(array('min' => 12)); // WHERE reference_id > 12
      * </code>
      *
-     * @see       filterByAssignment()
+     * @see       filterByassignmentReferenceId()
+     *
+     * @see       filterBystudentsReferenceId()
      *
      * @param     mixed $referenceId The value to use as filter.
      *              Use scalar values for equality.
@@ -417,7 +424,7 @@ abstract class BaseFileReferencesQuery extends ModelCriteria
      * @return   FileReferencesQuery The current query, for fluid interface
      * @throws   PropelException - if the provided filter is invalid.
      */
-    public function filterByAssignment($assignment, $comparison = null)
+    public function filterByassignmentReferenceId($assignment, $comparison = null)
     {
         if ($assignment instanceof Assignment) {
             return $this
@@ -430,22 +437,22 @@ abstract class BaseFileReferencesQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(FileReferencesPeer::REFERENCE_ID, $assignment->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByAssignment() only accepts arguments of type Assignment or PropelCollection');
+            throw new PropelException('filterByassignmentReferenceId() only accepts arguments of type Assignment or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Assignment relation
+     * Adds a JOIN clause to the query using the assignmentReferenceId relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return FileReferencesQuery The current query, for fluid interface
      */
-    public function joinAssignment($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinassignmentReferenceId($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Assignment');
+        $relationMap = $tableMap->getRelation('assignmentReferenceId');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -460,14 +467,14 @@ abstract class BaseFileReferencesQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Assignment');
+            $this->addJoinObject($join, 'assignmentReferenceId');
         }
 
         return $this;
     }
 
     /**
-     * Use the Assignment relation Assignment object
+     * Use the assignmentReferenceId relation Assignment object
      *
      * @see       useQuery()
      *
@@ -477,11 +484,87 @@ abstract class BaseFileReferencesQuery extends ModelCriteria
      *
      * @return   \Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery A secondary query class using the current class as primary query
      */
-    public function useAssignmentQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useassignmentReferenceIdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinAssignment($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Assignment', '\Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery');
+            ->joinassignmentReferenceId($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'assignmentReferenceId', '\Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery');
+    }
+
+    /**
+     * Filter the query by a related Student object
+     *
+     * @param   Student|PropelObjectCollection $student The related object(s) to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   FileReferencesQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterBystudentsReferenceId($student, $comparison = null)
+    {
+        if ($student instanceof Student) {
+            return $this
+                ->addUsingAlias(FileReferencesPeer::REFERENCE_ID, $student->getId(), $comparison);
+        } elseif ($student instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(FileReferencesPeer::REFERENCE_ID, $student->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterBystudentsReferenceId() only accepts arguments of type Student or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the studentsReferenceId relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return FileReferencesQuery The current query, for fluid interface
+     */
+    public function joinstudentsReferenceId($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('studentsReferenceId');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'studentsReferenceId');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the studentsReferenceId relation Student object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Zerebral\BusinessBundle\Model\User\StudentQuery A secondary query class using the current class as primary query
+     */
+    public function usestudentsReferenceIdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinstudentsReferenceId($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'studentsReferenceId', '\Zerebral\BusinessBundle\Model\User\StudentQuery');
     }
 
     /**

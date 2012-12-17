@@ -28,7 +28,7 @@ class FileType extends AbstractType {
         $resolver->setDefaults(
             array(
                 'data_class' => 'Zerebral\BusinessBundle\Model\File\File',
-                'storage' => 'local'
+                'storage' => null
             )
         );
     }

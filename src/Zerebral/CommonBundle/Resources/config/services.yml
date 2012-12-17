@@ -2,9 +2,6 @@ parameters:
 #    zerebral_common.example.class: Zerebral\CommonBundle\Example
 
 services:
-#    security.access.voter:
-#        class:      Zerebral\CommonBundle\Security\Acl\AccessVoter
-#        arguments:  []
-#        public:     false
-#        tags:
-#            -       { name: security.voter }
+    zerebral.file_storage:
+        class:      Zerebral\CommonBundle\Component\FileStorage\LocalFileStorage
+        arguments:  [%localstorage.path%]

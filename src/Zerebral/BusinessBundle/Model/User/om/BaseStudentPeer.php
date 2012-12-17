@@ -13,6 +13,7 @@ use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\PeerEvent;
 use Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentPeer;
 use Zerebral\BusinessBundle\Model\Course\CourseStudentPeer;
+use Zerebral\BusinessBundle\Model\File\FileReferencesPeer;
 use Zerebral\BusinessBundle\Model\User\Student;
 use Zerebral\BusinessBundle\Model\User\StudentPeer;
 use Zerebral\BusinessBundle\Model\User\UserPeer;
@@ -386,6 +387,9 @@ abstract class BaseStudentPeer
         // Invalidate objects in CourseStudentPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         CourseStudentPeer::clearInstancePool();
+        // Invalidate objects in FileReferencesPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        FileReferencesPeer::clearInstancePool();
     }
 
     /**
