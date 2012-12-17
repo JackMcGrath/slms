@@ -12,7 +12,7 @@
 {% block file_widget %}
     {% spaceless %}
         {% if value %}
-            <div {{ block('widget_container_attributes') }}><a href="#">x</a> {{ value.name }}</div>
+            <div {{ block('widget_container_attributes') }} class="uploaded_file_div"><a href="#">x</a> {{ value.name }}</div>
         {% else %}
             <input type="file" {{ block('widget_attributes') }} />
         {% endif %}
