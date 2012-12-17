@@ -6,6 +6,7 @@
         <column name="grade_level_id" phpName="GradeLevelId" type="TINYINT" size="2" sqlType="tinyint(2) unsigned" required="true"/>
         <column name="name" phpName="Name" type="VARCHAR" size="100" required="true"/>
         <column name="description" phpName="Description" type="LONGVARCHAR" required="false"/>
+        <column name="access_code" phpName="AccessCode" type="VARCHAR"  size="32" required="false"/>
         <column name="created_by" phpName="CreatedBy" type="INTEGER" sqlType="int(11) unsigned" required="true"/>
         <column name="created_at" phpName="CreatedAt" type="TIMESTAMP" required="true"/>
         <column name="updated_at" phpName="UpdatedAt" type="TIMESTAMP" required="false"/>
@@ -29,6 +30,9 @@
         <validator column="description">
             <rule name="type" value="string" message="The column description must be an string value."/>
         </validator>
+        <!--<validator column="access_code">-->
+            <!--<rule name="type" value="string" message="The column description must be an string value."/>-->
+        <!--</validator>-->
         <validator column="created_by">
             <rule name="required" message="The field created_by is required."/>
             <rule name="type" value="int" message="The column created_by must be an int value."/>

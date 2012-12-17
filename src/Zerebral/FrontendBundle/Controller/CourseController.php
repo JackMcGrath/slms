@@ -136,11 +136,61 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function membersAction(Model\Course\Course $course)
     {
+        $form = $this->createForm(new FormType\MembersType(), new Model\Course\Member());
+        if ($this->getRequest()->isMethod("POST")) {
+            $form->bind($this->getRequest());
+            if ($form->isValid()) {
+                /**
+                 * @var \Zerebral\BusinessBundle\Model\Course\Member $memberInviteForm
+                 */
+                $memberInviteForm = $form->getData();
+                $emails = $memberInviteForm->getEmailList();
+
+                foreach ($emails as $email) {
+                    $message = \Swift_Message::newInstance()
+                        ->setSubject('Welcome to zerebral')
+                        ->setFrom('hello@zerebral.com')
+                        ->setTo($email)
+                        ->setBody(
+                        $this->renderView(
+                            'ZerebralFrontendBundle:Email:invite.html.twig',
+                            array(
+                                'course' => $course,
+                                'user' => $this->getRoleUser()->getUser(),
+                                'host' => $this->getRequest()->getHttpHost()
+                            )
+                        )
+                    );
+                    $this->get('mailer')->send($message);
+                }
+            }
+        }
+
         return array(
             'students' => $course->getStudents(),
             'teachers' => $course->getTeachers(),
             'course' => $course,
+            'form' => $form->createView(),
             'target' => 'members'
         );
+    }
+
+    /**
+     * @Route("/accept/{accessCode}", name="course_accept_invite")
+     * @ParamConverter("course", options={"mapping": {"accessCode": "access_code"}})
+     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     *
+     * @Template()
+     */
+    public function acceptInviteAction(Model\Course\Course $course){
+        $user = $this->getRoleUser();
+
+        if($user instanceof \Zerebral\BusinessBundle\Model\User\Student){
+            $course->addStudent($this->getRoleUser());
+        }else{
+            $course->addTeacher($this->getRoleUser());
+        }
+        $course->save();
+        return $this->redirect($this->generateUrl('course_view', array('id' => $course->getId())));
     }
 }

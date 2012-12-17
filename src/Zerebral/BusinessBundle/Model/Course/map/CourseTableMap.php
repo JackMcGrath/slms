@@ -47,6 +47,7 @@ class CourseTableMap extends TableMap
         $this->addForeignKey('grade_level_id', 'GradeLevelId', 'TINYINT', 'grade_levels', 'id', true, 2, null);
         $this->addColumn('name', 'Name', 'VARCHAR', true, 100, null);
         $this->addColumn('description', 'Description', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('access_code', 'AccessCode', 'VARCHAR', false, 32, null);
         $this->addForeignKey('created_by', 'CreatedBy', 'INTEGER', 'teachers', 'id', true, null, null);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', true, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
