@@ -1,4 +1,16 @@
 $(document).ready(function(){
+    // Dynamic files fields creating
+    var collectionHolder = $('div.add_files');
+    $('.add_file_link').on('click', function(e) {
+        e.preventDefault();
+        var prototype = collectionHolder.attr('data-prototype');
+        var $newForm = $(prototype.replace(/__name__/g, collectionHolder.children().length));
+        $newForm.attr('name', $newForm.attr('name') + '[uploadedFile]');
+
+        collectionHolder.append($('<div></div>').append($newForm));
+    });
+
+
     $('.icon-new-calendar').datepicker();
     $('.icon-new-clock').timepicker({
         defaultTime: 'value'

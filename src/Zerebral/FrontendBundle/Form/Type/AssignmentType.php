@@ -4,6 +4,7 @@ namespace Zerebral\FrontendBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Zerebral\CommonBundle\Form\Type\OptionalModelType;
+use Zerebral\FrontendBundle\Form\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints\Collection;
@@ -42,8 +43,12 @@ class AssignmentType extends AbstractType
             'required' => false,
             'date_widget' => 'single_text',
             'date_format' => 'MM/dd/yyyy',
-            'time_widget' => 'single_text',
+            'time_widget' => 'single_text'
+        ));
 
+        $builder->add('files',  'collection', array(
+            'type' => new \Zerebral\FrontendBundle\Form\Type\FileType(),
+            'allow_add' => true
         ));
     }
 
