@@ -89,6 +89,12 @@ abstract class BaseCourse extends BaseObject implements Persistent
     protected $description;
 
     /**
+     * The value for the access_code field.
+     * @var        string
+     */
+    protected $access_code;
+
+    /**
      * The value for the created_by field.
      * @var        int
      */
@@ -253,6 +259,16 @@ abstract class BaseCourse extends BaseObject implements Persistent
     public function getDescription()
     {
         return $this->description;
+    }
+
+    /**
+     * Get the [access_code] column value.
+     *
+     * @return string
+     */
+    public function getAccessCode()
+    {
+        return $this->access_code;
     }
 
     /**
@@ -459,6 +475,27 @@ abstract class BaseCourse extends BaseObject implements Persistent
     } // setDescription()
 
     /**
+     * Set the value of [access_code] column.
+     *
+     * @param string $v new value
+     * @return Course The current object (for fluent API support)
+     */
+    public function setAccessCode($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->access_code !== $v) {
+            $this->access_code = $v;
+            $this->modifiedColumns[] = CoursePeer::ACCESS_CODE;
+        }
+
+
+        return $this;
+    } // setAccessCode()
+
+    /**
      * Set the value of [created_by] column.
      *
      * @param int $v new value
@@ -566,9 +603,10 @@ abstract class BaseCourse extends BaseObject implements Persistent
             $this->grade_level_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
             $this->name = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
             $this->description = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
-            $this->created_by = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
-            $this->created_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-            $this->updated_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+            $this->access_code = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+            $this->created_by = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
+            $this->created_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+            $this->updated_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -577,7 +615,7 @@ abstract class BaseCourse extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 8; // 8 = CoursePeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 9; // 9 = CoursePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Course object", $e);
@@ -977,6 +1015,9 @@ abstract class BaseCourse extends BaseObject implements Persistent
         if ($this->isColumnModified(CoursePeer::DESCRIPTION)) {
             $modifiedColumns[':p' . $index++]  = '`description`';
         }
+        if ($this->isColumnModified(CoursePeer::ACCESS_CODE)) {
+            $modifiedColumns[':p' . $index++]  = '`access_code`';
+        }
         if ($this->isColumnModified(CoursePeer::CREATED_BY)) {
             $modifiedColumns[':p' . $index++]  = '`created_by`';
         }
@@ -1011,6 +1052,9 @@ abstract class BaseCourse extends BaseObject implements Persistent
                         break;
                     case '`description`':
                         $stmt->bindValue($identifier, $this->description, PDO::PARAM_STR);
+                        break;
+                    case '`access_code`':
+                        $stmt->bindValue($identifier, $this->access_code, PDO::PARAM_STR);
                         break;
                     case '`created_by`':
                         $stmt->bindValue($identifier, $this->created_by, PDO::PARAM_INT);
@@ -1227,12 +1271,15 @@ abstract class BaseCourse extends BaseObject implements Persistent
                 return $this->getDescription();
                 break;
             case 5:
-                return $this->getCreatedBy();
+                return $this->getAccessCode();
                 break;
             case 6:
-                return $this->getCreatedAt();
+                return $this->getCreatedBy();
                 break;
             case 7:
+                return $this->getCreatedAt();
+                break;
+            case 8:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1269,9 +1316,10 @@ abstract class BaseCourse extends BaseObject implements Persistent
             $keys[2] => $this->getGradeLevelId(),
             $keys[3] => $this->getName(),
             $keys[4] => $this->getDescription(),
-            $keys[5] => $this->getCreatedBy(),
-            $keys[6] => $this->getCreatedAt(),
-            $keys[7] => $this->getUpdatedAt(),
+            $keys[5] => $this->getAccessCode(),
+            $keys[6] => $this->getCreatedBy(),
+            $keys[7] => $this->getCreatedAt(),
+            $keys[8] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aCreatedByTeacher) {
@@ -1345,12 +1393,15 @@ abstract class BaseCourse extends BaseObject implements Persistent
                 $this->setDescription($value);
                 break;
             case 5:
-                $this->setCreatedBy($value);
+                $this->setAccessCode($value);
                 break;
             case 6:
-                $this->setCreatedAt($value);
+                $this->setCreatedBy($value);
                 break;
             case 7:
+                $this->setCreatedAt($value);
+                break;
+            case 8:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1382,9 +1433,10 @@ abstract class BaseCourse extends BaseObject implements Persistent
         if (array_key_exists($keys[2], $arr)) $this->setGradeLevelId($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setName($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setDescription($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setCreatedBy($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setUpdatedAt($arr[$keys[7]]);
+        if (array_key_exists($keys[5], $arr)) $this->setAccessCode($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setCreatedBy($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setCreatedAt($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setUpdatedAt($arr[$keys[8]]);
     }
 
     /**
@@ -1401,6 +1453,7 @@ abstract class BaseCourse extends BaseObject implements Persistent
         if ($this->isColumnModified(CoursePeer::GRADE_LEVEL_ID)) $criteria->add(CoursePeer::GRADE_LEVEL_ID, $this->grade_level_id);
         if ($this->isColumnModified(CoursePeer::NAME)) $criteria->add(CoursePeer::NAME, $this->name);
         if ($this->isColumnModified(CoursePeer::DESCRIPTION)) $criteria->add(CoursePeer::DESCRIPTION, $this->description);
+        if ($this->isColumnModified(CoursePeer::ACCESS_CODE)) $criteria->add(CoursePeer::ACCESS_CODE, $this->access_code);
         if ($this->isColumnModified(CoursePeer::CREATED_BY)) $criteria->add(CoursePeer::CREATED_BY, $this->created_by);
         if ($this->isColumnModified(CoursePeer::CREATED_AT)) $criteria->add(CoursePeer::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(CoursePeer::UPDATED_AT)) $criteria->add(CoursePeer::UPDATED_AT, $this->updated_at);
@@ -1471,6 +1524,7 @@ abstract class BaseCourse extends BaseObject implements Persistent
         $copyObj->setGradeLevelId($this->getGradeLevelId());
         $copyObj->setName($this->getName());
         $copyObj->setDescription($this->getDescription());
+        $copyObj->setAccessCode($this->getAccessCode());
         $copyObj->setCreatedBy($this->getCreatedBy());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
@@ -3094,6 +3148,7 @@ abstract class BaseCourse extends BaseObject implements Persistent
         $this->grade_level_id = null;
         $this->name = null;
         $this->description = null;
+        $this->access_code = null;
         $this->created_by = null;
         $this->created_at = null;
         $this->updated_at = null;

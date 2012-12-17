@@ -1,0 +1,28 @@
+{% macro month(month) %}
+    <div class="calendar-widget">
+        <h4>{{ month.format('F') }}</h4>
+        <table class="">
+            <tr class="day-name">
+                <th>Mon</th>
+                <th>Tue</th>
+                <th>Wed</th>
+                <th>Thu</th>
+                <th>Fri</th>
+                <th>Sat</th>
+                <th>Sun</th>
+            </tr>
+            {% for week in month %}
+                <tr>
+                    {% for day in week %}
+                        {% if month.contains(day.begin) %}
+                            <td class="{% if "now"|date("m/d") == day.begin.format('m/d') %}today{% endif %}"><span>{{ day.begin.format('d') }}</span></td>
+                        {% else %}
+                            <td class="inactive"><span>{{ day.begin.format('d') }}</span></td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+
+        </table>
+    </div>
+{% endmacro %}

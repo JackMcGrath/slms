@@ -32,6 +32,7 @@ use Zerebral\BusinessBundle\Model\User\Teacher;
  * @method CourseQuery orderByGradeLevelId($order = Criteria::ASC) Order by the grade_level_id column
  * @method CourseQuery orderByName($order = Criteria::ASC) Order by the name column
  * @method CourseQuery orderByDescription($order = Criteria::ASC) Order by the description column
+ * @method CourseQuery orderByAccessCode($order = Criteria::ASC) Order by the access_code column
  * @method CourseQuery orderByCreatedBy($order = Criteria::ASC) Order by the created_by column
  * @method CourseQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method CourseQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
@@ -41,6 +42,7 @@ use Zerebral\BusinessBundle\Model\User\Teacher;
  * @method CourseQuery groupByGradeLevelId() Group by the grade_level_id column
  * @method CourseQuery groupByName() Group by the name column
  * @method CourseQuery groupByDescription() Group by the description column
+ * @method CourseQuery groupByAccessCode() Group by the access_code column
  * @method CourseQuery groupByCreatedBy() Group by the created_by column
  * @method CourseQuery groupByCreatedAt() Group by the created_at column
  * @method CourseQuery groupByUpdatedAt() Group by the updated_at column
@@ -84,6 +86,7 @@ use Zerebral\BusinessBundle\Model\User\Teacher;
  * @method Course findOneByGradeLevelId(int $grade_level_id) Return the first Course filtered by the grade_level_id column
  * @method Course findOneByName(string $name) Return the first Course filtered by the name column
  * @method Course findOneByDescription(string $description) Return the first Course filtered by the description column
+ * @method Course findOneByAccessCode(string $access_code) Return the first Course filtered by the access_code column
  * @method Course findOneByCreatedBy(int $created_by) Return the first Course filtered by the created_by column
  * @method Course findOneByCreatedAt(string $created_at) Return the first Course filtered by the created_at column
  * @method Course findOneByUpdatedAt(string $updated_at) Return the first Course filtered by the updated_at column
@@ -93,6 +96,7 @@ use Zerebral\BusinessBundle\Model\User\Teacher;
  * @method array findByGradeLevelId(int $grade_level_id) Return Course objects filtered by the grade_level_id column
  * @method array findByName(string $name) Return Course objects filtered by the name column
  * @method array findByDescription(string $description) Return Course objects filtered by the description column
+ * @method array findByAccessCode(string $access_code) Return Course objects filtered by the access_code column
  * @method array findByCreatedBy(int $created_by) Return Course objects filtered by the created_by column
  * @method array findByCreatedAt(string $created_at) Return Course objects filtered by the created_at column
  * @method array findByUpdatedAt(string $updated_at) Return Course objects filtered by the updated_at column
@@ -198,7 +202,7 @@ abstract class BaseCourseQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `discipline_id`, `grade_level_id`, `name`, `description`, `created_by`, `created_at`, `updated_at` FROM `courses` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `discipline_id`, `grade_level_id`, `name`, `description`, `access_code`, `created_by`, `created_at`, `updated_at` FROM `courses` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -456,6 +460,35 @@ abstract class BaseCourseQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CoursePeer::DESCRIPTION, $description, $comparison);
+    }
+
+    /**
+     * Filter the query on the access_code column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByAccessCode('fooValue');   // WHERE access_code = 'fooValue'
+     * $query->filterByAccessCode('%fooValue%'); // WHERE access_code LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $accessCode The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return CourseQuery The current query, for fluid interface
+     */
+    public function filterByAccessCode($accessCode = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($accessCode)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $accessCode)) {
+                $accessCode = str_replace('*', '%', $accessCode);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(CoursePeer::ACCESS_CODE, $accessCode, $comparison);
     }
 
     /**
