@@ -19,7 +19,6 @@ use Zerebral\BusinessBundle\Model\File\File;
 use Zerebral\BusinessBundle\Model\File\FilePeer;
 use Zerebral\BusinessBundle\Model\File\FileQuery;
 use Zerebral\BusinessBundle\Model\File\FileReferences;
-use Zerebral\BusinessBundle\Model\User\Student;
 
 /**
  * @method FileQuery orderById($order = Criteria::ASC) Order by the id column
@@ -536,23 +535,6 @@ abstract class BaseFileQuery extends ModelCriteria
         return $this
             ->useFileReferencesQuery()
             ->filterByassignmentReferenceId($assignment, $comparison)
-            ->endUse();
-    }
-
-    /**
-     * Filter the query by a related Student object
-     * using the file_references table as cross reference
-     *
-     * @param   Student $student the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   FileQuery The current query, for fluid interface
-     */
-    public function filterBystudentsReferenceId($student, $comparison = Criteria::EQUAL)
-    {
-        return $this
-            ->useFileReferencesQuery()
-            ->filterBystudentsReferenceId($student, $comparison)
             ->endUse();
     }
 
