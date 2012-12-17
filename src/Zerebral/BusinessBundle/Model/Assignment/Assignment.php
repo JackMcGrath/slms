@@ -3,6 +3,7 @@
 namespace Zerebral\BusinessBundle\Model\Assignment;
 
 use Zerebral\BusinessBundle\Model\Assignment\om\BaseAssignment;
+use \Zerebral\BusinessBundle\Model\File\FileReferences;
 
 class Assignment extends BaseAssignment
 {
@@ -12,7 +13,7 @@ class Assignment extends BaseAssignment
         $fileReferences = new FileReferences();
         $fileReferences->setFile($file);
         $fileReferences->setreferenceType('assignment');
-        $this->addstudentsReferenceName($fileReferences);
+        $this->addassignmentReferenceName($fileReferences);
     }
 
     public function preDelete(\PropelPDO $con = null)
