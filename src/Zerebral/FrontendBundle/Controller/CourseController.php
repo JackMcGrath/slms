@@ -24,7 +24,15 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function indexAction()
     {
+        list($currentYear, $currentMonth) = explode('-', date('Y-m'));
+        list($nextYear, $nextMonth) = explode('-', date('Y-m', strtotime("+1 month")));
+        $calendar = new \CalendR\Calendar();
+        $calendarCurrentMonth = $calendar->getMonth($currentYear, $currentMonth);
+        $calendarNextMonth = $calendar->getMonth($nextYear, $nextMonth);
+
         return array(
+            'currentMonth' => $calendarCurrentMonth,
+            'nextMonth' => $calendarNextMonth,
             'courses' => $this->getRoleUser()->getCourses(),
             'target' => 'courses'
         );
@@ -105,7 +113,15 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function assignmentsAction(Model\Course\Course $course)
     {
+        list($currentYear, $currentMonth) = explode('-', date('Y-m'));
+        list($nextYear, $nextMonth) = explode('-', date('Y-m', strtotime("+1 month")));
+        $calendar = new \CalendR\Calendar();
+        $calendarCurrentMonth = $calendar->getMonth($currentYear, $currentMonth);
+        $calendarNextMonth = $calendar->getMonth($nextYear, $nextMonth);
+
         return array(
+            'currentMonth' => $calendarCurrentMonth,
+            'nextMonth' => $calendarNextMonth,
             'assignments' => $course->getAssignments(),
             'course' => $course,
             'target' => 'courses'

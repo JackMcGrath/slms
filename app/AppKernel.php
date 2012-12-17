@@ -25,6 +25,7 @@ class AppKernel extends Kernel
             new Glorpen\PropelEvent\PropelEventBundle\PropelEventBundle(),
             new Zerebral\BusinessBundle\ZerebralBusinessBundle(),
             new Zerebral\FrontendBundle\ZerebralFrontendBundle(),
+            new FrequenceWeb\Bundle\CalendRBundle\FrequenceWebCalendRBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {
