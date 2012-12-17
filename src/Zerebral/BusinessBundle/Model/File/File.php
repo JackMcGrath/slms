@@ -53,9 +53,9 @@ class File extends BaseFile
      * @throws \Exception
      */
     public function setUploadedFile(UploadedFile $uploadedFile) {
-        if (!$this->isNew()) {
-            throw new \Exception('Cannot set uploaded file on loaded entity');
-        }
+//        if (!$this->isNew()) {
+//            throw new \Exception('Cannot set uploaded file on loaded entity');
+//        }
 
         $this->setSourcePath($uploadedFile->getRealPath());
         $this->setName($uploadedFile->getClientOriginalName());
