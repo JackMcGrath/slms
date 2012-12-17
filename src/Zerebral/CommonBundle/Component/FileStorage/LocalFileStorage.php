@@ -7,12 +7,12 @@ use Zerebral\CommonBundle\Component\FileStorage\FileStorageException;
 class LocalFileStorage extends AbstractFileStorage {
 
     /** @var string */
-    protected $path = '/home/deespater/Work/zerebral/web/data';
+    protected $path;
 
 
-    public function __construct() {
+    public function __construct($path) {
         // Converting slash to a system specific directory separator
-        $this->path = str_replace('/', DIRECTORY_SEPARATOR, $this->path);
+        $this->path = str_replace('/', DIRECTORY_SEPARATOR, $path);
     }
 
     /**

@@ -79,6 +79,7 @@ parameters:
     glorpen.propel.event.dispatcher.class: "Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher"
     locale:            en
     secret:            45jed83234l9
+    localstorage.path: %kernel.root_dir%/../web/data
 
 knp_time: ~
 

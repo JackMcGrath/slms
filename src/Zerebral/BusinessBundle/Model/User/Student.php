@@ -3,6 +3,7 @@
 namespace Zerebral\BusinessBundle\Model\User;
 
 use Zerebral\BusinessBundle\Model\User\om\BaseStudent;
+use Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery;
 
 class Student extends BaseStudent
 {
@@ -17,5 +18,17 @@ class Student extends BaseStudent
     public function getFullName()
     {
         return $this->getUser()->getFullName();
+    }
+
+    public function getCourseAssignments(\Zerebral\BusinessBundle\Model\Course\Course $course)
+    {
+        $assignments = new \PropelObjectCollection();
+        $assignments->setModel('Zerebral\BusinessBundle\Model\Assignment\Assignment');
+        foreach($this->getAssignments() as $assignment) {
+            if ($assignment->getCourseId() == $course->getId()) {
+                $assignments->append($assignment);
+            }
+        }
+        return $assignments;
     }
 }
