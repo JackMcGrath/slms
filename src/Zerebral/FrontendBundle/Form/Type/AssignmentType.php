@@ -49,7 +49,8 @@ class AssignmentType extends AbstractType
 
         $builder->add('files',  'collection', array(
             'type' => new \Zerebral\FrontendBundle\Form\Type\FileType(),
-            'allow_add' => true
+            'allow_add' => true,
+            'by_reference' => false
         ));
 
         $builder->get('dueAt')->get('time')->addViewTransformer(new TimeTransformer());

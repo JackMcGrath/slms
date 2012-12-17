@@ -4,7 +4,7 @@ $(document).ready(function(){
     $('.add_file_link').on('click', function(e) {
         e.preventDefault();
         var prototype = collectionHolder.attr('data-prototype');
-        var $newForm = $(prototype.replace(/__name__/g, collectionHolder.children().length));
+        var $newForm = $(prototype.replace(/__name__/g, (($('div.uploaded_file_div').length)) + ($('div.add_files input').length)));
         $newForm.attr('name', $newForm.attr('name') + '[uploadedFile]');
 
         collectionHolder.append($('<div></div>').append($newForm));
