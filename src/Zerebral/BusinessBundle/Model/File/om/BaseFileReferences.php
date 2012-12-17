@@ -20,6 +20,8 @@ use Zerebral\BusinessBundle\Model\File\FileQuery;
 use Zerebral\BusinessBundle\Model\File\FileReferences;
 use Zerebral\BusinessBundle\Model\File\FileReferencesPeer;
 use Zerebral\BusinessBundle\Model\File\FileReferencesQuery;
+use Zerebral\BusinessBundle\Model\User\Student;
+use Zerebral\BusinessBundle\Model\User\StudentQuery;
 
 abstract class BaseFileReferences extends BaseObject implements Persistent
 {
@@ -68,7 +70,12 @@ abstract class BaseFileReferences extends BaseObject implements Persistent
     /**
      * @var        Assignment
      */
-    protected $aAssignment;
+    protected $aassignmentReferenceId;
+
+    /**
+     * @var        Student
+     */
+    protected $astudentsReferenceId;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -156,8 +163,12 @@ abstract class BaseFileReferences extends BaseObject implements Persistent
             $this->modifiedColumns[] = FileReferencesPeer::REFERENCE_ID;
         }
 
-        if ($this->aAssignment !== null && $this->aAssignment->getId() !== $v) {
-            $this->aAssignment = null;
+        if ($this->aassignmentReferenceId !== null && $this->aassignmentReferenceId->getId() !== $v) {
+            $this->aassignmentReferenceId = null;
+        }
+
+        if ($this->astudentsReferenceId !== null && $this->astudentsReferenceId->getId() !== $v) {
+            $this->astudentsReferenceId = null;
         }
 
 
@@ -254,8 +265,11 @@ abstract class BaseFileReferences extends BaseObject implements Persistent
         if ($this->aFile !== null && $this->file_id !== $this->aFile->getId()) {
             $this->aFile = null;
         }
-        if ($this->aAssignment !== null && $this->reference_id !== $this->aAssignment->getId()) {
-            $this->aAssignment = null;
+        if ($this->aassignmentReferenceId !== null && $this->reference_id !== $this->aassignmentReferenceId->getId()) {
+            $this->aassignmentReferenceId = null;
+        }
+        if ($this->astudentsReferenceId !== null && $this->reference_id !== $this->astudentsReferenceId->getId()) {
+            $this->astudentsReferenceId = null;
         }
     } // ensureConsistency
 
@@ -297,7 +311,8 @@ abstract class BaseFileReferences extends BaseObject implements Persistent
         if ($deep) {  // also de-associate any related objects?
 
             $this->aFile = null;
-            $this->aAssignment = null;
+            $this->aassignmentReferenceId = null;
+            $this->astudentsReferenceId = null;
         } // if (deep)
     }
 
@@ -439,11 +454,18 @@ abstract class BaseFileReferences extends BaseObject implements Persistent
                 $this->setFile($this->aFile);
             }
 
-            if ($this->aAssignment !== null) {
-                if ($this->aAssignment->isModified() || $this->aAssignment->isNew()) {
-                    $affectedRows += $this->aAssignment->save($con);
+            if ($this->aassignmentReferenceId !== null) {
+                if ($this->aassignmentReferenceId->isModified() || $this->aassignmentReferenceId->isNew()) {
+                    $affectedRows += $this->aassignmentReferenceId->save($con);
                 }
-                $this->setAssignment($this->aAssignment);
+                $this->setassignmentReferenceId($this->aassignmentReferenceId);
+            }
+
+            if ($this->astudentsReferenceId !== null) {
+                if ($this->astudentsReferenceId->isModified() || $this->astudentsReferenceId->isNew()) {
+                    $affectedRows += $this->astudentsReferenceId->save($con);
+                }
+                $this->setstudentsReferenceId($this->astudentsReferenceId);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -606,9 +628,15 @@ abstract class BaseFileReferences extends BaseObject implements Persistent
                 }
             }
 
-            if ($this->aAssignment !== null) {
-                if (!$this->aAssignment->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aAssignment->getValidationFailures());
+            if ($this->aassignmentReferenceId !== null) {
+                if (!$this->aassignmentReferenceId->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aassignmentReferenceId->getValidationFailures());
+                }
+            }
+
+            if ($this->astudentsReferenceId !== null) {
+                if (!$this->astudentsReferenceId->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->astudentsReferenceId->getValidationFailures());
                 }
             }
 
@@ -699,8 +727,11 @@ abstract class BaseFileReferences extends BaseObject implements Persistent
             if (null !== $this->aFile) {
                 $result['File'] = $this->aFile->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->aAssignment) {
-                $result['Assignment'] = $this->aAssignment->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aassignmentReferenceId) {
+                $result['assignmentReferenceId'] = $this->aassignmentReferenceId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->astudentsReferenceId) {
+                $result['studentsReferenceId'] = $this->astudentsReferenceId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -978,7 +1009,7 @@ abstract class BaseFileReferences extends BaseObject implements Persistent
      * @return FileReferences The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setAssignment(Assignment $v = null)
+    public function setassignmentReferenceId(Assignment $v = null)
     {
         if ($v === null) {
             $this->setreferenceId(NULL);
@@ -986,12 +1017,12 @@ abstract class BaseFileReferences extends BaseObject implements Persistent
             $this->setreferenceId($v->getId());
         }
 
-        $this->aAssignment = $v;
+        $this->aassignmentReferenceId = $v;
 
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the Assignment object, it will not be re-added.
         if ($v !== null) {
-            $v->addFileReferences($this);
+            $v->addassignmentReferenceName($this);
         }
 
 
@@ -1007,20 +1038,72 @@ abstract class BaseFileReferences extends BaseObject implements Persistent
      * @return Assignment The associated Assignment object.
      * @throws PropelException
      */
-    public function getAssignment(PropelPDO $con = null, $doQuery = true)
+    public function getassignmentReferenceId(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aAssignment === null && ($this->reference_id !== null) && $doQuery) {
-            $this->aAssignment = AssignmentQuery::create()->findPk($this->reference_id, $con);
+        if ($this->aassignmentReferenceId === null && ($this->reference_id !== null) && $doQuery) {
+            $this->aassignmentReferenceId = AssignmentQuery::create()->findPk($this->reference_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aAssignment->addFileReferencess($this);
+                $this->aassignmentReferenceId->addassignmentReferenceNames($this);
              */
         }
 
-        return $this->aAssignment;
+        return $this->aassignmentReferenceId;
+    }
+
+    /**
+     * Declares an association between this object and a Student object.
+     *
+     * @param             Student $v
+     * @return FileReferences The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setstudentsReferenceId(Student $v = null)
+    {
+        if ($v === null) {
+            $this->setreferenceId(NULL);
+        } else {
+            $this->setreferenceId($v->getId());
+        }
+
+        $this->astudentsReferenceId = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Student object, it will not be re-added.
+        if ($v !== null) {
+            $v->addstudentsReferenceName($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Student object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return Student The associated Student object.
+     * @throws PropelException
+     */
+    public function getstudentsReferenceId(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->astudentsReferenceId === null && ($this->reference_id !== null) && $doQuery) {
+            $this->astudentsReferenceId = StudentQuery::create()->findPk($this->reference_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->astudentsReferenceId->addstudentsReferenceNames($this);
+             */
+        }
+
+        return $this->astudentsReferenceId;
     }
 
     /**
@@ -1054,7 +1137,8 @@ abstract class BaseFileReferences extends BaseObject implements Persistent
         } // if ($deep)
 
         $this->aFile = null;
-        $this->aAssignment = null;
+        $this->aassignmentReferenceId = null;
+        $this->astudentsReferenceId = null;
     }
 
     /**

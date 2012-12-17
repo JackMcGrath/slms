@@ -67,17 +67,19 @@ propel:
 
 
 # Swiftmailer Configuration
-#swiftmailer:
-#    transport: "%mailer_transport%"
-#    host:      "%mailer_host%"
-#    username:  "%mailer_user%"
-#    password:  "%mailer_password%"
-#    spool:     { type: memory }
+swiftmailer:
+        transport: smtp
+        encryption: ssl
+        auth_mode:  login
+        host:       smtp.gmail.com
+        username:   weavoradev
+        password:   0ynWRVe6Vx
 
 parameters:
     glorpen.propel.event.dispatcher.class: "Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher"
     locale:            en
     secret:            45jed83234l9
+    localstorage.path: %kernel.root_dir%/../web/data
 
 knp_time: ~
 

@@ -14,6 +14,16 @@ class AssignmentType extends AbstractType
 {
 
     protected $teacher;
+    protected $fileStorage;
+
+
+    public function setFileStorage($fileStorage) {
+        $this->fileStorage = $fileStorage;
+    }
+
+    public function getFileStorage() {
+        return $this->fileStorage;
+    }
 
     /**
      * Set teacher model to class instance for using it in callback function
@@ -50,7 +60,8 @@ class AssignmentType extends AbstractType
         $builder->add('files',  'collection', array(
             'type' => new \Zerebral\FrontendBundle\Form\Type\FileType(),
             'allow_add' => true,
-            'by_reference' => false
+            'by_reference' => false,
+            'options' => array('storage' => $this->getFileStorage())
         ));
 
         $builder->get('dueAt')->get('time')->addViewTransformer(new TimeTransformer());
