@@ -12,6 +12,8 @@ use JMS\SecurityExtraBundle\Annotation\PreAuthorize;
 use Zerebral\FrontendBundle\Form\Type as FormType;
 use Zerebral\BusinessBundle\Model as Model;
 
+use Zerebral\BusinessBundle\Calendar\EventProviders\AssignmentEventsProvider;
+
 /**
  * @Route("/courses")
  */
@@ -24,15 +26,13 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function indexAction()
     {
-        list($currentYear, $currentMonth) = explode('-', date('Y-m'));
-        list($nextYear, $nextMonth) = explode('-', date('Y-m', strtotime("+1 month")));
-        $calendar = new \CalendR\Calendar();
-        $calendarCurrentMonth = $calendar->getMonth($currentYear, $currentMonth);
-        $calendarNextMonth = $calendar->getMonth($nextYear, $nextMonth);
+        $provider = new AssignmentEventsProvider($this->getRoleUser()->getAssignments());
+        $currentMonth = new \Zerebral\CommonBundle\Component\Calendar\Calendar(time(), $provider);
+        $nextMonth = new \Zerebral\CommonBundle\Component\Calendar\Calendar(strtotime("+1 month"), $provider);
 
         return array(
-            'currentMonth' => $calendarCurrentMonth,
-            'nextMonth' => $calendarNextMonth,
+            'currentMonth' => $currentMonth,
+            'nextMonth' => $nextMonth,
             'courses' => $this->getRoleUser()->getCourses(),
             'target' => 'courses'
         );
@@ -113,16 +113,15 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function assignmentsAction(Model\Course\Course $course)
     {
-        list($currentYear, $currentMonth) = explode('-', date('Y-m'));
-        list($nextYear, $nextMonth) = explode('-', date('Y-m', strtotime("+1 month")));
-        $calendar = new \CalendR\Calendar();
-        $calendarCurrentMonth = $calendar->getMonth($currentYear, $currentMonth);
-        $calendarNextMonth = $calendar->getMonth($nextYear, $nextMonth);
+        $assignments = $this->getRoleUser()->getCourseAssignments($course);
+        $provider = new AssignmentEventsProvider($assignments);
+        $currentMonth = new \Zerebral\CommonBundle\Component\Calendar\Calendar(time(), $provider);
+        $nextMonth = new \Zerebral\CommonBundle\Component\Calendar\Calendar(strtotime("+1 month"), $provider);
 
         return array(
-            'currentMonth' => $calendarCurrentMonth,
-            'nextMonth' => $calendarNextMonth,
-            'assignments' => $course->getAssignments(),
+            'currentMonth' => $currentMonth,
+            'nextMonth' => $nextMonth,
+            'assignments' => $assignments,
             'course' => $course,
             'target' => 'courses'
         );
