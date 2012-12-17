@@ -1,4 +1,5 @@
 {% extends 'ZerebralFrontendBundle::layout.html.twig' %}
+{% import "ZerebralFrontendBundle:Macro:calendar.html.twig" as calendar %}
 
 {% block content %}
 {% javascripts
@@ -10,7 +11,7 @@
 <div class="row-fluid courses-list">
     <div class="span6 main-list-block">
         <div class="row-fluid">
-            <h2 class="span6 pull-left form-title">
+            <h2 class="pull-left form-title">
                 My Courses <small>all</small>
             </h2>
         </div>
@@ -82,6 +83,11 @@
                 <li><div class="assignment-label"><span class="label label-important">Milestone</span></div> <a href="">Addition Session</a> (Due in 2 days)</li>
                 <li><div class="assignment-label"><span class="label label-warning">Home</span></div> <a href="">Division Session</a> (Due in 2 days)</li>
             </ul>
+        </div>
+
+        <div class="calendar">
+            {{ calendar.month(currentMonth) }}
+            {{ calendar.month(nextMonth) }}
         </div>
     </div>
 
