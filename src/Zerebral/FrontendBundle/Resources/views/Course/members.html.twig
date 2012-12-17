@@ -39,7 +39,7 @@
     </div>
 
     <div class="modal hide fade" id="inviteModal">
-        <form>
+        <form method="post" {{ form_enctype(form) }} novalidate>
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h3>Invite users</h3>
@@ -48,7 +48,14 @@
                 <p>
                     To send invitations to join your course, enter one ore more email addresses into the text box, separated by space or new lines, and click "Send Invites" button.
                 </p>
-                <textarea rows="4 span12"></textarea>
+                {{ form_row(form.emailList, {
+                    label: '',
+                    form_type: 'horizontal',
+                    attr: {
+                        class: 'input-block-level',
+                        rows: 6
+                    }
+                }) }}
                 <div class="clearfix"></div>
                 <p>
                     Your course currently has {{ students|length + teachers|length }} of 50 available. Invite(s) remaining: {{ 50 - students|length - teachers|length }} for your current plan.
@@ -57,6 +64,7 @@
                 <input type="submit" class="btn btn-danger" value="Send Invites"/>
                 <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Cancel</a>
             </div>
+            {{ form_rest(form) }}
         </form>
     </div>
 
