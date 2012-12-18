@@ -1,5 +1,5 @@
 {% extends 'ZerebralFrontendBundle::layout.html.twig' %}
-{% import "ZerebralFrontendBundle:Macro:calendar.html.twig" as calendar %}
+{% import "ZerebralFrontendBundle:Macro:main.html.twig" as mainPartials %}
 
 {% block content %}
 {% javascripts
@@ -89,8 +89,8 @@
         </div>
 
         <div class="calendar">
-            {{ calendar.month(currentMonth) }}
-            {{ calendar.month(nextMonth) }}
+            {{ mainPartials.month(currentMonth) }}
+            {{ mainPartials.month(nextMonth) }}
         </div>
     </div>
 
