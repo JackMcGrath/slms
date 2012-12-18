@@ -15,6 +15,7 @@ framework:
     templating:      { engines: ['twig'] } #assets_version: SomeVersionScheme
     default_locale:  "%locale%"
     trust_proxy_headers: false # Whether or not the Request object should trust proxy headers (X_FORWARDED_FOR/HTTP_CLIENT_IP)
+    trusted_proxies: []
     session:         ~
     translator: { fallback: en }
 
@@ -75,11 +76,22 @@ swiftmailer:
         username:   weavoradev
         password:   0ynWRVe6Vx
 
+liip_imagine:
+    driver:               gd
+    cache_prefix:         /img-cache
+    cache_mkdir_mode:     0777
+    filter_sets:
+        thumbnail:
+            quality: 75
+            filters:
+                thumbnail: { size: [200, 150], mode: outbound }
+
 parameters:
     glorpen.propel.event.dispatcher.class: "Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher"
     locale:            en
     secret:            45jed83234l9
     localstorage.path: %kernel.root_dir%/../web/data
+    localstorage.web:  /data/
 
 knp_time: ~
 

@@ -48,6 +48,10 @@ class File extends BaseFile
         return $this->sourcePath;
     }
 
+    public function getLink() {
+        return $this->getFileStorage()->getWebPath() . $this->getName();
+    }
+
     /**
      * @param \Symfony\Component\HttpFoundation\File\UploadedFile $uploadedFile
      * @throws \Exception

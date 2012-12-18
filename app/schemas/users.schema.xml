@@ -17,9 +17,13 @@
         <column name="email" phpName="Email" type="VARCHAR" size="100" required="true"/>
         <column name="password" phpName="Password" type="VARCHAR" size="40" required="true"/>
         <column name="salt" phpName="Salt" type="VARCHAR" size="32" required="true"/>
+        <column name="avatar_id" phpName="AvatarId" type="INTEGER" sqlType="int(11) unsigned" required="false"/>
         <column name="is_active" phpName="IsActive" type="BOOLEAN" size="1" sqlType="tinyint(1) unsigned" required="true" defaultValue="true"/>
         <column name="created_at" phpName="CreatedAt" type="TIMESTAMP" required="false"/>
         <column name="updated_at" phpName="UpdatedAt" type="TIMESTAMP" required="true"/>
+        <foreign-key foreignTable="files" name="user_avatar" phpName="Avatar" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="avatar_id" foreign="id" />
+        </foreign-key>
         <validator column="id">
             <rule name="required" message="The field id is required."/>
             <rule name="maxValue" value="REPLACEME" message="The field id must be not greater than REPLACEME."/>

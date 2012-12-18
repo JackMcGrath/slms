@@ -6,6 +6,10 @@ zerebral_frontend:
     resource: "@ZerebralFrontendBundle/Controller"
     type:     annotation
 
+_imagine:
+    resource: .
+    type:     imagine
+
 #zerebral_business:
 #    resource: "@ZerebralBusinessBundle/Resources/config/routing.yml"
 #    prefix:   /

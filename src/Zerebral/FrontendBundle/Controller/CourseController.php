@@ -13,6 +13,7 @@ use Zerebral\FrontendBundle\Form\Type as FormType;
 use Zerebral\BusinessBundle\Model as Model;
 
 use Zerebral\BusinessBundle\Calendar\EventProviders\AssignmentEventsProvider;
+use Zerebral\BusinessBundle\Calendar\EventProviders\CourseAssignmentEventsProvider;
 
 /**
  * @Route("/courses")
@@ -26,7 +27,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function indexAction()
     {
-        $provider = new AssignmentEventsProvider($this->getRoleUser()->getAssignments());
+        $provider = new CourseAssignmentEventsProvider($this->getRoleUser()->getAssignments());
         $currentMonth = new \Zerebral\CommonBundle\Component\Calendar\Calendar(time(), $provider);
         $nextMonth = new \Zerebral\CommonBundle\Component\Calendar\Calendar(strtotime("+1 month"), $provider);
 

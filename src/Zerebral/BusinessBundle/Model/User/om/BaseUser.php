@@ -17,6 +17,8 @@ use \PropelObjectCollection;
 use \PropelPDO;
 use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\ModelEvent;
+use Zerebral\BusinessBundle\Model\File\File;
+use Zerebral\BusinessBundle\Model\File\FileQuery;
 use Zerebral\BusinessBundle\Model\User\Student;
 use Zerebral\BusinessBundle\Model\User\StudentQuery;
 use Zerebral\BusinessBundle\Model\User\Teacher;
@@ -107,6 +109,12 @@ abstract class BaseUser extends BaseObject implements Persistent
     protected $salt;
 
     /**
+     * The value for the avatar_id field.
+     * @var        int
+     */
+    protected $avatar_id;
+
+    /**
      * The value for the is_active field.
      * Note: this column has a database default value of: true
      * @var        boolean
@@ -124,6 +132,11 @@ abstract class BaseUser extends BaseObject implements Persistent
      * @var        string
      */
     protected $updated_at;
+
+    /**
+     * @var        File
+     */
+    protected $aAvatar;
 
     /**
      * @var        PropelObjectCollection|Student[] Collection to store aggregation of Student objects.
@@ -313,6 +326,16 @@ abstract class BaseUser extends BaseObject implements Persistent
     public function getSalt()
     {
         return $this->salt;
+    }
+
+    /**
+     * Get the [avatar_id] column value.
+     *
+     * @return int
+     */
+    public function getAvatarId()
+    {
+        return $this->avatar_id;
     }
 
     /**
@@ -618,6 +641,31 @@ abstract class BaseUser extends BaseObject implements Persistent
     } // setSalt()
 
     /**
+     * Set the value of [avatar_id] column.
+     *
+     * @param int $v new value
+     * @return User The current object (for fluent API support)
+     */
+    public function setAvatarId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->avatar_id !== $v) {
+            $this->avatar_id = $v;
+            $this->modifiedColumns[] = UserPeer::AVATAR_ID;
+        }
+
+        if ($this->aAvatar !== null && $this->aAvatar->getId() !== $v) {
+            $this->aAvatar = null;
+        }
+
+
+        return $this;
+    } // setAvatarId()
+
+    /**
      * Sets the value of the [is_active] column.
      * Non-boolean arguments are converted using the following rules:
      *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
@@ -738,9 +786,10 @@ abstract class BaseUser extends BaseObject implements Persistent
             $this->email = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
             $this->password = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
             $this->salt = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
-            $this->is_active = ($row[$startcol + 10] !== null) ? (boolean) $row[$startcol + 10] : null;
-            $this->created_at = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
-            $this->updated_at = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
+            $this->avatar_id = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
+            $this->is_active = ($row[$startcol + 11] !== null) ? (boolean) $row[$startcol + 11] : null;
+            $this->created_at = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
+            $this->updated_at = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -749,7 +798,7 @@ abstract class BaseUser extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 13; // 13 = UserPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 14; // 14 = UserPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating User object", $e);
@@ -772,6 +821,9 @@ abstract class BaseUser extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aAvatar !== null && $this->avatar_id !== $this->aAvatar->getId()) {
+            $this->aAvatar = null;
+        }
     } // ensureConsistency
 
     /**
@@ -811,6 +863,7 @@ abstract class BaseUser extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->aAvatar = null;
             $this->collStudents = null;
 
             $this->collTeachers = null;
@@ -944,6 +997,18 @@ abstract class BaseUser extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aAvatar !== null) {
+                if ($this->aAvatar->isModified() || $this->aAvatar->isNew()) {
+                    $affectedRows += $this->aAvatar->save($con);
+                }
+                $this->setAvatar($this->aAvatar);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -1045,6 +1110,9 @@ abstract class BaseUser extends BaseObject implements Persistent
         if ($this->isColumnModified(UserPeer::SALT)) {
             $modifiedColumns[':p' . $index++]  = '`salt`';
         }
+        if ($this->isColumnModified(UserPeer::AVATAR_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`avatar_id`';
+        }
         if ($this->isColumnModified(UserPeer::IS_ACTIVE)) {
             $modifiedColumns[':p' . $index++]  = '`is_active`';
         }
@@ -1094,6 +1162,9 @@ abstract class BaseUser extends BaseObject implements Persistent
                         break;
                     case '`salt`':
                         $stmt->bindValue($identifier, $this->salt, PDO::PARAM_STR);
+                        break;
+                    case '`avatar_id`':
+                        $stmt->bindValue($identifier, $this->avatar_id, PDO::PARAM_INT);
                         break;
                     case '`is_active`':
                         $stmt->bindValue($identifier, (int) $this->is_active, PDO::PARAM_INT);
@@ -1198,6 +1269,18 @@ abstract class BaseUser extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aAvatar !== null) {
+                if (!$this->aAvatar->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aAvatar->getValidationFailures());
+                }
+            }
+
+
             if (($retval = UserPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
@@ -1285,12 +1368,15 @@ abstract class BaseUser extends BaseObject implements Persistent
                 return $this->getSalt();
                 break;
             case 10:
-                return $this->getIsActive();
+                return $this->getAvatarId();
                 break;
             case 11:
-                return $this->getCreatedAt();
+                return $this->getIsActive();
                 break;
             case 12:
+                return $this->getCreatedAt();
+                break;
+            case 13:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1332,11 +1418,15 @@ abstract class BaseUser extends BaseObject implements Persistent
             $keys[7] => $this->getEmail(),
             $keys[8] => $this->getPassword(),
             $keys[9] => $this->getSalt(),
-            $keys[10] => $this->getIsActive(),
-            $keys[11] => $this->getCreatedAt(),
-            $keys[12] => $this->getUpdatedAt(),
+            $keys[10] => $this->getAvatarId(),
+            $keys[11] => $this->getIsActive(),
+            $keys[12] => $this->getCreatedAt(),
+            $keys[13] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
+            if (null !== $this->aAvatar) {
+                $result['Avatar'] = $this->aAvatar->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
             if (null !== $this->collStudents) {
                 $result['Students'] = $this->collStudents->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -1408,12 +1498,15 @@ abstract class BaseUser extends BaseObject implements Persistent
                 $this->setSalt($value);
                 break;
             case 10:
-                $this->setIsActive($value);
+                $this->setAvatarId($value);
                 break;
             case 11:
-                $this->setCreatedAt($value);
+                $this->setIsActive($value);
                 break;
             case 12:
+                $this->setCreatedAt($value);
+                break;
+            case 13:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1450,9 +1543,10 @@ abstract class BaseUser extends BaseObject implements Persistent
         if (array_key_exists($keys[7], $arr)) $this->setEmail($arr[$keys[7]]);
         if (array_key_exists($keys[8], $arr)) $this->setPassword($arr[$keys[8]]);
         if (array_key_exists($keys[9], $arr)) $this->setSalt($arr[$keys[9]]);
-        if (array_key_exists($keys[10], $arr)) $this->setIsActive($arr[$keys[10]]);
-        if (array_key_exists($keys[11], $arr)) $this->setCreatedAt($arr[$keys[11]]);
-        if (array_key_exists($keys[12], $arr)) $this->setUpdatedAt($arr[$keys[12]]);
+        if (array_key_exists($keys[10], $arr)) $this->setAvatarId($arr[$keys[10]]);
+        if (array_key_exists($keys[11], $arr)) $this->setIsActive($arr[$keys[11]]);
+        if (array_key_exists($keys[12], $arr)) $this->setCreatedAt($arr[$keys[12]]);
+        if (array_key_exists($keys[13], $arr)) $this->setUpdatedAt($arr[$keys[13]]);
     }
 
     /**
@@ -1474,6 +1568,7 @@ abstract class BaseUser extends BaseObject implements Persistent
         if ($this->isColumnModified(UserPeer::EMAIL)) $criteria->add(UserPeer::EMAIL, $this->email);
         if ($this->isColumnModified(UserPeer::PASSWORD)) $criteria->add(UserPeer::PASSWORD, $this->password);
         if ($this->isColumnModified(UserPeer::SALT)) $criteria->add(UserPeer::SALT, $this->salt);
+        if ($this->isColumnModified(UserPeer::AVATAR_ID)) $criteria->add(UserPeer::AVATAR_ID, $this->avatar_id);
         if ($this->isColumnModified(UserPeer::IS_ACTIVE)) $criteria->add(UserPeer::IS_ACTIVE, $this->is_active);
         if ($this->isColumnModified(UserPeer::CREATED_AT)) $criteria->add(UserPeer::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(UserPeer::UPDATED_AT)) $criteria->add(UserPeer::UPDATED_AT, $this->updated_at);
@@ -1549,6 +1644,7 @@ abstract class BaseUser extends BaseObject implements Persistent
         $copyObj->setEmail($this->getEmail());
         $copyObj->setPassword($this->getPassword());
         $copyObj->setSalt($this->getSalt());
+        $copyObj->setAvatarId($this->getAvatarId());
         $copyObj->setIsActive($this->getIsActive());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
@@ -1620,6 +1716,58 @@ abstract class BaseUser extends BaseObject implements Persistent
         }
 
         return self::$peer;
+    }
+
+    /**
+     * Declares an association between this object and a File object.
+     *
+     * @param             File $v
+     * @return User The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setAvatar(File $v = null)
+    {
+        if ($v === null) {
+            $this->setAvatarId(NULL);
+        } else {
+            $this->setAvatarId($v->getId());
+        }
+
+        $this->aAvatar = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the File object, it will not be re-added.
+        if ($v !== null) {
+            $v->addUser($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated File object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return File The associated File object.
+     * @throws PropelException
+     */
+    public function getAvatar(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->aAvatar === null && ($this->avatar_id !== null) && $doQuery) {
+            $this->aAvatar = FileQuery::create()->findPk($this->avatar_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aAvatar->addUsers($this);
+             */
+        }
+
+        return $this->aAvatar;
     }
 
 
@@ -2090,6 +2238,7 @@ abstract class BaseUser extends BaseObject implements Persistent
         $this->email = null;
         $this->password = null;
         $this->salt = null;
+        $this->avatar_id = null;
         $this->is_active = null;
         $this->created_at = null;
         $this->updated_at = null;
@@ -2134,6 +2283,7 @@ abstract class BaseUser extends BaseObject implements Persistent
             $this->collTeachers->clearIterator();
         }
         $this->collTeachers = null;
+        $this->aAvatar = null;
     }
 
     /**

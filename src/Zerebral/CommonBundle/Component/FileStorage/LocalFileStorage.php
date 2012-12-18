@@ -8,11 +8,14 @@ class LocalFileStorage extends AbstractFileStorage {
 
     /** @var string */
     protected $path;
+    /** @var string */
+    protected $webPath;
 
 
-    public function __construct($path) {
+    public function __construct($path, $webPath) {
         // Converting slash to a system specific directory separator
         $this->path = str_replace('/', DIRECTORY_SEPARATOR, $path);
+        $this->webPath = $webPath;
     }
 
     /**
@@ -20,6 +23,10 @@ class LocalFileStorage extends AbstractFileStorage {
      */
     public function getPath() {
         return $this->path;
+    }
+
+    public function getWebPath() {
+        return $this->webPath;
     }
 
 
