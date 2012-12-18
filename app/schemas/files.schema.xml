@@ -18,8 +18,5 @@
         <foreign-key foreignTable="assignments" name="file_references_assignments" onDelete="CASCADE" onUpdate="CASCADE" phpName="assignmentReferenceId" refPhpName="assignmentReferenceName">
             <reference local="reference_id" foreign="id"/>
         </foreign-key>
-        <foreign-key foreignTable="students" name="file_references_students" onDelete="CASCADE" onUpdate="CASCADE" phpName="studentsReferenceId" refPhpName="studentsReferenceName">
-            <reference local="reference_id" foreign="id" />
-        </foreign-key>
     </table>
 </database>
