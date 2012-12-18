@@ -80,6 +80,7 @@ parameters:
     locale:            en
     secret:            45jed83234l9
     localstorage.path: %kernel.root_dir%/../web/data
+    localstorage.web:  /data/
 
 knp_time: ~
 

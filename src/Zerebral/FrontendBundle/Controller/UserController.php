@@ -28,6 +28,11 @@ class UserController extends \Zerebral\CommonBundle\Component\Controller
 
         $form = $this->createForm($studentProfileType, $this->getRoleUser());
         $user = $form->getData();
+
+        if (!is_null($user->getAvatar())) {
+            $user->getAvatar()->setFileStorage($this->container->get('zerebral.file_storage'));
+        }
+
         if ($this->getRequest()->isMethod('POST')) {
             $form->bind($this->getRequest());
 

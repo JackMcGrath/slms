@@ -4,4 +4,4 @@ parameters:
 services:
     zerebral.file_storage:
         class:      Zerebral\CommonBundle\Component\FileStorage\LocalFileStorage
-        arguments:  [%localstorage.path%]
+        arguments:  [%localstorage.path%, %localstorage.web%]
