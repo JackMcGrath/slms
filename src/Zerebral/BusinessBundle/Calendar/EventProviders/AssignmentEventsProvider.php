@@ -7,12 +7,14 @@ use \CalendR\Event\Event;
 
 class AssignmentEventsProvider implements ProviderInterface
 {
-    private $events;
+    private $events = array();
 
     public function __construct($collection)
     {
-        foreach ($collection as $object) {
-            $this->setEvent($object);
+        if ($collection) {
+            foreach ($collection as $object) {
+                $this->setEvent($object);
+            }
         }
     }
 
