@@ -15,6 +15,7 @@ use Zerebral\BusinessBundle\Model\File\File;
 use Zerebral\BusinessBundle\Model\File\FilePeer;
 use Zerebral\BusinessBundle\Model\File\FileReferencesPeer;
 use Zerebral\BusinessBundle\Model\File\map\FileTableMap;
+use Zerebral\BusinessBundle\Model\User\UserPeer;
 
 abstract class BaseFilePeer
 {
@@ -386,6 +387,9 @@ abstract class BaseFilePeer
         // Invalidate objects in FileReferencesPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         FileReferencesPeer::clearInstancePool();
+        // Invalidate objects in UserPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        UserPeer::clearInstancePool();
     }
 
     /**

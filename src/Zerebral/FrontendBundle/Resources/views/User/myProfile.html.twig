@@ -64,17 +64,24 @@
                         }
                     }) }}
 
-                    {{ form_rest(form) }}
-
                 </div>
 
                 <div class="span4 pull-right">
                     <div class="profile-avatar pull-right span12">
-                        <img class="span12" src="http://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?s=200"/>
-                        <p>Change your avatar at</p>
-                        <a href="#">Gravatar.com</a>
+                        {% if user.getAvatar() %}
+                            <img class="span12" src="{{ user.getAvatar().getLink() | imagine_filter('thumbnail') }}"/>
+                        {% else %}
+                            NO AVATAR<br />
+                        {% endif %}
+                        <a href="#">Change your avatar</a>
+                        <div class="hidden-avatar-div">
+                            {{ form_row(form.user.avatar) }}
+                        </div>
                     </div>
                 </div>
+
+
+                {{ form_rest(form) }}
 
                 <div class="clearfix"></div>
 

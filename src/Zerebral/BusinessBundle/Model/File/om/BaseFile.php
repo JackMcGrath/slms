@@ -24,6 +24,8 @@ use Zerebral\BusinessBundle\Model\File\FilePeer;
 use Zerebral\BusinessBundle\Model\File\FileQuery;
 use Zerebral\BusinessBundle\Model\File\FileReferences;
 use Zerebral\BusinessBundle\Model\File\FileReferencesQuery;
+use Zerebral\BusinessBundle\Model\User\User;
+use Zerebral\BusinessBundle\Model\User\UserQuery;
 
 abstract class BaseFile extends BaseObject implements Persistent
 {
@@ -90,6 +92,12 @@ abstract class BaseFile extends BaseObject implements Persistent
     protected $collFileReferencessPartial;
 
     /**
+     * @var        PropelObjectCollection|User[] Collection to store aggregation of User objects.
+     */
+    protected $collUsers;
+    protected $collUsersPartial;
+
+    /**
      * @var        PropelObjectCollection|Assignment[] Collection to store aggregation of Assignment objects.
      */
     protected $collassignmentReferenceIds;
@@ -119,6 +127,12 @@ abstract class BaseFile extends BaseObject implements Persistent
      * @var		PropelObjectCollection
      */
     protected $fileReferencessScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $usersScheduledForDeletion = null;
 
     /**
      * Applies default values to this object.
@@ -474,6 +488,8 @@ abstract class BaseFile extends BaseObject implements Persistent
 
             $this->collFileReferencess = null;
 
+            $this->collUsers = null;
+
             $this->collassignmentReferenceIds = null;
         } // if (deep)
     }
@@ -646,6 +662,24 @@ abstract class BaseFile extends BaseObject implements Persistent
 
             if ($this->collFileReferencess !== null) {
                 foreach ($this->collFileReferencess as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->usersScheduledForDeletion !== null) {
+                if (!$this->usersScheduledForDeletion->isEmpty()) {
+                    foreach ($this->usersScheduledForDeletion as $user) {
+                        // need to save related object because we set the relation to null
+                        $user->save($con);
+                    }
+                    $this->usersScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collUsers !== null) {
+                foreach ($this->collUsers as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -832,6 +866,14 @@ abstract class BaseFile extends BaseObject implements Persistent
                     }
                 }
 
+                if ($this->collUsers !== null) {
+                    foreach ($this->collUsers as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
 
             $this->alreadyInValidation = false;
         }
@@ -924,6 +966,9 @@ abstract class BaseFile extends BaseObject implements Persistent
         if ($includeForeignObjects) {
             if (null !== $this->collFileReferencess) {
                 $result['FileReferencess'] = $this->collFileReferencess->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collUsers) {
+                $result['Users'] = $this->collUsers->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1106,6 +1151,12 @@ abstract class BaseFile extends BaseObject implements Persistent
                 }
             }
 
+            foreach ($this->getUsers() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addUser($relObj->copy($deepCopy));
+                }
+            }
+
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1169,6 +1220,9 @@ abstract class BaseFile extends BaseObject implements Persistent
     {
         if ('FileReferences' == $relationName) {
             $this->initFileReferencess();
+        }
+        if ('User' == $relationName) {
+            $this->initUsers();
         }
     }
 
@@ -1415,6 +1469,223 @@ abstract class BaseFile extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collUsers collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return File The current object (for fluent API support)
+     * @see        addUsers()
+     */
+    public function clearUsers()
+    {
+        $this->collUsers = null; // important to set this to null since that means it is uninitialized
+        $this->collUsersPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collUsers collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialUsers($v = true)
+    {
+        $this->collUsersPartial = $v;
+    }
+
+    /**
+     * Initializes the collUsers collection.
+     *
+     * By default this just sets the collUsers collection to an empty array (like clearcollUsers());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initUsers($overrideExisting = true)
+    {
+        if (null !== $this->collUsers && !$overrideExisting) {
+            return;
+        }
+        $this->collUsers = new PropelObjectCollection();
+        $this->collUsers->setModel('User');
+    }
+
+    /**
+     * Gets an array of User objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this File is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|User[] List of User objects
+     * @throws PropelException
+     */
+    public function getUsers($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collUsersPartial && !$this->isNew();
+        if (null === $this->collUsers || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collUsers) {
+                // return empty collection
+                $this->initUsers();
+            } else {
+                $collUsers = UserQuery::create(null, $criteria)
+                    ->filterByAvatar($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collUsersPartial && count($collUsers)) {
+                      $this->initUsers(false);
+
+                      foreach($collUsers as $obj) {
+                        if (false == $this->collUsers->contains($obj)) {
+                          $this->collUsers->append($obj);
+                        }
+                      }
+
+                      $this->collUsersPartial = true;
+                    }
+
+                    return $collUsers;
+                }
+
+                if($partial && $this->collUsers) {
+                    foreach($this->collUsers as $obj) {
+                        if($obj->isNew()) {
+                            $collUsers[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collUsers = $collUsers;
+                $this->collUsersPartial = false;
+            }
+        }
+
+        return $this->collUsers;
+    }
+
+    /**
+     * Sets a collection of User objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $users A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return File The current object (for fluent API support)
+     */
+    public function setUsers(PropelCollection $users, PropelPDO $con = null)
+    {
+        $usersToDelete = $this->getUsers(new Criteria(), $con)->diff($users);
+
+        $this->usersScheduledForDeletion = unserialize(serialize($usersToDelete));
+
+        foreach ($usersToDelete as $userRemoved) {
+            $userRemoved->setAvatar(null);
+        }
+
+        $this->collUsers = null;
+        foreach ($users as $user) {
+            $this->addUser($user);
+        }
+
+        $this->collUsers = $users;
+        $this->collUsersPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related User objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related User objects.
+     * @throws PropelException
+     */
+    public function countUsers(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collUsersPartial && !$this->isNew();
+        if (null === $this->collUsers || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collUsers) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getUsers());
+            }
+            $query = UserQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByAvatar($this)
+                ->count($con);
+        }
+
+        return count($this->collUsers);
+    }
+
+    /**
+     * Method called to associate a User object to this object
+     * through the User foreign key attribute.
+     *
+     * @param    User $l User
+     * @return File The current object (for fluent API support)
+     */
+    public function addUser(User $l)
+    {
+        if ($this->collUsers === null) {
+            $this->initUsers();
+            $this->collUsersPartial = true;
+        }
+        if (!in_array($l, $this->collUsers->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddUser($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	User $user The user object to add.
+     */
+    protected function doAddUser($user)
+    {
+        $this->collUsers[]= $user;
+        $user->setAvatar($this);
+    }
+
+    /**
+     * @param	User $user The user object to remove.
+     * @return File The current object (for fluent API support)
+     */
+    public function removeUser($user)
+    {
+        if ($this->getUsers()->contains($user)) {
+            $this->collUsers->remove($this->collUsers->search($user));
+            if (null === $this->usersScheduledForDeletion) {
+                $this->usersScheduledForDeletion = clone $this->collUsers;
+                $this->usersScheduledForDeletion->clear();
+            }
+            $this->usersScheduledForDeletion[]= $user;
+            $user->setAvatar(null);
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears out the collassignmentReferenceIds collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -1628,6 +1899,11 @@ abstract class BaseFile extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collUsers) {
+                foreach ($this->collUsers as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collassignmentReferenceIds) {
                 foreach ($this->collassignmentReferenceIds as $o) {
                     $o->clearAllReferences($deep);
@@ -1639,6 +1915,10 @@ abstract class BaseFile extends BaseObject implements Persistent
             $this->collFileReferencess->clearIterator();
         }
         $this->collFileReferencess = null;
+        if ($this->collUsers instanceof PropelCollection) {
+            $this->collUsers->clearIterator();
+        }
+        $this->collUsers = null;
         if ($this->collassignmentReferenceIds instanceof PropelCollection) {
             $this->collassignmentReferenceIds->clearIterator();
         }

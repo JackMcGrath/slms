@@ -11,6 +11,7 @@ use \PropelException;
 use \PropelPDO;
 use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\PeerEvent;
+use Zerebral\BusinessBundle\Model\File\FilePeer;
 use Zerebral\BusinessBundle\Model\User\User;
 use Zerebral\BusinessBundle\Model\User\UserPeer;
 use Zerebral\BusinessBundle\Model\User\map\UserTableMap;
@@ -31,13 +32,13 @@ abstract class BaseUserPeer
     const TM_CLASS = 'UserTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 13;
+    const NUM_COLUMNS = 14;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 13;
+    const NUM_HYDRATE_COLUMNS = 14;
 
     /** the column name for the id field */
     const ID = 'users.id';
@@ -69,6 +70,9 @@ abstract class BaseUserPeer
     /** the column name for the salt field */
     const SALT = 'users.salt';
 
+    /** the column name for the avatar_id field */
+    const AVATAR_ID = 'users.avatar_id';
+
     /** the column name for the is_active field */
     const IS_ACTIVE = 'users.is_active';
 
@@ -97,12 +101,12 @@ abstract class BaseUserPeer
      * e.g. UserPeer::$fieldNames[UserPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Role', 'FirstName', 'LastName', 'Salutation', 'Birthday', 'Gender', 'Email', 'Password', 'Salt', 'IsActive', 'CreatedAt', 'UpdatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'role', 'firstName', 'lastName', 'salutation', 'birthday', 'gender', 'email', 'password', 'salt', 'isActive', 'createdAt', 'updatedAt', ),
-        BasePeer::TYPE_COLNAME => array (UserPeer::ID, UserPeer::ROLE, UserPeer::FIRST_NAME, UserPeer::LAST_NAME, UserPeer::SALUTATION, UserPeer::BIRTHDAY, UserPeer::GENDER, UserPeer::EMAIL, UserPeer::PASSWORD, UserPeer::SALT, UserPeer::IS_ACTIVE, UserPeer::CREATED_AT, UserPeer::UPDATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'ROLE', 'FIRST_NAME', 'LAST_NAME', 'SALUTATION', 'BIRTHDAY', 'GENDER', 'EMAIL', 'PASSWORD', 'SALT', 'IS_ACTIVE', 'CREATED_AT', 'UPDATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'role', 'first_name', 'last_name', 'salutation', 'birthday', 'gender', 'email', 'password', 'salt', 'is_active', 'created_at', 'updated_at', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Role', 'FirstName', 'LastName', 'Salutation', 'Birthday', 'Gender', 'Email', 'Password', 'Salt', 'AvatarId', 'IsActive', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'role', 'firstName', 'lastName', 'salutation', 'birthday', 'gender', 'email', 'password', 'salt', 'avatarId', 'isActive', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (UserPeer::ID, UserPeer::ROLE, UserPeer::FIRST_NAME, UserPeer::LAST_NAME, UserPeer::SALUTATION, UserPeer::BIRTHDAY, UserPeer::GENDER, UserPeer::EMAIL, UserPeer::PASSWORD, UserPeer::SALT, UserPeer::AVATAR_ID, UserPeer::IS_ACTIVE, UserPeer::CREATED_AT, UserPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'ROLE', 'FIRST_NAME', 'LAST_NAME', 'SALUTATION', 'BIRTHDAY', 'GENDER', 'EMAIL', 'PASSWORD', 'SALT', 'AVATAR_ID', 'IS_ACTIVE', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'role', 'first_name', 'last_name', 'salutation', 'birthday', 'gender', 'email', 'password', 'salt', 'avatar_id', 'is_active', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, )
     );
 
     /**
@@ -112,12 +116,12 @@ abstract class BaseUserPeer
      * e.g. UserPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Role' => 1, 'FirstName' => 2, 'LastName' => 3, 'Salutation' => 4, 'Birthday' => 5, 'Gender' => 6, 'Email' => 7, 'Password' => 8, 'Salt' => 9, 'IsActive' => 10, 'CreatedAt' => 11, 'UpdatedAt' => 12, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'role' => 1, 'firstName' => 2, 'lastName' => 3, 'salutation' => 4, 'birthday' => 5, 'gender' => 6, 'email' => 7, 'password' => 8, 'salt' => 9, 'isActive' => 10, 'createdAt' => 11, 'updatedAt' => 12, ),
-        BasePeer::TYPE_COLNAME => array (UserPeer::ID => 0, UserPeer::ROLE => 1, UserPeer::FIRST_NAME => 2, UserPeer::LAST_NAME => 3, UserPeer::SALUTATION => 4, UserPeer::BIRTHDAY => 5, UserPeer::GENDER => 6, UserPeer::EMAIL => 7, UserPeer::PASSWORD => 8, UserPeer::SALT => 9, UserPeer::IS_ACTIVE => 10, UserPeer::CREATED_AT => 11, UserPeer::UPDATED_AT => 12, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'ROLE' => 1, 'FIRST_NAME' => 2, 'LAST_NAME' => 3, 'SALUTATION' => 4, 'BIRTHDAY' => 5, 'GENDER' => 6, 'EMAIL' => 7, 'PASSWORD' => 8, 'SALT' => 9, 'IS_ACTIVE' => 10, 'CREATED_AT' => 11, 'UPDATED_AT' => 12, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'role' => 1, 'first_name' => 2, 'last_name' => 3, 'salutation' => 4, 'birthday' => 5, 'gender' => 6, 'email' => 7, 'password' => 8, 'salt' => 9, 'is_active' => 10, 'created_at' => 11, 'updated_at' => 12, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Role' => 1, 'FirstName' => 2, 'LastName' => 3, 'Salutation' => 4, 'Birthday' => 5, 'Gender' => 6, 'Email' => 7, 'Password' => 8, 'Salt' => 9, 'AvatarId' => 10, 'IsActive' => 11, 'CreatedAt' => 12, 'UpdatedAt' => 13, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'role' => 1, 'firstName' => 2, 'lastName' => 3, 'salutation' => 4, 'birthday' => 5, 'gender' => 6, 'email' => 7, 'password' => 8, 'salt' => 9, 'avatarId' => 10, 'isActive' => 11, 'createdAt' => 12, 'updatedAt' => 13, ),
+        BasePeer::TYPE_COLNAME => array (UserPeer::ID => 0, UserPeer::ROLE => 1, UserPeer::FIRST_NAME => 2, UserPeer::LAST_NAME => 3, UserPeer::SALUTATION => 4, UserPeer::BIRTHDAY => 5, UserPeer::GENDER => 6, UserPeer::EMAIL => 7, UserPeer::PASSWORD => 8, UserPeer::SALT => 9, UserPeer::AVATAR_ID => 10, UserPeer::IS_ACTIVE => 11, UserPeer::CREATED_AT => 12, UserPeer::UPDATED_AT => 13, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'ROLE' => 1, 'FIRST_NAME' => 2, 'LAST_NAME' => 3, 'SALUTATION' => 4, 'BIRTHDAY' => 5, 'GENDER' => 6, 'EMAIL' => 7, 'PASSWORD' => 8, 'SALT' => 9, 'AVATAR_ID' => 10, 'IS_ACTIVE' => 11, 'CREATED_AT' => 12, 'UPDATED_AT' => 13, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'role' => 1, 'first_name' => 2, 'last_name' => 3, 'salutation' => 4, 'birthday' => 5, 'gender' => 6, 'email' => 7, 'password' => 8, 'salt' => 9, 'avatar_id' => 10, 'is_active' => 11, 'created_at' => 12, 'updated_at' => 13, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, )
     );
 
     /**
@@ -201,6 +205,7 @@ abstract class BaseUserPeer
             $criteria->addSelectColumn(UserPeer::EMAIL);
             $criteria->addSelectColumn(UserPeer::PASSWORD);
             $criteria->addSelectColumn(UserPeer::SALT);
+            $criteria->addSelectColumn(UserPeer::AVATAR_ID);
             $criteria->addSelectColumn(UserPeer::IS_ACTIVE);
             $criteria->addSelectColumn(UserPeer::CREATED_AT);
             $criteria->addSelectColumn(UserPeer::UPDATED_AT);
@@ -215,6 +220,7 @@ abstract class BaseUserPeer
             $criteria->addSelectColumn($alias . '.email');
             $criteria->addSelectColumn($alias . '.password');
             $criteria->addSelectColumn($alias . '.salt');
+            $criteria->addSelectColumn($alias . '.avatar_id');
             $criteria->addSelectColumn($alias . '.is_active');
             $criteria->addSelectColumn($alias . '.created_at');
             $criteria->addSelectColumn($alias . '.updated_at');
@@ -511,6 +517,244 @@ abstract class BaseUserPeer
         }
 
         return array($obj, $col);
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related Avatar table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAvatar(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(UserPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            UserPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(UserPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(UserPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(UserPeer::AVATAR_ID, FilePeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Selects a collection of User objects pre-filled with their File objects.
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of User objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAvatar(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(UserPeer::DATABASE_NAME);
+        }
+
+        UserPeer::addSelectColumns($criteria);
+        $startcol = UserPeer::NUM_HYDRATE_COLUMNS;
+        FilePeer::addSelectColumns($criteria);
+
+        $criteria->addJoin(UserPeer::AVATAR_ID, FilePeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = UserPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = UserPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+
+                $cls = UserPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                UserPeer::addInstanceToPool($obj1, $key1);
+            } // if $obj1 already loaded
+
+            $key2 = FilePeer::getPrimaryKeyHashFromRow($row, $startcol);
+            if ($key2 !== null) {
+                $obj2 = FilePeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = FilePeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol);
+                    FilePeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 already loaded
+
+                // Add the $obj1 (User) to $obj2 (File)
+                $obj2->addUser($obj1);
+
+            } // if joined row was not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining all related tables
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAll(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(UserPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            UserPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(UserPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(UserPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(UserPeer::AVATAR_ID, FilePeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+    /**
+     * Selects a collection of User objects pre-filled with all related objects.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of User objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAll(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(UserPeer::DATABASE_NAME);
+        }
+
+        UserPeer::addSelectColumns($criteria);
+        $startcol2 = UserPeer::NUM_HYDRATE_COLUMNS;
+
+        FilePeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + FilePeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(UserPeer::AVATAR_ID, FilePeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = UserPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = UserPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = UserPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                UserPeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+            // Add objects for joined File rows
+
+            $key2 = FilePeer::getPrimaryKeyHashFromRow($row, $startcol2);
+            if ($key2 !== null) {
+                $obj2 = FilePeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = FilePeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    FilePeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 loaded
+
+                // Add the $obj1 (User) to the collection in $obj2 (File)
+                $obj2->addUser($obj1);
+            } // if joined row not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
     }
 
     /**

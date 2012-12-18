@@ -10,10 +10,24 @@ use Zerebral\BusinessBundle\Model\User\User;
 
 class UserProfileType extends AbstractType
 {
+    protected $fileStorage;
+
+    public function setFileStorage($fileStorage) {
+        $this->fileStorage = $fileStorage;
+    }
+
+    public function getFileStorage() {
+        return $this->fileStorage;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('birthday', 'date', array('required' => false, 'input' => 'datetime', 'widget' => 'single_text', 'format' => 'MM/dd/yyyy'));
         $builder->add('gender', 'choice', array('required' => false, 'choices' => array('male' => 'Male', 'female' => 'Female')));
+        $builder->add('avatar', new \Zerebral\FrontendBundle\Form\Type\FileType(), array(
+            'storage' => $this->getFileStorage(),
+            'by_reference' => false
+        ));
     }
 
     public function getName()

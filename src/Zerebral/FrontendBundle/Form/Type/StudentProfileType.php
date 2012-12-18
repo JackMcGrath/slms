@@ -10,9 +10,23 @@ use Zerebral\BusinessBundle\Model\User\Student;
 
 class StudentProfileType extends AbstractType
 {
+    protected $fileStorage;
+
+
+    public function setFileStorage($fileStorage) {
+        $this->fileStorage = $fileStorage;
+    }
+
+    public function getFileStorage() {
+        return $this->fileStorage;
+    }
+
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('user', new UserProfileType());
+        $userProfileType = new UserProfileType();
+        $userProfileType->setFileStorage($this->getFileStorage());
+        $builder->add('user', $userProfileType);
         $builder->add('bio', 'textarea', array('required' => false, 'max_length' => 160));
         $builder->add('activities', 'textarea', array('required' => false));
         $builder->add('interests', 'textarea', array('required' => false));
