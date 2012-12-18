@@ -75,6 +75,16 @@ swiftmailer:
         username:   weavoradev
         password:   0ynWRVe6Vx
 
+liip_imagine:
+    driver:               gd
+    cache_prefix:         /img-cache
+    cache_mkdir_mode:     0777
+    filter_sets:
+        thumbnail:
+            quality: 75
+            filters:
+                thumbnail: { size: [200, 150], mode: outbound }
+
 parameters:
     glorpen.propel.event.dispatcher.class: "Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher"
     locale:            en

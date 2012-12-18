@@ -69,7 +69,7 @@
                 <div class="span4 pull-right">
                     <div class="profile-avatar pull-right span12">
                         {% if user.getAvatar() %}
-                            <img class="span12" src="{{ user.getAvatar().getLink() }}"/>
+                            <img class="span12" src="{{ user.getAvatar().getLink() | imagine_filter('thumbnail') }}"/>
                         {% else %}
                             NO AVATAR<br />
                         {% endif %}
