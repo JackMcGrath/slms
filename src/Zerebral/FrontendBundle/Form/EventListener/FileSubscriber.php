@@ -30,8 +30,6 @@ class FileSubscriber implements EventSubscriberInterface {
             return;
         }
 
-        if (!is_null($file->getId())) {
-            $file->setFileStorage($options['storage']);
-        }
+        $file->setFileStorage($options['storage']);
     }
 }
