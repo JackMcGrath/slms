@@ -7,6 +7,7 @@ use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
 use Zerebral\BusinessBundle\Model\User\om\BaseUser;
+use Zerebral\BusinessBundle\Model\File\File;
 
 class User extends BaseUser implements UserInterface, \Serializable, EquatableInterface
 {
@@ -273,4 +274,4 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
 
         return $this->getFirstName() . ' ' . $this->getLastName();
     }
-} 
+}

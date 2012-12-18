@@ -75,7 +75,7 @@
         {% if is_granted('ROLE_TEACHER') %}
             <a href="{{ path('course_add') }}" class="btn create-course create-new-item">create course</a>
         {% else %}
-            <a href="#" class="btn create-new-item use-access-code">use access code</a>
+            <a href="#inviteModal" class="btn create-new-item use-access-code" data-toggle="modal" data-target="#inviteModal">use access code</a>
         {% endif %}
 
         <div class="upcoming-assignments">
@@ -96,5 +96,28 @@
 
 </div>
 
+{% if is_granted('ROLE_STUDENT') %}
+    <div class="modal hide fade" id="inviteModal">
+        <form method="post" {{ form_enctype(form) }}  action="{{ path("course_accept") }}" class="form-horizontal" novalidate>
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3>Invite users</h3>
+            </div>
+            <div class="modal-body">
+                {{ form_row(form.accessCode, {
+                    label: 'Access code',
+                    form_type: 'horizontal',
+                    attr: {
+                        class: 'input-block-level',
+                        help: 'Provided by instructor'
+                    }
+                }) }}
 
+                <input type="submit" class="btn btn-danger" value="Join"/>
+                <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Cancel</a>
+            </div>
+            {{ form_rest(form) }}
+        </form>
+    </div>
+{% endif %}
 {% endblock %}

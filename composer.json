@@ -21,7 +21,8 @@
         "propel/propel-bundle": "1.1.*",
         "real-chocopanda/glorpen-propel-event-bundle": "*",
         "knplabs/knp-time-bundle": "*",
-        "frequence-web/calendr-bundle": "*"
+        "frequence-web/calendr-bundle": "*",
+        "liip/imagine-bundle": "*"
     },
     "scripts": {
         "post-install-cmd": [

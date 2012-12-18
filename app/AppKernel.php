@@ -26,6 +26,7 @@ class AppKernel extends Kernel
             new Zerebral\BusinessBundle\ZerebralBusinessBundle(),
             new Zerebral\FrontendBundle\ZerebralFrontendBundle(),
             new FrequenceWeb\Bundle\CalendRBundle\FrequenceWebCalendRBundle(),
+            new Liip\ImagineBundle\LiipImagineBundle()
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {
