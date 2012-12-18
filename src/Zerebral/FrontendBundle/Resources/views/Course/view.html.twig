@@ -1,4 +1,5 @@
 {% extends 'ZerebralFrontendBundle::layout.html.twig' %}
+{% import "ZerebralFrontendBundle:Macro:main.html.twig" as mainPartials %}
 
 {% block content %}
     {% javascripts
@@ -7,19 +8,19 @@
     <script type="text/javascript" src="{{ asset_url }}"></script>
     {% endjavascripts %}
     <div class="top-second-navbar">
-        <ul>
-            <li><a href="#">Feed</a></li>
-            <li><a href="{{ path('course_assignments', {id: course.id}) }}">Assignments</a></li>
-            <li class="active"><a href="{{ path('course_view', {id: course.id}) }}">Details</a></li>
-            <li><a href="#">Materials</a></li>
-            <li class="active"><a href="{{ path('course_members', {id: course.id}) }}">Members</a></li>
-        </ul>
+        {{ mainPartials.topMenu('details', course) }}
     </div>
 
     <div class="row-fluid courses-list course-details">
         <div class="span6 main-list-block">
             <div class="row-fluid manage">
-                <h2 class="span6 pull-left form-title">
+                {% if showWelcomeMessage %}
+                    <div class="alert alert-success">
+                        <button type="button" class="close" data-dismiss="alert">×</button>
+                        <strong> Heads up!</strong> You have successfully joined new course - <strong>{{ course.getName }}</strong>.
+                    </div>
+                {% endif %}
+                <h2 class="pull-left form-title">
                     {{ course.name }} <small>course details</small>
                 </h2>
                 {% if is_granted('ROLE_TEACHER') %}

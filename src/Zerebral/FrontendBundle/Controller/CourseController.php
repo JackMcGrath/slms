@@ -31,11 +31,14 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
         $currentMonth = new \Zerebral\CommonBundle\Component\Calendar\Calendar(time(), $provider);
         $nextMonth = new \Zerebral\CommonBundle\Component\Calendar\Calendar(strtotime("+1 month"), $provider);
 
+        $form = $this->createForm(new FormType\AccessCodeType(), new Model\Course\Member());
+
         return array(
             'currentMonth' => $currentMonth,
             'nextMonth' => $nextMonth,
             'courses' => $this->getRoleUser()->getCourses(),
-            'target' => 'courses'
+            'target' => 'courses',
+            'form' => $form->createView()
         );
     }
 
@@ -52,7 +55,8 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     {
         return array(
             'course' => $course,
-            'target' => 'courses'
+            'target' => 'courses',
+            'showWelcomeMessage' => $this->getRequest()->get('showWelcomeMessage', false)
         );
     }
 
@@ -148,7 +152,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
 
                 foreach ($emails as $email) {
                     $message = \Swift_Message::newInstance()
-                        ->setSubject('Welcome to zerebral')
+                        ->setSubject('Course invitation')
                         ->setFrom('hello@zerebral.com')
                         ->setTo($email)
                         ->setBody(
@@ -177,20 +181,37 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
 
     /**
      * @Route("/accept/{accessCode}", name="course_accept_invite")
+     * @Route("/accept", name="course_accept")
      * @ParamConverter("course", options={"mapping": {"accessCode": "access_code"}})
-     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
-     *
-     * @Template()
      */
-    public function acceptInviteAction(Model\Course\Course $course){
+    public function acceptInviteAction(Model\Course\Course $course = null){
         $user = $this->getRoleUser();
 
-        if($user instanceof \Zerebral\BusinessBundle\Model\User\Student){
-            $course->addStudent($this->getRoleUser());
-        }else{
-            $course->addTeacher($this->getRoleUser());
+        if(!$course && $this->getRequest()->isMethod("POST")){
+            $form = $this->createForm(new FormType\AccessCodeType(), new Model\Course\Member());
+            $form->bind($this->getRequest());
+            if ($form->isValid()) {
+                /** @var $invite Model\Course\Member */
+                $invite = $form->getData();
+                $course = \Zerebral\BusinessBundle\Model\Course\CourseQuery::create()->findOneByAccessCode($invite->getAccessCode());
+            }
         }
-        $course->save();
-        return $this->redirect($this->generateUrl('course_view', array('id' => $course->getId())));
+
+        if(empty($user)){
+            $this->getRequest()->getSession()->set('access_code', $course->getAccessCode());
+            return $this->redirect($this->generateUrl('signup', array()));
+        }else{
+            if($user instanceof \Zerebral\BusinessBundle\Model\User\Student){
+                $course->addStudent($this->getRoleUser());
+            }else{
+                $course->addTeacher($this->getRoleUser());
+            }
+            $course->save();
+            return $this->redirect($this->generateUrl('course_view', array(
+                        'id' => $course->getId(),
+                        'showWelcomeMessage' => true
+                    )
+            ));
+        }
     }
 }
