@@ -3,7 +3,12 @@
 //
 
 .primary .main-list-block {
-    width: 675px;
+    @listWidth: 675px;
+    width: @listWidth;
+
+    h2.form-title {
+        width: @listWidth - 120;
+    }
     hr {
         margin-bottom: 0px;
     }
