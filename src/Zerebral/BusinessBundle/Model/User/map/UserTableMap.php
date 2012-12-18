@@ -52,6 +52,7 @@ class UserTableMap extends TableMap
         $this->addColumn('email', 'Email', 'VARCHAR', true, 100, null);
         $this->addColumn('password', 'Password', 'VARCHAR', true, 40, null);
         $this->addColumn('salt', 'Salt', 'VARCHAR', true, 32, null);
+        $this->addForeignKey('avatar_id', 'AvatarId', 'INTEGER', 'files', 'id', false, null, null);
         $this->addColumn('is_active', 'IsActive', 'BOOLEAN', true, 1, true);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', true, null, null);
@@ -79,6 +80,7 @@ class UserTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('Avatar', 'Zerebral\\BusinessBundle\\Model\\File\\File', RelationMap::MANY_TO_ONE, array('avatar_id' => 'id', ), 'CASCADE', 'CASCADE');
         $this->addRelation('Student', 'Zerebral\\BusinessBundle\\Model\\User\\Student', RelationMap::ONE_TO_MANY, array('id' => 'user_id', ), null, null, 'Students');
         $this->addRelation('Teacher', 'Zerebral\\BusinessBundle\\Model\\User\\Teacher', RelationMap::ONE_TO_MANY, array('id' => 'user_id', ), null, null, 'Teachers');
     } // buildRelations()
