@@ -15,7 +15,7 @@
                 <tr>
                     {% for day in week %}
                         {% if calendar.currentMonth.contains(day.begin) %}
-                            <td class="{% if calendar.currentEvents.has(day) %}active{% endif %} {% if "now"|date("m/d") == day.begin.format('m/d') %}today{% endif %}"><span>{{ day.begin.format('d') }}</span></td>
+                            <td class="{% if calendar.currentEvents.has(day) %}active{% endif %} {% if "now"|date("m/d") == day.begin.format('m/d') %}today{% endif %}"><a href="#" rel="tooltip" title="{% if calendar.currentEvents.has(day) %}{{ calendar.getEventText(day) }} {% endif %}">{{ day.begin.format('d') }}</a></td>
                         {% else %}
                             <td class="inactive"><span>{{ day.begin.format('d') }}</span></td>
                         {% endif %}

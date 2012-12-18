@@ -1,11 +1,10 @@
 <?php
-
 namespace Zerebral\BusinessBundle\Calendar\EventProviders;
 
 use CalendR\Event\Provider\ProviderInterface;
 use \CalendR\Event\Event;
 
-class AssignmentEventsProvider implements ProviderInterface
+class CourseAssignmentEventsProvider implements ProviderInterface
 {
     private $events = array();
 
@@ -31,6 +30,6 @@ class AssignmentEventsProvider implements ProviderInterface
     private function setEvent(\Zerebral\BusinessBundle\Model\Assignment\Assignment $model)
     {
         if ($model->getDueAt())
-            $this->events[] = new Event($model->getName(), $model->getDueAt(), $model->getDueAt());
+            $this->events[] = new Event($model->getCourse()->getName().': '. $model->getName(), $model->getDueAt(), $model->getDueAt());
     }
 }
