@@ -20,11 +20,21 @@ class Course extends BaseCourse
     {
         //@todo fix it
         $this->setCreatedAt(date("Y-m-d H:i:s", time()));
+        $this->setAccessCode($this->generateInvite());
         return parent::preInsert($con);
     }
 
     public function getTeacher()
     {
         return $this->getTeachers()->getFirst();
+    }
+
+    /**
+     * Generate random string for use it as course invite code
+     * @param int $length
+     * @return string
+     */
+    private function generateInvite($length = 7) {
+        return substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, $length);
     }
 }
