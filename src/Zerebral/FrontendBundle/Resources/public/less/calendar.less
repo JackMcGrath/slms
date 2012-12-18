@@ -6,14 +6,14 @@
         }
     }
     td.today {
-        span {
+        a {
             color: white;
             background: #b74a47;
             .rounded;
         }
     }
     td.active {
-        span {
+        a {
             .rounded;
         }
     }
@@ -28,7 +28,7 @@
         vertical-align: middle;
         text-align: center;
 
-        span {
+        a {
             padding: 2px;
             color: #707070;
             font-size: 11px;
@@ -42,8 +42,9 @@
 
         &:hover {
             cursor: pointer;
-            span {
+            a {
                 cursor: pointer;
+                text-decoration: none;
                 .rounded;
             }
         }

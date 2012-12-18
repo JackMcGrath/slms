@@ -21,6 +21,18 @@ class Calendar extends \CalendR\Calendar
         return $this->getEvents($this->getCurrentMonth());
     }
 
+    public function getEventText($date)
+    {
+        $events = array();
+        $rawEvents = $this->getEvents($this->getCurrentMonth());
+        foreach ($rawEvents->find($date) as $event) {
+            $events[] = htmlspecialchars($event->getUid());
+        }
+        return implode("<br/>", $events);
+    }
+
+
+
 
 //    public function getNextMonth()
 //    {
