@@ -34,6 +34,7 @@ class UserController extends \Zerebral\CommonBundle\Component\Controller
             if ($form->isValid()) {
 
 
+                $user->getUser()->save();
                 $user->save();
 
                 $this->getRequest()->getSession()->setFlash('profile_save_success', 'Profile has been saved!');

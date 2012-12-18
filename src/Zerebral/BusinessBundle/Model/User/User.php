@@ -274,25 +274,4 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
 
         return $this->getFirstName() . ' ' . $this->getLastName();
     }
-
-    public function setAvatar(File $v = null)
-    {
-        if ($v === null) {
-            $this->setAvatarId(NULL);
-        } else {
-            $this->setAvatarId($v->getId());
-            $this->modifiedColumns[] = UserPeer::AVATAR_ID;
-        }
-
-        $this->aAvatar = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the File object, it will not be re-added.
-        if ($v !== null) {
-            $v->addUser($this);
-        }
-
-
-        return $this;
-    }
 }
