@@ -1,6 +1,6 @@
-{% macro month(month) %}
+{% macro month(calendar) %}
     <div class="calendar-widget">
-        <h4>{{ month.format('F') }}</h4>
+        <h4>{{ calendar.currentMonth.format('F') }}</h4>
         <table class="">
             <tr class="day-name">
                 <th>Mon</th>
@@ -11,11 +11,11 @@
                 <th>Sat</th>
                 <th>Sun</th>
             </tr>
-            {% for week in month %}
+            {% for week in calendar.currentMonth %}
                 <tr>
                     {% for day in week %}
-                        {% if month.contains(day.begin) %}
-                            <td class="{% if "now"|date("m/d") == day.begin.format('m/d') %}today{% endif %}"><span>{{ day.begin.format('d') }}</span></td>
+                        {% if calendar.currentMonth.contains(day.begin) %}
+                            <td class="{% if calendar.currentEvents.has(day) %}active{% endif %} {% if "now"|date("m/d") == day.begin.format('m/d') %}today{% endif %}"><span>{{ day.begin.format('d') }}</span></td>
                         {% else %}
                             <td class="inactive"><span>{{ day.begin.format('d') }}</span></td>
                         {% endif %}

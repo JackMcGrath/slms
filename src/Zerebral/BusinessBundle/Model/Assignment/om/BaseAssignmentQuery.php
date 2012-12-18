@@ -987,23 +987,6 @@ abstract class BaseAssignmentQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related Student object
-     * using the file_references table as cross reference
-     *
-     * @param   Student $student the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   AssignmentQuery The current query, for fluid interface
-     */
-    public function filterBystudentsReferenceId($student, $comparison = Criteria::EQUAL)
-    {
-        return $this
-            ->useassignmentReferenceNameQuery()
-            ->filterBystudentsReferenceId($student, $comparison)
-            ->endUse();
-    }
-
-    /**
      * Exclude object from result
      *
      * @param   Assignment $assignment Object to remove from the list of results
