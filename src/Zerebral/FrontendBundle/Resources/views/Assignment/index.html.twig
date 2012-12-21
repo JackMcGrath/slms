@@ -13,7 +13,7 @@
         <div style="margin: 20px 0; border-bottom: 1px dashed #ccc;">
             <h4><a href="{{ path('assignment_view', {id: assignment.id}) }}" style="color: #555;">{{ assignment.name }}</a></h4>
             {% if is_granted('EDIT', assignment) %}<a href="{{ path('assignment_edit', {id: assignment.id, courseId: assignment.course.id}) }}">Edit</a>{% endif %}
-            {% if is_granted('DELETE', assignment) %}<a href="{{ path('assignment_delete', {id: assignment.id}) }}" onclick="return confirm('Are you sure?');">Remove</a>{% endif %}
+            {% if is_granted('DELETE', assignment) %}<a href="{{ path('assignment_delete', {id: assignment.id}) }}" class="delete-confirm">Remove</a>{% endif %}
         </div>
 
     {% endfor %}

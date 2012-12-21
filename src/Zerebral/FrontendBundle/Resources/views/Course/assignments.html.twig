@@ -35,8 +35,7 @@
                                 <i class="manage-buttons-gears icon-small-gears"></i>
                                 <div class="manage-buttons invisible">
                                     {% if is_granted('EDIT', assignment) %}<a href="{{ path('assignment_edit', {id: assignment.id, courseId: course.id}) }}"><i class="icon-small-pencil"></i>Edit</a>{% endif %}
-                                    {% if is_granted('DELETE', assignment) %}<a href="{{ path('assignment_delete', {id: assignment.id}) }}"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
-                                    <a href=""><i class="icon-small-people"></i>Edit members</a>
+                                    {% if is_granted('DELETE', assignment) %}<a href="{{ path('assignment_delete', {id: assignment.id}) }}" class="delete-confirm"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
                                 </div>
 
                             {% endif %}
