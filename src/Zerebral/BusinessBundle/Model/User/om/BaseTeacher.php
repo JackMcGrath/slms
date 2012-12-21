@@ -65,6 +65,24 @@ abstract class BaseTeacher extends BaseObject implements Persistent
     protected $user_id;
 
     /**
+     * The value for the bio field.
+     * @var        string
+     */
+    protected $bio;
+
+    /**
+     * The value for the subjects field.
+     * @var        string
+     */
+    protected $subjects;
+
+    /**
+     * The value for the grades field.
+     * @var        string
+     */
+    protected $grades;
+
+    /**
      * @var        User
      */
     protected $aUser;
@@ -175,6 +193,36 @@ abstract class BaseTeacher extends BaseObject implements Persistent
     }
 
     /**
+     * Get the [bio] column value.
+     *
+     * @return string
+     */
+    public function getBio()
+    {
+        return $this->bio;
+    }
+
+    /**
+     * Get the [subjects] column value.
+     *
+     * @return string
+     */
+    public function getSubjects()
+    {
+        return $this->subjects;
+    }
+
+    /**
+     * Get the [grades] column value.
+     *
+     * @return string
+     */
+    public function getGrades()
+    {
+        return $this->grades;
+    }
+
+    /**
      * Set the value of [id] column.
      *
      * @param int $v new value
@@ -221,6 +269,69 @@ abstract class BaseTeacher extends BaseObject implements Persistent
     } // setUserId()
 
     /**
+     * Set the value of [bio] column.
+     *
+     * @param string $v new value
+     * @return Teacher The current object (for fluent API support)
+     */
+    public function setBio($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->bio !== $v) {
+            $this->bio = $v;
+            $this->modifiedColumns[] = TeacherPeer::BIO;
+        }
+
+
+        return $this;
+    } // setBio()
+
+    /**
+     * Set the value of [subjects] column.
+     *
+     * @param string $v new value
+     * @return Teacher The current object (for fluent API support)
+     */
+    public function setSubjects($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->subjects !== $v) {
+            $this->subjects = $v;
+            $this->modifiedColumns[] = TeacherPeer::SUBJECTS;
+        }
+
+
+        return $this;
+    } // setSubjects()
+
+    /**
+     * Set the value of [grades] column.
+     *
+     * @param string $v new value
+     * @return Teacher The current object (for fluent API support)
+     */
+    public function setGrades($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->grades !== $v) {
+            $this->grades = $v;
+            $this->modifiedColumns[] = TeacherPeer::GRADES;
+        }
+
+
+        return $this;
+    } // setGrades()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -254,6 +365,9 @@ abstract class BaseTeacher extends BaseObject implements Persistent
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->user_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
+            $this->bio = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+            $this->subjects = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+            $this->grades = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -262,7 +376,7 @@ abstract class BaseTeacher extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 2; // 2 = TeacherPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = TeacherPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Teacher object", $e);
@@ -630,6 +744,15 @@ abstract class BaseTeacher extends BaseObject implements Persistent
         if ($this->isColumnModified(TeacherPeer::USER_ID)) {
             $modifiedColumns[':p' . $index++]  = '`user_id`';
         }
+        if ($this->isColumnModified(TeacherPeer::BIO)) {
+            $modifiedColumns[':p' . $index++]  = '`bio`';
+        }
+        if ($this->isColumnModified(TeacherPeer::SUBJECTS)) {
+            $modifiedColumns[':p' . $index++]  = '`subjects`';
+        }
+        if ($this->isColumnModified(TeacherPeer::GRADES)) {
+            $modifiedColumns[':p' . $index++]  = '`grades`';
+        }
 
         $sql = sprintf(
             'INSERT INTO `teachers` (%s) VALUES (%s)',
@@ -646,6 +769,15 @@ abstract class BaseTeacher extends BaseObject implements Persistent
                         break;
                     case '`user_id`':
                         $stmt->bindValue($identifier, $this->user_id, PDO::PARAM_INT);
+                        break;
+                    case '`bio`':
+                        $stmt->bindValue($identifier, $this->bio, PDO::PARAM_STR);
+                        break;
+                    case '`subjects`':
+                        $stmt->bindValue($identifier, $this->subjects, PDO::PARAM_STR);
+                        break;
+                    case '`grades`':
+                        $stmt->bindValue($identifier, $this->grades, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -839,6 +971,15 @@ abstract class BaseTeacher extends BaseObject implements Persistent
             case 1:
                 return $this->getUserId();
                 break;
+            case 2:
+                return $this->getBio();
+                break;
+            case 3:
+                return $this->getSubjects();
+                break;
+            case 4:
+                return $this->getGrades();
+                break;
             default:
                 return null;
                 break;
@@ -870,6 +1011,9 @@ abstract class BaseTeacher extends BaseObject implements Persistent
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getUserId(),
+            $keys[2] => $this->getBio(),
+            $keys[3] => $this->getSubjects(),
+            $keys[4] => $this->getGrades(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aUser) {
@@ -930,6 +1074,15 @@ abstract class BaseTeacher extends BaseObject implements Persistent
             case 1:
                 $this->setUserId($value);
                 break;
+            case 2:
+                $this->setBio($value);
+                break;
+            case 3:
+                $this->setSubjects($value);
+                break;
+            case 4:
+                $this->setGrades($value);
+                break;
         } // switch()
     }
 
@@ -956,6 +1109,9 @@ abstract class BaseTeacher extends BaseObject implements Persistent
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setUserId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setBio($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setSubjects($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setGrades($arr[$keys[4]]);
     }
 
     /**
@@ -969,6 +1125,9 @@ abstract class BaseTeacher extends BaseObject implements Persistent
 
         if ($this->isColumnModified(TeacherPeer::ID)) $criteria->add(TeacherPeer::ID, $this->id);
         if ($this->isColumnModified(TeacherPeer::USER_ID)) $criteria->add(TeacherPeer::USER_ID, $this->user_id);
+        if ($this->isColumnModified(TeacherPeer::BIO)) $criteria->add(TeacherPeer::BIO, $this->bio);
+        if ($this->isColumnModified(TeacherPeer::SUBJECTS)) $criteria->add(TeacherPeer::SUBJECTS, $this->subjects);
+        if ($this->isColumnModified(TeacherPeer::GRADES)) $criteria->add(TeacherPeer::GRADES, $this->grades);
 
         return $criteria;
     }
@@ -1033,6 +1192,9 @@ abstract class BaseTeacher extends BaseObject implements Persistent
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setUserId($this->getUserId());
+        $copyObj->setBio($this->getBio());
+        $copyObj->setSubjects($this->getSubjects());
+        $copyObj->setGrades($this->getGrades());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -2620,6 +2782,9 @@ abstract class BaseTeacher extends BaseObject implements Persistent
     {
         $this->id = null;
         $this->user_id = null;
+        $this->bio = null;
+        $this->subjects = null;
+        $this->grades = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->clearAllReferences();
