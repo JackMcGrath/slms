@@ -21,7 +21,7 @@
             <form method="post" {{ form_enctype(form) }} novalidate  class="form-horizontal create-form no-left-margin">
                 <div class="span8">
                     {{ form_row(form.bio, {
-                        label: 'Description',
+                        label: 'Bio',
                         form_type: 'horizontal',
                         attr: {
                             class: 'input-block-level',
@@ -46,23 +46,43 @@
                         }
                     }) }}
 
-                    {{ form_row(form.activities, {
+                    {% if is_granted('ROLE_TEACHER') %}
+                        {{ form_row(form.subjects, {
+                        label: 'Subject taught',
+                        form_type: 'horizontal',
+                        attr: {
+                            class: 'input-block-level',
+                            rows: 6
+                        }
+                        }) }}
+
+                        {{ form_row(form.grades, {
+                        label: 'Grades',
+                        form_type: 'horizontal',
+                        attr: {
+                            class: 'input-block-level',
+                            rows: 6
+                        }
+                        }) }}
+                    {% else %}
+                        {{ form_row(form.activities, {
                         label: 'Activities',
                         form_type: 'horizontal',
                         attr: {
                             class: 'input-block-level',
                             rows: 6
                         }
-                    }) }}
+                        }) }}
 
-                    {{ form_row(form.interests, {
+                        {{ form_row(form.interests, {
                         label: 'Interests',
                         form_type: 'horizontal',
                         attr: {
                             class: 'input-block-level',
                             rows: 6
                         }
-                    }) }}
+                        }) }}
+                    {% endif %}
 
                 </div>
 
