@@ -20,7 +20,7 @@ class Member
     }
 
     private function getFromString($emailList){
-        $results = explode(' ', preg_replace('/\s\s+/', ' ', $emailList));
+        $results = explode(' ', preg_replace('/\s\s+/', ' ', trim($emailList)));
         return $results;
     }
 

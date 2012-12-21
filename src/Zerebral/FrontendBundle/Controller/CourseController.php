@@ -34,15 +34,20 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
 
         $form = $this->createForm(new FormType\AccessCodeType(), new Model\Course\AccessCode());
 
-        if($this->getRequest()->isMethod('POST')){
+        if ($this->getRequest()->isMethod('POST')) {
             $form->bind($this->getRequest());
             if ($form->isValid()) {
                 /** @var $invite Model\Course\AccessCode */
                 $invite = $form->getData();
 
-                return $this->redirect($this->generateUrl('course_accept_invite', array(
-                    'accessCode' => $invite->getAccessCode(),
-                )));
+                return $this->redirect(
+                    $this->generateUrl(
+                        'course_accept_invite',
+                        array(
+                            'accessCode' => $invite->getAccessCode(),
+                        )
+                    )
+                );
             }
         }
 
@@ -209,32 +214,37 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      * @Route("/accept", name="course_accept")
      * @ParamConverter("course", options={"mapping": {"accessCode": "access_code"}})
      */
-    public function acceptInviteAction(Model\Course\Course $course = null){
+    public function acceptInviteAction(Model\Course\Course $course = null)
+    {
         $user = $this->getRoleUser();
 
-        if(!$course){
+        if (!$course) {
             throw $this->createNotFoundException('The course not found');
         }
 
-        if(empty($user)){
+        if (empty($user)) {
             $this->getRequest()->getSession()->set('access_code', $course->getAccessCode());
             return $this->redirect($this->generateUrl('signup', array()));
-        }else{
-            if($user->hasCourse($course)){
+        } else {
+            if ($user->hasCourse($course)) {
                 throw $this->createNotFoundException('User already assigned to course');
             }
 
-            if($user instanceof \Zerebral\BusinessBundle\Model\User\Student){
+            if ($user instanceof \Zerebral\BusinessBundle\Model\User\Student) {
                 $course->addStudent($this->getRoleUser());
-            }else{
+            } else {
                 $course->addTeacher($this->getRoleUser());
             }
             $course->save();
-            return $this->redirect($this->generateUrl('course_view', array(
+            return $this->redirect(
+                $this->generateUrl(
+                    'course_view',
+                    array(
                         'id' => $course->getId(),
                         'showWelcomeMessage' => true
                     )
-            ));
+                )
+            );
         }
     }
 
@@ -243,11 +253,34 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      * @ParamConverter("course")
      * @PreAuthorize("hasRole('ROLE_TEACHER')")
      */
-    public function resetAccessCodeAction(Model\Course\Course $course = null){
+    public function resetAccessCodeAction(Model\Course\Course $course = null)
+    {
         $course->resetAccessCode();
         $course->save();
-        return $this->redirect($this->generateUrl('course_members', array(
+        return $this->redirect(
+            $this->generateUrl(
+                'course_members',
+                array(
                     'id' => $course->getId()
-        )));
+                )
+            )
+        );
+    }
+
+    /**
+     * @Route("/verifyCode/{accessCode}", name="course_verify_code")
+     * @ParamConverter("course", options={"mapping": {"accessCode": "access_code"}})
+     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     */
+    public function verifyAccessCodeAction(Model\Course\Course $course = null)
+    {
+        $result = false;
+        if ($course) {
+            $result = true;
+        }
+
+        $response = new \Symfony\Component\HttpFoundation\Response(json_encode(array('success' => $result)));
+        $response->headers->set('Content-Type', 'application/json');
+        return $response;
     }
 }
