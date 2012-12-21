@@ -2,6 +2,11 @@ parameters:
 #    zerebral_frontend.example.class: Zerebral\FrontendBundle\Example
 
 services:
+    zerbral.twig.extension.file_storage:
+        class: Zerebral\FrontendBundle\Extension\FileStorageExtension
+        arguments:  [@zerebral.file_storage]
+        tags:
+            -  { name: twig.extension }
     twig.extension:
         class: Assetic\Extension\Twig
     zerebral.frontend.login_success_handler:

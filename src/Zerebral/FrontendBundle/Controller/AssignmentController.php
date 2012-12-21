@@ -62,7 +62,7 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
     public function addAction(Model\Course\Course $course, Model\Assignment\Assignment $assignment = null)
     {
         $assignmentType = new FormType\AssignmentType();
-        $assignmentType->setFileStorage($this->container->get('zerebral.file_storage'));
+        $assignmentType->setFileStorage($this->container->get('zerebral.file_storage')->getFileStorage('local'));
         $assignmentType->setTeacher($this->getRoleUser());
         $form = $this->createForm($assignmentType, $assignment);
 
