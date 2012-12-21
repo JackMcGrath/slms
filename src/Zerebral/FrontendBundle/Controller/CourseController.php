@@ -227,27 +227,27 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
         if (empty($user)) {
             $this->getRequest()->getSession()->set('access_code', $course->getAccessCode());
             return $this->redirect($this->generateUrl('signup', array()));
-        } else {
-            if ($user->hasCourse($course)) {
-                throw $this->createNotFoundException('User already assigned to course');
-            }
-
-            if ($user instanceof \Zerebral\BusinessBundle\Model\User\Student) {
-                $course->addStudent($this->getRoleUser());
-            } else {
-                $course->addTeacher($this->getRoleUser());
-            }
-            $course->save();
-            return $this->redirect(
-                $this->generateUrl(
-                    'course_view',
-                    array(
-                        'id' => $course->getId(),
-                        'showWelcomeMessage' => true
-                    )
-                )
-            );
         }
+
+        if ($user->hasCourse($course)) {
+            throw $this->createNotFoundException('User already assigned to course');
+        }
+
+        if ($user instanceof \Zerebral\BusinessBundle\Model\User\Student) {
+            $course->addStudent($user);
+        } else {
+            $course->addTeacher($user);
+        }
+        $course->save();
+        return $this->redirect(
+            $this->generateUrl(
+                'course_view',
+                array(
+                    'id' => $course->getId(),
+                    'showWelcomeMessage' => true
+                )
+            )
+        );
     }
 
     /**
@@ -259,6 +259,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     {
         $course->resetAccessCode();
         $course->save();
+
         return $this->redirect(
             $this->generateUrl(
                 'course_members',
@@ -276,13 +277,6 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function verifyAccessCodeAction(Model\Course\Course $course = null)
     {
-        $result = false;
-        if ($course) {
-            $result = true;
-        }
-
-        $response = new \Symfony\Component\HttpFoundation\Response(json_encode(array('success' => $result)));
-        $response->headers->set('Content-Type', 'application/json');
-        return $response;
+        return new \Symfony\Component\HttpFoundation\JsonResponse(array('success' => !empty($course)));
     }
 }

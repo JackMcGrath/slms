@@ -88,9 +88,11 @@
                     <i class="icon-gray-mail"></i>Message
                 </a>
 
+                {% if is_granted('EDIT', course) %}
                 <a href="{{ path('course_remove_student', {courseId: course.id, studentId: member.id}) }}" class="delete-confirm">
                     <i class="icon-small-trash-bin"></i>Delete
                 </a>
+                {% endif %}
             </div>
         </div>
 
