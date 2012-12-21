@@ -80,11 +80,11 @@
 
             <div class="manage-buttons">
                 <a href="#">
-                    <i class="icon-gray-mail"></i> Message
+                    <i class="icon-gray-mail"></i>Message
                 </a>
 
-                <a href="#">
-                    <i class="icon-small-trash-bin"></i> Delete
+                <a href="{{ path('course_remove_student', {courseId: course.id, studentId: member.id}) }}">
+                    <i class="icon-small-trash-bin"></i>Delete
                 </a>
             </div>
         </div>
