@@ -20,4 +20,9 @@ class Controller extends BaseController
 
         return $user->getRoleModel();
     }
+
+    public function setFlash($name, $message)
+    {
+        $this->getRequest()->getSession()->setFlash($name, $message);
+    }
 }

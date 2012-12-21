@@ -21,7 +21,7 @@
 
 .members-list {
     display: block;
-    max-width: 760px;
+    width: 760px;
     .member {
         margin: 27px 5px 27px 0;
         width: 245px;
@@ -80,13 +80,19 @@
     }
 }
 
-.create-form {
+.edit-course {
     .course-name {
         font-size: 16px;
+    }
+    .alert {
+        margin-bottom: @baseLineHeight + 25;
     }
 }
 
 .courses-list {
+    .alert {
+        margin-top: 20px;
+    }
     .timetable {
         margin-left: -10px;
         color: #908e8e;
@@ -219,7 +225,8 @@
 }
 
 .course-members {
-    max-width: 1050px;
+    width: 1050px;
+
     .right-navbar {
         margin-top: 28px;
         hr {
