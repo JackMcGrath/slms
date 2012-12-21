@@ -54,8 +54,8 @@ Zerebral\BusinessBundle\Model\File\File:
         uploadedFile:
             - Image:
                 groups: [profile]
-            - File:
-                groups: [assignment]
+            - NotNull:
+                message: Please select file for uploading
 
 Zerebral\BusinessBundle\Model\Assignment\Assignment:
     getters:
@@ -70,6 +70,8 @@ Zerebral\BusinessBundle\Model\Assignment\Assignment:
                 message: Max ponts is required.
         assignmentCategory:
             - NotNull: ~
+        files:
+            - Valid: ~
 
 Zerebral\BusinessBundle\Model\Course\Member:
     properties:
