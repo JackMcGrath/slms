@@ -5,13 +5,13 @@ $(document).ready(function(){
 
         //validation to empty value
         if(!$.trim($(this).find('textarea').val()).length){
-            addError($(this).find('.control-group'), 'This value should not be blank.');
+            addError($(this).find('.control-group'), 'This field can not be blank.');
             return false;
         }
 
         //email validation
         if(!multiEmail($.trim($(this).find('textarea').val()))){
-            addError($(this).find('.control-group'), 'Please enter one ore more email addresses into the text box, separated by space or new lines.');
+            addError($(this).find('.control-group'), ' Please enter a valid email address.');
             return false;
         }
 

@@ -16,7 +16,7 @@ $(document).ready(function(){
         //validation to empty value
         if(!$.trim($(this).find('input').val()).length){
             validationResult = false;
-            addError($(this).find('.control-group'), 'This value should not be blank.');
+            addError($(this).find('.control-group'), 'This field cannot be blank.');
             return false;
         }
 
@@ -27,7 +27,7 @@ $(document).ready(function(){
                     validationResult = true;
                     $('.invite-form').submit();
                 }else{
-                    addError($(self).find('.control-group'), 'Wrong access code.');
+                    addError($(self).find('.control-group'), 'You have to provide a valid (shared by teacher) access code to join the course.');
                 }
             });
         }
