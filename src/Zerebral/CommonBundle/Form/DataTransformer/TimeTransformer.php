@@ -8,18 +8,20 @@ class TimeTransformer implements DataTransformerInterface
 {
     public function reverseTransform($value)
     {
-        if (preg_match('/(\d{2}):(\d{2})\s(AM|PM)/is', $value, $matches)) {
-            list($time, $hour, $minutes, $meridian) = $matches;
-            if (strtoupper($meridian) == 'PM') {
-                $hour += 12;
-            }
-            return $hour . ":" . $minutes;
+        if (preg_match('/^\d{2}:\d{2}\s(AM|PM)$/is', $value, $matches)) {
+            return date("H:i", strtotime(strtolower($value)));
         }
         return $value;
     }
 
     public function transform($value)
     {
+        if (preg_match('/^\d{2}:\d{2}$/is', $value, $matches)) {
+            if ($value == '00:00')
+                return '';
+
+            return strtoupper(date("h:i a", strtotime($value)));
+        }
         return $value;
     }
 }
