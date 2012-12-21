@@ -11,6 +11,7 @@ use JMS\SecurityExtraBundle\Annotation\PreAuthorize;
 
 use Zerebral\FrontendBundle\Form\Type as FormType;
 use Zerebral\BusinessBundle\Model as Model;
+use Zerebral\BusinessBundle\Model\Course\CourseStudentQuery;
 
 use Zerebral\BusinessBundle\Calendar\EventProviders\AssignmentEventsProvider;
 use Zerebral\BusinessBundle\Calendar\EventProviders\CourseAssignmentEventsProvider;
@@ -177,6 +178,18 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
             'form' => $form->createView(),
             'target' => 'members'
         );
+    }
+
+    /**
+     * @Route("/remove-student/{courseId}/{studentId}", name="course_remove_student")
+     * @PreAuthorize("hasRole('ROLE_TEACHER')")
+     * @ParamConverter("course", options={"mapping": {"courseId": "course_id"}})
+     * @ParamConverter("student", options={"mapping": {"studentId": "student_id"}})
+     */
+    public function removeStudent(Model\Course\CourseStudent $courseStudent)
+    {
+        $courseStudent->delete();
+        return $this->redirect($this->generateUrl('course_members', array('id' => $courseStudent->getCourseId())));
     }
 
     /**
