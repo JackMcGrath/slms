@@ -26,24 +26,29 @@ class UserController extends \Zerebral\CommonBundle\Component\Controller
 
 
 
-        $form = $this->createForm($studentProfileType, $this->getRoleUser());
-        $user = $form->getData();
+        $user = $this->getRoleUser();
+        $form = $this->createForm($studentProfileType, $user);
 
-        if (!is_null($user->getAvatar())) {
-            $user->getAvatar()->setFileStorage($this->container->get('zerebral.file_storage'));
+        $avatar = $user->getAvatar();
+        if (!is_null($avatar)) {
+            $avatar->setFileStorage($this->container->get('zerebral.file_storage'));
         }
+        $user->setAvatar($avatar);
 
         if ($this->getRequest()->isMethod('POST')) {
             $form->bind($this->getRequest());
 
             if ($form->isValid()) {
 
-
-                $user->getUser()->save();
-                $user->save();
+                $formUser = $form->getData();
+                $formUser->getUser()->save();
+                $formUser->save();
 
                 $this->getRequest()->getSession()->setFlash('profile_save_success', 'Profile has been saved!');
                 return $this->redirect($this->generateUrl('myprofile'));
+            } else {
+                // Restoring previous avatar because we can't draw unvalid avatar
+                $user->setAvatar($avatar);
             }
         }
 

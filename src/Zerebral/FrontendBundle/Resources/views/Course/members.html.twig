@@ -7,18 +7,16 @@
             {{ mainPartials.topMenu('members', course) }}
         </div>
         <div class="row-fluid">
-            <h2 class="pull-left form-title">{{ course.name }} <small>course members</small></h2>
-            <div class="pull-right filter">
-                <span>Show:</span> <a href="#">All</a> | <a href="">Students</a>
-            </div>
-            <div class="clearfix"></div>
-            <hr/>
 
-            <div class="members-list">
+
+
+            <div class="pull-left members-list">
+                <h2 class="pull-left form-title">{{ course.name }} <small>course members</small></h2>
+
+                <div class="clearfix"></div>
+                <hr/>
+
                 {% for member in students %}
-                    {{ block('member') }}
-                {% endfor %}
-                {% for member in teachers %}
                     {{ block('member') }}
                 {% endfor %}
 
@@ -30,7 +28,16 @@
                 </div>
                 {% endif %}
             </div>
-        </div>
+
+
+            <div class="right-navbar pull-left">
+                <h4>Teacher profile</h4>
+                <hr/>
+                {{ course.teacher.fullName }}
+                <img class="pull-right rounded" src="http://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?s=50"/>
+                <a href="#" class="btn create-new-item">Send Message</a>
+            </div>
+
     </div>
 
     <div class="modal hide fade" id="inviteModal">
@@ -70,12 +77,17 @@
         <div class="avatar"><img src="http://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?s=50"/></div>
         <div class="info">
             <a href="#">{{ member.fullName }}</a>
-            <span>{{ member.user.role | capitalize }}</span>
+
+            <div class="manage-buttons">
+                <a href="#">
+                    <i class="icon-gray-mail"></i> Message
+                </a>
+
+                <a href="#">
+                    <i class="icon-small-trash-bin"></i> Delete
+                </a>
+            </div>
         </div>
-        <div class="mail rounded">
-            <a href="#">
-                <i class="icon-gray-mail"></i>
-            </a>
-        </div>
+
     </div>
 {% endblock %}

@@ -60,7 +60,7 @@ class File extends BaseFile
         if ($uploadedFile->getError() === 1) {
             throw new \Exception('File "' . $uploadedFile->getClientOriginalName() . '" was not uploaded due to uploadedFile error');
         }
-
+        $this->uploadedFile = $uploadedFile;
         $this->setSourcePath($uploadedFile->getRealPath());
         $this->setName($uploadedFile->getClientOriginalName());
     }

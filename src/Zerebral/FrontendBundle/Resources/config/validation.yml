@@ -20,6 +20,8 @@ Zerebral\BusinessBundle\Model\User\User:
             - Email:
                 groups: [signup]
                 message: Doesn't look like a valid email.
+        avatar:
+            - Valid: ~
         plainPassword:
             - NotBlank:
                 groups: [signup]
@@ -46,6 +48,14 @@ Zerebral\BusinessBundle\Model\Course\Course:
             - Valid: ~
         gradeLevel:
             - Valid: ~
+
+Zerebral\BusinessBundle\Model\File\File:
+    getters:
+        uploadedFile:
+            - Image:
+                groups: [profile]
+            - File:
+                groups: [assignment]
 
 Zerebral\BusinessBundle\Model\Assignment\Assignment:
     getters:
