@@ -5,6 +5,7 @@ namespace Zerebral\FrontendBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Zerebral\CommonBundle\Form\Type\OptionalModelType;
 use Zerebral\CommonBundle\Form\DataTransformer\TimeTransformer;
+use Zerebral\CommonBundle\Form\DataTransformer\DefaultValueTransformer;
 use Zerebral\FrontendBundle\Form\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -48,7 +49,7 @@ class AssignmentType extends AbstractType
             'invalid_message' => 'Category is required',
         ));
 
-        $builder->add('maxPoints', 'text', array('required' => false, 'data' => 100,));
+        $builder->add('maxPoints', 'text', array('required' => false));
 
         $builder->add('dueAt', 'datetime', array(
             'required' => false,
@@ -65,6 +66,7 @@ class AssignmentType extends AbstractType
         ));
 
         $builder->get('dueAt')->get('time')->addViewTransformer(new TimeTransformer());
+        $builder->get('maxPoints')->addViewTransformer(new DefaultValueTransformer('100'));
 
     }
 
