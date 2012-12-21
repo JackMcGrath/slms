@@ -17,7 +17,7 @@
             </div>
             <hr/>
 
-            {{ flashMessages.show('profile_save_success', 'success', 'Well done!') }}
+            {{ flashMessages.show('profile_save_success', 'success') }}
             <form method="post" {{ form_enctype(form) }} novalidate  class="form-horizontal create-form no-left-margin">
                 <div class="span8">
                     {{ form_row(form.bio, {

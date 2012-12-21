@@ -115,6 +115,7 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
     public function deleteAction(Model\Assignment\Assignment $assignment = null)
     {
         $assignment->delete();
+        $this->setFlash('delete_assignment_success', 'Assignment <b>' . $assignment->getName() . '</b> has been successfully deleted from course ' . $assignment->getCourse()->getName() . '.');
         return $this->redirect($this->generateUrl('assignments'));
     }
 }

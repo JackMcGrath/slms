@@ -75,6 +75,9 @@ Zerebral\BusinessBundle\Model\Course\Member:
     properties:
         emailList:
             - NotBlank: ~
+    constraints:
+        - Callback:
+            methods:   [isEmailListValid]
 
 Zerebral\BusinessBundle\Model\Course\AccessCode:
     properties:
