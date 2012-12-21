@@ -6,7 +6,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvents;
 
-use Zerebral\CommonBundle\Component\FileStorage\AbstractFileStorage;
+use Zerebral\CommonBundle\Component\FileStorage\FileStorageInterface;
 
 class FileSubscriber implements EventSubscriberInterface {
     /** @var \Symfony\Component\Form\FormBuilder */
