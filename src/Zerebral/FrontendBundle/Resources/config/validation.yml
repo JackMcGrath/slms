@@ -71,8 +71,12 @@ Zerebral\BusinessBundle\Model\Assignment\Assignment:
         assignmentCategory:
             - NotNull: ~
 
-#Zerebral\BusinessBundle\Model\Assignment\AssignmentCategory:
-#    properties:
-#        name:
-#            - NotBlank:
-#                message: Enter your category name. You can change it later.
+Zerebral\BusinessBundle\Model\Course\Member:
+    properties:
+        emailList:
+            - NotBlank: ~
+
+Zerebral\BusinessBundle\Model\Course\AccessCode:
+    properties:
+        accessCode:
+            - NotBlank: ~

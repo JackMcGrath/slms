@@ -37,4 +37,8 @@ class Course extends BaseCourse
     private function generateInvite($length = 7) {
         return substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, $length);
     }
+
+    public function resetAccessCode(){
+        $this->setAccessCode($this->generateInvite());
+    }
 }
