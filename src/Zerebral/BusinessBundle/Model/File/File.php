@@ -4,12 +4,12 @@ namespace Zerebral\BusinessBundle\Model\File;
 
 use Zerebral\BusinessBundle\Model\File\om\BaseFile;
 
-use Zerebral\CommonBundle\Component\FileStorage\AbstractFileStorage;
+use Zerebral\CommonBundle\Component\FileStorage\FileStorageInterface;
 use \Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class File extends BaseFile
 {
-    /** @var null|AbstractFileStorage */
+    /** @var null|FileStorageInterface */
     protected $fileStorage = null;
 
     /** @var null|string */
@@ -74,14 +74,14 @@ class File extends BaseFile
 
 
     /**
-     * @param \Zerebral\CommonBundle\Component\FileStorage\AbstractFileStorage $fileStorage
+     * @param \Zerebral\CommonBundle\Component\FileStorage\FileStorageInterface $fileStorage
      */
-    public function setFileStorage(AbstractFileStorage $fileStorage) {
+    public function setFileStorage(FileStorageInterface $fileStorage) {
         $this->fileStorage = $fileStorage;
     }
 
     /**
-     * @return \Zerebral\CommonBundle\Component\FileStorage\AbstractFileStorage
+     * @return \Zerebral\CommonBundle\Component\FileStorage\FileStorageInterface
      */
     public function getFileStorage() {
         return $this->fileStorage;

@@ -65,13 +65,9 @@
                         {% if is_granted('ROLE_USER') %}
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            {#<img width="27" height="27" src="{{ app.user.getAvatar() }}" />#} &nbsp; {{ app.user.firstName }} {{ app.user.lastName }} &nbsp; <b class="caret"></b></a>
+                            <img width="27" height="27" src="{{ get_file_storage_link(app.user.getAvatar()) | imagine_filter('top_thumbnail') }}" /> &nbsp; {{ app.user.firstName }} {{ app.user.lastName }} &nbsp; <b class="caret"></b></a>
                             <ul class="dropdown-menu">
-                                {% if is_granted('ROLE_STUDENT') %}
-                                    <li><a href="{{ path('myprofile') }}"><i class="icon-user"></i> Profile</a></li>
-                                {% else %}
-                                    <li><a href="#"><i class="icon-user"></i> Profile</a></li>
-                                {% endif %}
+                                <li><a href="{{ path('myprofile') }}"><i class="icon-user"></i> Profile</a></li>
                                 <li class="divider"></li>
                                 <li><a href="{{ path('_logout') }}" data-target="loginModal"><i class="icon-share-alt"></i> Sign Out</a></li>
                             </ul>

@@ -3,6 +3,11 @@
 {% import "ZerebralFrontendBundle:Macro:flashMessages.html.twig" as flashMessages %}
 
 {% block content %}
+    {% javascripts
+        '@ZerebralFrontendBundle/Resources/public/js/controllers/course/members.js'
+        output='js/compiled/course_members.js' %}
+        <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
     <div class="row-fluid course-members">
         <div class="top-second-navbar">
             {{ mainPartials.topMenu('members', course) }}
@@ -40,7 +45,7 @@
     </div>
 
     <div class="modal hide fade" id="inviteModal">
-        <form method="post" {{ form_enctype(form) }} novalidate>
+        <form method="post" {{ form_enctype(form) }} class="member-form">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h3>Invite users</h3>
@@ -49,20 +54,21 @@
                 <p>
                     To send invitations to join your course, enter one ore more email addresses into the text box, separated by space or new lines, and click "Send Invites" button.
                 </p>
-                {{ form_widget(form.emailList, {
-                    label: '',
+                {{ form_row(form.emailList, {
+                    label: ' ',
                     form_type: 'horizontal',
                     attr: {
                         class: 'input-block-level',
                         rows: 6
                     }
                 }) }}
+                {{ form_errors(form) }}
                 <div class="clearfix"></div>
                 <p>
                     Your course currently has {{ students|length + teachers|length }} of 50 available. Invite(s) remaining: {{ 50 - students|length - teachers|length }} for your current plan.
                 </p>
 
-                <input type="submit" class="btn btn-danger" value="Send Invites"/>
+                <input type="submit" class="btn btn-danger" value="Send invites"/>
                 <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Cancel</a>
             </div>
             {{ form_rest(form) }}

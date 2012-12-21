@@ -92,10 +92,12 @@ liip_imagine:
 
 parameters:
     glorpen.propel.event.dispatcher.class: "Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher"
-    locale:            en
-    secret:            45jed83234l9
-    localstorage.path: %kernel.root_dir%/../web/data
-    localstorage.web:  /data/
+    locale:                 en
+    secret:                 45jed83234l9
+    storage:
+        local:
+            path:     %kernel.root_dir%/../web/data
+            webpath:  /data/
 
 knp_time: ~
 

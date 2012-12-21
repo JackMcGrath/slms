@@ -44,7 +44,13 @@ class TeacherTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('user_id', 'UserId', 'INTEGER', 'users', 'id', true, null, null);
+        $this->addColumn('bio', 'Bio', 'VARCHAR', false, 160, null);
+        $this->addColumn('subjects', 'Subjects', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('grades', 'Grades', 'LONGVARCHAR', false, null, null);
         // validators
+        $this->addValidator('bio', 'type', 'propel.validator.TypeValidator', 'string', 'The column bio must be an string value.');
+        $this->addValidator('subjects', 'type', 'propel.validator.TypeValidator', 'string', 'The column subjects must be an string value.');
+        $this->addValidator('grades', 'type', 'propel.validator.TypeValidator', 'string', 'The column grades must be an string value.');
     } // initialize()
 
     /**

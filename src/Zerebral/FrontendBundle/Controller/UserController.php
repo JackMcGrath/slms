@@ -16,23 +16,24 @@ class UserController extends \Zerebral\CommonBundle\Component\Controller
 {
     /**
      * @Route("/my-profile", name="myprofile")
-     * @PreAuthorize("hasRole('ROLE_STUDENT')")
+     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @Template()
      */
     public function myProfileAction()
     {
-        $studentProfileType = new FormType\StudentProfileType();
-        $studentProfileType->setFileStorage($this->container->get('zerebral.file_storage'));
+        if ($this->get('security.context')->isGranted('ROLE_TEACHER')) {
+            $profileType = new FormType\TeacherProfileType();
+        } else {
+            $profileType = new FormType\StudentProfileType();
+        }
+        
+        
+        $profileType->setFileStorage($this->container->get('zerebral.file_storage')->getFileStorage('local'));
 
         $user = $this->getRoleUser();
-        $form = $this->createForm($studentProfileType, $user);
+        $form = $this->createForm($profileType, $user);
 
         $avatar = $user->getAvatar();
-        if (!is_null($avatar)) {
-            $avatar->setFileStorage($this->container->get('zerebral.file_storage'));
-        }
-        $user->setAvatar($avatar);
-
         if ($this->getRequest()->isMethod('POST')) {
             $form->bind($this->getRequest());
 

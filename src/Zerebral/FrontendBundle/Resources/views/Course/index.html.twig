@@ -100,7 +100,7 @@
 
 {% if is_granted('ROLE_STUDENT') %}
     <div class="modal hide fade" id="inviteModal">
-        <form method="post" {{ form_enctype(form) }}  class="form-horizontal" novalidate>
+        <form method="post" {{ form_enctype(form) }}  class="form-horizontal invite-form" novalidate data-validate-url="{{ path('course_verify_code', {accessCode: '__ACCESS_CODE__'}) }}" >
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h3>Invite users</h3>
