@@ -31,7 +31,19 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
         $currentMonth = new \Zerebral\CommonBundle\Component\Calendar\Calendar(time(), $provider);
         $nextMonth = new \Zerebral\CommonBundle\Component\Calendar\Calendar(strtotime("+1 month"), $provider);
 
-        $form = $this->createForm(new FormType\AccessCodeType(), new Model\Course\Member());
+        $form = $this->createForm(new FormType\AccessCodeType(), new Model\Course\AccessCode());
+
+        if($this->getRequest()->isMethod('POST')){
+            $form->bind($this->getRequest());
+            if ($form->isValid()) {
+                /** @var $invite Model\Course\AccessCode */
+                $invite = $form->getData();
+
+                return $this->redirect($this->generateUrl('course_accept_invite', array(
+                    'accessCode' => $invite->getAccessCode(),
+                )));
+            }
+        }
 
         return array(
             'currentMonth' => $currentMonth,
@@ -187,20 +199,18 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     public function acceptInviteAction(Model\Course\Course $course = null){
         $user = $this->getRoleUser();
 
-        if(!$course && $this->getRequest()->isMethod("POST")){
-            $form = $this->createForm(new FormType\AccessCodeType(), new Model\Course\Member());
-            $form->bind($this->getRequest());
-            if ($form->isValid()) {
-                /** @var $invite Model\Course\Member */
-                $invite = $form->getData();
-                $course = \Zerebral\BusinessBundle\Model\Course\CourseQuery::create()->findOneByAccessCode($invite->getAccessCode());
-            }
+        if(!$course){
+            throw $this->createNotFoundException('The course not found');
         }
 
         if(empty($user)){
             $this->getRequest()->getSession()->set('access_code', $course->getAccessCode());
             return $this->redirect($this->generateUrl('signup', array()));
         }else{
+            if($user->hasCourse($course)){
+                throw $this->createNotFoundException('User already assigned to course');
+            }
+
             if($user instanceof \Zerebral\BusinessBundle\Model\User\Student){
                 $course->addStudent($this->getRoleUser());
             }else{
@@ -213,5 +223,18 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
                     )
             ));
         }
+    }
+
+    /**
+     * @Route("/reset/{id}", name="course_reset_code")
+     * @ParamConverter("course")
+     * @PreAuthorize("hasRole('ROLE_TEACHER')")
+     */
+    public function resetAccessCodeAction(Model\Course\Course $course = null){
+        $course->resetAccessCode();
+        $course->save();
+        return $this->redirect($this->generateUrl('course_members', array(
+                    'id' => $course->getId()
+        )));
     }
 }

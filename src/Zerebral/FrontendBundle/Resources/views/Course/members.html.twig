@@ -25,8 +25,8 @@
                 {% if is_granted('ROLE_TEACHER') %}
                 <div class="form-actions">
                     <a href="#inviteModal" class="btn btn-danger invite" data-toggle="modal" data-target="#inviteModal">Invite someone by email</a>
-                    or share an access code: <b>JWBGN-9KX1X5</b>
-                    <a href="#" class="reset">reset</a>
+                    or share an access code: <b>{{ course.getAccessCode }}</b>
+                    <a href="{{ path("course_reset_code", {id: course.getId}) }}" class="reset">reset</a>
                 </div>
                 {% endif %}
             </div>

@@ -24,11 +24,21 @@ class Student extends BaseStudent
     {
         $assignments = new \PropelObjectCollection();
         $assignments->setModel('Zerebral\BusinessBundle\Model\Assignment\Assignment');
-        foreach($this->getAssignments() as $assignment) {
+        foreach ($this->getAssignments() as $assignment) {
             if ($assignment->getCourseId() == $course->getId()) {
                 $assignments->append($assignment);
             }
         }
         return $assignments;
+    }
+
+    public function hasCourse(\Zerebral\BusinessBundle\Model\Course\Course $course)
+    {
+        foreach($this->getCourses() as $c){
+            if($course->getId() == $c->getId()){
+                return true;
+            }
+        }
+        return false;
     }
 }
