@@ -1,10 +1,10 @@
 <?php
 namespace Zerebral\CommonBundle\Component\FileStorage;
 
-use Zerebral\CommonBundle\Component\FileStorage\AbstractFileStorage;
+use Zerebral\CommonBundle\Component\FileStorage\FileStorageInterface;
 use Zerebral\CommonBundle\Component\FileStorage\FileStorageException;
 
-class LocalFileStorage extends AbstractFileStorage {
+class LocalFileStorage implements FileStorageInterface {
 
     /** @var string */
     protected $path;
