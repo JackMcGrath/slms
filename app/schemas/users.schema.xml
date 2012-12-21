@@ -21,7 +21,7 @@
         <column name="is_active" phpName="IsActive" type="BOOLEAN" size="1" sqlType="tinyint(1) unsigned" required="true" defaultValue="true"/>
         <column name="created_at" phpName="CreatedAt" type="TIMESTAMP" required="false"/>
         <column name="updated_at" phpName="UpdatedAt" type="TIMESTAMP" required="true"/>
-        <foreign-key foreignTable="files" name="user_avatar" phpName="Avatar" onDelete="CASCADE" onUpdate="CASCADE">
+        <foreign-key foreignTable="files" name="user_avatar" phpName="Avatar" onDelete="SET NULL" onUpdate="CASCADE">
             <reference local="avatar_id" foreign="id" />
         </foreign-key>
         <validator column="id">
