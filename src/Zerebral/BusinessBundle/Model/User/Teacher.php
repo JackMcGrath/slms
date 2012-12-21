@@ -23,4 +23,14 @@ class Teacher extends BaseTeacher
     {
         return $course->getAssignments();
     }
+
+    public function hasCourse(\Zerebral\BusinessBundle\Model\Course\Course $course)
+    {
+        foreach($this->getCourses() as $c){
+            if($course->getId() == $c->getId()){
+                return true;
+            }
+        }
+        return false;
+    }
 }

@@ -7,8 +7,6 @@ class Member
 {
     private $emailList;
 
-    private $accessCode;
-
     /**
      * @param mixed $emailList
      */
@@ -34,15 +32,5 @@ class Member
     public function getEmailList()
     {
         return $this->emailList;
-    }
-
-    public function setAccessCode($accessCode)
-    {
-        $this->accessCode = $accessCode;
-    }
-
-    public function getAccessCode()
-    {
-        return $this->accessCode;
     }
 }
