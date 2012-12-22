@@ -524,20 +524,27 @@
 
 {% block optional_model_widget %}
     {% spaceless %}
+        {% set modelClass = form.name.vars.value | length > 0 ? 'hide' : 'show' %}
+        {% set nameClass = form.name.vars.value | length > 0 ? 'show' : 'hide' %}
+        {% set placeholder = placeholder is defined ? placeholder : '' %}
 
-        {#{{ form_widget(form) }}#}
 
-        {{ form_widget(form.model) }}
-        {{ form_widget(form.name, {
+        {{ form_widget(form.model, {
             attr: {
-                class: 'hide',
-                disabled: true
+                class: modelClass
+            }
+        }) }}
+        {{ form_widget(form.name, {
+            placeholder: placeholder,
+            attr: {
+                class: nameClass
             }
         }) }}
 
-        <div class="span4 pull-right optional-model">
-            <a href="#" class="create-discipline show-input">Create New</a>
-            <a href="#" class="create-discipline show-dropdown hide">Show Dropdown</a>
+
+        <div class="span6 pull-right optional-model">
+            <a href="#" class="create-discipline show-input {{ modelClass }}">{{ create_new_label }}</a>
+            <a href="#" class="create-discipline show-dropdown {{ nameClass }}">{{ choose_exists_label }}</a>
         </div>
 
         {#{{ form_errors(form.dropdown) }}#}

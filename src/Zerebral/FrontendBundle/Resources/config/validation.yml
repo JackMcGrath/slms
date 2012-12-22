@@ -87,7 +87,8 @@ Zerebral\BusinessBundle\Model\Assignment\Assignment:
                 max: 50000
                 maxMessage: "{{ value }} is too much for grading (max 50000 allowed)"
         assignmentCategory:
-            - NotNull: ~
+            - NotNull:
+                message: Category is required
         files:
             - Valid: ~
 
