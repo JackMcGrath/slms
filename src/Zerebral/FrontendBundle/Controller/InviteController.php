@@ -70,7 +70,7 @@ class InviteController extends \Zerebral\CommonBundle\Component\Controller
         $form = $this->createForm(new FormType\CourseJoinType());
 
         if (!$this->getRequest()->isXmlHttpRequest()) {
-            $this->createNotFoundException();
+            throw $this->createNotFoundException();
         }
 
         $form->bind($this->getRequest());
@@ -106,7 +106,7 @@ class InviteController extends \Zerebral\CommonBundle\Component\Controller
         $form = $this->createForm(new FormType\CourseInviteType());
 
         if (!$this->getRequest()->isXmlHttpRequest()) {
-            $this->createNotFoundException();
+            throw $this->createNotFoundException();
         }
 
         $form->bind($this->getRequest());
