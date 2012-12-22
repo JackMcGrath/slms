@@ -45,6 +45,8 @@ Zerebral\BusinessBundle\Model\Course\Course:
             - NotBlank:
                 message: Enter course description.Provide any useful information for students enrolled in this course.
         discipline:
+            - NotNull:
+                message: Subject area is required
             - Valid: ~
         gradeLevel:
             - Valid: ~
@@ -56,7 +58,13 @@ Zerebral\BusinessBundle\Model\Course\Course:
                 message: You have to provide a valid (shared by teacher) access code to join the course.
                 groups: [accept_invite]
         courseScheduleDays:
-                    - Valid: ~
+            - Valid: ~
+
+Zerebral\BusinessBundle\Model\Course\Discipline:
+    constraints:
+        - Propel\PropelBundle\Validator\Constraints\UniqueObject:
+            fields: [name, teacher_id]
+            message: Subject area already exists
 
 Zerebral\BusinessBundle\Model\File\File:
      getters:
@@ -89,8 +97,15 @@ Zerebral\BusinessBundle\Model\Assignment\Assignment:
         assignmentCategory:
             - NotNull:
                 message: Category is required
+            - Valid: ~
         files:
             - Valid: ~
+
+Zerebral\BusinessBundle\Model\Assignment\AssignmentCategory:
+    constraints:
+        - Propel\PropelBundle\Validator\Constraints\UniqueObject:
+            fields: [name, teacher_id]
+            message: Category already exists
 
 Zerebral\BusinessBundle\Model\Course\CourseScheduleDay:
     properties:
