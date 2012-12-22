@@ -5,7 +5,6 @@ namespace Zerebral\FrontendBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Zerebral\CommonBundle\Form\Type\OptionalModelType;
 use Zerebral\CommonBundle\Form\DataTransformer\TimeTransformer;
-use Zerebral\CommonBundle\Form\DataTransformer\DefaultValueTransformer;
 use Zerebral\FrontendBundle\Form\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -67,7 +66,6 @@ class AssignmentType extends AbstractType
         ));
 
         $builder->get('dueAt')->get('time')->addViewTransformer(new TimeTransformer());
-        $builder->get('maxPoints')->addViewTransformer(new DefaultValueTransformer('100'));
 
     }
 

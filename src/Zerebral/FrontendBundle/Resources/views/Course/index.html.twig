@@ -56,14 +56,13 @@
                         <div class="timetable">
                             <div class="duration span4"><i class="icon-small-calendar"></i> <b>From:</b> 14/02 &nbsp;&nbsp; <b>Due:</b> 05/06</div>
                             <div class="time span8">
-                                <i class="icon-small-clipboard pull-left"></i>
+                                {% if course.getCourseScheduleDays|length %}
+                                    <i class="icon-small-clipboard pull-left"></i>
+                                {% endif %}
                                 <ul>
-                                    <li><b>Mon:</b> 09:00 - 14:00</li>
-                                    <li><b>Tue:</b> 14:10 - 19:00</li>
-                                    <li><b>Wed:</b> 05:00 - 15:45</li>
-                                    <li><b>Mon:</b> 09:00 - 14:00</li>
-                                    <li><b>Tue:</b> 14:10 - 19:00</li>
-                                    <li><b>Wed:</b> 05:00 - 15:45</li>
+                                    {% for schedule in course.getCourseScheduleDays %}
+                                        <li><b>{{ schedule.getWeekDay|slice(0, 3) }}:</b> {{ schedule.getTimeFrom|date('h:i a') }} - {{ schedule.getTimeTo|date('h:i a') }}</li>
+                                    {% endfor %}
                                 </ul>
                             </div>
                         </div>
@@ -108,7 +107,8 @@
                         help: 'Provided by instructor'
                     }
                 }) }}
-
+            </div>
+            <div class="modal-footer">
                 <input type="submit" class="btn btn-danger" value="Join"/>
                 <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Cancel</a>
             </div>
