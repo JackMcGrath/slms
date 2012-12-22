@@ -13,7 +13,7 @@ $(document).ready(function(){
     $('.add_file_link').on('click', addAttachmentField);
 
 
-    $('.remove-uploaded-file').click(function(e) {
+    $(document).on('click', '.remove-uploaded-file', function(e) {
         e.preventDefault();
         if (window.confirm('Are you sure to delete this attachment?')) {
             $(e.target).parent().remove();

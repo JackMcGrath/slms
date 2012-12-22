@@ -38,6 +38,7 @@ class AssignmentAccessVoter extends \Zerebral\CommonBundle\Security\ModelAccessV
      */
     public function isGranted(TokenInterface $token, $assignment, $attribute)
     {
+//        var_dump($token->getUser()->getId(), $assignment->getId(), $attribute);die();
         return $this->getCourseAccessVoter()->isGranted($token, $assignment->getCourse(), $attribute);
     }
 }

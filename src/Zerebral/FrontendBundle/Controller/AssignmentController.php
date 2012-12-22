@@ -63,8 +63,7 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
      * @ParamConverter("course", options={"mapping": {"courseId": "id"}})
      *
      * @SecureParam(name="assignment", permissions="EDIT")
-     * @SecureParam(name="course", permissions="ADD_ASSIGNMENT
-")
+     * @SecureParam(name="course", permissions="ADD_ASSIGNMENT")
      * @PreAuthorize("hasRole('ROLE_TEACHER')")
      * @Template()
      */
