@@ -19,6 +19,34 @@ table.student-list{
     }
 }
 
+div#attachments_div {
+  a {
+    margin-left: 0;
+  }
+  span.gray {
+    color: #8C8C8C;
+  }
+}
+
+div#upload_files_div {
+  margin-top: 6px;
+  div {
+    padding-bottom: 4px;
+    a.remove-uploaded-file {
+      margin-left: 0;
+      display: none;
+    }
+    &:hover{
+      a.remove-uploaded-file {
+        display: none;
+      }
+    }
+    span.help-inline {
+      color: #B94A48;
+    }
+  }
+}
+
 #studentsModal, .modal{
     padding-top: 15px;
 

@@ -57,12 +57,13 @@ Zerebral\BusinessBundle\Model\Course\Course:
                 groups: [accept_invite]
 
 Zerebral\BusinessBundle\Model\File\File:
-    getters:
-        uploadedFile:
-            - Image:
-                groups: [profile]
-            - File:
-                groups: [assignment]
+     getters:
+         name:
+             - NotBlank: ~
+         uploadedFile:
+             - Image:
+                 groups: [profile]
+             - File: ~
 
 Zerebral\BusinessBundle\Model\Assignment\Assignment:
     getters:
@@ -77,3 +78,5 @@ Zerebral\BusinessBundle\Model\Assignment\Assignment:
                 message: Max ponts is required.
         assignmentCategory:
             - NotNull: ~
+        files:
+            - Valid: ~
