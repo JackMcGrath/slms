@@ -13,7 +13,7 @@ class Assignment extends BaseAssignment
         $fileReferences = new FileReferences();
         $fileReferences->setFile($file);
         $fileReferences->setreferenceType('assignment');
-        $this->addassignmentReferenceName($fileReferences);
+        $this->addFileReferences($fileReferences);
     }
 
     public function preDelete(\PropelPDO $con = null)

@@ -31,7 +31,8 @@ class UserProfileType extends AbstractType
             'storage' => $this->getFileStorage(),
             'by_reference' => false
         ));
-        $builder->add($avatarFormField)->prependNormTransformer($transformer);
+        $avatarFormField->prependNormTransformer($transformer);
+        $builder->add($avatarFormField);
     }
 
     public function getName()

@@ -690,7 +690,7 @@ abstract class BaseFileReferencesPeer
                 } // if obj2 already loaded
 
                 // Add the $obj1 (FileReferences) to $obj2 (Assignment)
-                $obj2->addassignmentReferenceName($obj1);
+                $obj2->addFileReferences($obj1);
 
             } // if joined row was not null
 
@@ -836,7 +836,7 @@ abstract class BaseFileReferencesPeer
                 } // if obj3 loaded
 
                 // Add the $obj1 (FileReferences) to the collection in $obj3 (Assignment)
-                $obj3->addassignmentReferenceName($obj1);
+                $obj3->addFileReferences($obj1);
             } // if joined row not null
 
             $results[] = $obj1;
@@ -1011,7 +1011,7 @@ abstract class BaseFileReferencesPeer
                 } // if $obj2 already loaded
 
                 // Add the $obj1 (FileReferences) to the collection in $obj2 (Assignment)
-                $obj2->addassignmentReferenceName($obj1);
+                $obj2->addFileReferences($obj1);
 
             } // if joined row is not null
 
