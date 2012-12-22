@@ -27,6 +27,13 @@ class FileStorageFactory {
         }
 
         $config = $this->config['local'];
+
+        if (!file_exists($config['path'])) {
+            if (!mkdir($config['path'])) {
+                throw new FileStorageException('Please create folder "' . $config['path']);
+            }
+        }
+
         $this->storages['local'] = new LocalFileStorage($config['path'], $config['webpath']);
     }
 
