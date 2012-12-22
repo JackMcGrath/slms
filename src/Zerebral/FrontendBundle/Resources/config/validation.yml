@@ -51,11 +51,12 @@ Zerebral\BusinessBundle\Model\Course\Course:
 
 Zerebral\BusinessBundle\Model\File\File:
     getters:
+        name:
+            - NotBlank: ~
         uploadedFile:
             - Image:
                 groups: [profile]
-            - NotNull:
-                message: Please select file for uploading
+            - File: ~
 
 Zerebral\BusinessBundle\Model\Assignment\Assignment:
     getters:
