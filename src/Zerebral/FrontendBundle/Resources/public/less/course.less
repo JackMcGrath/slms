@@ -12,6 +12,61 @@
         .create-discipline {
             vertical-align: middle;
         }
+
+        .form-subtitle{
+            color: #4E4E4E;
+            font-weight: normal;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+
+            border-bottom: 1px solid #ccc;
+        }
+
+        .collection-container{
+            list-style: none;
+            margin-left: 0;
+
+            select{
+                height: 33px;
+                width: 107px;
+            }
+
+            .control-group {
+                margin-bottom: 17px;
+                margin-left: 25px;
+
+                label.control-label {
+                    width: @formControlLeftMargin / 2;
+                }
+                .controls {
+                    margin-left: @formControlLeftMargin / 2;
+                }
+
+                &:first-child{
+                    margin-left: 15px;
+                    label.control-label {
+                        width: @formControlLeftMargin - 13;
+                    }
+                    .controls {
+                        margin-left: @formControlLeftMargin - 13;
+                    }
+                }
+
+                .controls .image-background{
+                    width: 55px;
+                }
+            }
+
+            .delete{
+                padding-left: 10px;
+                padding-top: 5px;
+                display: inline-block;
+            }
+        }
+
+        #add-another-schedule{
+            margin-left: @formControlLeftMargin;
+        }
     }
 }
 .top-second-navbar {
