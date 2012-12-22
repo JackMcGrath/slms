@@ -56,7 +56,7 @@
         </div>
         <div class="right-navbar pull-left">
             {% if is_granted('ADD_ASSIGNMENT', course) %}
-                <a href="{{ path('assignment_add', {courseId: course.id}) }}" class="btn create-course create-new-item">create assignment</a>
+                <a href="{{ path('assignment_add', {courseId: course.id}) }}" class="btn create-course big-button top-buttons">create assignment</a>
             {% endif %}
             <div class="upcoming-assignments">
                 <h4>Upcoming assignments</h4>
@@ -79,18 +79,7 @@
             </div>
 
             <div class="upcoming-assignments">
-                <h4>Teacher profile</h4>
-                <ul>
-                    <li>
-                        <a href="#" >{{ course.getTeacher.getUser.getFirstName }} {{ course.getTeacher.getUser.getLastName }}</a>
-                        <img class="rounded pull-right" src="http://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?s=48"/>
-                        <br/><a href="#">email: {{ course.getTeacher.getUser.getEmail }}</a>
-                        <div class="clearfix"></div>
-                    </li>
-                    <li>
-                        <a href="#" class="btn create-new-item">Send message</a>
-                    </li>
-                </ul>
+                {{ mainPartials.teacherShortInfo(course.teacher) }}
             </div>
         </div>
     </div>

@@ -48,16 +48,24 @@ Zerebral\BusinessBundle\Model\Course\Course:
             - Valid: ~
         gradeLevel:
             - Valid: ~
+        accessCode:
+            - NotBlank:
+                groups: [accept_invite]
+                message: Access code can't be blank
+            - Zerebral\BusinessBundle\Validator\Constraints\AccessCode:
+                message: You have to provide a valid (shared by teacher) access code to join the course.
+                groups: [accept_invite]
         courseScheduleDays:
-            - Valid: ~
+                    - Valid: ~
 
 Zerebral\BusinessBundle\Model\File\File:
-    getters:
-        uploadedFile:
-            - Image:
-                groups: [profile]
-            - File:
-                groups: [assignment]
+     getters:
+         name:
+             - NotBlank: ~
+         uploadedFile:
+             - Image:
+                 groups: [profile]
+             - File: ~
 
 Zerebral\BusinessBundle\Model\Assignment\Assignment:
     getters:
@@ -69,22 +77,17 @@ Zerebral\BusinessBundle\Model\Assignment\Assignment:
                 message: Enter assignment description. Any useful information from the student point of view.
         maxPoints:
             - NotBlank:
-                message: Max ponts is required.
+                message: Max points is required.
+            - Type:
+                type: integer
+                message: Max points should be numerical
+            - Range:
+                min: 1
+                minMessage: Max points should be numerical and positive
         assignmentCategory:
             - NotNull: ~
-
-Zerebral\BusinessBundle\Model\Course\Member:
-    properties:
-        emailList:
-            - NotBlank: ~
-    constraints:
-        - Callback:
-            methods:   [isEmailListValid]
-
-Zerebral\BusinessBundle\Model\Course\AccessCode:
-    properties:
-        accessCode:
-            - NotBlank: ~
+        files:
+            - Valid: ~
 
 Zerebral\BusinessBundle\Model\Course\CourseScheduleDay:
     properties:

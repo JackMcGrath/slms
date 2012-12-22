@@ -70,8 +70,10 @@
 
         <div class="right-navbar pull-left">
             {% if is_granted('ROLE_TEACHER') %}
-                <a href="{{ path('assignment_add', {courseId: course.id}) }}" class="btn create-new-item create-course">create assignment</a>
-                <a href="{{ path('assignments') }}" class="btn create-new-item use-access-code">view all</a>
+                <div class="top-buttons">
+                    <a href="{{ path('assignment_add', {courseId: course.id}) }}" class="btn big-button create-course">create assignment</a>
+                    <a href="{{ path('assignments') }}" class="btn big-button use-access-code">view all</a>
+                </div>
             {% endif %}
 
             <div class="calendar">
