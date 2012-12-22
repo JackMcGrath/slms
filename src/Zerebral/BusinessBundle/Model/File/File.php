@@ -78,6 +78,7 @@ class File extends BaseFile
      */
     public function setFileStorage(FileStorageInterface $fileStorage) {
         $this->fileStorage = $fileStorage;
+        $this->setStorage($fileStorage->getName());
     }
 
     /**

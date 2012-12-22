@@ -274,4 +274,17 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
 
         return $this->getFirstName() . ' ' . $this->getLastName();
     }
+
+     public function getAvatar(PropelPDO $con = null, $doQuery = true) {
+         $avatar = parent::getAvatar($con, $doQuery);
+         if (is_null($avatar)) {
+             $avatarFile = new File();
+             $avatarFile->setName('avatar-placeholder.jpg');
+             $avatarFile->setStorage('dummy');
+             return $avatarFile;
+         } else {
+             return $avatar;
+         }
+
+     }
 }
