@@ -84,11 +84,16 @@ liip_imagine:
         thumbnail:
             quality: 75
             filters:
+                thumbnail: { size: [50, 50], mode: outbound }
+        big_thumbnail:
+            quality: 75
+            filters:
                 thumbnail: { size: [200, 150], mode: outbound }
         top_thumbnail:
             quality: 50
             filters:
                 thumbnail: { size: [27, 27], mode: outbound }
+
 
 parameters:
     glorpen.propel.event.dispatcher.class: "Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher"
