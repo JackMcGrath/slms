@@ -296,6 +296,17 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
         return $this->getRoleModel()->getAssignments($c);
     }
 
+    /**
+     * @param \Zerebral\BusinessBundle\Model\Course\Course $course
+     * @return PropelObjectCollection
+     */
+    public function getFutureAssignments($course = null)
+    {
+        $c = new \Criteria();
+        $c->add('due_at', date('Y-m-d H:i:s'), \Criteria::GREATER_EQUAL);
+        return $this->getRoleModel()->getAssignments($c);
+    }
+
      public function getAvatar(PropelPDO $con = null, $doQuery = true) {
          $avatar = parent::getAvatar($con, $doQuery);
          if (is_null($avatar)) {
@@ -306,6 +317,5 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
          } else {
              return $avatar;
          }
-
      }
 }

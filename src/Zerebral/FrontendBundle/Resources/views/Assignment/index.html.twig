@@ -35,9 +35,8 @@
                                     {% if is_granted('EDIT', assignment) %}<a href="{{ path('assignment_edit', {id: assignment.id, courseId: assignment.course.id}) }}"><i class="icon-small-pencil"></i>Edit</a>{% endif %}
                                     {% if is_granted('DELETE', assignment) %}<a href="{{ path('assignment_delete', {id: assignment.id}) }}" class="delete-confirm"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
                                 </div>
-
                             {% endif %}
-                            <h4><a href="{{ path('course_view', {id: assignment.courseId}) }}">{{ assignment.course.name }}</a> -> <a href="{{ path('assignment_view', {id: assignment.id}) }}">{{ assignment.name }}</a></h4>
+                            <h4><a class="course" href="{{ path('course_view', {id: assignment.courseId}) }}">{{ assignment.course.name }}</a> <span class="arrow">&#8594;</span> <a href="{{ path('assignment_view', {id: assignment.id}) }}">{{ assignment.name }}</a></h4>
                             <div class="stat">
                                 {% if is_granted('ROLE_STUDENT') %}
                                     <div class="instructor-name">Instructor <b>{{ assignment.teacher.fullName }}</b></div>

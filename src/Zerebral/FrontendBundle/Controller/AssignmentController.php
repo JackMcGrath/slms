@@ -34,7 +34,7 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
         return array(
             'currentMonth' => $currentMonth,
             'nextMonth' => $nextMonth,
-            'assignments' => $this->getRoleUser()->getAssignments(),
+            'assignments' => $this->getRoleUser()->getFutureAssignments(),
             'target' => 'assignments'
         );
     }
