@@ -13,14 +13,18 @@
     {% spaceless %}
         {% if value %}
             {% if value.name == '' %}
-                <div><input type="file" name="assignment[files][{{ name }}][uploadedFile]" /><span class="help-inline">Please select file for uploading</span></div>
+                <div>
+                    <input type="file" name="assignment[files][{{ name }}][uploadedFile]" /> <i class="icon-small-trash-bin"></i><a class="remove-uploaded-file" href="#">remove</a> <span class="help-inline">Please select file for uploading</span>
+                </div>
             {% else %}
                 <div>
                     <span>{{ value.name }}</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="hidden" name="assignment[files][{{ name }}][uploadedFile]" /><i class="icon-small-trash-bin"></i><a class="remove-uploaded-file" href="#">remove</a>
                 </div>
             {% endif %}
         {% else %}
-            <div><input type="file" {{ block('widget_attributes') }} /></div>
+            <div>
+                <input type="file" {{ block('widget_attributes') }} /> <i class="icon-small-trash-bin"></i><a class="remove-uploaded-file" href="#">remove</a>
+            </div>
         {% endif %}
     {% endspaceless %}
 {% endblock file_widget %}
@@ -160,7 +164,7 @@
                 </div>
 
                 <div class="control-group radio-control-group">
-                    <label class="control-label">Attachments</label>
+                    <label class="control-label">Attachments 57x18</label>
                     <div id="attachments_div" class="controls" data-prototype="{{ form_widget(form.files.vars.prototype)|e }}">
                         <div id="upload_files_div">
                             {{ form_widget(form.files) }}

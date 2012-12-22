@@ -18,6 +18,7 @@ class FileStorageExtension extends \Twig_Extension {
             'msword' => 'word.png',
             'vnd.ms-excel' => 'excel.png',
             'x-rar' => 'archive.png',
+            'x-gzip' => 'archive.png',
             'zip' => 'archive.png'
         ),
         'image' => 'image.png',
