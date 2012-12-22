@@ -26,7 +26,7 @@ class UserProfileType extends AbstractType
         $builder->add('gender', 'choice', array('required' => false, 'choices' => array('male' => 'Male', 'female' => 'Female')));
         $builder->add('avatar', new \Zerebral\FrontendBundle\Form\Type\FileType(), array(
             'storage' => $this->getFileStorage(),
-            'by_reference' => false
+            'by_reference' => true
         ));
     }
 
@@ -37,6 +37,7 @@ class UserProfileType extends AbstractType
 
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        $resolver->setOptional(array('fileQuery'));
         $resolver->setDefaults(array(
             'data_class' => 'Zerebral\BusinessBundle\Model\User\User',
             'validation_groups' => array('profile')

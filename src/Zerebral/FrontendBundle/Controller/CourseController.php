@@ -33,9 +33,12 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
         $currentMonth = new Calendar(time(), $provider);
         $nextMonth = new Calendar(strtotime("+1 month"), $provider);
 
+        $upcomingAssignments = $this->getRoleUser()->getUpcomingAssignments();
+
         return array(
             'currentMonth' => $currentMonth,
             'nextMonth' => $nextMonth,
+            'upcomingAssignments' => $upcomingAssignments,
             'courses' => $this->getRoleUser()->getCourses(),
             'target' => 'courses',
             'courseJoinForm' => $this->createForm(new FormType\CourseJoinType())->createView()
@@ -45,7 +48,6 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     /**
      * @Route("/view/{id}", name="course_view")
      * @ParamConverter("course")
-     *
      * @SecureParam(name="course", permissions="VIEW")
      *
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
@@ -53,8 +55,11 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function viewAction(Model\Course\Course $course)
     {
+        $upcomingAssignments = $this->getRoleUser()->getUpcomingAssignments($course);
+
         return array(
             'course' => $course,
+            'upcomingAssignments' => $upcomingAssignments,
             'target' => 'courses',
             'showWelcomeMessage' => $this->getRequest()->get('showWelcomeMessage', false)
         );

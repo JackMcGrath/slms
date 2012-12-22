@@ -16,7 +16,7 @@
                 <div><input type="file" name="assignment[files][{{ name }}][uploadedFile]" /><span class="help-inline">Please select file for uploading</span></div>
             {% else %}
                 <div>
-                    <span>{{ value.name }}</span>&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-small-trash-bin"></i><a class="remove-uploaded-file" href="#">remove</a>
+                    <span>{{ value.name }}</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="hidden" name="assignment[files][{{ name }}][uploadedFile]" /><i class="icon-small-trash-bin"></i><a class="remove-uploaded-file" href="#">remove</a>
                 </div>
             {% endif %}
         {% else %}
@@ -137,6 +137,8 @@
                             {%  endfor %}
                         </table>
 
+                    </div>
+                    <div class="modal-footer">
                         <a href="#" class="btn btn-danger" data-dismiss="modal" aria-hidden="true">Assign</a>
                     </div>
                 </div>

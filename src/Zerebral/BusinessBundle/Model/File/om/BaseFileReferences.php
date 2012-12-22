@@ -991,7 +991,7 @@ abstract class BaseFileReferences extends BaseObject implements Persistent
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the Assignment object, it will not be re-added.
         if ($v !== null) {
-            $v->addassignmentReferenceName($this);
+            $v->addFileReferences($this);
         }
 
 
@@ -1016,7 +1016,7 @@ abstract class BaseFileReferences extends BaseObject implements Persistent
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aassignmentReferenceId->addassignmentReferenceNames($this);
+                $this->aassignmentReferenceId->addFileReferencess($this);
              */
         }
 

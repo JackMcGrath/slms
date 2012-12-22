@@ -28,7 +28,7 @@ $(document).ready(function(){
 });
 
 var addScheduleDayDeleteLink = function($tagFormLi) {
-    var $removeFormA = $('<a href="#" class="delete">delete</a>');
+    var $removeFormA = $('<a href="#" class="delete"><i class="icon-small-trash-bin"></i>Delete</a>');
     $tagFormLi.append($removeFormA);
 
     $removeFormA.on('click', function(e) {

@@ -18,6 +18,11 @@ class LocalFileStorage implements FileStorageInterface {
         $this->webPath = $webPath;
     }
 
+
+    public function getName() {
+        return 'local';
+    }
+
     /**
      * @return string
      */

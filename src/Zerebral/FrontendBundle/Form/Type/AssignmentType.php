@@ -85,7 +85,7 @@ class AssignmentType extends AbstractType
             array(
                 'type' => new \Zerebral\FrontendBundle\Form\Type\FileType(),
                 'allow_add' => true,
-                'allow_delete' => false,
+                'allow_delete' => true,
                 'by_reference' => false,
                 'options' => array('storage' => $this->getFileStorage(), 'error_bubbling' => true)
             )

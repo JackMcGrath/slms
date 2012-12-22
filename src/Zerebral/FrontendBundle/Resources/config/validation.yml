@@ -87,7 +87,8 @@ Zerebral\BusinessBundle\Model\Assignment\Assignment:
                 max: 50000
                 maxMessage: "{{ value }} is too much for grading (max 50000 allowed)"
         assignmentCategory:
-            - NotNull: ~
+            - NotNull:
+                message: Category is required
         files:
             - Valid: ~
 
@@ -98,7 +99,7 @@ Zerebral\BusinessBundle\Model\Course\CourseScheduleDay:
                 message: Day cannot be blank.
         time_from:
             - NotBlank:
-                message: Time is required..
+                message: Time is required.
         time_to:
             - NotBlank:
-                message: Time is required..
+                message: Time is required.
