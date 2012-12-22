@@ -8,7 +8,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Collection;
 
-use Zerebral\CommonBundle\Form\Validator\AssignmentCategory;
+//use Zerebral\CommonBundle\Form\Validator\AssignmentCategory;
 
 class OptionalModelType extends AbstractType
 {
