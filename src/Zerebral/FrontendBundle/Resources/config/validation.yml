@@ -74,6 +74,12 @@ Zerebral\BusinessBundle\Model\Assignment\Assignment:
                 message: Enter assignment description. Any useful information from the student point of view.
         maxPoints:
             - NotBlank:
-                message: Max ponts is required.
+                message: Max points is required.
+            - Type:
+                type: integer
+                message: Max points should be numerical
+            - Range:
+                min: 1
+                minMessage: Max points should be numerical and positive
         assignmentCategory:
             - NotNull: ~
