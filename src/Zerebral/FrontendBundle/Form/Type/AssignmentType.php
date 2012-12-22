@@ -10,6 +10,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints\Collection;
 
+use Zerebral\BusinessBundle\Model\Assignment\AssignmentCategoryQuery;
+use Zerebral\BusinessBundle\Model\Assignment\AssignmentCategory;
+
 class AssignmentType extends AbstractType
 {
 
@@ -17,11 +20,13 @@ class AssignmentType extends AbstractType
     protected $fileStorage;
 
 
-    public function setFileStorage($fileStorage) {
+    public function setFileStorage($fileStorage)
+    {
         $this->fileStorage = $fileStorage;
     }
 
-    public function getFileStorage() {
+    public function getFileStorage()
+    {
         return $this->fileStorage;
     }
 
@@ -39,34 +44,54 @@ class AssignmentType extends AbstractType
         $builder->add('name', 'text', array('required' => false));
         $builder->add('description', 'textarea', array('required' => false));
 
-        $builder->add('assignmentCategory', 'model', array(
-            'class' => 'Zerebral\BusinessBundle\Model\Assignment\AssignmentCategory',
-            'property' => 'name',
-            'required' => false,
-            'empty_value' => "What's assignment category?",
-            'empty_data' => 0,
-            'invalid_message' => 'Category is required',
-        ));
+        $teacher = $this->teacher;
+        $builder->add(
+            'assignmentCategory',
+            new OptionalModelType(),
+            array(
+                'choices' => AssignmentCategoryQuery::create()->findAvailableByTeacher($teacher),
+                'create_model' => function($text) use ($teacher) {
+                    $assignmentCategory = new AssignmentCategory();
+                    $assignmentCategory->setName($text);
+                    $assignmentCategory->setTeacher($teacher);
+                    return $assignmentCategory;
+                },
+                'required' => false,
+                'empty_value' => "What's assignment category?",
+                'invalid_message' => 'Category is required',
+
+                'create_new_label' => 'Create new category',
+                'choose_exists_label' => 'Choose exists category',
+                'placeholder' => 'Category name',
+            )
+        );
 
         $builder->add('maxPoints', 'text', array('required' => false));
 
-        $builder->add('dueAt', 'datetime', array(
-            'required' => false,
-            'date_widget' => 'single_text',
-            'date_format' => 'MM/dd/yyyy',
-            'time_widget' => 'single_text'
-        ));
+        $builder->add(
+            'dueAt',
+            'datetime',
+            array(
+                'required' => false,
+                'date_widget' => 'single_text',
+                'date_format' => 'MM/dd/yyyy',
+                'time_widget' => 'single_text'
+            )
+        );
 
-        $builder->add('files',  'collection', array(
-            'type' => new \Zerebral\FrontendBundle\Form\Type\FileType(),
-            'allow_add' => true,
-            'allow_delete' => false,
-            'by_reference' => false,
-            'options' => array('storage' => $this->getFileStorage(), 'error_bubbling' => true)
-        ));
+        $builder->add(
+            'files',
+            'collection',
+            array(
+                'type' => new \Zerebral\FrontendBundle\Form\Type\FileType(),
+                'allow_add' => true,
+                'allow_delete' => false,
+                'by_reference' => false,
+                'options' => array('storage' => $this->getFileStorage(), 'error_bubbling' => true)
+            )
+        );
 
         $builder->get('dueAt')->get('time')->addViewTransformer(new TimeTransformer());
-
     }
 
     public function getName()
