@@ -11,10 +11,11 @@ use JMS\SecurityExtraBundle\Annotation\PreAuthorize;
 
 use Zerebral\FrontendBundle\Form\Type as FormType;
 use Zerebral\BusinessBundle\Model as Model;
-use Zerebral\BusinessBundle\Model\Course\CourseStudentQuery;
 
 use Zerebral\BusinessBundle\Calendar\EventProviders\AssignmentEventsProvider;
 use Zerebral\BusinessBundle\Calendar\EventProviders\CourseAssignmentEventsProvider;
+
+use Zerebral\CommonBundle\Component\Calendar\Calendar;
 
 /**
  * @Route("/courses")
@@ -29,34 +30,15 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     public function indexAction()
     {
         $provider = new CourseAssignmentEventsProvider($this->getRoleUser()->getAssignments());
-        $currentMonth = new \Zerebral\CommonBundle\Component\Calendar\Calendar(time(), $provider);
-        $nextMonth = new \Zerebral\CommonBundle\Component\Calendar\Calendar(strtotime("+1 month"), $provider);
-
-        $form = $this->createForm(new FormType\AccessCodeType(), new Model\Course\AccessCode());
-
-        if ($this->getRequest()->isMethod('POST')) {
-            $form->bind($this->getRequest());
-            if ($form->isValid()) {
-                /** @var $invite Model\Course\AccessCode */
-                $invite = $form->getData();
-
-                return $this->redirect(
-                    $this->generateUrl(
-                        'course_accept_invite',
-                        array(
-                            'accessCode' => $invite->getAccessCode(),
-                        )
-                    )
-                );
-            }
-        }
+        $currentMonth = new Calendar(time(), $provider);
+        $nextMonth = new Calendar(strtotime("+1 month"), $provider);
 
         return array(
             'currentMonth' => $currentMonth,
             'nextMonth' => $nextMonth,
             'courses' => $this->getRoleUser()->getCourses(),
             'target' => 'courses',
-            'form' => $form->createView()
+            'courseJoinForm' => $this->createForm(new FormType\CourseJoinType())->createView()
         );
     }
 
@@ -159,41 +141,11 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function membersAction(Model\Course\Course $course)
     {
-        $form = $this->createForm(new FormType\MembersType(), new Model\Course\Member());
-        if ($this->getRequest()->isMethod("POST")) {
-            $form->bind($this->getRequest());
-            if ($form->isValid()) {
-                /**
-                 * @var \Zerebral\BusinessBundle\Model\Course\Member $memberInviteForm
-                 */
-                $memberInviteForm = $form->getData();
-                $emails = $memberInviteForm->getEmailList();
-
-                foreach ($emails as $email) {
-                    $message = \Swift_Message::newInstance()
-                        ->setSubject('Course invitation')
-                        ->setFrom('hello@zerebral.com')
-                        ->setTo($email)
-                        ->setBody(
-                        $this->renderView(
-                            'ZerebralFrontendBundle:Email:invite.html.twig',
-                            array(
-                                'course' => $course,
-                                'user' => $this->getRoleUser()->getUser(),
-                                'host' => $this->getRequest()->getHttpHost()
-                            )
-                        )
-                    );
-                    $this->get('mailer')->send($message);
-                }
-            }
-        }
-
         return array(
             'students' => $course->getStudents(),
             'teachers' => $course->getTeachers(),
             'course' => $course,
-            'form' => $form->createView(),
+            'courseInviteForm' => $this->createForm(new FormType\CourseInviteType())->createView(),
             'target' => 'members'
         );
     }
@@ -209,45 +161,6 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
         $courseStudent->delete();
         $this->setFlash('delete_course_student_success', 'Student <b>' . $courseStudent->getStudent()->getFullName() . '</b> has been successfully deleted from course.');
         return $this->redirect($this->generateUrl('course_members', array('id' => $courseStudent->getCourseId())));
-    }
-
-    /**
-     * @Route("/accept/{accessCode}", name="course_accept_invite")
-     * @Route("/accept", name="course_accept")
-     * @ParamConverter("course", options={"mapping": {"accessCode": "access_code"}})
-     */
-    public function acceptInviteAction(Model\Course\Course $course = null)
-    {
-        $user = $this->getRoleUser();
-
-        if (!$course) {
-            throw $this->createNotFoundException('The course not found');
-        }
-
-        if (empty($user)) {
-            $this->getRequest()->getSession()->set('access_code', $course->getAccessCode());
-            return $this->redirect($this->generateUrl('signup', array()));
-        }
-
-        if ($user->hasCourse($course)) {
-            throw $this->createNotFoundException('User already assigned to course');
-        }
-
-        if ($user instanceof \Zerebral\BusinessBundle\Model\User\Student) {
-            $course->addStudent($user);
-        } else {
-            $course->addTeacher($user);
-        }
-        $course->save();
-        return $this->redirect(
-            $this->generateUrl(
-                'course_view',
-                array(
-                    'id' => $course->getId(),
-                    'showWelcomeMessage' => true
-                )
-            )
-        );
     }
 
     /**
@@ -268,15 +181,5 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
                 )
             )
         );
-    }
-
-    /**
-     * @Route("/verifyCode/{accessCode}", name="course_verify_code")
-     * @ParamConverter("course", options={"mapping": {"accessCode": "access_code"}})
-     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
-     */
-    public function verifyAccessCodeAction(Model\Course\Course $course = null)
-    {
-        return new \Symfony\Component\HttpFoundation\JsonResponse(array('success' => !empty($course)));
     }
 }

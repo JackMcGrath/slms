@@ -100,13 +100,13 @@
 
 {% if is_granted('ROLE_STUDENT') %}
     <div class="modal hide fade" id="inviteModal">
-        <form method="post" {{ form_enctype(form) }}  class="form-horizontal invite-form" novalidate data-validate-url="{{ path('course_verify_code', {accessCode: '__ACCESS_CODE__'}) }}" >
+        <form method="post" {{ form_enctype(courseJoinForm) }}  class="form-horizontal invite-form" action="{{ path('ajax_course_join') }}" novalidate >
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h3>Invite users</h3>
             </div>
             <div class="modal-body">
-                {{ form_row(form.accessCode, {
+                {{ form_row(courseJoinForm.accessCode, {
                     label: 'Access code',
                     form_type: 'horizontal',
                     attr: {
@@ -118,7 +118,7 @@
                 <input type="submit" class="btn btn-danger" value="Join"/>
                 <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Cancel</a>
             </div>
-            {{ form_rest(form) }}
+            {{ form_rest(courseJoinForm) }}
         </form>
     </div>
 {% endif %}
