@@ -36,11 +36,7 @@
             </div>
 
             <div class="right-navbar pull-left">
-                <h4>Teacher profile</h4>
-                <hr/>
-                {{ course.teacher.fullName }}
-                <img class="pull-right rounded" src="http://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?s=50"/>
-                <a href="#" class="btn create-new-item">Send Message</a>
+                {{ mainPartials.teacherShortInfo(course.teacher) }}
             </div>
         </div>
     </div>
