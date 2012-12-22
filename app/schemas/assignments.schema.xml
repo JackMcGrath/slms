@@ -48,7 +48,7 @@
         <column name="assignment_category_id" phpName="AssignmentCategoryId" type="TINYINT" size="2" sqlType="tinyint(2) unsigned" required="true"/>
         <column name="name" phpName="Name" type="VARCHAR" size="200" required="true"/>
         <column name="description" phpName="Description" type="LONGVARCHAR" required="false"/>
-        <column name="max_points" phpName="MaxPoints" type="TINYINT" size="2" sqlType="tinyint(2) unsigned" required="true"/>
+        <column name="max_points" phpName="MaxPoints" type="SMALLINT" size="2" sqlType="smallint(3) unsigned" required="true"/>
         <column name="due_at" phpName="DueAt" type="TIMESTAMP" required="false"/>
         <validator column="id">
             <rule name="required" message="The field id is required."/>
