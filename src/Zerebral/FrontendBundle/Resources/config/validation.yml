@@ -98,7 +98,7 @@ Zerebral\BusinessBundle\Model\Course\CourseScheduleDay:
                 message: Day cannot be blank.
         time_from:
             - NotBlank:
-                message: Time is required..
+                message: Time is required.
         time_to:
             - NotBlank:
-                message: Time is required..
+                message: Time is required.
