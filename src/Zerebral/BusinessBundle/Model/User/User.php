@@ -295,4 +295,17 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
         $c->addDescendingOrderByColumn('due_at');
         return $this->getRoleModel()->getAssignments($c);
     }
+
+     public function getAvatar(PropelPDO $con = null, $doQuery = true) {
+         $avatar = parent::getAvatar($con, $doQuery);
+         if (is_null($avatar)) {
+             $avatarFile = new File();
+             $avatarFile->setName('avatar-placeholder.jpg');
+             $avatarFile->setStorage('dummy');
+             return $avatarFile;
+         } else {
+             return $avatar;
+         }
+
+     }
 }

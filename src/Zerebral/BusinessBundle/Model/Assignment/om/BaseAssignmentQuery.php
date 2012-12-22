@@ -64,9 +64,9 @@ use Zerebral\BusinessBundle\Model\User\Teacher;
  * @method AssignmentQuery rightJoinStudentAssignment($relationAlias = null) Adds a RIGHT JOIN clause to the query using the StudentAssignment relation
  * @method AssignmentQuery innerJoinStudentAssignment($relationAlias = null) Adds a INNER JOIN clause to the query using the StudentAssignment relation
  *
- * @method AssignmentQuery leftJoinassignmentReferenceName($relationAlias = null) Adds a LEFT JOIN clause to the query using the assignmentReferenceName relation
- * @method AssignmentQuery rightJoinassignmentReferenceName($relationAlias = null) Adds a RIGHT JOIN clause to the query using the assignmentReferenceName relation
- * @method AssignmentQuery innerJoinassignmentReferenceName($relationAlias = null) Adds a INNER JOIN clause to the query using the assignmentReferenceName relation
+ * @method AssignmentQuery leftJoinFileReferences($relationAlias = null) Adds a LEFT JOIN clause to the query using the FileReferences relation
+ * @method AssignmentQuery rightJoinFileReferences($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FileReferences relation
+ * @method AssignmentQuery innerJoinFileReferences($relationAlias = null) Adds a INNER JOIN clause to the query using the FileReferences relation
  *
  * @method Assignment findOne(PropelPDO $con = null) Return the first Assignment matching the query
  * @method Assignment findOneOrCreate(PropelPDO $con = null) Return the first Assignment matching the query, or a new Assignment object populated from the query conditions when no match is found
@@ -887,33 +887,33 @@ abstract class BaseAssignmentQuery extends ModelCriteria
      * @return   AssignmentQuery The current query, for fluid interface
      * @throws   PropelException - if the provided filter is invalid.
      */
-    public function filterByassignmentReferenceName($fileReferences, $comparison = null)
+    public function filterByFileReferences($fileReferences, $comparison = null)
     {
         if ($fileReferences instanceof FileReferences) {
             return $this
                 ->addUsingAlias(AssignmentPeer::ID, $fileReferences->getreferenceId(), $comparison);
         } elseif ($fileReferences instanceof PropelObjectCollection) {
             return $this
-                ->useassignmentReferenceNameQuery()
+                ->useFileReferencesQuery()
                 ->filterByPrimaryKeys($fileReferences->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByassignmentReferenceName() only accepts arguments of type FileReferences or PropelCollection');
+            throw new PropelException('filterByFileReferences() only accepts arguments of type FileReferences or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the assignmentReferenceName relation
+     * Adds a JOIN clause to the query using the FileReferences relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return AssignmentQuery The current query, for fluid interface
      */
-    public function joinassignmentReferenceName($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinFileReferences($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('assignmentReferenceName');
+        $relationMap = $tableMap->getRelation('FileReferences');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -928,14 +928,14 @@ abstract class BaseAssignmentQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'assignmentReferenceName');
+            $this->addJoinObject($join, 'FileReferences');
         }
 
         return $this;
     }
 
     /**
-     * Use the assignmentReferenceName relation FileReferences object
+     * Use the FileReferences relation FileReferences object
      *
      * @see       useQuery()
      *
@@ -945,11 +945,11 @@ abstract class BaseAssignmentQuery extends ModelCriteria
      *
      * @return   \Zerebral\BusinessBundle\Model\File\FileReferencesQuery A secondary query class using the current class as primary query
      */
-    public function useassignmentReferenceNameQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useFileReferencesQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinassignmentReferenceName($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'assignmentReferenceName', '\Zerebral\BusinessBundle\Model\File\FileReferencesQuery');
+            ->joinFileReferences($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'FileReferences', '\Zerebral\BusinessBundle\Model\File\FileReferencesQuery');
     }
 
     /**
@@ -981,7 +981,7 @@ abstract class BaseAssignmentQuery extends ModelCriteria
     public function filterByFile($file, $comparison = Criteria::EQUAL)
     {
         return $this
-            ->useassignmentReferenceNameQuery()
+            ->useFileReferencesQuery()
             ->filterByFile($file, $comparison)
             ->endUse();
     }

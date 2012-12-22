@@ -4,6 +4,7 @@ namespace Zerebral\CommonBundle\Component\FileStorage;
 use Zerebral\CommonBundle\Component\FileStorage\FileStorageException;
 
 use Zerebral\CommonBundle\Component\FileStorage\LocalFileStorage;
+use Zerebral\CommonBundle\Component\FileStorage\DummyFileStorage;
 
 class FileStorageFactory {
 
@@ -26,7 +27,23 @@ class FileStorageFactory {
         }
 
         $config = $this->config['local'];
+
+        if (!file_exists($config['path'])) {
+            if (!mkdir($config['path'])) {
+                throw new FileStorageException('Please create folder "' . $config['path']);
+            }
+        }
+
         $this->storages['local'] = new LocalFileStorage($config['path'], $config['webpath']);
+    }
+
+    private function createDummyStorage() {
+        if (!isset($this->config['dummy'])) {
+            throw new FileStorageException('Please set storage.dummy section in config file');
+        }
+
+        $config = $this->config['dummy'];
+        $this->storages['dummy'] = new DummyFileStorage($config['webpath']);
     }
 
 
@@ -39,6 +56,7 @@ class FileStorageFactory {
         if (!isset($this->storages[$type])) {
             switch ($type) {
                 case 'local': { $this->createLocalStorage(); break; }
+                case 'dummy': { $this->createDummyStorage(); break; }
                 default: throw new FileStorageException('Unknown FileStorage type: "' . $type . '"');
             }
         }

@@ -100,6 +100,8 @@ parameters:
     locale:                 en
     secret:                 45jed83234l9
     storage:
+        dummy:
+            webpath:  /img/
         local:
             path:     %kernel.root_dir%/../web/data
             webpath:  /data/
