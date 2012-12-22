@@ -54,3 +54,18 @@
     </ul>
 </div>
 {% endmacro %}
+
+{% macro upcomingAssignments(assignments) %}
+<div class="upcoming-assignments-widget">
+    <h4>Upcoming assignments</h4>
+    {% if assignments.count > 0 %}
+        <ul>
+        {% for assignment in assignments %}
+            <li><span class="label label-info">{{ assignment.assignmentCategory.name }}</span> <a href="{{ path('assignment_view', {id: assignment.id}) }}">{{ assignment.name }}</a> <span class="new">(Due {{ time_diff(assignment.dueAt) }})</span></li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        Relax. No assignments for you.
+    {% endif %}
+</div>
+{% endmacro %}

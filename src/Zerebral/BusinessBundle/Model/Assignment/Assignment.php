@@ -8,6 +8,11 @@ use \Zerebral\BusinessBundle\Model\File\FileReferences;
 class Assignment extends BaseAssignment
 {
 
+    public function __construct()
+    {
+        $this->setMaxPoints(100);
+    }
+
     /** @inheritdoc */
     protected function doAddFile($file) {
         $fileReferences = new FileReferences();

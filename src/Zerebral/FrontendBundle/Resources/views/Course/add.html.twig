@@ -1,5 +1,15 @@
 {% extends 'ZerebralFrontendBundle::layout.html.twig' %}
 
+{% form_theme form _self %}
+
+{% block form_rows %}
+    {% spaceless %}
+        {% for child in form %}
+            {{ form_widget(child) }}
+        {% endfor %}
+    {% endspaceless %}
+{% endblock form_rows %}
+
 {% block content %}
     {% javascripts
         '@ZerebralFrontendBundle/Resources/public/js/controllers/course/add.js'
@@ -74,6 +84,15 @@
                         class: 'input-xlarge'
                     }
                 }) }}
+
+                <h5 class="form-subtitle">Schedule</h5>
+
+                <div id="schedule-fields-list" data-prototype="{{ form_widget(form.courseScheduleDays.vars.prototype) | e }}" class="collection-container">
+                    {{ form_widget(form.courseScheduleDays) }}
+                </div>
+
+                <div class="clearfix"></div>
+                <a href="#" id="add-another-schedule">Add time slot</a>
 
                 {{ form_rest(form) }}
 

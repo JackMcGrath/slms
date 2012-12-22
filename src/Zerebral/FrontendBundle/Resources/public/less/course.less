@@ -12,6 +12,62 @@
         .create-discipline {
             vertical-align: middle;
         }
+
+        .form-subtitle{
+            color: #4E4E4E;
+            font-weight: normal;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+
+            border-bottom: 1px solid #ccc;
+        }
+
+        .collection-container{
+            list-style: none;
+            margin-left: 0;
+
+            select{
+                height: 33px;
+                width: 107px;
+            }
+
+            .control-group {
+                margin-bottom: 17px;
+                margin-left: 25px;
+
+                label.control-label {
+                    width: @formControlLeftMargin / 2;
+                }
+                .controls {
+                    margin-left: @formControlLeftMargin / 2;
+                }
+
+                &:first-child{
+                    margin-left: 15px;
+                    label.control-label {
+                        width: @formControlLeftMargin - 13;
+                    }
+                    .controls {
+                        margin-left: @formControlLeftMargin - 13;
+                    }
+                }
+
+                .controls .image-background{
+                    width: 55px;
+                }
+            }
+
+            .delete{
+                padding-left: 10px;
+                padding-top: 5px;
+                display: inline-block;
+                color: #8C8C8C;
+            }
+        }
+
+        #add-another-schedule{
+            margin-left: @formControlLeftMargin;
+        }
     }
 }
 .top-second-navbar {
@@ -108,19 +164,27 @@
         margin-top: 5px;
         background: #fcfbeb;
         display: inline-block;
+        width: 100%;
+        padding-bottom: 0;
+
         .duration {
             display: inline-block;
             i { margin-right:10px; }
             color: #333333;
+            min-height: 23px;
         }
         .time {
             margin-left: 0px;
             display: inline-block;
             vertical-align: bottom;
+            min-height: 23px;
+
             ul {
                 margin-left: 25px;
-                margin-bottom: 0px;
+                margin-bottom: 3px;
                 list-style: none outside none;
+                min-width: 367px;
+
                 li {
                     display: inline-block;
                     color: #333333;
@@ -225,16 +289,6 @@
 
 .course-members {
     width: 1065px;
-
-    .right-navbar {
-        margin-top: 28px;
-        hr {
-            margin-bottom: 20px;
-        }
-        a.btn {
-            margin-top: 15px;
-        }
-    }
 }
 
 .manage{
@@ -260,5 +314,11 @@
 
     .alert{
         margin: 20px 0px;
+    }
+}
+
+#inviteModal{
+    .form-horizontal .control-group{
+        margin-bottom: 18px;
     }
 }

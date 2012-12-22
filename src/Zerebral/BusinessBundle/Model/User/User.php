@@ -275,6 +275,27 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
         return $this->getFirstName() . ' ' . $this->getLastName();
     }
 
+
+    /**
+     * @param \Zerebral\BusinessBundle\Model\Course\Course $course
+     * @return PropelObjectCollection
+     */
+    public function getUpcomingAssignments($course = null)
+    {
+        $criteries = array('dueAtLess', 'dueAtGreat');
+        $c = new \Criteria();
+        $c->addCond('dueAtLess', 'due_at', date('Y-m-d H:i:s', strtotime('+14 days')), \Criteria::LESS_EQUAL);
+        $c->addCond('dueAtGreat', 'due_at', date('Y-m-d H:i:s'), \Criteria::GREATER_EQUAL);
+        if ($course) {
+            $c->addCond('courseId', 'course_id', $course->getId());
+            $criteries[] = 'courseId';
+        }
+
+        $c->combine($criteries, \Criteria::LOGICAL_AND);
+        $c->addDescendingOrderByColumn('due_at');
+        return $this->getRoleModel()->getAssignments($c);
+    }
+
      public function getAvatar(PropelPDO $con = null, $doQuery = true) {
          $avatar = parent::getAvatar($con, $doQuery);
          if (is_null($avatar)) {

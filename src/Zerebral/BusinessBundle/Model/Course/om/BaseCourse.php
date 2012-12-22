@@ -24,6 +24,8 @@ use Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery;
 use Zerebral\BusinessBundle\Model\Course\Course;
 use Zerebral\BusinessBundle\Model\Course\CoursePeer;
 use Zerebral\BusinessBundle\Model\Course\CourseQuery;
+use Zerebral\BusinessBundle\Model\Course\CourseScheduleDay;
+use Zerebral\BusinessBundle\Model\Course\CourseScheduleDayQuery;
 use Zerebral\BusinessBundle\Model\Course\CourseStudent;
 use Zerebral\BusinessBundle\Model\Course\CourseStudentQuery;
 use Zerebral\BusinessBundle\Model\Course\CourseTeacher;
@@ -152,6 +154,12 @@ abstract class BaseCourse extends BaseObject implements Persistent
     protected $collCourseTeachersPartial;
 
     /**
+     * @var        PropelObjectCollection|CourseScheduleDay[] Collection to store aggregation of CourseScheduleDay objects.
+     */
+    protected $collCourseScheduleDays;
+    protected $collCourseScheduleDaysPartial;
+
+    /**
      * @var        PropelObjectCollection|Student[] Collection to store aggregation of Student objects.
      */
     protected $collStudents;
@@ -210,6 +218,12 @@ abstract class BaseCourse extends BaseObject implements Persistent
      * @var		PropelObjectCollection
      */
     protected $courseTeachersScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $courseScheduleDaysScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -697,6 +711,8 @@ abstract class BaseCourse extends BaseObject implements Persistent
 
             $this->collCourseTeachers = null;
 
+            $this->collCourseScheduleDays = null;
+
             $this->collStudents = null;
             $this->collTeachers = null;
         } // if (deep)
@@ -974,6 +990,23 @@ abstract class BaseCourse extends BaseObject implements Persistent
                 }
             }
 
+            if ($this->courseScheduleDaysScheduledForDeletion !== null) {
+                if (!$this->courseScheduleDaysScheduledForDeletion->isEmpty()) {
+                    CourseScheduleDayQuery::create()
+                        ->filterByPrimaryKeys($this->courseScheduleDaysScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->courseScheduleDaysScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collCourseScheduleDays !== null) {
+                foreach ($this->collCourseScheduleDays as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             $this->alreadyInSave = false;
 
         }
@@ -1220,6 +1253,14 @@ abstract class BaseCourse extends BaseObject implements Persistent
                     }
                 }
 
+                if ($this->collCourseScheduleDays !== null) {
+                    foreach ($this->collCourseScheduleDays as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
 
             $this->alreadyInValidation = false;
         }
@@ -1342,6 +1383,9 @@ abstract class BaseCourse extends BaseObject implements Persistent
             }
             if (null !== $this->collCourseTeachers) {
                 $result['CourseTeachers'] = $this->collCourseTeachers->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collCourseScheduleDays) {
+                $result['CourseScheduleDays'] = $this->collCourseScheduleDays->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1557,6 +1601,12 @@ abstract class BaseCourse extends BaseObject implements Persistent
             foreach ($this->getCourseTeachers() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addCourseTeacher($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getCourseScheduleDays() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addCourseScheduleDay($relObj->copy($deepCopy));
                 }
             }
 
@@ -1788,6 +1838,9 @@ abstract class BaseCourse extends BaseObject implements Persistent
         }
         if ('CourseTeacher' == $relationName) {
             $this->initCourseTeachers();
+        }
+        if ('CourseScheduleDay' == $relationName) {
+            $this->initCourseScheduleDays();
         }
     }
 
@@ -2785,6 +2838,223 @@ abstract class BaseCourse extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collCourseScheduleDays collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Course The current object (for fluent API support)
+     * @see        addCourseScheduleDays()
+     */
+    public function clearCourseScheduleDays()
+    {
+        $this->collCourseScheduleDays = null; // important to set this to null since that means it is uninitialized
+        $this->collCourseScheduleDaysPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collCourseScheduleDays collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialCourseScheduleDays($v = true)
+    {
+        $this->collCourseScheduleDaysPartial = $v;
+    }
+
+    /**
+     * Initializes the collCourseScheduleDays collection.
+     *
+     * By default this just sets the collCourseScheduleDays collection to an empty array (like clearcollCourseScheduleDays());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initCourseScheduleDays($overrideExisting = true)
+    {
+        if (null !== $this->collCourseScheduleDays && !$overrideExisting) {
+            return;
+        }
+        $this->collCourseScheduleDays = new PropelObjectCollection();
+        $this->collCourseScheduleDays->setModel('CourseScheduleDay');
+    }
+
+    /**
+     * Gets an array of CourseScheduleDay objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Course is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|CourseScheduleDay[] List of CourseScheduleDay objects
+     * @throws PropelException
+     */
+    public function getCourseScheduleDays($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collCourseScheduleDaysPartial && !$this->isNew();
+        if (null === $this->collCourseScheduleDays || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCourseScheduleDays) {
+                // return empty collection
+                $this->initCourseScheduleDays();
+            } else {
+                $collCourseScheduleDays = CourseScheduleDayQuery::create(null, $criteria)
+                    ->filterByCourse($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collCourseScheduleDaysPartial && count($collCourseScheduleDays)) {
+                      $this->initCourseScheduleDays(false);
+
+                      foreach($collCourseScheduleDays as $obj) {
+                        if (false == $this->collCourseScheduleDays->contains($obj)) {
+                          $this->collCourseScheduleDays->append($obj);
+                        }
+                      }
+
+                      $this->collCourseScheduleDaysPartial = true;
+                    }
+
+                    return $collCourseScheduleDays;
+                }
+
+                if($partial && $this->collCourseScheduleDays) {
+                    foreach($this->collCourseScheduleDays as $obj) {
+                        if($obj->isNew()) {
+                            $collCourseScheduleDays[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collCourseScheduleDays = $collCourseScheduleDays;
+                $this->collCourseScheduleDaysPartial = false;
+            }
+        }
+
+        return $this->collCourseScheduleDays;
+    }
+
+    /**
+     * Sets a collection of CourseScheduleDay objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $courseScheduleDays A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Course The current object (for fluent API support)
+     */
+    public function setCourseScheduleDays(PropelCollection $courseScheduleDays, PropelPDO $con = null)
+    {
+        $courseScheduleDaysToDelete = $this->getCourseScheduleDays(new Criteria(), $con)->diff($courseScheduleDays);
+
+        $this->courseScheduleDaysScheduledForDeletion = unserialize(serialize($courseScheduleDaysToDelete));
+
+        foreach ($courseScheduleDaysToDelete as $courseScheduleDayRemoved) {
+            $courseScheduleDayRemoved->setCourse(null);
+        }
+
+        $this->collCourseScheduleDays = null;
+        foreach ($courseScheduleDays as $courseScheduleDay) {
+            $this->addCourseScheduleDay($courseScheduleDay);
+        }
+
+        $this->collCourseScheduleDays = $courseScheduleDays;
+        $this->collCourseScheduleDaysPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related CourseScheduleDay objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related CourseScheduleDay objects.
+     * @throws PropelException
+     */
+    public function countCourseScheduleDays(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collCourseScheduleDaysPartial && !$this->isNew();
+        if (null === $this->collCourseScheduleDays || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCourseScheduleDays) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getCourseScheduleDays());
+            }
+            $query = CourseScheduleDayQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByCourse($this)
+                ->count($con);
+        }
+
+        return count($this->collCourseScheduleDays);
+    }
+
+    /**
+     * Method called to associate a CourseScheduleDay object to this object
+     * through the CourseScheduleDay foreign key attribute.
+     *
+     * @param    CourseScheduleDay $l CourseScheduleDay
+     * @return Course The current object (for fluent API support)
+     */
+    public function addCourseScheduleDay(CourseScheduleDay $l)
+    {
+        if ($this->collCourseScheduleDays === null) {
+            $this->initCourseScheduleDays();
+            $this->collCourseScheduleDaysPartial = true;
+        }
+        if (!in_array($l, $this->collCourseScheduleDays->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddCourseScheduleDay($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	CourseScheduleDay $courseScheduleDay The courseScheduleDay object to add.
+     */
+    protected function doAddCourseScheduleDay($courseScheduleDay)
+    {
+        $this->collCourseScheduleDays[]= $courseScheduleDay;
+        $courseScheduleDay->setCourse($this);
+    }
+
+    /**
+     * @param	CourseScheduleDay $courseScheduleDay The courseScheduleDay object to remove.
+     * @return Course The current object (for fluent API support)
+     */
+    public function removeCourseScheduleDay($courseScheduleDay)
+    {
+        if ($this->getCourseScheduleDays()->contains($courseScheduleDay)) {
+            $this->collCourseScheduleDays->remove($this->collCourseScheduleDays->search($courseScheduleDay));
+            if (null === $this->courseScheduleDaysScheduledForDeletion) {
+                $this->courseScheduleDaysScheduledForDeletion = clone $this->collCourseScheduleDays;
+                $this->courseScheduleDaysScheduledForDeletion->clear();
+            }
+            $this->courseScheduleDaysScheduledForDeletion[]= clone $courseScheduleDay;
+            $courseScheduleDay->setCourse(null);
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears out the collStudents collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -3192,6 +3462,11 @@ abstract class BaseCourse extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collCourseScheduleDays) {
+                foreach ($this->collCourseScheduleDays as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collStudents) {
                 foreach ($this->collStudents as $o) {
                     $o->clearAllReferences($deep);
@@ -3220,6 +3495,10 @@ abstract class BaseCourse extends BaseObject implements Persistent
             $this->collCourseTeachers->clearIterator();
         }
         $this->collCourseTeachers = null;
+        if ($this->collCourseScheduleDays instanceof PropelCollection) {
+            $this->collCourseScheduleDays->clearIterator();
+        }
+        $this->collCourseScheduleDays = null;
         if ($this->collStudents instanceof PropelCollection) {
             $this->collStudents->clearIterator();
         }
