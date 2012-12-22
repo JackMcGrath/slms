@@ -59,7 +59,7 @@ div#upload_files_div {
 
 .assignment-view {
     .assignment-block {
-        min-width: 675px;
+        width: 675px;
     }
     hr {
         margin-bottom: 10px;
@@ -92,6 +92,47 @@ div#upload_files_div {
     }
     .details {
         margin-top: 20px;
+    }
+
+    .files {
+        margin-top: 20px;
+        ul {
+            list-style-type: none;
+            margin-left: 0;
+            li.file {
+                display: inline-block;
+                margin-right: 20px;
+                margin-bottom: 20px;
+                width: 180px;
+                min-width: 180px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                &:hover {
+                    background-color: #F1F1F1;
+                }
+                a.link {
+                    color: #02379c;
+                    text-decoration: underline;
+                    white-space: nowrap;
+                    max-width: 120px;
+                    min-width: 120px;
+                    float: left;
+                    &:hover {
+                      text-decoration: none;
+                    }
+                }
+                span.size {
+                    color: #9c999c;
+                }
+                img.icon {
+                    width: 32px;
+                    height: 32px;
+                    float: left;
+                    margin-right: 6px;
+                    display: block;
+                }
+            }
+        }
     }
 
     .right-navbar {
