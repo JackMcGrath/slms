@@ -37,6 +37,17 @@
                 <div class="details">
                     {{ assignment.description | raw }}
                 </div>
+                <div class="files">
+                    <ul>
+                    {% for file in assignment.getFiles() %}
+                        <li class="file">
+                            <img class="icon" src="{{ get_file_storage_link(get_file_icon(file)) | imagine_filter('file_icon') }}" />
+                            <a class="link" target="_blank" href="{{ get_file_storage_link(file) }}">{{ file.getName() }}</a><br >
+                            <span class="size">{{ file.getSize() | bytes_to_human }}</span>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                </div>
             </div>
         </div>
 
