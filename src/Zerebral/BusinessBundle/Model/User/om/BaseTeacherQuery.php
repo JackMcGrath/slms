@@ -27,9 +27,15 @@ use Zerebral\BusinessBundle\Model\User\User;
 /**
  * @method TeacherQuery orderById($order = Criteria::ASC) Order by the id column
  * @method TeacherQuery orderByUserId($order = Criteria::ASC) Order by the user_id column
+ * @method TeacherQuery orderByBio($order = Criteria::ASC) Order by the bio column
+ * @method TeacherQuery orderBySubjects($order = Criteria::ASC) Order by the subjects column
+ * @method TeacherQuery orderByGrades($order = Criteria::ASC) Order by the grades column
  *
  * @method TeacherQuery groupById() Group by the id column
  * @method TeacherQuery groupByUserId() Group by the user_id column
+ * @method TeacherQuery groupByBio() Group by the bio column
+ * @method TeacherQuery groupBySubjects() Group by the subjects column
+ * @method TeacherQuery groupByGrades() Group by the grades column
  *
  * @method TeacherQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method TeacherQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -63,9 +69,15 @@ use Zerebral\BusinessBundle\Model\User\User;
  * @method Teacher findOneOrCreate(PropelPDO $con = null) Return the first Teacher matching the query, or a new Teacher object populated from the query conditions when no match is found
  *
  * @method Teacher findOneByUserId(int $user_id) Return the first Teacher filtered by the user_id column
+ * @method Teacher findOneByBio(string $bio) Return the first Teacher filtered by the bio column
+ * @method Teacher findOneBySubjects(string $subjects) Return the first Teacher filtered by the subjects column
+ * @method Teacher findOneByGrades(string $grades) Return the first Teacher filtered by the grades column
  *
  * @method array findById(int $id) Return Teacher objects filtered by the id column
  * @method array findByUserId(int $user_id) Return Teacher objects filtered by the user_id column
+ * @method array findByBio(string $bio) Return Teacher objects filtered by the bio column
+ * @method array findBySubjects(string $subjects) Return Teacher objects filtered by the subjects column
+ * @method array findByGrades(string $grades) Return Teacher objects filtered by the grades column
  */
 abstract class BaseTeacherQuery extends ModelCriteria
 {
@@ -168,7 +180,7 @@ abstract class BaseTeacherQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `user_id` FROM `teachers` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `user_id`, `bio`, `subjects`, `grades` FROM `teachers` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -325,6 +337,93 @@ abstract class BaseTeacherQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(TeacherPeer::USER_ID, $userId, $comparison);
+    }
+
+    /**
+     * Filter the query on the bio column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByBio('fooValue');   // WHERE bio = 'fooValue'
+     * $query->filterByBio('%fooValue%'); // WHERE bio LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $bio The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return TeacherQuery The current query, for fluid interface
+     */
+    public function filterByBio($bio = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($bio)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $bio)) {
+                $bio = str_replace('*', '%', $bio);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(TeacherPeer::BIO, $bio, $comparison);
+    }
+
+    /**
+     * Filter the query on the subjects column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterBySubjects('fooValue');   // WHERE subjects = 'fooValue'
+     * $query->filterBySubjects('%fooValue%'); // WHERE subjects LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $subjects The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return TeacherQuery The current query, for fluid interface
+     */
+    public function filterBySubjects($subjects = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($subjects)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $subjects)) {
+                $subjects = str_replace('*', '%', $subjects);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(TeacherPeer::SUBJECTS, $subjects, $comparison);
+    }
+
+    /**
+     * Filter the query on the grades column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByGrades('fooValue');   // WHERE grades = 'fooValue'
+     * $query->filterByGrades('%fooValue%'); // WHERE grades LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $grades The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return TeacherQuery The current query, for fluid interface
+     */
+    public function filterByGrades($grades = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($grades)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $grades)) {
+                $grades = str_replace('*', '%', $grades);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(TeacherPeer::GRADES, $grades, $comparison);
     }
 
     /**

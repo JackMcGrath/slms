@@ -48,15 +48,22 @@ Zerebral\BusinessBundle\Model\Course\Course:
             - Valid: ~
         gradeLevel:
             - Valid: ~
+        accessCode:
+            - NotBlank:
+                groups: [accept_invite]
+                message: Access code can't be blank
+            - Zerebral\BusinessBundle\Validator\Constraints\AccessCode:
+                message: You have to provide a valid (shared by teacher) access code to join the course.
+                groups: [accept_invite]
 
 Zerebral\BusinessBundle\Model\File\File:
-    getters:
-        name:
-            - NotBlank: ~
-        uploadedFile:
-            - Image:
-                groups: [profile]
-            - File: ~
+     getters:
+         name:
+             - NotBlank: ~
+         uploadedFile:
+             - Image:
+                 groups: [profile]
+             - File: ~
 
 Zerebral\BusinessBundle\Model\Assignment\Assignment:
     getters:
@@ -73,16 +80,3 @@ Zerebral\BusinessBundle\Model\Assignment\Assignment:
             - NotNull: ~
         files:
             - Valid: ~
-
-Zerebral\BusinessBundle\Model\Course\Member:
-    properties:
-        emailList:
-            - NotBlank: ~
-    constraints:
-        - Callback:
-            methods:   [isEmailListValid]
-
-Zerebral\BusinessBundle\Model\Course\AccessCode:
-    properties:
-        accessCode:
-            - NotBlank: ~

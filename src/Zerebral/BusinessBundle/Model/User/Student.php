@@ -34,8 +34,8 @@ class Student extends BaseStudent
 
     public function hasCourse(\Zerebral\BusinessBundle\Model\Course\Course $course)
     {
-        foreach($this->getCourses() as $c){
-            if($course->getId() == $c->getId()){
+        foreach($this->getCourses() as $course){
+            if($course->getId() == $course->getId()){
                 return true;
             }
         }

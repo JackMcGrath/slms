@@ -37,19 +37,28 @@ abstract class BaseTeacherPeer
     const TM_CLASS = 'TeacherTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 2;
+    const NUM_COLUMNS = 5;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 2;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /** the column name for the id field */
     const ID = 'teachers.id';
 
     /** the column name for the user_id field */
     const USER_ID = 'teachers.user_id';
+
+    /** the column name for the bio field */
+    const BIO = 'teachers.bio';
+
+    /** the column name for the subjects field */
+    const SUBJECTS = 'teachers.subjects';
+
+    /** the column name for the grades field */
+    const GRADES = 'teachers.grades';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -70,12 +79,12 @@ abstract class BaseTeacherPeer
      * e.g. TeacherPeer::$fieldNames[TeacherPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'UserId', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'userId', ),
-        BasePeer::TYPE_COLNAME => array (TeacherPeer::ID, TeacherPeer::USER_ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'USER_ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'user_id', ),
-        BasePeer::TYPE_NUM => array (0, 1, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'UserId', 'Bio', 'Subjects', 'Grades', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'userId', 'bio', 'subjects', 'grades', ),
+        BasePeer::TYPE_COLNAME => array (TeacherPeer::ID, TeacherPeer::USER_ID, TeacherPeer::BIO, TeacherPeer::SUBJECTS, TeacherPeer::GRADES, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'USER_ID', 'BIO', 'SUBJECTS', 'GRADES', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'user_id', 'bio', 'subjects', 'grades', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
     /**
@@ -85,12 +94,12 @@ abstract class BaseTeacherPeer
      * e.g. TeacherPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'UserId' => 1, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'userId' => 1, ),
-        BasePeer::TYPE_COLNAME => array (TeacherPeer::ID => 0, TeacherPeer::USER_ID => 1, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'USER_ID' => 1, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'user_id' => 1, ),
-        BasePeer::TYPE_NUM => array (0, 1, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'UserId' => 1, 'Bio' => 2, 'Subjects' => 3, 'Grades' => 4, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'userId' => 1, 'bio' => 2, 'subjects' => 3, 'grades' => 4, ),
+        BasePeer::TYPE_COLNAME => array (TeacherPeer::ID => 0, TeacherPeer::USER_ID => 1, TeacherPeer::BIO => 2, TeacherPeer::SUBJECTS => 3, TeacherPeer::GRADES => 4, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'USER_ID' => 1, 'BIO' => 2, 'SUBJECTS' => 3, 'GRADES' => 4, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'user_id' => 1, 'bio' => 2, 'subjects' => 3, 'grades' => 4, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
     /**
@@ -166,9 +175,15 @@ abstract class BaseTeacherPeer
         if (null === $alias) {
             $criteria->addSelectColumn(TeacherPeer::ID);
             $criteria->addSelectColumn(TeacherPeer::USER_ID);
+            $criteria->addSelectColumn(TeacherPeer::BIO);
+            $criteria->addSelectColumn(TeacherPeer::SUBJECTS);
+            $criteria->addSelectColumn(TeacherPeer::GRADES);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.user_id');
+            $criteria->addSelectColumn($alias . '.bio');
+            $criteria->addSelectColumn($alias . '.subjects');
+            $criteria->addSelectColumn($alias . '.grades');
         }
     }
 
@@ -955,6 +970,15 @@ abstract class BaseTeacherPeer
                 }
             }
         } else {
+
+        if ($obj->isNew() || $obj->isColumnModified(TeacherPeer::BIO))
+            $columns[TeacherPeer::BIO] = $obj->getBio();
+
+        if ($obj->isNew() || $obj->isColumnModified(TeacherPeer::SUBJECTS))
+            $columns[TeacherPeer::SUBJECTS] = $obj->getSubjects();
+
+        if ($obj->isNew() || $obj->isColumnModified(TeacherPeer::GRADES))
+            $columns[TeacherPeer::GRADES] = $obj->getGrades();
 
         }
 

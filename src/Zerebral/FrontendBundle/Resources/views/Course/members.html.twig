@@ -20,6 +20,7 @@
                 <hr/>
 
                 {{ flashMessages.show('delete_course_student_success', 'success') }}
+                {{ flashMessages.show('invites_send', 'success') }}
 
                 {% for member in students %}
                     {{ block('member') }}
@@ -45,7 +46,7 @@
     </div>
 
     <div class="modal hide fade" id="inviteModal">
-        <form method="post" {{ form_enctype(form) }} class="member-form">
+        <form method="post" {{ form_enctype(courseInviteForm) }} class="member-form" action="{{ path('ajax_course_send_invites', {id: course.id}) }}">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h3>Invite users</h3>
@@ -54,7 +55,7 @@
                 <p>
                     To send invitations to join your course, enter one ore more email addresses into the text box, separated by space or new lines, and click "Send Invites" button.
                 </p>
-                {{ form_row(form.emailList, {
+                {{ form_row(courseInviteForm.emails, {
                     label: ' ',
                     form_type: 'horizontal',
                     attr: {
@@ -62,7 +63,7 @@
                         rows: 6
                     }
                 }) }}
-                {{ form_errors(form) }}
+                {{ form_errors(courseInviteForm) }}
                 <div class="clearfix"></div>
                 <p>
                     Your course currently has {{ students|length + teachers|length }} of 50 available. Invite(s) remaining: {{ 50 - students|length - teachers|length }} for your current plan.
@@ -71,7 +72,7 @@
                 <input type="submit" class="btn btn-danger" value="Send invites"/>
                 <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Cancel</a>
             </div>
-            {{ form_rest(form) }}
+            {{ form_rest(courseInviteForm) }}
         </form>
     </div>
 
@@ -88,9 +89,11 @@
                     <i class="icon-gray-mail"></i>Message
                 </a>
 
+                {% if is_granted('EDIT', course) %}
                 <a href="{{ path('course_remove_student', {courseId: course.id, studentId: member.id}) }}" class="delete-confirm">
                     <i class="icon-small-trash-bin"></i>Delete
                 </a>
+                {% endif %}
             </div>
         </div>
 
