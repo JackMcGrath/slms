@@ -42,6 +42,17 @@ class CourseType extends AbstractType
             'empty_data' => 0,
             'invalid_message' => 'Grade level is required.',
         ));
+
+        $builder->add('courseScheduleDays', 'collection', array(
+            'type'   => new CourseScheduleDayType(),
+            'allow_add' => true,
+            'allow_delete' => true,
+            'by_reference' => false,
+            'options'  => array(
+                'required'  => false,
+            ),
+        ));
+
     }
 
     public function getName()
