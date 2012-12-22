@@ -9,9 +9,12 @@ use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\SecureParam;
 use JMS\SecurityExtraBundle\Annotation\PreAuthorize;
 
+use Zerebral\BusinessBundle\Calendar\EventProviders\CourseAssignmentEventsProvider;
+
 use Zerebral\FrontendBundle\Form\Type as FormType;
 use Zerebral\BusinessBundle\Model as Model;
 
+use Zerebral\CommonBundle\Component\Calendar\Calendar;
 /**
  * @Route("/assignments")
  */
@@ -24,7 +27,13 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function indexAction()
     {
+        $provider = new CourseAssignmentEventsProvider($this->getRoleUser()->getAssignments());
+        $currentMonth = new Calendar(time(), $provider);
+        $nextMonth = new Calendar(strtotime("+1 month"), $provider);
+
         return array(
+            'currentMonth' => $currentMonth,
+            'nextMonth' => $nextMonth,
             'assignments' => $this->getRoleUser()->getAssignments(),
             'target' => 'assignments'
         );

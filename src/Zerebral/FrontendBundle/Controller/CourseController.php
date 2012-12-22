@@ -48,7 +48,6 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     /**
      * @Route("/view/{id}", name="course_view")
      * @ParamConverter("course")
-     *
      * @SecureParam(name="course", permissions="VIEW")
      *
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
