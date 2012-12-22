@@ -13,6 +13,14 @@ $(document).ready(function(){
     $('.add_file_link').on('click', addAttachmentField);
 
 
+    $('.remove-uploaded-file').click(function(e) {
+        e.preventDefault();
+        if (window.confirm('Are you sure to delete this attachment?')) {
+            $(e.target).parent().remove();
+        }
+    });
+
+
     $('.icon-new-calendar').datepicker();
     $('.icon-new-clock').timepicker({
         defaultTime: 'value'

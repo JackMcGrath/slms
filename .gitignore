@@ -3,6 +3,8 @@ web/bundles/
 web/css/
 web/js/compiled/
 web/.htaccess
+web/data
+web/img-cache/
 app/bootstrap.php.cache
 app/cache/*
 app/logs/*

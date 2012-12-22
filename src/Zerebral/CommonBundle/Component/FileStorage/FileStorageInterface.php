@@ -10,4 +10,9 @@ interface FileStorageInterface {
      * @throws FileStorageException
      */
     public function save($sourceFilePath, $fileName);
+
+    /**
+     * @return string
+     */
+    public function getName();
 }
