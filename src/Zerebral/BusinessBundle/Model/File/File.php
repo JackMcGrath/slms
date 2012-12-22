@@ -102,6 +102,17 @@ class File extends BaseFile
         return true;
     }
 
+    public function __sleep() {
+        $properties = parent::__sleep();
+        $editedProperties = array();
+        foreach ($properties as $field) {
+            if ($field != 'uploadedFile') {
+                $editedProperties[] = $field;
+            }
+        }
+        return $editedProperties;
+    }
+
 
 
 }

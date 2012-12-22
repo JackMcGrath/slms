@@ -57,12 +57,13 @@ Zerebral\BusinessBundle\Model\Course\Course:
                 groups: [accept_invite]
 
 Zerebral\BusinessBundle\Model\File\File:
-    getters:
-        uploadedFile:
-            - Image:
-                groups: [profile]
-            - File:
-                groups: [assignment]
+     getters:
+         name:
+             - NotBlank: ~
+         uploadedFile:
+             - Image:
+                 groups: [profile]
+             - File: ~
 
 Zerebral\BusinessBundle\Model\Assignment\Assignment:
     getters:
@@ -83,3 +84,5 @@ Zerebral\BusinessBundle\Model\Assignment\Assignment:
                 minMessage: Max points should be numerical and positive
         assignmentCategory:
             - NotNull: ~
+        files:
+            - Valid: ~

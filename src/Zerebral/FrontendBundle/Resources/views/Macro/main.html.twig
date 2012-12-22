@@ -37,3 +37,20 @@
         <li{{ selected == 'members' ? ' class="active"' : '' }}><a href="{{ path('course_members', {id: course.id}) }}">Members</a></li>
     </ul>
 {% endmacro %}
+
+{% macro teacherShortInfo(teacher) %}
+<div class="teacher-profile-widget">
+    <h4>Teacher profile</h4>
+    <ul>
+        <li>
+            <a href="#" >{{ teacher.getUser.getFirstName }} {{ teacher.getUser.getLastName }}</a>
+            <img class="rounded pull-right" src="{{ get_file_storage_link(teacher.getUser.getAvatar()) | imagine_filter('thumbnail') }}"/>
+            <br/><a href="#">email: {{ teacher.getUser.getEmail }}</a>
+            <div class="clearfix"></div>
+        </li>
+        <li>
+            <a href="#" class="btn">Send message</a>
+        </li>
+    </ul>
+</div>
+{% endmacro %}
