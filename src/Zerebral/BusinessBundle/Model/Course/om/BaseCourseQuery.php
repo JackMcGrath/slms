@@ -19,6 +19,7 @@ use Zerebral\BusinessBundle\Model\Assignment\AssignmentCategory;
 use Zerebral\BusinessBundle\Model\Course\Course;
 use Zerebral\BusinessBundle\Model\Course\CoursePeer;
 use Zerebral\BusinessBundle\Model\Course\CourseQuery;
+use Zerebral\BusinessBundle\Model\Course\CourseScheduleDay;
 use Zerebral\BusinessBundle\Model\Course\CourseStudent;
 use Zerebral\BusinessBundle\Model\Course\CourseTeacher;
 use Zerebral\BusinessBundle\Model\Course\Discipline;
@@ -78,6 +79,10 @@ use Zerebral\BusinessBundle\Model\User\Teacher;
  * @method CourseQuery leftJoinCourseTeacher($relationAlias = null) Adds a LEFT JOIN clause to the query using the CourseTeacher relation
  * @method CourseQuery rightJoinCourseTeacher($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CourseTeacher relation
  * @method CourseQuery innerJoinCourseTeacher($relationAlias = null) Adds a INNER JOIN clause to the query using the CourseTeacher relation
+ *
+ * @method CourseQuery leftJoinCourseScheduleDay($relationAlias = null) Adds a LEFT JOIN clause to the query using the CourseScheduleDay relation
+ * @method CourseQuery rightJoinCourseScheduleDay($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CourseScheduleDay relation
+ * @method CourseQuery innerJoinCourseScheduleDay($relationAlias = null) Adds a INNER JOIN clause to the query using the CourseScheduleDay relation
  *
  * @method Course findOne(PropelPDO $con = null) Return the first Course matching the query
  * @method Course findOneOrCreate(PropelPDO $con = null) Return the first Course matching the query, or a new Course object populated from the query conditions when no match is found
@@ -1142,6 +1147,80 @@ abstract class BaseCourseQuery extends ModelCriteria
         return $this
             ->joinCourseTeacher($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'CourseTeacher', '\Zerebral\BusinessBundle\Model\Course\CourseTeacherQuery');
+    }
+
+    /**
+     * Filter the query by a related CourseScheduleDay object
+     *
+     * @param   CourseScheduleDay|PropelObjectCollection $courseScheduleDay  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   CourseQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByCourseScheduleDay($courseScheduleDay, $comparison = null)
+    {
+        if ($courseScheduleDay instanceof CourseScheduleDay) {
+            return $this
+                ->addUsingAlias(CoursePeer::ID, $courseScheduleDay->getCourseId(), $comparison);
+        } elseif ($courseScheduleDay instanceof PropelObjectCollection) {
+            return $this
+                ->useCourseScheduleDayQuery()
+                ->filterByPrimaryKeys($courseScheduleDay->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByCourseScheduleDay() only accepts arguments of type CourseScheduleDay or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the CourseScheduleDay relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return CourseQuery The current query, for fluid interface
+     */
+    public function joinCourseScheduleDay($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('CourseScheduleDay');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'CourseScheduleDay');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the CourseScheduleDay relation CourseScheduleDay object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Zerebral\BusinessBundle\Model\Course\CourseScheduleDayQuery A secondary query class using the current class as primary query
+     */
+    public function useCourseScheduleDayQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinCourseScheduleDay($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CourseScheduleDay', '\Zerebral\BusinessBundle\Model\Course\CourseScheduleDayQuery');
     }
 
     /**

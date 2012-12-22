@@ -55,6 +55,8 @@ Zerebral\BusinessBundle\Model\Course\Course:
             - Zerebral\BusinessBundle\Validator\Constraints\AccessCode:
                 message: You have to provide a valid (shared by teacher) access code to join the course.
                 groups: [accept_invite]
+        courseScheduleDays:
+                    - Valid: ~
 
 Zerebral\BusinessBundle\Model\File\File:
      getters:
@@ -86,3 +88,15 @@ Zerebral\BusinessBundle\Model\Assignment\Assignment:
             - NotNull: ~
         files:
             - Valid: ~
+
+Zerebral\BusinessBundle\Model\Course\CourseScheduleDay:
+    properties:
+        week_day:
+            - NotBlank:
+                message: Day cannot be blank.
+        time_from:
+            - NotBlank:
+                message: Time is required..
+        time_to:
+            - NotBlank:
+                message: Time is required..
