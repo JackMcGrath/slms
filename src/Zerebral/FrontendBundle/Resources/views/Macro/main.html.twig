@@ -33,7 +33,7 @@
         <li{{ selected == 'feed' ? ' class="active"' : '' }}><a href="#">Feed</a></li>
         <li{{ selected == 'assignments' ? ' class="active"' : '' }}><a href="{{ path('course_assignments', {id: course.id}) }}">Assignments</a></li>
         <li{{ selected == 'details' ? ' class="active"' : '' }}><a href="{{ path('course_view', {id: course.id}) }}">Details</a></li>
-        <li{{ selected == 'materials' ? ' class="active"' : '' }}><a href="#">Materials</a></li>
+        <li{{ selected == 'materials' ? ' class="active"' : '' }}><a href="{{ path('course_materials', {id: course.id}) }}">Materials</a></li>
         <li{{ selected == 'members' ? ' class="active"' : '' }}><a href="{{ path('course_members', {id: course.id}) }}">Members</a></li>
     </ul>
 {% endmacro %}
