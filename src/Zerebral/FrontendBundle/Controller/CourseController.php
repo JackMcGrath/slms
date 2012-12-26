@@ -139,6 +139,28 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     }
 
     /**
+     * @Route("/syllabus/{id}", name="course_materials")
+     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @ParamConverter("course")
+     * @Template()
+     */
+    public function materialsAction(Model\Course\Course $course)
+    {
+        $dayMaterials = array();
+
+        $dayMaterials[strtotime('now')] = array('1', '2');
+        $dayMaterials[strtotime('-2 days')] = array('1', '2');
+
+        return array(
+            'dayMaterials' => $dayMaterials,
+            'course' => $course,
+            'target' => 'courses'
+        );
+    }
+
+
+
+    /**
      * @Route("/members/{id}", name="course_members")
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @ParamConverter("course")
