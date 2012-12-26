@@ -46,11 +46,11 @@
                 </div>
                 <div class="files">
                     <ul>
-                    {% for file in assignment.getFiles() %}
+                    {% for file in assignment.files %}
                         <li class="file">
                             <img class="icon" src="{{ get_file_storage_link(get_file_icon(file)) | imagine_filter('file_icon') }}" />
-                            <a class="link" target="_blank" href="{{ get_file_storage_link(file) }}">{{ file.getName() }}</a><br >
-                            <span class="size">{{ file.getSize() | bytes_to_human }}</span>
+                            <a class="link" target="_blank" href="{{ get_file_storage_link(file) }}">{{ file.name }}</a><br >
+                            <span class="size">{{ file.size | bytes_to_human }}</span>
                         </li>
                     {% endfor %}
                     </ul>
@@ -62,6 +62,50 @@
             <div class="grading">
                 <h4>Grading: 20</h4> <span class="label label-important">Failed</span> <i class="info-icon icon-small-info"></i>
             </div>
+
+            <div class="block solutions">
+                <div class="solutions-widget">
+                    <h4>Solution files</h4>
+                    <ul>
+                        {% for file in assignment.files %}
+                            <li class="file">
+                                <i class="icon-search"></i>
+                                <a class="link" target="_blank" href="{{ get_file_storage_link(file) }}">{{ file.name }}</a>
+                                <i class="icon-small-trash-bin"></i><a class="remove-uploaded-file" href="#">Delete</a>
+                            </li>
+                        {% else %}
+                            <span class="gray">No soultion files yet.<br />Press "Upload" button to attach first one</span>
+                        {% endfor %}
+                    </ul>
+                    <div class="buttons">
+                        <a href="#uploadModal" class="btn" data-toggle="modal" data-target="#uploadModal">Upload</a>
+                        <input type="button" class="btn btn-danger" value="Submit for review" />
+                    </div>
+                    <span class="gray"><b>Note:</b> You cannot modify anything upon submit</span>
+                </div>
+            </div>
+
+            <div class="block teacher-profile">
+                {{ mainPartials.teacherShortInfo(assignment.course.teacher) }}
+            </div>
+        </div>
+
+        <div class="modal hide fade" id="uploadModal">
+            <form method="post" class="member-form">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h3>Upload solution files</h3>
+                </div>
+                <div class="modal-body">
+                    <ul class="uploadedFiles">
+                        <a id="addUploadFile" href="#">Add another file</a> <span class="gray">(Maximum size: 1MB)</span>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <input type="submit" class="btn btn-danger" value="Upload" />
+                    <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Cancel</a>
+                </div>
+            </form>
         </div>
 
     </div>
