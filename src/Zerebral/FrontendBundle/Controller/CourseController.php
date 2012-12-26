@@ -148,8 +148,9 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     {
         $dayMaterials = array();
 
-        $dayMaterials[strtotime('now')] = array('1', '2');
-        $dayMaterials[strtotime('-2 days')] = array('1', '2');
+        foreach ($course->getCourseMaterials() as $material) {
+            $dayMaterials[$material->getCreatedAt('U')][] = $material;
+        }
 
         return array(
             'dayMaterials' => $dayMaterials,

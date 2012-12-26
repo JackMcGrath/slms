@@ -24,22 +24,21 @@
                 {% for date,day in dayMaterials %}
                     <div class="date">{{ date | date('l, d F Y') }}</div>
 
-                    {% for materials in day %}
+                    {% for material in day %}
                         <div class="material-item{{ loop.last ? ' last' : '' }}">
                             <div class="type">
-                                <img src="/img/icons/files/pack_01/word.png" width="30"/>
+                                <img src="/img/{{ get_file_icon(material.file).name }}" width="30"/>
                             </div>
                             <div class="details">
                                 <div class="title">
-                                    <h3>Source_SET_25-June-2012.zip</h3>
+                                    <h3>{{ material.file.name }}</h3>
                                 </div>
-                                <div class="description">SET Storyboard v.1 (Draft)</div>
+                                <div class="description">{{ material.description }}</div>
                                 <div class="info">
-                                    by Gregory Baker in <a href="#" class="folder"><i class="icon-small-folder"></i>Week 1 - Getting started week</a> 15 MB <span class="separator">/</span>
+                                    by {{ material.teacher.fullName }} {% if material.courseFolder %}in <a href="#" class="folder"><i class="icon-small-folder"></i>{{ material.courseFolder.name }}</a>{% endif %} {{ material.file.size | bytes_to_human }} <span class="separator">/</span>
                                     <div class="manage-buttons">
                                         <a href="#"><i class="icon-small-pencil"></i>Edit</a> <a href="#"><i class="icon-small-trash-bin"></i>Delete</a>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
