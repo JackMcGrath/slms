@@ -57,11 +57,11 @@
             {% if is_granted('ADD_ASSIGNMENT', course) %}
                 <a href="{{ path('assignment_add', {courseId: course.id}) }}" class="btn create-course big-button top-buttons">create assignment</a>
             {% endif %}
-            <div class="upcoming-assignments">
+            <div class="block">
                 {{ mainPartials.upcomingAssignments(upcomingAssignments) }}
             </div>
 
-            <div class="upcoming-assignments">
+            <div class="block">
                 <h4>Recent materials</h4>
                 <ul>
                     <li><i class="icon-file"></i> <a href="">Homework_1.doc</a></li>
@@ -71,7 +71,7 @@
                 </ul>
             </div>
 
-            <div class="upcoming-assignments">
+            <div class="block">
                 {{ mainPartials.teacherShortInfo(course.teacher) }}
             </div>
         </div>
