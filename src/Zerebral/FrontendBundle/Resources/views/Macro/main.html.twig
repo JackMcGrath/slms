@@ -44,7 +44,7 @@
     <ul>
         <li>
             <a href="#" >{{ teacher.getUser.getFirstName }} {{ teacher.getUser.getLastName }}</a>
-            <img class="rounded pull-right" src="{{ get_file_storage_link(teacher.getUser.getAvatar()) | imagine_filter('thumbnail') }}"/>
+            <img class="rounded pull-right" src="{{ get_file_storage_link(teacher.getUser.getAvatarFile()) | imagine_filter('thumbnail') }}"/>
             <br/><a href="#">email: {{ teacher.getUser.getEmail }}</a>
             <div class="clearfix"></div>
         </li>

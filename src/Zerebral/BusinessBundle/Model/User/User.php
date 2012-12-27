@@ -306,7 +306,7 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
         return $this->getRoleModel()->getAssignments($c);
     }
 
-     public function getAvatar(PropelPDO $con = null, $doQuery = true) {
+     public function getAvatarFile(PropelPDO $con = null, $doQuery = true) {
          $avatar = parent::getAvatar($con, $doQuery);
          if (is_null($avatar)) {
              $avatarFile = new File();
