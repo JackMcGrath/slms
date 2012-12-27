@@ -186,9 +186,17 @@ div#upload_files_div {
                 li.file {
                     overflow: hidden;
                     text-overflow: ellipsis;
-                    width: 200px;
-                    a {
+                    width: 250px;
+                    a.link {
                         white-space: nowrap;
+                    }
+                    a.remove-uploaded-file {
+                        display: none;
+                    }
+                    &:hover {
+                        a.remove-uploaded-file {
+                            display: inline;
+                        }
                     }
                 }
             }
