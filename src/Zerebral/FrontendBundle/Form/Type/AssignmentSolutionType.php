@@ -30,7 +30,7 @@ class AssignmentSolutionType extends AbstractType
             'allow_add' => true,
             'allow_delete' => false,
             'by_reference' => false,
-            'options' => array('storage' => $this->getFileStorage(), 'error_bubbling' => true)
+            'options' => array('storage' => $this->getFileStorage(), 'error_bubbling' => true, 'error_mapping' => array('name' => 'description'))
         ));
     }
 

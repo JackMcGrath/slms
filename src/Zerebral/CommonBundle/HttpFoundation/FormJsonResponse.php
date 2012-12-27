@@ -30,26 +30,30 @@ class FormJsonResponse extends JsonResponse
 //        return new static($form, $status, $headers);
 //    }
 
-    private function setForm(Form $form)
-    {
-        $data = array();
-        $data['is_empty'] = $form->isEmpty();
-        $data['errors'] = array();
+    private function getErrors($form, &$data, $name = '') {
         foreach($form->all() as $child) {
-            if (count($child->getErrors()) > 0) {
-                $propertyPath = (string) $child->getPropertyPath();
-                if (strpos($propertyPath, '[') === 0) {
-                    $propertyPath = $form->getName() . $propertyPath;
-                } else {
-                    $propertyPath = $form->getName() . "[" . $propertyPath . "]";
-                }
-
-                $data['errors'][$propertyPath] = array();
-                foreach($child->getErrors()as $error) {
-                    $data['errors'][$propertyPath][] = $error->getMessage();
+            $propertyPath = str_replace(array('[', ']'), '', $child->getPropertyPath());
+            if (count($child->all()) > 0) {
+                $this->getErrors($child, $data, ($name . '[' . $propertyPath . ']'));
+            } else {
+                if (count($child->getErrors()) > 0) {
+                    $propertyPath = $name . '[' . $propertyPath . ']';
+                    $data['errors'][$propertyPath] = array();
+                    foreach($child->getErrors()as $error) {
+                        $data['errors'][$propertyPath][] = $error->getMessage();
+                    }
                 }
             }
         }
+    }
+
+    private function setForm(Form $form)
+    {
+
+        $data = array();
+        $data['is_empty'] = $form->isEmpty();
+        $data['errors'] = array();
+        $this->getErrors($form, $data, $form->getName());
         $data['has_errors'] = count($data['errors']) > 0;
         $this->setData($data);
     }

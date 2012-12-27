@@ -92,6 +92,13 @@ Zerebral\BusinessBundle\Model\Assignment\Assignment:
         files:
             - Valid: ~
 
+Zerebral\BusinessBundle\Model\Assignment\StudentAssignment:
+    getters:
+        files:
+            - Valid: ~
+            - Count:
+                min: 1
+
 Zerebral\BusinessBundle\Model\Course\CourseScheduleDay:
     properties:
         week_day:

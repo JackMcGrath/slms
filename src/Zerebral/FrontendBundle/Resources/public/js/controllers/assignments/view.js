@@ -19,7 +19,11 @@ $(document).ready(function(){
         var uploadedFileLisCount = $('.solutions-widget li.file').length;
         var index = fileFieldsCount + uploadedFileLisCount;
 
-        var newLi = $('<li><input type="file" name="assignment_solution[files][' + index + '][uploadedFile]" /><input type="text" name="assignment_solution[files][' + index + '][description]" placeholder="Description (optional)" /></li>');
+
+        var newLi = $('<li class="control-group"></li>');
+        var newFileInput = $('<input type="file" name="assignment_solution[files][' + index + '][uploadedFile]" />');
+        var newDescInput = $('<input type="text" name="assignment_solution[files][' + index + '][description]" placeholder="Description (optional)" />');
+        newLi.append(newFileInput).append(newDescInput);
         if (fileFieldsCount == 0) {
             ul.prepend(newLi);
         } else {
