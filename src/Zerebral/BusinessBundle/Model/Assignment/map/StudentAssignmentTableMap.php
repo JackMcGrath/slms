@@ -68,6 +68,9 @@ class StudentAssignmentTableMap extends TableMap
     {
         $this->addRelation('Student', 'Zerebral\\BusinessBundle\\Model\\User\\Student', RelationMap::MANY_TO_ONE, array('student_id' => 'id', ), 'CASCADE', 'CASCADE');
         $this->addRelation('Assignment', 'Zerebral\\BusinessBundle\\Model\\Assignment\\Assignment', RelationMap::MANY_TO_ONE, array('assignment_id' => 'id', ), 'CASCADE', 'CASCADE');
+        $this->addRelation('FileReferences', 'Zerebral\\BusinessBundle\\Model\\File\\FileReferences', RelationMap::ONE_TO_MANY, array('id' => 'reference_id', ), 'CASCADE', 'CASCADE', 'FileReferencess');
+        $this->addRelation('File', 'Zerebral\\BusinessBundle\\Model\\File\\File', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'CASCADE', 'Files');
+        $this->addRelation('assignmentReferenceId', 'Zerebral\\BusinessBundle\\Model\\Assignment\\Assignment', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'CASCADE', 'assignmentReferenceIds');
     } // buildRelations()
 
     /**

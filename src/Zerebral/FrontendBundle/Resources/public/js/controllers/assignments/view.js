@@ -15,14 +15,38 @@ $(document).ready(function(){
         e.preventDefault();
 
         var ul = $(e.target).parent();
-        var liCount = ul.find('li').length;
-        var newLi = $('<li><input type="file" name="solution[file][' + liCount + ']" /><input type="text" placeholder="Description (optional)" /></li>');
-        if (liCount == 0) {
+        var fileFieldsCount = ul.find('li').length;
+        var uploadedFileLisCount = $('.solutions-widget li.file').length;
+        var index = fileFieldsCount + uploadedFileLisCount;
+
+        var newLi = $('<li><input type="file" name="assignment_solution[files][' + index + '][uploadedFile]" /><input type="text" placeholder="Description (optional)" /></li>');
+        if (fileFieldsCount == 0) {
             ul.prepend(newLi);
         } else {
             $(e.target).prev().append(newLi);
         }
 
     });
+
+    $(document).on('click', '.remove-uploaded-file', function(e) {
+        e.preventDefault();
+        var link = $(e.target).attr('href');
+        if (window.confirm('Are you sure to delete this solution?')) {
+            $.ajax({
+                type: 'post',
+                url: link,
+                success: function() {
+                    $(e.target).parent().slideUp(function() {
+                        $(this).remove();
+                    });
+                },
+                error: function(response) {
+                    alert(response.statusText);
+                }
+            })
+        }
+    });
+
+    $('#ajaxUploadSolutionsForm').zerebralAjaxForm();
 
 });

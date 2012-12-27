@@ -15,6 +15,7 @@ use \PropelPDO;
 use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\QueryEvent;
 use Zerebral\BusinessBundle\Model\Assignment\Assignment;
+use Zerebral\BusinessBundle\Model\Assignment\StudentAssignment;
 use Zerebral\BusinessBundle\Model\File\File;
 use Zerebral\BusinessBundle\Model\File\FilePeer;
 use Zerebral\BusinessBundle\Model\File\FileQuery;
@@ -614,6 +615,23 @@ abstract class BaseFileQuery extends ModelCriteria
         return $this
             ->useFileReferencesQuery()
             ->filterByassignmentReferenceId($assignment, $comparison)
+            ->endUse();
+    }
+
+    /**
+     * Filter the query by a related StudentAssignment object
+     * using the file_references table as cross reference
+     *
+     * @param   StudentAssignment $studentAssignment the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   FileQuery The current query, for fluid interface
+     */
+    public function filterBystudentAssignmentReferenceId($studentAssignment, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useFileReferencesQuery()
+            ->filterBystudentAssignmentReferenceId($studentAssignment, $comparison)
             ->endUse();
     }
 

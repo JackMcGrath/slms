@@ -63,15 +63,16 @@
                 <h4>Grading: 20</h4> <span class="label label-important">Failed</span> <i class="info-icon icon-small-info"></i>
             </div>
 
+            {% if user.isStudent() %}
             <div class="block solutions">
                 <div class="solutions-widget">
                     <h4>Solution files</h4>
                     <ul>
-                        {% for file in assignment.files %}
+                        {% for file in studentAssignment.files %}
                             <li class="file">
                                 <i class="icon-search"></i>
                                 <a class="link" target="_blank" href="{{ get_file_storage_link(file) }}">{{ file.name }}</a>
-                                <i class="icon-small-trash-bin"></i><a class="remove-uploaded-file" href="#">Delete</a>
+                                <i class="icon-small-trash-bin"></i><a class="remove-uploaded-file" href="{{ path('ajax_student_assignment_solutions_remove', {id: studentAssignment.id, fileId: file.id}) }}">Delete</a>
                             </li>
                         {% else %}
                             <span class="gray">No soultion files yet.<br />Press "Upload" button to attach first one</span>
@@ -85,27 +86,30 @@
                 </div>
             </div>
 
+            <div class="modal hide fade" id="uploadModal">
+                <form id="ajaxUploadSolutionsForm" method="post" {{ form_enctype(solutionForm) }} class="member-form" action="{{ path('ajax_student_assignment_solutions_upload', {id: studentAssignment.id}) }}">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h3>Upload solution files</h3>
+                    </div>
+                    <div class="modal-body">
+                        <ul class="uploadedFiles">
+                            <a id="addUploadFile" href="#">Add another file</a> <span class="gray">(Maximum size: 1MB)</span>
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="submit" class="btn btn-danger" value="Upload" />
+                        <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Cancel</a>
+                    </div>
+                    {{ form_widget(solutionForm._token) }}
+                </form>
+            </div>
+
+            {% endif %}
+
             <div class="block teacher-profile">
                 {{ mainPartials.teacherShortInfo(assignment.course.teacher) }}
             </div>
-        </div>
-
-        <div class="modal hide fade" id="uploadModal">
-            <form method="post" class="member-form">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h3>Upload solution files</h3>
-                </div>
-                <div class="modal-body">
-                    <ul class="uploadedFiles">
-                        <a id="addUploadFile" href="#">Add another file</a> <span class="gray">(Maximum size: 1MB)</span>
-                    </ul>
-                </div>
-                <div class="modal-footer">
-                    <input type="submit" class="btn btn-danger" value="Upload" />
-                    <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Cancel</a>
-                </div>
-            </form>
         </div>
 
     </div>

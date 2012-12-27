@@ -21,4 +21,13 @@ class FileQuery extends BaseFileQuery
             ->addAnd('file_references.reference_type', $this->getReferenceType($assignment))
             ->endUse();
     }
+
+    /** @inheritdoc */
+    public function filterBystudentAssignmentReferenceId($studentAssignment, $comparison = Criteria::EQUAL) {
+        return $this
+            ->useFileReferencesQuery()
+            ->filterBystudentAssignmentReferenceId($studentAssignment, $comparison)
+            ->addAnd('file_references.reference_type', $this->getReferenceType($studentAssignment))
+            ->endUse();
+    }
 }

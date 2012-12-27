@@ -9,10 +9,15 @@ use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\SecureParam;
 use JMS\SecurityExtraBundle\Annotation\PreAuthorize;
 
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Zerebral\CommonBundle\HttpFoundation\FormJsonResponse;
+
 use Zerebral\BusinessBundle\Calendar\EventProviders\CourseAssignmentEventsProvider;
 
 use Zerebral\FrontendBundle\Form\Type as FormType;
 use Zerebral\BusinessBundle\Model as Model;
+
+use \Criteria;
 
 use Zerebral\CommonBundle\Component\Calendar\Calendar;
 /**
@@ -49,11 +54,80 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function viewAction(Model\Assignment\Assignment $assignment)
     {
-        return array(
+        $user = $this->getRoleUser();
+        $optionalReturn = array();
+
+        if ($user->isStudent()) {
+            $assignmentSolutionType = new FormType\AssignmentSolutionType();
+            $assignmentSolutionType->setFileStorage($this->container->get('zerebral.file_storage')->getFileStorage('local'));
+
+            $criteria = new \Criteria();
+            $criteria->add('assignment_id', $assignment->getId());
+            $studentAssignment = $user->getStudentAssignments($criteria)->getFirst();
+
+            $form = $this->createForm($assignmentSolutionType, $studentAssignment);
+
+            $optionalReturn['solutionForm'] = $form->createView();
+            $optionalReturn['studentAssignment'] = $studentAssignment;
+        }
+
+
+        $return = array(
             'course' => $assignment->getCourse(),
             'assignment' => $assignment,
+            'user' => $this->getRoleUser(),
             'target' => 'assignments'
         );
+
+        return array_merge($return, $optionalReturn);
+    }
+
+    /**
+     * @Route("/upload-solutions/{id}", name="ajax_student_assignment_solutions_upload")
+     * @ParamConverter("studentAssignment")
+     *
+     * @PreAuthorize("hasRole('ROLE_STUDENT')")
+     * @Template()
+     */
+    public function uploadSolutionAction(Model\Assignment\StudentAssignment $studentAssignment) {
+
+        $assignmentSolutionType = new FormType\AssignmentSolutionType();
+        $assignmentSolutionType->setFileStorage($this->container->get('zerebral.file_storage')->getFileStorage('local'));
+
+        $form = $this->createForm($assignmentSolutionType, $studentAssignment);
+        $form->bind($this->getRequest());
+
+        if ($form->isValid()) {
+            $studentAssignment->save();
+            return new JsonResponse(array(
+                'redirect' => $this->generateUrl(
+                    'assignment_view',
+                    array(
+                        'id' => $studentAssignment->getAssignment()->getId()
+                    )
+                )
+            ));
+        }
+
+        return new FormJsonResponse($form);
+    }
+
+    /**
+     * @Route("/remove-solutions/{id}/{fileId}", name="ajax_student_assignment_solutions_remove")
+     * @ParamConverter("studentAssignment", options={"mapping": {"id": "id"}})
+     * @ParamConverter("file", options={"mapping": {"fileId": "id"}})
+     *
+     * @PreAuthorize("hasRole('ROLE_STUDENT')")
+     * @Template()
+     */
+    public function removeSolutionAction(Model\Assignment\StudentAssignment $studentAssignment, \Zerebral\BusinessBundle\Model\File\File $file) {
+        $fileStudentAssignment = $file->getstudentAssignmentReferenceIds();
+        if ((count($fileStudentAssignment) === 1) && ($fileStudentAssignment[0]->getId() === $studentAssignment->getId())) {
+            $file->delete();
+            return new JsonResponse(array('success' => true));
+        }
+
+        throw new \Symfony\Component\HttpKernel\Exception\HttpException(404, 'File doesn\'t belong to student assignment');
     }
 
    /**

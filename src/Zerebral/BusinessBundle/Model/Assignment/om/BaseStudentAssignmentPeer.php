@@ -15,6 +15,7 @@ use Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer;
 use Zerebral\BusinessBundle\Model\Assignment\StudentAssignment;
 use Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentPeer;
 use Zerebral\BusinessBundle\Model\Assignment\map\StudentAssignmentTableMap;
+use Zerebral\BusinessBundle\Model\File\FileReferencesPeer;
 use Zerebral\BusinessBundle\Model\User\StudentPeer;
 
 abstract class BaseStudentAssignmentPeer
@@ -258,7 +259,7 @@ abstract class BaseStudentAssignmentPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement directly (for example
+     * Use this method directly if you want to work with an executed statement durirectly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -374,6 +375,9 @@ abstract class BaseStudentAssignmentPeer
      */
     public static function clearRelatedInstancePool()
     {
+        // Invalidate objects in FileReferencesPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        FileReferencesPeer::clearInstancePool();
     }
 
     /**

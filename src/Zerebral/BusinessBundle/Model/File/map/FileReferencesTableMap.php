@@ -45,6 +45,7 @@ class FileReferencesTableMap extends TableMap
         // columns
         $this->addForeignPrimaryKey('file_id', 'fileId', 'INTEGER' , 'files', 'id', true, null, null);
         $this->addForeignPrimaryKey('reference_id', 'referenceId', 'INTEGER' , 'assignments', 'id', true, null, null);
+        $this->addForeignPrimaryKey('reference_id', 'referenceId', 'INTEGER' , 'student_assignments', 'id', true, null, null);
         $this->addPrimaryKey('reference_type', 'referenceType', 'CHAR', true, null, null);
         // validators
     } // initialize()
@@ -56,6 +57,7 @@ class FileReferencesTableMap extends TableMap
     {
         $this->addRelation('File', 'Zerebral\\BusinessBundle\\Model\\File\\File', RelationMap::MANY_TO_ONE, array('file_id' => 'id', ), 'CASCADE', 'CASCADE');
         $this->addRelation('assignmentReferenceId', 'Zerebral\\BusinessBundle\\Model\\Assignment\\Assignment', RelationMap::MANY_TO_ONE, array('reference_id' => 'id', ), 'CASCADE', 'CASCADE');
+        $this->addRelation('studentAssignmentReferenceId', 'Zerebral\\BusinessBundle\\Model\\Assignment\\StudentAssignment', RelationMap::MANY_TO_ONE, array('reference_id' => 'id', ), 'CASCADE', 'CASCADE');
     } // buildRelations()
 
     /**
