@@ -87,7 +87,7 @@
                     {% if not studentAssignment.isSubmitted %}
                     <div class="buttons">
                         <a href="#uploadModal" class="btn" data-toggle="modal" data-target="#uploadModal">Upload</a>
-                        <a href="{{ path('student_assignment_solutions_submit', {id: studentAssignment.id }) }}" class="btn btn-danger">Submit for review</a>
+                        <a id="submitSolutionsButton" href="{{ path('student_assignment_solutions_submit', {id: studentAssignment.id }) }}" class="btn btn-danger">Submit for review</a>
                     </div>
                     {% endif %}
                     <span class="gray"><b>Note:</b> You cannot modify anything upon submit</span>

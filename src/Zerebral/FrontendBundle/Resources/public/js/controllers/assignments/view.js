@@ -32,6 +32,14 @@ $(document).ready(function(){
 
     });
 
+    $('#submitSolutionsButton').click(function(e) {
+        if (window.confirm('Dou you want to publish submit your solutions? You cannot undo this action!')) {
+
+        } else {
+            e.preventDefault();
+        }
+    });
+
     $('.solutions-widget i.file-info').tooltip();
 
     $(document).on('click', '.remove-uploaded-file', function(e) {
