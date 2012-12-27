@@ -46,6 +46,7 @@ class StudentAssignmentTableMap extends TableMap
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('student_id', 'StudentId', 'INTEGER', 'students', 'id', true, null, null);
         $this->addForeignKey('assignment_id', 'AssignmentId', 'INTEGER', 'assignments', 'id', true, null, null);
+        $this->addColumn('is_submitted', 'IsSubmitted', 'BOOLEAN', true, 1, false);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', true, null, null);
         // validators
         $this->addValidator('id', 'required', 'propel.validator.RequiredValidator', '', 'The field id is required.');
@@ -68,6 +69,9 @@ class StudentAssignmentTableMap extends TableMap
     {
         $this->addRelation('Student', 'Zerebral\\BusinessBundle\\Model\\User\\Student', RelationMap::MANY_TO_ONE, array('student_id' => 'id', ), 'CASCADE', 'CASCADE');
         $this->addRelation('Assignment', 'Zerebral\\BusinessBundle\\Model\\Assignment\\Assignment', RelationMap::MANY_TO_ONE, array('assignment_id' => 'id', ), 'CASCADE', 'CASCADE');
+        $this->addRelation('FileReferences', 'Zerebral\\BusinessBundle\\Model\\File\\FileReferences', RelationMap::ONE_TO_MANY, array('id' => 'reference_id', ), 'CASCADE', 'CASCADE', 'FileReferencess');
+        $this->addRelation('File', 'Zerebral\\BusinessBundle\\Model\\File\\File', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'CASCADE', 'Files');
+        $this->addRelation('assignmentReferenceId', 'Zerebral\\BusinessBundle\\Model\\Assignment\\Assignment', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'CASCADE', 'assignmentReferenceIds');
     } // buildRelations()
 
     /**
