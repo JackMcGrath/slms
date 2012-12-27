@@ -148,8 +148,11 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function materialsAction(Model\Course\Course $course, Model\Material\CourseFolder $folder = null)
     {
-        $dayMaterials = array();
+        $folderType = new FormType\FolderType();
+        $folderForm = $this->createForm($folderType);
 
+
+        $dayMaterials = array();
         $c = new \Criteria();
         if ($folder) {
             $c->add('folder_id', $folder->getId(), \Criteria::EQUAL);
@@ -161,6 +164,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
 
         return array(
             'dayMaterials' => $dayMaterials,
+            'folderRenameForm' => $folderForm->createView(),
             'folder' => $folder,
             'course' => $course,
             'target' => 'courses'

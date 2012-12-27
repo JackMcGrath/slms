@@ -65,22 +65,54 @@
                 </ul>
             </div>
 
-            <div class="block">
-                <div class="title">
-                    <h4>Folders</h4>
-                    <a href="#">Edit</a>
-                </div>
+            <div class="block folders">
+                <h4>Folders</h4>
 
                 <ul class="marker">
-                    <li {{ folder == null ? 'class="active"' : '' }}><i>&#9656;</i><a href="{{ path('course_materials', {id: course.id}) }}">All files</a></li>
+                    <li {{ folder == null ? 'class="active"' : '' }}><i class="marker">&#9656;</i><a href="{{ path('course_materials', {id: course.id}) }}">All files</a></li>
                     {% for courseFolder in course.courseFolders %}
-                        <li {{ folder and courseFolder.id == folder.id ? 'class="active"' : '' }}><i>&#9656;</i><a href="{{ path('course_materials_folder', {id: course.id, folderId: courseFolder.id}) }}">{{ courseFolder.name }}</a></li>
+                        <li {{ folder and courseFolder.id == folder.id ? 'class="active"' : '' }} folderId="{{ courseFolder.id }}" courseId="{{ course.id }}" folderName="{{ courseFolder.name }}">
+                            <i class="marker">&#9656;</i>
+                            <a href="{{ path('course_materials_folder', {id: course.id, folderId: courseFolder.id}) }}">{{ courseFolder.name }}</a>
+                            <div class="manage">
+                                <i class="manage-buttons-gears icon-small-gears"></i>
+                                <div class="manage-buttons invisible">
+                                    {% if is_granted('EDIT', courseFolder) %}<a href="#" class="edit"><i class="icon-small-pencil"></i>Edit</a>{% endif %}
+                                    {% if is_granted('DELETE', courseFolder) %}<a href="{{ path('delete_folder', {id: courseFolder.id}) }}" class="delete"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
+                                </div>
+                            </div>
+                        </li>
                     {% endfor %}
                 </ul>
             </div>
 
         </div>
 
+    </div>
+
+    <div class="modal hide fade" id="editFolderModal">
+        <form class="form-vertical folder-form" action="{{ path('ajax_course_join') }}" method="post" {{ form_enctype(folderRenameForm) }} novalidate>
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3>Rename folder</h3>
+            </div>
+            <div class="modal-body">
+                {{ form_row(folderRenameForm.name, {
+                    label: 'Name',
+                    form_type: 'horizontal',
+                    placeholder: 'Folder name',
+                    attr: {
+                        class: 'input-xlarge'
+                    }
+                }) }}
+
+                {{ form_rest(folderRenameForm) }}
+
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-danger">Save</button>
+            </div>
+        </form>
     </div>
 
 
