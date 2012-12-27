@@ -19,6 +19,7 @@ use Zerebral\BusinessBundle\Model\Assignment\AssignmentCategory;
 use Zerebral\BusinessBundle\Model\Course\Course;
 use Zerebral\BusinessBundle\Model\Course\CourseTeacher;
 use Zerebral\BusinessBundle\Model\Course\Discipline;
+use Zerebral\BusinessBundle\Model\Material\CourseMaterial;
 use Zerebral\BusinessBundle\Model\User\Teacher;
 use Zerebral\BusinessBundle\Model\User\TeacherPeer;
 use Zerebral\BusinessBundle\Model\User\TeacherQuery;
@@ -64,6 +65,10 @@ use Zerebral\BusinessBundle\Model\User\User;
  * @method TeacherQuery leftJoinCourseTeacher($relationAlias = null) Adds a LEFT JOIN clause to the query using the CourseTeacher relation
  * @method TeacherQuery rightJoinCourseTeacher($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CourseTeacher relation
  * @method TeacherQuery innerJoinCourseTeacher($relationAlias = null) Adds a INNER JOIN clause to the query using the CourseTeacher relation
+ *
+ * @method TeacherQuery leftJoinCourseMaterial($relationAlias = null) Adds a LEFT JOIN clause to the query using the CourseMaterial relation
+ * @method TeacherQuery rightJoinCourseMaterial($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CourseMaterial relation
+ * @method TeacherQuery innerJoinCourseMaterial($relationAlias = null) Adds a INNER JOIN clause to the query using the CourseMaterial relation
  *
  * @method Teacher findOne(PropelPDO $con = null) Return the first Teacher matching the query
  * @method Teacher findOneOrCreate(PropelPDO $con = null) Return the first Teacher matching the query, or a new Teacher object populated from the query conditions when no match is found
@@ -870,6 +875,80 @@ abstract class BaseTeacherQuery extends ModelCriteria
         return $this
             ->joinCourseTeacher($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'CourseTeacher', '\Zerebral\BusinessBundle\Model\Course\CourseTeacherQuery');
+    }
+
+    /**
+     * Filter the query by a related CourseMaterial object
+     *
+     * @param   CourseMaterial|PropelObjectCollection $courseMaterial  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   TeacherQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByCourseMaterial($courseMaterial, $comparison = null)
+    {
+        if ($courseMaterial instanceof CourseMaterial) {
+            return $this
+                ->addUsingAlias(TeacherPeer::ID, $courseMaterial->getCreatedBy(), $comparison);
+        } elseif ($courseMaterial instanceof PropelObjectCollection) {
+            return $this
+                ->useCourseMaterialQuery()
+                ->filterByPrimaryKeys($courseMaterial->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByCourseMaterial() only accepts arguments of type CourseMaterial or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the CourseMaterial relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return TeacherQuery The current query, for fluid interface
+     */
+    public function joinCourseMaterial($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('CourseMaterial');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'CourseMaterial');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the CourseMaterial relation CourseMaterial object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Zerebral\BusinessBundle\Model\Material\CourseMaterialQuery A secondary query class using the current class as primary query
+     */
+    public function useCourseMaterialQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinCourseMaterial($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CourseMaterial', '\Zerebral\BusinessBundle\Model\Material\CourseMaterialQuery');
     }
 
     /**

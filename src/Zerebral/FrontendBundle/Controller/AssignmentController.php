@@ -227,16 +227,24 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
 
     /**
      * @Route("/delete/{id}", name="assignment_delete")
-     * @ParamConverter("assignment")
+     * @Route("/delete/{id}/{courseId}", name="course_assignment_delete")
+
+     * @ParamConverter("assignment", options={"mapping": {"id": "id"}})
+     * @ParamConverter("course", options={"mapping": {"courseId": "id"}})
      *
      * @SecureParam(name="assignment", permissions="DELETE")
      * @PreAuthorize("hasRole('ROLE_TEACHER')")
      * @Template()
      */
-    public function deleteAction(Model\Assignment\Assignment $assignment = null)
+    public function deleteAction(Model\Assignment\Assignment $assignment, Model\Course\Course $course = null)
     {
         $assignment->delete();
         $this->setFlash('delete_assignment_success', 'Assignment <b>' . $assignment->getName() . '</b> has been successfully deleted from course ' . $assignment->getCourse()->getName() . '.');
-        return $this->redirect($this->generateUrl('assignments'));
+        if ($course) {
+            return $this->redirect($this->generateUrl('course_assignments', array('id' => $course->getId())));
+        } else {
+            return $this->redirect($this->generateUrl('assignments'));
+        }
+
     }
 }

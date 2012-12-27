@@ -1,6 +1,6 @@
 <?php
 
-namespace Zerebral\BusinessBundle\Model\File\om;
+namespace Zerebral\BusinessBundle\Model\Material\om;
 
 use \BasePeer;
 use \Criteria;
@@ -11,66 +11,53 @@ use \PropelException;
 use \PropelPDO;
 use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\PeerEvent;
-use Zerebral\BusinessBundle\Model\File\File;
-use Zerebral\BusinessBundle\Model\File\FilePeer;
-use Zerebral\BusinessBundle\Model\File\FileReferencesPeer;
-use Zerebral\BusinessBundle\Model\File\map\FileTableMap;
+use Zerebral\BusinessBundle\Model\Course\CoursePeer;
+use Zerebral\BusinessBundle\Model\Material\CourseFolder;
+use Zerebral\BusinessBundle\Model\Material\CourseFolderPeer;
 use Zerebral\BusinessBundle\Model\Material\CourseMaterialPeer;
-use Zerebral\BusinessBundle\Model\User\UserPeer;
+use Zerebral\BusinessBundle\Model\Material\map\CourseFolderTableMap;
 
-abstract class BaseFilePeer
+abstract class BaseCourseFolderPeer
 {
 
     /** the default database name for this class */
     const DATABASE_NAME = 'default';
 
     /** the table name for this class */
-    const TABLE_NAME = 'files';
+    const TABLE_NAME = 'course_folders';
 
     /** the related Propel class for this table */
-    const OM_CLASS = 'Zerebral\\BusinessBundle\\Model\\File\\File';
+    const OM_CLASS = 'Zerebral\\BusinessBundle\\Model\\Material\\CourseFolder';
 
     /** the related TableMap class for this table */
-    const TM_CLASS = 'FileTableMap';
+    const TM_CLASS = 'CourseFolderTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 7;
+    const NUM_COLUMNS = 3;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 7;
+    const NUM_HYDRATE_COLUMNS = 3;
 
     /** the column name for the id field */
-    const ID = 'files.id';
+    const ID = 'course_folders.id';
+
+    /** the column name for the course_id field */
+    const COURSE_ID = 'course_folders.course_id';
 
     /** the column name for the name field */
-    const NAME = 'files.name';
-
-    /** the column name for the description field */
-    const DESCRIPTION = 'files.description';
-
-    /** the column name for the size field */
-    const SIZE = 'files.size';
-
-    /** the column name for the mime_type field */
-    const MIME_TYPE = 'files.mime_type';
-
-    /** the column name for the storage field */
-    const STORAGE = 'files.storage';
-
-    /** the column name for the created_at field */
-    const CREATED_AT = 'files.created_at';
+    const NAME = 'course_folders.name';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
 
     /**
-     * An identiy map to hold any loaded instances of File objects.
+     * An identiy map to hold any loaded instances of CourseFolder objects.
      * This must be public so that other peer classes can access this when hydrating from JOIN
      * queries.
-     * @var        array File[]
+     * @var        array CourseFolder[]
      */
     public static $instances = array();
 
@@ -79,30 +66,30 @@ abstract class BaseFilePeer
      * holds an array of fieldnames
      *
      * first dimension keys are the type constants
-     * e.g. FilePeer::$fieldNames[FilePeer::TYPE_PHPNAME][0] = 'Id'
+     * e.g. CourseFolderPeer::$fieldNames[CourseFolderPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'Description', 'Size', 'MimeType', 'Storage', 'CreatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'description', 'size', 'mimeType', 'storage', 'createdAt', ),
-        BasePeer::TYPE_COLNAME => array (FilePeer::ID, FilePeer::NAME, FilePeer::DESCRIPTION, FilePeer::SIZE, FilePeer::MIME_TYPE, FilePeer::STORAGE, FilePeer::CREATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', 'DESCRIPTION', 'SIZE', 'MIME_TYPE', 'STORAGE', 'CREATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'description', 'size', 'mime_type', 'storage', 'created_at', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'CourseId', 'Name', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'courseId', 'name', ),
+        BasePeer::TYPE_COLNAME => array (CourseFolderPeer::ID, CourseFolderPeer::COURSE_ID, CourseFolderPeer::NAME, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'COURSE_ID', 'NAME', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'course_id', 'name', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, )
     );
 
     /**
      * holds an array of keys for quick access to the fieldnames array
      *
      * first dimension keys are the type constants
-     * e.g. FilePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
+     * e.g. CourseFolderPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'Description' => 2, 'Size' => 3, 'MimeType' => 4, 'Storage' => 5, 'CreatedAt' => 6, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'description' => 2, 'size' => 3, 'mimeType' => 4, 'storage' => 5, 'createdAt' => 6, ),
-        BasePeer::TYPE_COLNAME => array (FilePeer::ID => 0, FilePeer::NAME => 1, FilePeer::DESCRIPTION => 2, FilePeer::SIZE => 3, FilePeer::MIME_TYPE => 4, FilePeer::STORAGE => 5, FilePeer::CREATED_AT => 6, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, 'DESCRIPTION' => 2, 'SIZE' => 3, 'MIME_TYPE' => 4, 'STORAGE' => 5, 'CREATED_AT' => 6, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'description' => 2, 'size' => 3, 'mime_type' => 4, 'storage' => 5, 'created_at' => 6, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CourseId' => 1, 'Name' => 2, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'courseId' => 1, 'name' => 2, ),
+        BasePeer::TYPE_COLNAME => array (CourseFolderPeer::ID => 0, CourseFolderPeer::COURSE_ID => 1, CourseFolderPeer::NAME => 2, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'COURSE_ID' => 1, 'NAME' => 2, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'course_id' => 1, 'name' => 2, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, )
     );
 
     /**
@@ -117,10 +104,10 @@ abstract class BaseFilePeer
      */
     public static function translateFieldName($name, $fromType, $toType)
     {
-        $toNames = FilePeer::getFieldNames($toType);
-        $key = isset(FilePeer::$fieldKeys[$fromType][$name]) ? FilePeer::$fieldKeys[$fromType][$name] : null;
+        $toNames = CourseFolderPeer::getFieldNames($toType);
+        $key = isset(CourseFolderPeer::$fieldKeys[$fromType][$name]) ? CourseFolderPeer::$fieldKeys[$fromType][$name] : null;
         if ($key === null) {
-            throw new PropelException("'$name' could not be found in the field names of type '$fromType'. These are: " . print_r(FilePeer::$fieldKeys[$fromType], true));
+            throw new PropelException("'$name' could not be found in the field names of type '$fromType'. These are: " . print_r(CourseFolderPeer::$fieldKeys[$fromType], true));
         }
 
         return $toNames[$key];
@@ -137,11 +124,11 @@ abstract class BaseFilePeer
      */
     public static function getFieldNames($type = BasePeer::TYPE_PHPNAME)
     {
-        if (!array_key_exists($type, FilePeer::$fieldNames)) {
+        if (!array_key_exists($type, CourseFolderPeer::$fieldNames)) {
             throw new PropelException('Method getFieldNames() expects the parameter $type to be one of the class constants BasePeer::TYPE_PHPNAME, BasePeer::TYPE_STUDLYPHPNAME, BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_NUM. ' . $type . ' was given.');
         }
 
-        return FilePeer::$fieldNames[$type];
+        return CourseFolderPeer::$fieldNames[$type];
     }
 
     /**
@@ -153,12 +140,12 @@ abstract class BaseFilePeer
      *		$c->addJoin(TablePeer::alias("alias1", TablePeer::PRIMARY_KEY_COLUMN), TablePeer::PRIMARY_KEY_COLUMN);
      * </code>
      * @param      string $alias The alias for the current table.
-     * @param      string $column The column name for current table. (i.e. FilePeer::COLUMN_NAME).
+     * @param      string $column The column name for current table. (i.e. CourseFolderPeer::COLUMN_NAME).
      * @return string
      */
     public static function alias($alias, $column)
     {
-        return str_replace(FilePeer::TABLE_NAME.'.', $alias.'.', $column);
+        return str_replace(CourseFolderPeer::TABLE_NAME.'.', $alias.'.', $column);
     }
 
     /**
@@ -176,21 +163,13 @@ abstract class BaseFilePeer
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(FilePeer::ID);
-            $criteria->addSelectColumn(FilePeer::NAME);
-            $criteria->addSelectColumn(FilePeer::DESCRIPTION);
-            $criteria->addSelectColumn(FilePeer::SIZE);
-            $criteria->addSelectColumn(FilePeer::MIME_TYPE);
-            $criteria->addSelectColumn(FilePeer::STORAGE);
-            $criteria->addSelectColumn(FilePeer::CREATED_AT);
+            $criteria->addSelectColumn(CourseFolderPeer::ID);
+            $criteria->addSelectColumn(CourseFolderPeer::COURSE_ID);
+            $criteria->addSelectColumn(CourseFolderPeer::NAME);
         } else {
             $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.course_id');
             $criteria->addSelectColumn($alias . '.name');
-            $criteria->addSelectColumn($alias . '.description');
-            $criteria->addSelectColumn($alias . '.size');
-            $criteria->addSelectColumn($alias . '.mime_type');
-            $criteria->addSelectColumn($alias . '.storage');
-            $criteria->addSelectColumn($alias . '.created_at');
         }
     }
 
@@ -210,21 +189,21 @@ abstract class BaseFilePeer
         // We need to set the primary table name, since in the case that there are no WHERE columns
         // it will be impossible for the BasePeer::createSelectSql() method to determine which
         // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(FilePeer::TABLE_NAME);
+        $criteria->setPrimaryTableName(CourseFolderPeer::TABLE_NAME);
 
         if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
             $criteria->setDistinct();
         }
 
         if (!$criteria->hasSelectClause()) {
-            FilePeer::addSelectColumns($criteria);
+            CourseFolderPeer::addSelectColumns($criteria);
         }
 
         $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
-        $criteria->setDbName(FilePeer::DATABASE_NAME); // Set the correct dbName
+        $criteria->setDbName(CourseFolderPeer::DATABASE_NAME); // Set the correct dbName
 
         if ($con === null) {
-            $con = Propel::getConnection(FilePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(CourseFolderPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
         // BasePeer returns a PDOStatement
         $stmt = BasePeer::doCount($criteria, $con);
@@ -243,7 +222,7 @@ abstract class BaseFilePeer
      *
      * @param      Criteria $criteria object used to create the SELECT statement.
      * @param      PropelPDO $con
-     * @return                 File
+     * @return                 CourseFolder
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -251,7 +230,7 @@ abstract class BaseFilePeer
     {
         $critcopy = clone $criteria;
         $critcopy->setLimit(1);
-        $objects = FilePeer::doSelect($critcopy, $con);
+        $objects = CourseFolderPeer::doSelect($critcopy, $con);
         if ($objects) {
             return $objects[0];
         }
@@ -269,7 +248,7 @@ abstract class BaseFilePeer
      */
     public static function doSelect(Criteria $criteria, PropelPDO $con = null)
     {
-        return FilePeer::populateObjects(FilePeer::doSelectStmt($criteria, $con));
+        return CourseFolderPeer::populateObjects(CourseFolderPeer::doSelectStmt($criteria, $con));
     }
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
@@ -287,16 +266,16 @@ abstract class BaseFilePeer
     public static function doSelectStmt(Criteria $criteria, PropelPDO $con = null)
     {
         if ($con === null) {
-            $con = Propel::getConnection(FilePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(CourseFolderPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
         if (!$criteria->hasSelectClause()) {
             $criteria = clone $criteria;
-            FilePeer::addSelectColumns($criteria);
+            CourseFolderPeer::addSelectColumns($criteria);
         }
 
         // Set the correct dbName
-        $criteria->setDbName(FilePeer::DATABASE_NAME);
+        $criteria->setDbName(CourseFolderPeer::DATABASE_NAME);
 
         // BasePeer returns a PDOStatement
         return BasePeer::doSelect($criteria, $con);
@@ -310,7 +289,7 @@ abstract class BaseFilePeer
      * to the cache in order to ensure that the same objects are always returned by doSelect*()
      * and retrieveByPK*() calls.
      *
-     * @param      File $obj A File object.
+     * @param      CourseFolder $obj A CourseFolder object.
      * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
      */
     public static function addInstanceToPool($obj, $key = null)
@@ -319,7 +298,7 @@ abstract class BaseFilePeer
             if ($key === null) {
                 $key = (string) $obj->getId();
             } // if key === null
-            FilePeer::$instances[$key] = $obj;
+            CourseFolderPeer::$instances[$key] = $obj;
         }
     }
 
@@ -331,7 +310,7 @@ abstract class BaseFilePeer
      * methods in your stub classes -- you may need to explicitly remove objects
      * from the cache in order to prevent returning objects that no longer exist.
      *
-     * @param      mixed $value A File object or a primary key value.
+     * @param      mixed $value A CourseFolder object or a primary key value.
      *
      * @return void
      * @throws PropelException - if the value is invalid.
@@ -339,17 +318,17 @@ abstract class BaseFilePeer
     public static function removeInstanceFromPool($value)
     {
         if (Propel::isInstancePoolingEnabled() && $value !== null) {
-            if (is_object($value) && $value instanceof File) {
+            if (is_object($value) && $value instanceof CourseFolder) {
                 $key = (string) $value->getId();
             } elseif (is_scalar($value)) {
                 // assume we've been passed a primary key
                 $key = (string) $value;
             } else {
-                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or File object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
+                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or CourseFolder object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
                 throw $e;
             }
 
-            unset(FilePeer::$instances[$key]);
+            unset(CourseFolderPeer::$instances[$key]);
         }
     } // removeInstanceFromPool()
 
@@ -360,14 +339,14 @@ abstract class BaseFilePeer
      * a multi-column primary key, a serialize()d version of the primary key will be returned.
      *
      * @param      string $key The key (@see getPrimaryKeyHash()) for this instance.
-     * @return   File Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
+     * @return   CourseFolder Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
      * @see        getPrimaryKeyHash()
      */
     public static function getInstanceFromPool($key)
     {
         if (Propel::isInstancePoolingEnabled()) {
-            if (isset(FilePeer::$instances[$key])) {
-                return FilePeer::$instances[$key];
+            if (isset(CourseFolderPeer::$instances[$key])) {
+                return CourseFolderPeer::$instances[$key];
             }
         }
 
@@ -381,24 +360,18 @@ abstract class BaseFilePeer
      */
     public static function clearInstancePool()
     {
-        FilePeer::$instances = array();
+        CourseFolderPeer::$instances = array();
     }
 
     /**
-     * Method to invalidate the instance pool of all tables related to files
+     * Method to invalidate the instance pool of all tables related to course_folders
      * by a foreign key with ON DELETE CASCADE
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in FileReferencesPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        FileReferencesPeer::clearInstancePool();
         // Invalidate objects in CourseMaterialPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         CourseMaterialPeer::clearInstancePool();
-        // Invalidate objects in UserPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        UserPeer::clearInstancePool();
     }
 
     /**
@@ -448,11 +421,11 @@ abstract class BaseFilePeer
         $results = array();
 
         // set the class once to avoid overhead in the loop
-        $cls = FilePeer::getOMClass();
+        $cls = CourseFolderPeer::getOMClass();
         // populate the object(s)
         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key = FilePeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj = FilePeer::getInstanceFromPool($key))) {
+            $key = CourseFolderPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj = CourseFolderPeer::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -461,7 +434,7 @@ abstract class BaseFilePeer
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                FilePeer::addInstanceToPool($obj, $key);
+                CourseFolderPeer::addInstanceToPool($obj, $key);
             } // if key exists
         }
         $stmt->closeCursor();
@@ -475,24 +448,262 @@ abstract class BaseFilePeer
      * @param      int $startcol The 0-based offset for reading from the resultset row.
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
-     * @return array (File object, last column rank)
+     * @return array (CourseFolder object, last column rank)
      */
     public static function populateObject($row, $startcol = 0)
     {
-        $key = FilePeer::getPrimaryKeyHashFromRow($row, $startcol);
-        if (null !== ($obj = FilePeer::getInstanceFromPool($key))) {
+        $key = CourseFolderPeer::getPrimaryKeyHashFromRow($row, $startcol);
+        if (null !== ($obj = CourseFolderPeer::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $startcol, true); // rehydrate
-            $col = $startcol + FilePeer::NUM_HYDRATE_COLUMNS;
+            $col = $startcol + CourseFolderPeer::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = FilePeer::OM_CLASS;
+            $cls = CourseFolderPeer::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $startcol);
-            FilePeer::addInstanceToPool($obj, $key);
+            CourseFolderPeer::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related Course table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinCourse(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(CourseFolderPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            CourseFolderPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(CourseFolderPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(CourseFolderPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(CourseFolderPeer::COURSE_ID, CoursePeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Selects a collection of CourseFolder objects pre-filled with their Course objects.
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of CourseFolder objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinCourse(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(CourseFolderPeer::DATABASE_NAME);
+        }
+
+        CourseFolderPeer::addSelectColumns($criteria);
+        $startcol = CourseFolderPeer::NUM_HYDRATE_COLUMNS;
+        CoursePeer::addSelectColumns($criteria);
+
+        $criteria->addJoin(CourseFolderPeer::COURSE_ID, CoursePeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = CourseFolderPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = CourseFolderPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+
+                $cls = CourseFolderPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                CourseFolderPeer::addInstanceToPool($obj1, $key1);
+            } // if $obj1 already loaded
+
+            $key2 = CoursePeer::getPrimaryKeyHashFromRow($row, $startcol);
+            if ($key2 !== null) {
+                $obj2 = CoursePeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = CoursePeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol);
+                    CoursePeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 already loaded
+
+                // Add the $obj1 (CourseFolder) to $obj2 (Course)
+                $obj2->addCourseFolder($obj1);
+
+            } // if joined row was not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining all related tables
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAll(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(CourseFolderPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            CourseFolderPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(CourseFolderPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(CourseFolderPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(CourseFolderPeer::COURSE_ID, CoursePeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+    /**
+     * Selects a collection of CourseFolder objects pre-filled with all related objects.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of CourseFolder objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAll(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(CourseFolderPeer::DATABASE_NAME);
+        }
+
+        CourseFolderPeer::addSelectColumns($criteria);
+        $startcol2 = CourseFolderPeer::NUM_HYDRATE_COLUMNS;
+
+        CoursePeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + CoursePeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(CourseFolderPeer::COURSE_ID, CoursePeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = CourseFolderPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = CourseFolderPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = CourseFolderPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                CourseFolderPeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+            // Add objects for joined Course rows
+
+            $key2 = CoursePeer::getPrimaryKeyHashFromRow($row, $startcol2);
+            if ($key2 !== null) {
+                $obj2 = CoursePeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = CoursePeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    CoursePeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 loaded
+
+                // Add the $obj1 (CourseFolder) to the collection in $obj2 (Course)
+                $obj2->addCourseFolder($obj1);
+            } // if joined row not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
     }
 
     /**
@@ -504,7 +715,7 @@ abstract class BaseFilePeer
      */
     public static function getTableMap()
     {
-        return Propel::getDatabaseMap(FilePeer::DATABASE_NAME)->getTable(FilePeer::TABLE_NAME);
+        return Propel::getDatabaseMap(CourseFolderPeer::DATABASE_NAME)->getTable(CourseFolderPeer::TABLE_NAME);
     }
 
     /**
@@ -512,9 +723,9 @@ abstract class BaseFilePeer
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getDatabaseMap(BaseFilePeer::DATABASE_NAME);
-      if (!$dbMap->hasTable(BaseFilePeer::TABLE_NAME)) {
-        $dbMap->addTableObject(new FileTableMap());
+      $dbMap = Propel::getDatabaseMap(BaseCourseFolderPeer::DATABASE_NAME);
+      if (!$dbMap->hasTable(BaseCourseFolderPeer::TABLE_NAME)) {
+        $dbMap->addTableObject(new CourseFolderTableMap());
       }
     }
 
@@ -526,13 +737,13 @@ abstract class BaseFilePeer
      */
     public static function getOMClass()
     {
-        return FilePeer::OM_CLASS;
+        return CourseFolderPeer::OM_CLASS;
     }
 
     /**
-     * Performs an INSERT on the database, given a File or Criteria object.
+     * Performs an INSERT on the database, given a CourseFolder or Criteria object.
      *
-     * @param      mixed $values Criteria or File object containing data that is used to create the INSERT statement.
+     * @param      mixed $values Criteria or CourseFolder object containing data that is used to create the INSERT statement.
      * @param      PropelPDO $con the PropelPDO connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -541,22 +752,22 @@ abstract class BaseFilePeer
     public static function doInsert($values, PropelPDO $con = null)
     {
         if ($con === null) {
-            $con = Propel::getConnection(FilePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(CourseFolderPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         if ($values instanceof Criteria) {
             $criteria = clone $values; // rename for clarity
         } else {
-            $criteria = $values->buildCriteria(); // build Criteria from File object
+            $criteria = $values->buildCriteria(); // build Criteria from CourseFolder object
         }
 
-        if ($criteria->containsKey(FilePeer::ID) && $criteria->keyContainsValue(FilePeer::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.FilePeer::ID.')');
+        if ($criteria->containsKey(CourseFolderPeer::ID) && $criteria->keyContainsValue(CourseFolderPeer::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.CourseFolderPeer::ID.')');
         }
 
 
         // Set the correct dbName
-        $criteria->setDbName(FilePeer::DATABASE_NAME);
+        $criteria->setDbName(CourseFolderPeer::DATABASE_NAME);
 
         try {
             // use transaction because $criteria could contain info
@@ -573,9 +784,9 @@ abstract class BaseFilePeer
     }
 
     /**
-     * Performs an UPDATE on the database, given a File or Criteria object.
+     * Performs an UPDATE on the database, given a CourseFolder or Criteria object.
      *
-     * @param      mixed $values Criteria or File object containing data that is used to create the UPDATE statement.
+     * @param      mixed $values Criteria or CourseFolder object containing data that is used to create the UPDATE statement.
      * @param      PropelPDO $con The connection to use (specify PropelPDO connection object to exert more control over transactions).
      * @return int             The number of affected rows (if supported by underlying database driver).
      * @throws PropelException Any exceptions caught during processing will be
@@ -584,35 +795,35 @@ abstract class BaseFilePeer
     public static function doUpdate($values, PropelPDO $con = null)
     {
         if ($con === null) {
-            $con = Propel::getConnection(FilePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(CourseFolderPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
-        $selectCriteria = new Criteria(FilePeer::DATABASE_NAME);
+        $selectCriteria = new Criteria(CourseFolderPeer::DATABASE_NAME);
 
         if ($values instanceof Criteria) {
             $criteria = clone $values; // rename for clarity
 
-            $comparison = $criteria->getComparison(FilePeer::ID);
-            $value = $criteria->remove(FilePeer::ID);
+            $comparison = $criteria->getComparison(CourseFolderPeer::ID);
+            $value = $criteria->remove(CourseFolderPeer::ID);
             if ($value) {
-                $selectCriteria->add(FilePeer::ID, $value, $comparison);
+                $selectCriteria->add(CourseFolderPeer::ID, $value, $comparison);
             } else {
-                $selectCriteria->setPrimaryTableName(FilePeer::TABLE_NAME);
+                $selectCriteria->setPrimaryTableName(CourseFolderPeer::TABLE_NAME);
             }
 
-        } else { // $values is File object
+        } else { // $values is CourseFolder object
             $criteria = $values->buildCriteria(); // gets full criteria
             $selectCriteria = $values->buildPkeyCriteria(); // gets criteria w/ primary key(s)
         }
 
         // set the correct dbName
-        $criteria->setDbName(FilePeer::DATABASE_NAME);
+        $criteria->setDbName(CourseFolderPeer::DATABASE_NAME);
 
         return BasePeer::doUpdate($selectCriteria, $criteria, $con);
     }
 
     /**
-     * Deletes all rows from the files table.
+     * Deletes all rows from the course_folders table.
      *
      * @param      PropelPDO $con the connection to use
      * @return int             The number of affected rows (if supported by underlying database driver).
@@ -621,19 +832,19 @@ abstract class BaseFilePeer
     public static function doDeleteAll(PropelPDO $con = null)
     {
         if ($con === null) {
-            $con = Propel::getConnection(FilePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(CourseFolderPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
         $affectedRows = 0; // initialize var to track total num of affected rows
         try {
             // use transaction because $criteria could contain info
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
-            $affectedRows += BasePeer::doDeleteAll(FilePeer::TABLE_NAME, $con, FilePeer::DATABASE_NAME);
+            $affectedRows += BasePeer::doDeleteAll(CourseFolderPeer::TABLE_NAME, $con, CourseFolderPeer::DATABASE_NAME);
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
             // instances get re-added by the select statement contained therein).
-            FilePeer::clearInstancePool();
-            FilePeer::clearRelatedInstancePool();
+            CourseFolderPeer::clearInstancePool();
+            CourseFolderPeer::clearRelatedInstancePool();
             $con->commit();
 
             return $affectedRows;
@@ -644,9 +855,9 @@ abstract class BaseFilePeer
     }
 
     /**
-     * Performs a DELETE on the database, given a File or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a CourseFolder or Criteria object OR a primary key value.
      *
-     * @param      mixed $values Criteria or File object or primary key or array of primary keys
+     * @param      mixed $values Criteria or CourseFolder object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param      PropelPDO $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -657,32 +868,32 @@ abstract class BaseFilePeer
      public static function doDelete($values, PropelPDO $con = null)
      {
         if ($con === null) {
-            $con = Propel::getConnection(FilePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(CourseFolderPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         if ($values instanceof Criteria) {
             // invalidate the cache for all objects of this type, since we have no
             // way of knowing (without running a query) what objects should be invalidated
             // from the cache based on this Criteria.
-            FilePeer::clearInstancePool();
+            CourseFolderPeer::clearInstancePool();
             // rename for clarity
             $criteria = clone $values;
-        } elseif ($values instanceof File) { // it's a model object
+        } elseif ($values instanceof CourseFolder) { // it's a model object
             // invalidate the cache for this single object
-            FilePeer::removeInstanceFromPool($values);
+            CourseFolderPeer::removeInstanceFromPool($values);
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(FilePeer::DATABASE_NAME);
-            $criteria->add(FilePeer::ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(CourseFolderPeer::DATABASE_NAME);
+            $criteria->add(CourseFolderPeer::ID, (array) $values, Criteria::IN);
             // invalidate the cache for this object(s)
             foreach ((array) $values as $singleval) {
-                FilePeer::removeInstanceFromPool($singleval);
+                CourseFolderPeer::removeInstanceFromPool($singleval);
             }
         }
 
         // Set the correct dbName
-        $criteria->setDbName(FilePeer::DATABASE_NAME);
+        $criteria->setDbName(CourseFolderPeer::DATABASE_NAME);
 
         $affectedRows = 0; // initialize var to track total num of affected rows
 
@@ -692,7 +903,7 @@ abstract class BaseFilePeer
             $con->beginTransaction();
 
             $affectedRows += BasePeer::doDelete($criteria, $con);
-            FilePeer::clearRelatedInstancePool();
+            CourseFolderPeer::clearRelatedInstancePool();
             $con->commit();
 
             return $affectedRows;
@@ -703,13 +914,13 @@ abstract class BaseFilePeer
     }
 
     /**
-     * Validates all modified columns of given File object.
+     * Validates all modified columns of given CourseFolder object.
      * If parameter $columns is either a single column name or an array of column names
      * than only those columns are validated.
      *
      * NOTICE: This does not apply to primary or foreign keys for now.
      *
-     * @param      File $obj The object to validate.
+     * @param      CourseFolder $obj The object to validate.
      * @param      mixed $cols Column name or array of column names.
      *
      * @return mixed TRUE if all columns are valid or the error message of the first invalid column.
@@ -719,8 +930,8 @@ abstract class BaseFilePeer
         $columns = array();
 
         if ($cols) {
-            $dbMap = Propel::getDatabaseMap(FilePeer::DATABASE_NAME);
-            $tableMap = $dbMap->getTable(FilePeer::TABLE_NAME);
+            $dbMap = Propel::getDatabaseMap(CourseFolderPeer::DATABASE_NAME);
+            $tableMap = $dbMap->getTable(CourseFolderPeer::TABLE_NAME);
 
             if (! is_array($cols)) {
                 $cols = array($cols);
@@ -734,9 +945,15 @@ abstract class BaseFilePeer
             }
         } else {
 
+        if ($obj->isNew() || $obj->isColumnModified(CourseFolderPeer::COURSE_ID))
+            $columns[CourseFolderPeer::COURSE_ID] = $obj->getCourseId();
+
+        if ($obj->isNew() || $obj->isColumnModified(CourseFolderPeer::NAME))
+            $columns[CourseFolderPeer::NAME] = $obj->getName();
+
         }
 
-        return BasePeer::doValidate(FilePeer::DATABASE_NAME, FilePeer::TABLE_NAME, $columns);
+        return BasePeer::doValidate(CourseFolderPeer::DATABASE_NAME, CourseFolderPeer::TABLE_NAME, $columns);
     }
 
     /**
@@ -744,23 +961,23 @@ abstract class BaseFilePeer
      *
      * @param      int $pk the primary key.
      * @param      PropelPDO $con the connection to use
-     * @return File
+     * @return CourseFolder
      */
     public static function retrieveByPK($pk, PropelPDO $con = null)
     {
 
-        if (null !== ($obj = FilePeer::getInstanceFromPool((string) $pk))) {
+        if (null !== ($obj = CourseFolderPeer::getInstanceFromPool((string) $pk))) {
             return $obj;
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(FilePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(CourseFolderPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria = new Criteria(FilePeer::DATABASE_NAME);
-        $criteria->add(FilePeer::ID, $pk);
+        $criteria = new Criteria(CourseFolderPeer::DATABASE_NAME);
+        $criteria->add(CourseFolderPeer::ID, $pk);
 
-        $v = FilePeer::doSelect($criteria, $con);
+        $v = CourseFolderPeer::doSelect($criteria, $con);
 
         return !empty($v) > 0 ? $v[0] : null;
     }
@@ -770,32 +987,32 @@ abstract class BaseFilePeer
      *
      * @param      array $pks List of primary keys
      * @param      PropelPDO $con the connection to use
-     * @return File[]
+     * @return CourseFolder[]
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
     public static function retrieveByPKs($pks, PropelPDO $con = null)
     {
         if ($con === null) {
-            $con = Propel::getConnection(FilePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(CourseFolderPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
         $objs = null;
         if (empty($pks)) {
             $objs = array();
         } else {
-            $criteria = new Criteria(FilePeer::DATABASE_NAME);
-            $criteria->add(FilePeer::ID, $pks, Criteria::IN);
-            $objs = FilePeer::doSelect($criteria, $con);
+            $criteria = new Criteria(CourseFolderPeer::DATABASE_NAME);
+            $criteria->add(CourseFolderPeer::ID, $pks, Criteria::IN);
+            $objs = CourseFolderPeer::doSelect($criteria, $con);
         }
 
         return $objs;
     }
 
-} // BaseFilePeer
+} // BaseCourseFolderPeer
 
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-BaseFilePeer::buildTableMap();
+BaseCourseFolderPeer::buildTableMap();
 
-EventDispatcherProxy::trigger(array('construct','peer.construct'), new PeerEvent('Zerebral\BusinessBundle\Model\File\om\BaseFilePeer'));
+EventDispatcherProxy::trigger(array('construct','peer.construct'), new PeerEvent('Zerebral\BusinessBundle\Model\Material\om\BaseCourseFolderPeer'));

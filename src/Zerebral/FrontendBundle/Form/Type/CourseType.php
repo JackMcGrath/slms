@@ -3,10 +3,13 @@
 namespace Zerebral\FrontendBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Zerebral\BusinessBundle\Model\Course\Discipline;
 use Zerebral\CommonBundle\Form\Type\OptionalModelType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
+use Zerebral\BusinessBundle\Model\Course\DisciplineQuery;
+use Zerebral\BusinessBundle\Model\Course\Discipline;
+
 
 class CourseType extends AbstractType
 {
@@ -25,14 +28,28 @@ class CourseType extends AbstractType
     {
         $builder->add('name', 'text', array('required' => false));
         $builder->add('description', 'textarea', array('required' => false));
-        $builder->add('discipline', 'model', array(
-            'class' => 'Zerebral\BusinessBundle\Model\Course\Discipline',
-            'property' => 'name',
-            'required' => false,
-            'empty_value' => "Course subject area...",
-            'empty_data' => 0,
-            'invalid_message' => 'Course subject is required.',
-        ));
+
+        $teacher = $this->teacher;
+        $builder->add(
+            'discipline',
+            new OptionalModelType(),
+            array(
+                'choices' => DisciplineQuery::create()->findAvailableByTeacher($teacher),
+                'create_model' => function($text) use ($teacher) {
+                    $discipline = new Discipline();
+                    $discipline->setName($text);
+                    $discipline->setTeacher($teacher);
+                    return $discipline;
+                },
+                'required' => false,
+                'empty_value' => "Course subject area...",
+                'invalid_message' => 'Course subject is required',
+
+                'create_new_label' => 'Create new subject area',
+                'choose_exists_label' => 'Choose exists subject area',
+                'placeholder' => 'Subject area title',
+            )
+        );
 
         $builder->add('gradeLevel', 'model', array(
             'class' => 'Zerebral\BusinessBundle\Model\Course\GradeLevel',

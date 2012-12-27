@@ -288,6 +288,10 @@
 }
 
 .right-navbar {
+    a.upload-file {
+        background: #d84b35;
+        color: white;
+    }
     a.create-course {
         background: #d84b35;
         color: white;
@@ -331,5 +335,87 @@
 #inviteModal{
     .form-horizontal .control-group{
         margin-bottom: 18px;
+    }
+}
+
+.materials-list {
+    h2.form-title {
+        a {
+            color: #999999;
+            text-decoration: underline;
+        }
+    }
+    .main-list-block {
+        .items-list.teacher-role {
+            margin-top: 25px;
+        }
+    }
+    .items-list {
+        margin-top: 25px;
+
+        .date {
+            border-bottom: 1px solid #dddddd;
+            text-transform: uppercase;
+            font-size: 10px;
+            color: #7c7b7b;
+            margin-bottom: 5px;
+            padding-left: 20px;
+            padding-right: 5px;
+            display: inline-block;
+        }
+        .material-item {
+            margin-bottom: 20px;
+            padding-left: 20px;
+            &.last {
+                margin-bottom: 30px;
+            }
+            .details {
+                display: inline-block;
+                margin-left: 20px;
+                .title {
+                    h3 {
+                        color: #222222;
+                        font-size: 16px;
+                        font-weight: bold;
+                        display: inline-block;
+                        vertical-align: middle;
+                        line-height: 20px;
+                    }
+                    span {
+                        margin-left: 5px;
+                    }
+                }
+                .info {
+                    color: #474747;
+                    a.folder {
+                        margin: 0 10px;
+                        text-decoration: underline;
+                        color: #474747;
+                    }
+                    i[class^="icon-"] {
+                        vertical-align: top;
+                        margin-right: 5px;
+                    }
+                    span.separator {
+                        margin: 0 5px;
+                    }
+                    .manage-buttons {
+                        display: inline-block;
+                        a {
+                            color: #474747;
+                            text-decoration: underline;
+                            margin-right: 10px;
+                        }
+                    }
+                }
+            }
+            .type {
+                width: 32px;
+                text-align: center;
+                display: inline-block;
+                padding-top: 6px;
+                vertical-align: top;
+            }
+        }
     }
 }

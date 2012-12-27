@@ -27,9 +27,9 @@ class LoginSuccessHandler implements AuthenticationSuccessHandlerInterface
         if($session->get('access_code', false)){
             $code = $session->get('access_code');
             $session->set('access_code', null);
-            return new RedirectResponse($this->router->generate('course_accept_invite', array(
-                        'accessCode' => $code
-                    ))
+                return new RedirectResponse($this->router->generate('course_join', array(
+                    'accessCode' => $code
+                ))
             );
         }
 

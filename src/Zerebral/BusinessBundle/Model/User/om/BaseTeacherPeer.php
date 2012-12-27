@@ -16,6 +16,7 @@ use Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer;
 use Zerebral\BusinessBundle\Model\Course\CoursePeer;
 use Zerebral\BusinessBundle\Model\Course\CourseTeacherPeer;
 use Zerebral\BusinessBundle\Model\Course\DisciplinePeer;
+use Zerebral\BusinessBundle\Model\Material\CourseMaterialPeer;
 use Zerebral\BusinessBundle\Model\User\Teacher;
 use Zerebral\BusinessBundle\Model\User\TeacherPeer;
 use Zerebral\BusinessBundle\Model\User\UserPeer;
@@ -398,6 +399,9 @@ abstract class BaseTeacherPeer
         // Invalidate objects in CourseTeacherPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         CourseTeacherPeer::clearInstancePool();
+        // Invalidate objects in CourseMaterialPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        CourseMaterialPeer::clearInstancePool();
     }
 
     /**

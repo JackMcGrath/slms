@@ -1,0 +1,87 @@
+{% extends 'ZerebralFrontendBundle::layout.html.twig' %}
+{% import "ZerebralFrontendBundle:Macro:main.html.twig" as mainPartials %}
+
+{% block content %}
+    {% javascripts
+    '@ZerebralFrontendBundle/Resources/public/js/controllers/course/materials.js'
+    output='js/compiled/materials.js' %}
+    <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+
+    <div class="top-second-navbar">
+        {{ mainPartials.topMenu('materials', course) }}
+    </div>
+    <div class="row-fluid materials-list">
+        <div class="span6 main-list-block">
+            <div class="row-fluid">
+                <h2 class="pull-left form-title">
+                    {{ course.name }} <small><a href="{{ path('course_materials', {id: course.id}) }}">Syllabus</a> {{ folder ? '/ ' ~ folder.name : '' }}</small>
+                </h2>
+            </div>
+            <hr/>
+
+            <div class="span9 items-list{% if is_granted('ROLE_TEACHER') %} teacher-role{% endif %}">
+                {% for date,day in dayMaterials %}
+                    <div class="date">{{ date | date('l, d F Y') }}</div>
+
+                    {% for material in day %}
+                        <div class="material-item{{ loop.last ? ' last' : '' }}">
+                            <div class="type">
+                                <img src="/img/{{ get_file_icon(material.file).name }}" width="30"/>
+                            </div>
+                            <div class="details">
+                                <div class="title">
+                                    <h3>{{ material.file.name }}</h3>
+                                </div>
+                                <div class="description">{{ material.description }}</div>
+                                <div class="info">
+                                    by {{ material.teacher.fullName }} {% if material.courseFolder %}in <a href="{{ path('course_materials_folder', {id: course.id, folderId: material.folderId}) }}" class="folder"><i class="icon-small-folder"></i>{{ material.courseFolder.name }}</a>{% endif %} {{ material.file.size | bytes_to_human }} <span class="separator">/</span>
+                                    <div class="manage-buttons">
+                                        <a href="#"><i class="icon-small-pencil"></i>Edit</a> <a href="#"><i class="icon-small-trash-bin"></i>Delete</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="right-navbar pull-left">
+            {% if is_granted('ROLE_TEACHER') %}
+                <div class="top-buttons">
+                    <a href="{{ path('assignment_add', {courseId: course.id}) }}" class="btn big-button upload-file">upload file</a>
+                    <a href="{{ path('assignments') }}" class="btn big-button">create folder</a>
+                </div>
+            {% endif %}
+
+            <div class="block">
+                <h4>sort by</h4>
+                <ul class="radio">
+                    <li><label><input type="radio" name="MaterialFilter"/> Date and time</label></li>
+                    <li><label><input type="radio" name="MaterialFilter"/> A-Z</label></li>
+                    <li><label><input type="radio" name="MaterialFilter"/> Folder</label></li>
+                </ul>
+            </div>
+
+            <div class="block">
+                <div class="title">
+                    <h4>Folders</h4>
+                    <a href="#">Edit</a>
+                </div>
+
+                <ul class="marker">
+                    <li {{ folder == null ? 'class="active"' : '' }}><i>&#9656;</i><a href="{{ path('course_materials', {id: course.id}) }}">All files</a></li>
+                    {% for courseFolder in course.courseFolders %}
+                        <li {{ folder and courseFolder.id == folder.id ? 'class="active"' : '' }}><i>&#9656;</i><a href="{{ path('course_materials_folder', {id: course.id, folderId: courseFolder.id}) }}">{{ courseFolder.name }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+        </div>
+
+    </div>
+
+
+{% endblock %}
