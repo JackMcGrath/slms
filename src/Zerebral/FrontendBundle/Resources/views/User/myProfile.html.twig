@@ -88,11 +88,7 @@
 
                 <div class="span4 pull-right">
                     <div class="profile-avatar pull-right span12">
-                        {% if user.getAvatar() %}
-                            <img class="span12" src="{{ get_file_storage_link(user.getAvatar()) | imagine_filter('big_thumbnail') }}"/>
-                        {% else %}
-                            NO AVATAR<br />
-                        {% endif %}
+                        <img class="span12" src="{{ get_file_storage_link(user.getAvatar()) | imagine_filter('big_thumbnail') }}"/>
                         <a id="show_avatar_file_field" href="#">Change your avatar</a>
                         <div class="hidden-avatar-div">
                             {{ form_widget(form.user.avatar) }}

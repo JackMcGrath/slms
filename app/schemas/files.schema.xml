@@ -3,6 +3,7 @@
     <table name="files" phpName="File" idMethod="native">
         <column name="id" phpName="Id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true" />
         <column name="name" phpName="Name" type="VARCHAR" size="255" required="true" />
+        <column name="description" phpName="Description" type="VARCHAR" size="255" required="false" />
         <column name="size" phpName="Size" type="INTEGER" sqlType="int(10) unsigned" required="true" />
         <column name="mime_type" phpName="MimeType" type="VARCHAR" size="30" required="true" />
         <column name="storage" phpName="Storage" type="CHAR" valueSet="local,dropbox,s3" sqlType="enum('local','dropbox','s3')" required="true" defaultValue="local" />
@@ -16,6 +17,9 @@
             <reference local="file_id" foreign="id"/>
         </foreign-key>
         <foreign-key foreignTable="assignments" name="file_references_assignments" onDelete="CASCADE" onUpdate="CASCADE" phpName="assignmentReferenceId">
+            <reference local="reference_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="student_assignments" name="file_references_student_assignments" onDelete="CASCADE" onUpdate="CASCADE" phpName="studentAssignmentReferenceId">
             <reference local="reference_id" foreign="id"/>
         </foreign-key>
     </table>

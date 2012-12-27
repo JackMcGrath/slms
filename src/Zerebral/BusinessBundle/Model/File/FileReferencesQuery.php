@@ -7,6 +7,8 @@ use \Criteria;
 
 class FileReferencesQuery extends BaseFileReferencesQuery
 {
+
+    //@todo: Find a way to get REFERENCE_TYPE
     public function filterByPrimaryKeys($keys)
     {
         if (empty($keys)) {

@@ -15,6 +15,7 @@ use \PropelPDO;
 use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\QueryEvent;
 use Zerebral\BusinessBundle\Model\Assignment\Assignment;
+use Zerebral\BusinessBundle\Model\Assignment\StudentAssignment;
 use Zerebral\BusinessBundle\Model\File\File;
 use Zerebral\BusinessBundle\Model\File\FilePeer;
 use Zerebral\BusinessBundle\Model\File\FileQuery;
@@ -25,6 +26,7 @@ use Zerebral\BusinessBundle\Model\User\User;
 /**
  * @method FileQuery orderById($order = Criteria::ASC) Order by the id column
  * @method FileQuery orderByName($order = Criteria::ASC) Order by the name column
+ * @method FileQuery orderByDescription($order = Criteria::ASC) Order by the description column
  * @method FileQuery orderBySize($order = Criteria::ASC) Order by the size column
  * @method FileQuery orderByMimeType($order = Criteria::ASC) Order by the mime_type column
  * @method FileQuery orderByStorage($order = Criteria::ASC) Order by the storage column
@@ -32,6 +34,7 @@ use Zerebral\BusinessBundle\Model\User\User;
  *
  * @method FileQuery groupById() Group by the id column
  * @method FileQuery groupByName() Group by the name column
+ * @method FileQuery groupByDescription() Group by the description column
  * @method FileQuery groupBySize() Group by the size column
  * @method FileQuery groupByMimeType() Group by the mime_type column
  * @method FileQuery groupByStorage() Group by the storage column
@@ -57,6 +60,7 @@ use Zerebral\BusinessBundle\Model\User\User;
  * @method File findOneOrCreate(PropelPDO $con = null) Return the first File matching the query, or a new File object populated from the query conditions when no match is found
  *
  * @method File findOneByName(string $name) Return the first File filtered by the name column
+ * @method File findOneByDescription(string $description) Return the first File filtered by the description column
  * @method File findOneBySize(int $size) Return the first File filtered by the size column
  * @method File findOneByMimeType(string $mime_type) Return the first File filtered by the mime_type column
  * @method File findOneByStorage(string $storage) Return the first File filtered by the storage column
@@ -64,6 +68,7 @@ use Zerebral\BusinessBundle\Model\User\User;
  *
  * @method array findById(int $id) Return File objects filtered by the id column
  * @method array findByName(string $name) Return File objects filtered by the name column
+ * @method array findByDescription(string $description) Return File objects filtered by the description column
  * @method array findBySize(int $size) Return File objects filtered by the size column
  * @method array findByMimeType(string $mime_type) Return File objects filtered by the mime_type column
  * @method array findByStorage(string $storage) Return File objects filtered by the storage column
@@ -170,7 +175,7 @@ abstract class BaseFileQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `name`, `size`, `mime_type`, `storage`, `created_at` FROM `files` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `name`, `description`, `size`, `mime_type`, `storage`, `created_at` FROM `files` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -313,6 +318,35 @@ abstract class BaseFileQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(FilePeer::NAME, $name, $comparison);
+    }
+
+    /**
+     * Filter the query on the description column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByDescription('fooValue');   // WHERE description = 'fooValue'
+     * $query->filterByDescription('%fooValue%'); // WHERE description LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $description The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return FileQuery The current query, for fluid interface
+     */
+    public function filterByDescription($description = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($description)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $description)) {
+                $description = str_replace('*', '%', $description);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(FilePeer::DESCRIPTION, $description, $comparison);
     }
 
     /**
@@ -693,6 +727,23 @@ abstract class BaseFileQuery extends ModelCriteria
         return $this
             ->useFileReferencesQuery()
             ->filterByassignmentReferenceId($assignment, $comparison)
+            ->endUse();
+    }
+
+    /**
+     * Filter the query by a related StudentAssignment object
+     * using the file_references table as cross reference
+     *
+     * @param   StudentAssignment $studentAssignment the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   FileQuery The current query, for fluid interface
+     */
+    public function filterBystudentAssignmentReferenceId($studentAssignment, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useFileReferencesQuery()
+            ->filterBystudentAssignmentReferenceId($studentAssignment, $comparison)
             ->endUse();
     }
 
