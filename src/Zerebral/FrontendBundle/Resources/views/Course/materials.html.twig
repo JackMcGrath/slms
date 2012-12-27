@@ -15,7 +15,7 @@
         <div class="span6 main-list-block">
             <div class="row-fluid">
                 <h2 class="pull-left form-title">
-                    {{ course.name }} <small><a href="#">Syllabus</a> / Tests</small>
+                    {{ course.name }} <small><a href="{{ path('course_materials', {id: course.id}) }}">Syllabus</a> {{ folder ? '/ ' ~ folder.name : '' }}</small>
                 </h2>
             </div>
             <hr/>
@@ -35,7 +35,7 @@
                                 </div>
                                 <div class="description">{{ material.description }}</div>
                                 <div class="info">
-                                    by {{ material.teacher.fullName }} {% if material.courseFolder %}in <a href="#" class="folder"><i class="icon-small-folder"></i>{{ material.courseFolder.name }}</a>{% endif %} {{ material.file.size | bytes_to_human }} <span class="separator">/</span>
+                                    by {{ material.teacher.fullName }} {% if material.courseFolder %}in <a href="{{ path('course_materials_folder', {id: course.id, folderId: material.folderId}) }}" class="folder"><i class="icon-small-folder"></i>{{ material.courseFolder.name }}</a>{% endif %} {{ material.file.size | bytes_to_human }} <span class="separator">/</span>
                                     <div class="manage-buttons">
                                         <a href="#"><i class="icon-small-pencil"></i>Edit</a> <a href="#"><i class="icon-small-trash-bin"></i>Delete</a>
                                     </div>
@@ -59,9 +59,9 @@
             <div class="block">
                 <h4>sort by</h4>
                 <ul class="radio">
-                    <li><label><input type="radio"/> Date and time</label></li>
-                    <li><label><input type="radio"/> A-Z</label></li>
-                    <li><label><input type="radio"/> Folder</label></li>
+                    <li><label><input type="radio" name="MaterialFilter"/> Date and time</label></li>
+                    <li><label><input type="radio" name="MaterialFilter"/> A-Z</label></li>
+                    <li><label><input type="radio" name="MaterialFilter"/> Folder</label></li>
                 </ul>
             </div>
 
@@ -72,9 +72,10 @@
                 </div>
 
                 <ul class="marker">
-                    <li class="active"><i>&#9656;</i><a href="#">All files</a></li>
-                    <li><a href="#"><i>&#9656;</i>Week 1 - Getting started week</a></li>
-                    <li><a href="#"><i>&#9656;</i>Tests</a></li>
+                    <li {{ folder == null ? 'class="active"' : '' }}><i>&#9656;</i><a href="{{ path('course_materials', {id: course.id}) }}">All files</a></li>
+                    {% for courseFolder in course.courseFolders %}
+                        <li {{ folder and courseFolder.id == folder.id ? 'class="active"' : '' }}><i>&#9656;</i><a href="{{ path('course_materials_folder', {id: course.id, folderId: courseFolder.id}) }}">{{ courseFolder.name }}</a></li>
+                    {% endfor %}
                 </ul>
             </div>
 
