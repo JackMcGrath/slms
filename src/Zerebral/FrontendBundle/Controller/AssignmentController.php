@@ -91,6 +91,14 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function uploadSolutionAction(Model\Assignment\StudentAssignment $studentAssignment) {
 
+        if ($studentAssignment->getStudentId() !== $this->getRoleUser()->getId()) {
+            throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, 'Assignment is not belong to current user');
+        }
+
+        if ($studentAssignment->getIsSubmitted()) {
+            throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, 'You cannot modify solutions after assignment publishing');
+        }
+
         $assignmentSolutionType = new FormType\AssignmentSolutionType();
         $assignmentSolutionType->setFileStorage($this->container->get('zerebral.file_storage')->getFileStorage('local'));
 
@@ -121,6 +129,15 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
      * @Template()
      */
     public function removeSolutionAction(Model\Assignment\StudentAssignment $studentAssignment, \Zerebral\BusinessBundle\Model\File\File $file) {
+
+        if ($studentAssignment->getStudentId() !== $this->getRoleUser()->getId()) {
+            throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, 'Assignment is not belong to current user');
+        }
+
+        if ($studentAssignment->getIsSubmitted()) {
+            throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, 'You cannot modify solutions after assignment publishing');
+        }
+
         $fileStudentAssignment = $file->getstudentAssignmentReferenceIds();
         if ((count($fileStudentAssignment) === 1) && ($fileStudentAssignment[0]->getId() === $studentAssignment->getId())) {
             $file->delete();
@@ -128,6 +145,24 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
         }
 
         throw new \Symfony\Component\HttpKernel\Exception\HttpException(404, 'File doesn\'t belong to student assignment');
+    }
+
+    /**
+     * @Route("/submit-solutions/{id}", name="student_assignment_solutions_submit")
+     * @ParamConverter("studentAssignment")
+     *
+     * @PreAuthorize("hasRole('ROLE_STUDENT')")
+     * @Template()
+     */
+    public function submitSolutionsAction(Model\Assignment\StudentAssignment $studentAssignment) {
+        if ($studentAssignment->getStudentId() !== $this->getRoleUser()->getId()) {
+            throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, 'Assignment is not belong to current user');
+        }
+
+        $studentAssignment->setIsSubmitted(1);
+        $studentAssignment->save();
+        $this->setFlash('student_assignment_solutions_submit', 'Solutions for assignment <b>' . $studentAssignment->getAssignment()->getName() . '</b> were successfully submitted');
+        return $this->redirect($this->generateUrl('assignment_view', array('id' => $studentAssignment->getAssignmentId())));
     }
 
    /**

@@ -26,11 +26,13 @@ use Zerebral\BusinessBundle\Model\User\Student;
  * @method StudentAssignmentQuery orderById($order = Criteria::ASC) Order by the id column
  * @method StudentAssignmentQuery orderByStudentId($order = Criteria::ASC) Order by the student_id column
  * @method StudentAssignmentQuery orderByAssignmentId($order = Criteria::ASC) Order by the assignment_id column
+ * @method StudentAssignmentQuery orderByIsSubmitted($order = Criteria::ASC) Order by the is_submitted column
  * @method StudentAssignmentQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  *
  * @method StudentAssignmentQuery groupById() Group by the id column
  * @method StudentAssignmentQuery groupByStudentId() Group by the student_id column
  * @method StudentAssignmentQuery groupByAssignmentId() Group by the assignment_id column
+ * @method StudentAssignmentQuery groupByIsSubmitted() Group by the is_submitted column
  * @method StudentAssignmentQuery groupByCreatedAt() Group by the created_at column
  *
  * @method StudentAssignmentQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
@@ -54,11 +56,13 @@ use Zerebral\BusinessBundle\Model\User\Student;
  *
  * @method StudentAssignment findOneByStudentId(int $student_id) Return the first StudentAssignment filtered by the student_id column
  * @method StudentAssignment findOneByAssignmentId(int $assignment_id) Return the first StudentAssignment filtered by the assignment_id column
+ * @method StudentAssignment findOneByIsSubmitted(boolean $is_submitted) Return the first StudentAssignment filtered by the is_submitted column
  * @method StudentAssignment findOneByCreatedAt(string $created_at) Return the first StudentAssignment filtered by the created_at column
  *
  * @method array findById(int $id) Return StudentAssignment objects filtered by the id column
  * @method array findByStudentId(int $student_id) Return StudentAssignment objects filtered by the student_id column
  * @method array findByAssignmentId(int $assignment_id) Return StudentAssignment objects filtered by the assignment_id column
+ * @method array findByIsSubmitted(boolean $is_submitted) Return StudentAssignment objects filtered by the is_submitted column
  * @method array findByCreatedAt(string $created_at) Return StudentAssignment objects filtered by the created_at column
  */
 abstract class BaseStudentAssignmentQuery extends ModelCriteria
@@ -162,7 +166,7 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `student_id`, `assignment_id`, `created_at` FROM `student_assignments` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `student_id`, `assignment_id`, `is_submitted`, `created_at` FROM `student_assignments` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -362,6 +366,33 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(StudentAssignmentPeer::ASSIGNMENT_ID, $assignmentId, $comparison);
+    }
+
+    /**
+     * Filter the query on the is_submitted column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByIsSubmitted(true); // WHERE is_submitted = true
+     * $query->filterByIsSubmitted('yes'); // WHERE is_submitted = true
+     * </code>
+     *
+     * @param     boolean|string $isSubmitted The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return StudentAssignmentQuery The current query, for fluid interface
+     */
+    public function filterByIsSubmitted($isSubmitted = null, $comparison = null)
+    {
+        if (is_string($isSubmitted)) {
+            $is_submitted = in_array(strtolower($isSubmitted), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        }
+
+        return $this->addUsingAlias(StudentAssignmentPeer::IS_SUBMITTED, $isSubmitted, $comparison);
     }
 
     /**

@@ -46,6 +46,7 @@ class StudentAssignmentTableMap extends TableMap
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('student_id', 'StudentId', 'INTEGER', 'students', 'id', true, null, null);
         $this->addForeignKey('assignment_id', 'AssignmentId', 'INTEGER', 'assignments', 'id', true, null, null);
+        $this->addColumn('is_submitted', 'IsSubmitted', 'BOOLEAN', true, 1, false);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', true, null, null);
         // validators
         $this->addValidator('id', 'required', 'propel.validator.RequiredValidator', '', 'The field id is required.');

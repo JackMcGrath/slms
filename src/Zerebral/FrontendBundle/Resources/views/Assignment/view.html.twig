@@ -1,4 +1,5 @@
 {% extends 'ZerebralFrontendBundle::layout.html.twig' %}
+{% import "ZerebralFrontendBundle:Macro:flashMessages.html.twig" as flashMessages %}
 {% import "ZerebralFrontendBundle:Macro:main.html.twig" as mainPartials %}
 
 {% block content %}
@@ -26,7 +27,7 @@
                 {% endif %}
             </div>
             <hr/>
-
+            {{ flashMessages.show('student_assignment_solutions_submit', 'success') }}
             <div class="">
                 <div class="info">
                     <div class="avatar pull-right">
@@ -75,16 +76,20 @@
                                 {% if file.description %}
                                     <i rel="tooltip" title="{{ file.description }}" class="icon-small-info file-info"></i>
                                 {% endif %}
+                                {% if not studentAssignment.isSubmitted %}
                                 <i class="icon-small-trash-bin"></i><a class="remove-uploaded-file" href="{{ path('ajax_student_assignment_solutions_remove', {id: studentAssignment.id, fileId: file.id}) }}">Delete</a>
+                                {% endif %}
                             </li>
                         {% else %}
                             <span class="gray">No soultion files yet.<br />Press "Upload" button to attach first one</span>
                         {% endfor %}
                     </ul>
+                    {% if not studentAssignment.isSubmitted %}
                     <div class="buttons">
                         <a href="#uploadModal" class="btn" data-toggle="modal" data-target="#uploadModal">Upload</a>
-                        <input type="button" class="btn btn-danger" value="Submit for review" />
+                        <a href="{{ path('student_assignment_solutions_submit', {id: studentAssignment.id }) }}" class="btn btn-danger">Submit for review</a>
                     </div>
+                    {% endif %}
                     <span class="gray"><b>Note:</b> You cannot modify anything upon submit</span>
                 </div>
             </div>

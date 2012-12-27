@@ -69,6 +69,13 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
     protected $assignment_id;
 
     /**
+     * The value for the is_submitted field.
+     * Note: this column has a database default value of: false
+     * @var        boolean
+     */
+    protected $is_submitted;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -133,6 +140,28 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
     protected $fileReferencessScheduledForDeletion = null;
 
     /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see        __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->is_submitted = false;
+    }
+
+    /**
+     * Initializes internal state of BaseStudentAssignment object.
+     * @see        applyDefaults()
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->applyDefaultValues();
+        EventDispatcherProxy::trigger(array('construct','model.construct'), new ModelEvent($this));
+}
+
+    /**
      * Get the [id] column value.
      *
      * @return int
@@ -160,6 +189,16 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
     public function getAssignmentId()
     {
         return $this->assignment_id;
+    }
+
+    /**
+     * Get the [is_submitted] column value.
+     *
+     * @return boolean
+     */
+    public function getIsSubmitted()
+    {
+        return $this->is_submitted;
     }
 
     /**
@@ -274,6 +313,35 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
     } // setAssignmentId()
 
     /**
+     * Sets the value of the [is_submitted] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param boolean|integer|string $v The new value
+     * @return StudentAssignment The current object (for fluent API support)
+     */
+    public function setIsSubmitted($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->is_submitted !== $v) {
+            $this->is_submitted = $v;
+            $this->modifiedColumns[] = StudentAssignmentPeer::IS_SUBMITTED;
+        }
+
+
+        return $this;
+    } // setIsSubmitted()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param mixed $v string, integer (timestamp), or DateTime value.
@@ -306,6 +374,10 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->is_submitted !== false) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return true
         return true;
     } // hasOnlyDefaultValues()
@@ -331,7 +403,8 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->student_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
             $this->assignment_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
-            $this->created_at = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+            $this->is_submitted = ($row[$startcol + 3] !== null) ? (boolean) $row[$startcol + 3] : null;
+            $this->created_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -340,7 +413,7 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 4; // 4 = StudentAssignmentPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = StudentAssignmentPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating StudentAssignment object", $e);
@@ -665,6 +738,9 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
         if ($this->isColumnModified(StudentAssignmentPeer::ASSIGNMENT_ID)) {
             $modifiedColumns[':p' . $index++]  = '`assignment_id`';
         }
+        if ($this->isColumnModified(StudentAssignmentPeer::IS_SUBMITTED)) {
+            $modifiedColumns[':p' . $index++]  = '`is_submitted`';
+        }
         if ($this->isColumnModified(StudentAssignmentPeer::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`created_at`';
         }
@@ -687,6 +763,9 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
                         break;
                     case '`assignment_id`':
                         $stmt->bindValue($identifier, $this->assignment_id, PDO::PARAM_INT);
+                        break;
+                    case '`is_submitted`':
+                        $stmt->bindValue($identifier, (int) $this->is_submitted, PDO::PARAM_INT);
                         break;
                     case '`created_at`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
@@ -861,6 +940,9 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
                 return $this->getAssignmentId();
                 break;
             case 3:
+                return $this->getIsSubmitted();
+                break;
+            case 4:
                 return $this->getCreatedAt();
                 break;
             default:
@@ -895,7 +977,8 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
             $keys[0] => $this->getId(),
             $keys[1] => $this->getStudentId(),
             $keys[2] => $this->getAssignmentId(),
-            $keys[3] => $this->getCreatedAt(),
+            $keys[3] => $this->getIsSubmitted(),
+            $keys[4] => $this->getCreatedAt(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aStudent) {
@@ -951,6 +1034,9 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
                 $this->setAssignmentId($value);
                 break;
             case 3:
+                $this->setIsSubmitted($value);
+                break;
+            case 4:
                 $this->setCreatedAt($value);
                 break;
         } // switch()
@@ -980,7 +1066,8 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setStudentId($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setAssignmentId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
+        if (array_key_exists($keys[3], $arr)) $this->setIsSubmitted($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
     }
 
     /**
@@ -995,6 +1082,7 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
         if ($this->isColumnModified(StudentAssignmentPeer::ID)) $criteria->add(StudentAssignmentPeer::ID, $this->id);
         if ($this->isColumnModified(StudentAssignmentPeer::STUDENT_ID)) $criteria->add(StudentAssignmentPeer::STUDENT_ID, $this->student_id);
         if ($this->isColumnModified(StudentAssignmentPeer::ASSIGNMENT_ID)) $criteria->add(StudentAssignmentPeer::ASSIGNMENT_ID, $this->assignment_id);
+        if ($this->isColumnModified(StudentAssignmentPeer::IS_SUBMITTED)) $criteria->add(StudentAssignmentPeer::IS_SUBMITTED, $this->is_submitted);
         if ($this->isColumnModified(StudentAssignmentPeer::CREATED_AT)) $criteria->add(StudentAssignmentPeer::CREATED_AT, $this->created_at);
 
         return $criteria;
@@ -1061,6 +1149,7 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
     {
         $copyObj->setStudentId($this->getStudentId());
         $copyObj->setAssignmentId($this->getAssignmentId());
+        $copyObj->setIsSubmitted($this->getIsSubmitted());
         $copyObj->setCreatedAt($this->getCreatedAt());
 
         if ($deepCopy && !$this->startCopy) {
@@ -1875,10 +1964,12 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
         $this->id = null;
         $this->student_id = null;
         $this->assignment_id = null;
+        $this->is_submitted = null;
         $this->created_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
