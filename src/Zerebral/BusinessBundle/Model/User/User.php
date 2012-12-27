@@ -80,8 +80,7 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
             )
         );
     }
-
-    /**
+/**
      * {@inheritDoc}
      */
     public function unserialize($serialized)
@@ -318,4 +317,12 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
              return $avatar;
          }
      }
+
+    public function isStudent() {
+        return $this->getRole() == self::ROLE_STUDENT;
+    }
+
+    public function isTeacher() {
+        return $this->getRole() == self::ROLE_TEACHER;
+    }
 }

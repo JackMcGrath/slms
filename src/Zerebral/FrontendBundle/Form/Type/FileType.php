@@ -15,6 +15,7 @@ class FileType extends AbstractType {
         $fileSubscriber = new FileSubscriber($builder);
         $builder->addEventSubscriber($fileSubscriber);
         $builder->add('uploadedFile', 'file', array('required' => false));
+        $builder->add('description', 'text', array('required' => false));
 
     }
 

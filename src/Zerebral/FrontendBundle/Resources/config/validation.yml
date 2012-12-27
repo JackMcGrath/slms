@@ -107,6 +107,13 @@ Zerebral\BusinessBundle\Model\Assignment\AssignmentCategory:
             fields: [name, teacher_id]
             message: Category already exists
 
+Zerebral\BusinessBundle\Model\Assignment\StudentAssignment:
+    getters:
+        files:
+            - Valid: ~
+            - Count:
+                min: 1
+
 Zerebral\BusinessBundle\Model\Course\CourseScheduleDay:
     properties:
         week_day:

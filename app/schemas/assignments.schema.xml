@@ -108,6 +108,7 @@
         <column name="id" phpName="Id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="student_id" phpName="StudentId" type="INTEGER" sqlType="int(11) unsigned" required="true"/>
         <column name="assignment_id" phpName="AssignmentId" type="INTEGER" sqlType="int(11) unsigned" required="true"/>
+        <column name="is_submitted" phpName="IsSubmitted" type="BOOLEAN" size="1" sqlType="tinyint(1) unsigned" required="true" defaultValue="false"/>
         <column name="created_at" phpName="CreatedAt" type="TIMESTAMP" required="true"/>
         <validator column="id">
             <rule name="required" message="The field id is required."/>
