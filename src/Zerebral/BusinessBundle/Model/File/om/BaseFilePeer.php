@@ -33,19 +33,22 @@ abstract class BaseFilePeer
     const TM_CLASS = 'FileTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 7;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 6;
+    const NUM_HYDRATE_COLUMNS = 7;
 
     /** the column name for the id field */
     const ID = 'files.id';
 
     /** the column name for the name field */
     const NAME = 'files.name';
+
+    /** the column name for the description field */
+    const DESCRIPTION = 'files.description';
 
     /** the column name for the size field */
     const SIZE = 'files.size';
@@ -78,12 +81,12 @@ abstract class BaseFilePeer
      * e.g. FilePeer::$fieldNames[FilePeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'Size', 'MimeType', 'Storage', 'CreatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'size', 'mimeType', 'storage', 'createdAt', ),
-        BasePeer::TYPE_COLNAME => array (FilePeer::ID, FilePeer::NAME, FilePeer::SIZE, FilePeer::MIME_TYPE, FilePeer::STORAGE, FilePeer::CREATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', 'SIZE', 'MIME_TYPE', 'STORAGE', 'CREATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'size', 'mime_type', 'storage', 'created_at', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'Description', 'Size', 'MimeType', 'Storage', 'CreatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'description', 'size', 'mimeType', 'storage', 'createdAt', ),
+        BasePeer::TYPE_COLNAME => array (FilePeer::ID, FilePeer::NAME, FilePeer::DESCRIPTION, FilePeer::SIZE, FilePeer::MIME_TYPE, FilePeer::STORAGE, FilePeer::CREATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', 'DESCRIPTION', 'SIZE', 'MIME_TYPE', 'STORAGE', 'CREATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'description', 'size', 'mime_type', 'storage', 'created_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -93,12 +96,12 @@ abstract class BaseFilePeer
      * e.g. FilePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'Size' => 2, 'MimeType' => 3, 'Storage' => 4, 'CreatedAt' => 5, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'size' => 2, 'mimeType' => 3, 'storage' => 4, 'createdAt' => 5, ),
-        BasePeer::TYPE_COLNAME => array (FilePeer::ID => 0, FilePeer::NAME => 1, FilePeer::SIZE => 2, FilePeer::MIME_TYPE => 3, FilePeer::STORAGE => 4, FilePeer::CREATED_AT => 5, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, 'SIZE' => 2, 'MIME_TYPE' => 3, 'STORAGE' => 4, 'CREATED_AT' => 5, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'size' => 2, 'mime_type' => 3, 'storage' => 4, 'created_at' => 5, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'Description' => 2, 'Size' => 3, 'MimeType' => 4, 'Storage' => 5, 'CreatedAt' => 6, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'description' => 2, 'size' => 3, 'mimeType' => 4, 'storage' => 5, 'createdAt' => 6, ),
+        BasePeer::TYPE_COLNAME => array (FilePeer::ID => 0, FilePeer::NAME => 1, FilePeer::DESCRIPTION => 2, FilePeer::SIZE => 3, FilePeer::MIME_TYPE => 4, FilePeer::STORAGE => 5, FilePeer::CREATED_AT => 6, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, 'DESCRIPTION' => 2, 'SIZE' => 3, 'MIME_TYPE' => 4, 'STORAGE' => 5, 'CREATED_AT' => 6, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'description' => 2, 'size' => 3, 'mime_type' => 4, 'storage' => 5, 'created_at' => 6, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -174,6 +177,7 @@ abstract class BaseFilePeer
         if (null === $alias) {
             $criteria->addSelectColumn(FilePeer::ID);
             $criteria->addSelectColumn(FilePeer::NAME);
+            $criteria->addSelectColumn(FilePeer::DESCRIPTION);
             $criteria->addSelectColumn(FilePeer::SIZE);
             $criteria->addSelectColumn(FilePeer::MIME_TYPE);
             $criteria->addSelectColumn(FilePeer::STORAGE);
@@ -181,6 +185,7 @@ abstract class BaseFilePeer
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.name');
+            $criteria->addSelectColumn($alias . '.description');
             $criteria->addSelectColumn($alias . '.size');
             $criteria->addSelectColumn($alias . '.mime_type');
             $criteria->addSelectColumn($alias . '.storage');

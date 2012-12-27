@@ -44,6 +44,7 @@ class FileTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('name', 'Name', 'VARCHAR', true, 255, null);
+        $this->addColumn('description', 'Description', 'VARCHAR', false, 255, null);
         $this->addColumn('size', 'Size', 'INTEGER', true, null, null);
         $this->addColumn('mime_type', 'MimeType', 'VARCHAR', true, 30, null);
         $this->addColumn('storage', 'Storage', 'CHAR', true, null, 'local');

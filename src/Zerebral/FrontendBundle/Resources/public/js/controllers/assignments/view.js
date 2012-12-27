@@ -19,7 +19,7 @@ $(document).ready(function(){
         var uploadedFileLisCount = $('.solutions-widget li.file').length;
         var index = fileFieldsCount + uploadedFileLisCount;
 
-        var newLi = $('<li><input type="file" name="assignment_solution[files][' + index + '][uploadedFile]" /><input type="text" placeholder="Description (optional)" /></li>');
+        var newLi = $('<li><input type="file" name="assignment_solution[files][' + index + '][uploadedFile]" /><input type="text" name="assignment_solution[files][' + index + '][description]" placeholder="Description (optional)" /></li>');
         if (fileFieldsCount == 0) {
             ul.prepend(newLi);
         } else {
@@ -27,6 +27,8 @@ $(document).ready(function(){
         }
 
     });
+
+    $('.solutions-widget i.file-info').tooltip();
 
     $(document).on('click', '.remove-uploaded-file', function(e) {
         e.preventDefault();

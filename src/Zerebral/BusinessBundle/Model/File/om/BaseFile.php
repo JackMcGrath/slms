@@ -63,6 +63,12 @@ abstract class BaseFile extends BaseObject implements Persistent
     protected $name;
 
     /**
+     * The value for the description field.
+     * @var        string
+     */
+    protected $description;
+
+    /**
      * The value for the size field.
      * @var        int
      */
@@ -190,6 +196,16 @@ abstract class BaseFile extends BaseObject implements Persistent
     }
 
     /**
+     * Get the [description] column value.
+     *
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
      * Get the [size] column value.
      *
      * @return int
@@ -300,6 +316,27 @@ abstract class BaseFile extends BaseObject implements Persistent
 
         return $this;
     } // setName()
+
+    /**
+     * Set the value of [description] column.
+     *
+     * @param string $v new value
+     * @return File The current object (for fluent API support)
+     */
+    public function setDescription($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->description !== $v) {
+            $this->description = $v;
+            $this->modifiedColumns[] = FilePeer::DESCRIPTION;
+        }
+
+
+        return $this;
+    } // setDescription()
 
     /**
      * Set the value of [size] column.
@@ -425,10 +462,11 @@ abstract class BaseFile extends BaseObject implements Persistent
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->name = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
-            $this->size = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
-            $this->mime_type = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-            $this->storage = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
-            $this->created_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+            $this->description = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+            $this->size = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
+            $this->mime_type = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+            $this->storage = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+            $this->created_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -437,7 +475,7 @@ abstract class BaseFile extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 6; // 6 = FilePeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 7; // 7 = FilePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating File object", $e);
@@ -752,6 +790,9 @@ abstract class BaseFile extends BaseObject implements Persistent
         if ($this->isColumnModified(FilePeer::NAME)) {
             $modifiedColumns[':p' . $index++]  = '`name`';
         }
+        if ($this->isColumnModified(FilePeer::DESCRIPTION)) {
+            $modifiedColumns[':p' . $index++]  = '`description`';
+        }
         if ($this->isColumnModified(FilePeer::SIZE)) {
             $modifiedColumns[':p' . $index++]  = '`size`';
         }
@@ -780,6 +821,9 @@ abstract class BaseFile extends BaseObject implements Persistent
                         break;
                     case '`name`':
                         $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
+                        break;
+                    case '`description`':
+                        $stmt->bindValue($identifier, $this->description, PDO::PARAM_STR);
                         break;
                     case '`size`':
                         $stmt->bindValue($identifier, $this->size, PDO::PARAM_INT);
@@ -950,15 +994,18 @@ abstract class BaseFile extends BaseObject implements Persistent
                 return $this->getName();
                 break;
             case 2:
-                return $this->getSize();
+                return $this->getDescription();
                 break;
             case 3:
-                return $this->getMimeType();
+                return $this->getSize();
                 break;
             case 4:
-                return $this->getStorage();
+                return $this->getMimeType();
                 break;
             case 5:
+                return $this->getStorage();
+                break;
+            case 6:
                 return $this->getCreatedAt();
                 break;
             default:
@@ -992,10 +1039,11 @@ abstract class BaseFile extends BaseObject implements Persistent
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getName(),
-            $keys[2] => $this->getSize(),
-            $keys[3] => $this->getMimeType(),
-            $keys[4] => $this->getStorage(),
-            $keys[5] => $this->getCreatedAt(),
+            $keys[2] => $this->getDescription(),
+            $keys[3] => $this->getSize(),
+            $keys[4] => $this->getMimeType(),
+            $keys[5] => $this->getStorage(),
+            $keys[6] => $this->getCreatedAt(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->collFileReferencess) {
@@ -1045,15 +1093,18 @@ abstract class BaseFile extends BaseObject implements Persistent
                 $this->setName($value);
                 break;
             case 2:
-                $this->setSize($value);
+                $this->setDescription($value);
                 break;
             case 3:
-                $this->setMimeType($value);
+                $this->setSize($value);
                 break;
             case 4:
-                $this->setStorage($value);
+                $this->setMimeType($value);
                 break;
             case 5:
+                $this->setStorage($value);
+                break;
+            case 6:
                 $this->setCreatedAt($value);
                 break;
         } // switch()
@@ -1082,10 +1133,11 @@ abstract class BaseFile extends BaseObject implements Persistent
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setName($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setSize($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setMimeType($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setStorage($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
+        if (array_key_exists($keys[2], $arr)) $this->setDescription($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setSize($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setMimeType($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setStorage($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
     }
 
     /**
@@ -1099,6 +1151,7 @@ abstract class BaseFile extends BaseObject implements Persistent
 
         if ($this->isColumnModified(FilePeer::ID)) $criteria->add(FilePeer::ID, $this->id);
         if ($this->isColumnModified(FilePeer::NAME)) $criteria->add(FilePeer::NAME, $this->name);
+        if ($this->isColumnModified(FilePeer::DESCRIPTION)) $criteria->add(FilePeer::DESCRIPTION, $this->description);
         if ($this->isColumnModified(FilePeer::SIZE)) $criteria->add(FilePeer::SIZE, $this->size);
         if ($this->isColumnModified(FilePeer::MIME_TYPE)) $criteria->add(FilePeer::MIME_TYPE, $this->mime_type);
         if ($this->isColumnModified(FilePeer::STORAGE)) $criteria->add(FilePeer::STORAGE, $this->storage);
@@ -1167,6 +1220,7 @@ abstract class BaseFile extends BaseObject implements Persistent
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setName($this->getName());
+        $copyObj->setDescription($this->getDescription());
         $copyObj->setSize($this->getSize());
         $copyObj->setMimeType($this->getMimeType());
         $copyObj->setStorage($this->getStorage());
@@ -2105,6 +2159,7 @@ abstract class BaseFile extends BaseObject implements Persistent
     {
         $this->id = null;
         $this->name = null;
+        $this->description = null;
         $this->size = null;
         $this->mime_type = null;
         $this->storage = null;
