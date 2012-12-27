@@ -24,6 +24,8 @@ use Zerebral\BusinessBundle\Model\Course\CourseStudent;
 use Zerebral\BusinessBundle\Model\Course\CourseTeacher;
 use Zerebral\BusinessBundle\Model\Course\Discipline;
 use Zerebral\BusinessBundle\Model\Course\GradeLevel;
+use Zerebral\BusinessBundle\Model\Material\CourseFolder;
+use Zerebral\BusinessBundle\Model\Material\CourseMaterial;
 use Zerebral\BusinessBundle\Model\User\Student;
 use Zerebral\BusinessBundle\Model\User\Teacher;
 
@@ -83,6 +85,14 @@ use Zerebral\BusinessBundle\Model\User\Teacher;
  * @method CourseQuery leftJoinCourseScheduleDay($relationAlias = null) Adds a LEFT JOIN clause to the query using the CourseScheduleDay relation
  * @method CourseQuery rightJoinCourseScheduleDay($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CourseScheduleDay relation
  * @method CourseQuery innerJoinCourseScheduleDay($relationAlias = null) Adds a INNER JOIN clause to the query using the CourseScheduleDay relation
+ *
+ * @method CourseQuery leftJoinCourseFolder($relationAlias = null) Adds a LEFT JOIN clause to the query using the CourseFolder relation
+ * @method CourseQuery rightJoinCourseFolder($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CourseFolder relation
+ * @method CourseQuery innerJoinCourseFolder($relationAlias = null) Adds a INNER JOIN clause to the query using the CourseFolder relation
+ *
+ * @method CourseQuery leftJoinCourseMaterial($relationAlias = null) Adds a LEFT JOIN clause to the query using the CourseMaterial relation
+ * @method CourseQuery rightJoinCourseMaterial($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CourseMaterial relation
+ * @method CourseQuery innerJoinCourseMaterial($relationAlias = null) Adds a INNER JOIN clause to the query using the CourseMaterial relation
  *
  * @method Course findOne(PropelPDO $con = null) Return the first Course matching the query
  * @method Course findOneOrCreate(PropelPDO $con = null) Return the first Course matching the query, or a new Course object populated from the query conditions when no match is found
@@ -1221,6 +1231,154 @@ abstract class BaseCourseQuery extends ModelCriteria
         return $this
             ->joinCourseScheduleDay($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'CourseScheduleDay', '\Zerebral\BusinessBundle\Model\Course\CourseScheduleDayQuery');
+    }
+
+    /**
+     * Filter the query by a related CourseFolder object
+     *
+     * @param   CourseFolder|PropelObjectCollection $courseFolder  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   CourseQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByCourseFolder($courseFolder, $comparison = null)
+    {
+        if ($courseFolder instanceof CourseFolder) {
+            return $this
+                ->addUsingAlias(CoursePeer::ID, $courseFolder->getCourseId(), $comparison);
+        } elseif ($courseFolder instanceof PropelObjectCollection) {
+            return $this
+                ->useCourseFolderQuery()
+                ->filterByPrimaryKeys($courseFolder->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByCourseFolder() only accepts arguments of type CourseFolder or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the CourseFolder relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return CourseQuery The current query, for fluid interface
+     */
+    public function joinCourseFolder($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('CourseFolder');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'CourseFolder');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the CourseFolder relation CourseFolder object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Zerebral\BusinessBundle\Model\Material\CourseFolderQuery A secondary query class using the current class as primary query
+     */
+    public function useCourseFolderQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinCourseFolder($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CourseFolder', '\Zerebral\BusinessBundle\Model\Material\CourseFolderQuery');
+    }
+
+    /**
+     * Filter the query by a related CourseMaterial object
+     *
+     * @param   CourseMaterial|PropelObjectCollection $courseMaterial  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   CourseQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByCourseMaterial($courseMaterial, $comparison = null)
+    {
+        if ($courseMaterial instanceof CourseMaterial) {
+            return $this
+                ->addUsingAlias(CoursePeer::ID, $courseMaterial->getCourseId(), $comparison);
+        } elseif ($courseMaterial instanceof PropelObjectCollection) {
+            return $this
+                ->useCourseMaterialQuery()
+                ->filterByPrimaryKeys($courseMaterial->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByCourseMaterial() only accepts arguments of type CourseMaterial or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the CourseMaterial relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return CourseQuery The current query, for fluid interface
+     */
+    public function joinCourseMaterial($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('CourseMaterial');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'CourseMaterial');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the CourseMaterial relation CourseMaterial object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Zerebral\BusinessBundle\Model\Material\CourseMaterialQuery A secondary query class using the current class as primary query
+     */
+    public function useCourseMaterialQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinCourseMaterial($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CourseMaterial', '\Zerebral\BusinessBundle\Model\Material\CourseMaterialQuery');
     }
 
     /**

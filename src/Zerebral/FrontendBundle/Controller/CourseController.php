@@ -140,19 +140,28 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
 
     /**
      * @Route("/syllabus/{id}", name="course_materials")
+     * @Route("/syllabus/{id}/{folderId}", name="course_materials_folder")
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
-     * @ParamConverter("course")
+     * @ParamConverter("course", options={"mapping": {"id": "id"}})
+     * @ParamConverter("folder", options={"mapping": {"folderId": "id"}})
      * @Template()
      */
-    public function materialsAction(Model\Course\Course $course)
+    public function materialsAction(Model\Course\Course $course, Model\Material\CourseFolder $folder = null)
     {
         $dayMaterials = array();
 
-        $dayMaterials[strtotime('now')] = array('1', '2');
-        $dayMaterials[strtotime('-2 days')] = array('1', '2');
+        $c = new \Criteria();
+        if ($folder) {
+            $c->add('folder_id', $folder->getId(), \Criteria::EQUAL);
+        }
+
+        foreach ($course->getCourseMaterials($c) as $material) {
+            $dayMaterials[$material->getCreatedAt('U')][] = $material;
+        }
 
         return array(
             'dayMaterials' => $dayMaterials,
+            'folder' => $folder,
             'course' => $course,
             'target' => 'courses'
         );

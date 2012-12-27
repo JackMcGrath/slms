@@ -73,7 +73,6 @@ class FileStorageExtension extends \Twig_Extension {
             $icon = isset($icon[$mimeTypeArray[1]]) ? $icon[$mimeTypeArray[1]] : $icons['general'];
         }
 
-
         $iconFile = new File();
         $iconFile->setName(self::$mimeTypeIconsPath . $icon);
         $iconFile->setStorage('dummy');

@@ -16,6 +16,7 @@ use Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer;
 use Zerebral\BusinessBundle\Model\Course\CoursePeer;
 use Zerebral\BusinessBundle\Model\Course\CourseTeacherPeer;
 use Zerebral\BusinessBundle\Model\Course\DisciplinePeer;
+use Zerebral\BusinessBundle\Model\Material\CourseMaterialPeer;
 use Zerebral\BusinessBundle\Model\User\Teacher;
 use Zerebral\BusinessBundle\Model\User\TeacherPeer;
 use Zerebral\BusinessBundle\Model\User\UserPeer;
@@ -267,7 +268,7 @@ abstract class BaseTeacherPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement directly (for example
+     * Use this method directly if you want to work with an executed statement durirectly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -398,6 +399,9 @@ abstract class BaseTeacherPeer
         // Invalidate objects in CourseTeacherPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         CourseTeacherPeer::clearInstancePool();
+        // Invalidate objects in CourseMaterialPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        CourseMaterialPeer::clearInstancePool();
     }
 
     /**

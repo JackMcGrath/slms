@@ -25,6 +25,8 @@ use Zerebral\BusinessBundle\Model\Course\CourseTeacher;
 use Zerebral\BusinessBundle\Model\Course\CourseTeacherQuery;
 use Zerebral\BusinessBundle\Model\Course\Discipline;
 use Zerebral\BusinessBundle\Model\Course\DisciplineQuery;
+use Zerebral\BusinessBundle\Model\Material\CourseMaterial;
+use Zerebral\BusinessBundle\Model\Material\CourseMaterialQuery;
 use Zerebral\BusinessBundle\Model\User\Teacher;
 use Zerebral\BusinessBundle\Model\User\TeacherPeer;
 use Zerebral\BusinessBundle\Model\User\TeacherQuery;
@@ -118,6 +120,12 @@ abstract class BaseTeacher extends BaseObject implements Persistent
     protected $collCourseTeachersPartial;
 
     /**
+     * @var        PropelObjectCollection|CourseMaterial[] Collection to store aggregation of CourseMaterial objects.
+     */
+    protected $collCourseMaterials;
+    protected $collCourseMaterialsPartial;
+
+    /**
      * @var        PropelObjectCollection|Course[] Collection to store aggregation of Course objects.
      */
     protected $collCourses;
@@ -171,6 +179,12 @@ abstract class BaseTeacher extends BaseObject implements Persistent
      * @var		PropelObjectCollection
      */
     protected $courseTeachersScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $courseMaterialsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -452,6 +466,8 @@ abstract class BaseTeacher extends BaseObject implements Persistent
 
             $this->collCourseTeachers = null;
 
+            $this->collCourseMaterials = null;
+
             $this->collCourses = null;
         } // if (deep)
     }
@@ -712,6 +728,23 @@ abstract class BaseTeacher extends BaseObject implements Persistent
                 }
             }
 
+            if ($this->courseMaterialsScheduledForDeletion !== null) {
+                if (!$this->courseMaterialsScheduledForDeletion->isEmpty()) {
+                    CourseMaterialQuery::create()
+                        ->filterByPrimaryKeys($this->courseMaterialsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->courseMaterialsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collCourseMaterials !== null) {
+                foreach ($this->collCourseMaterials as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             $this->alreadyInSave = false;
 
         }
@@ -930,6 +963,14 @@ abstract class BaseTeacher extends BaseObject implements Persistent
                     }
                 }
 
+                if ($this->collCourseMaterials !== null) {
+                    foreach ($this->collCourseMaterials as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
 
             $this->alreadyInValidation = false;
         }
@@ -1033,6 +1074,9 @@ abstract class BaseTeacher extends BaseObject implements Persistent
             }
             if (null !== $this->collCourseTeachers) {
                 $result['CourseTeachers'] = $this->collCourseTeachers->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collCourseMaterials) {
+                $result['CourseMaterials'] = $this->collCourseMaterials->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1233,6 +1277,12 @@ abstract class BaseTeacher extends BaseObject implements Persistent
                 }
             }
 
+            foreach ($this->getCourseMaterials() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addCourseMaterial($relObj->copy($deepCopy));
+                }
+            }
+
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1360,6 +1410,9 @@ abstract class BaseTeacher extends BaseObject implements Persistent
         }
         if ('CourseTeacher' == $relationName) {
             $this->initCourseTeachers();
+        }
+        if ('CourseMaterial' == $relationName) {
+            $this->initCourseMaterials();
         }
     }
 
@@ -2599,6 +2652,298 @@ abstract class BaseTeacher extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collCourseMaterials collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Teacher The current object (for fluent API support)
+     * @see        addCourseMaterials()
+     */
+    public function clearCourseMaterials()
+    {
+        $this->collCourseMaterials = null; // important to set this to null since that means it is uninitialized
+        $this->collCourseMaterialsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collCourseMaterials collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialCourseMaterials($v = true)
+    {
+        $this->collCourseMaterialsPartial = $v;
+    }
+
+    /**
+     * Initializes the collCourseMaterials collection.
+     *
+     * By default this just sets the collCourseMaterials collection to an empty array (like clearcollCourseMaterials());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initCourseMaterials($overrideExisting = true)
+    {
+        if (null !== $this->collCourseMaterials && !$overrideExisting) {
+            return;
+        }
+        $this->collCourseMaterials = new PropelObjectCollection();
+        $this->collCourseMaterials->setModel('CourseMaterial');
+    }
+
+    /**
+     * Gets an array of CourseMaterial objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Teacher is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|CourseMaterial[] List of CourseMaterial objects
+     * @throws PropelException
+     */
+    public function getCourseMaterials($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collCourseMaterialsPartial && !$this->isNew();
+        if (null === $this->collCourseMaterials || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCourseMaterials) {
+                // return empty collection
+                $this->initCourseMaterials();
+            } else {
+                $collCourseMaterials = CourseMaterialQuery::create(null, $criteria)
+                    ->filterByTeacher($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collCourseMaterialsPartial && count($collCourseMaterials)) {
+                      $this->initCourseMaterials(false);
+
+                      foreach($collCourseMaterials as $obj) {
+                        if (false == $this->collCourseMaterials->contains($obj)) {
+                          $this->collCourseMaterials->append($obj);
+                        }
+                      }
+
+                      $this->collCourseMaterialsPartial = true;
+                    }
+
+                    return $collCourseMaterials;
+                }
+
+                if($partial && $this->collCourseMaterials) {
+                    foreach($this->collCourseMaterials as $obj) {
+                        if($obj->isNew()) {
+                            $collCourseMaterials[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collCourseMaterials = $collCourseMaterials;
+                $this->collCourseMaterialsPartial = false;
+            }
+        }
+
+        return $this->collCourseMaterials;
+    }
+
+    /**
+     * Sets a collection of CourseMaterial objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $courseMaterials A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Teacher The current object (for fluent API support)
+     */
+    public function setCourseMaterials(PropelCollection $courseMaterials, PropelPDO $con = null)
+    {
+        $courseMaterialsToDelete = $this->getCourseMaterials(new Criteria(), $con)->diff($courseMaterials);
+
+        $this->courseMaterialsScheduledForDeletion = unserialize(serialize($courseMaterialsToDelete));
+
+        foreach ($courseMaterialsToDelete as $courseMaterialRemoved) {
+            $courseMaterialRemoved->setTeacher(null);
+        }
+
+        $this->collCourseMaterials = null;
+        foreach ($courseMaterials as $courseMaterial) {
+            $this->addCourseMaterial($courseMaterial);
+        }
+
+        $this->collCourseMaterials = $courseMaterials;
+        $this->collCourseMaterialsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related CourseMaterial objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related CourseMaterial objects.
+     * @throws PropelException
+     */
+    public function countCourseMaterials(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collCourseMaterialsPartial && !$this->isNew();
+        if (null === $this->collCourseMaterials || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCourseMaterials) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getCourseMaterials());
+            }
+            $query = CourseMaterialQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByTeacher($this)
+                ->count($con);
+        }
+
+        return count($this->collCourseMaterials);
+    }
+
+    /**
+     * Method called to associate a CourseMaterial object to this object
+     * through the CourseMaterial foreign key attribute.
+     *
+     * @param    CourseMaterial $l CourseMaterial
+     * @return Teacher The current object (for fluent API support)
+     */
+    public function addCourseMaterial(CourseMaterial $l)
+    {
+        if ($this->collCourseMaterials === null) {
+            $this->initCourseMaterials();
+            $this->collCourseMaterialsPartial = true;
+        }
+        if (!in_array($l, $this->collCourseMaterials->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddCourseMaterial($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	CourseMaterial $courseMaterial The courseMaterial object to add.
+     */
+    protected function doAddCourseMaterial($courseMaterial)
+    {
+        $this->collCourseMaterials[]= $courseMaterial;
+        $courseMaterial->setTeacher($this);
+    }
+
+    /**
+     * @param	CourseMaterial $courseMaterial The courseMaterial object to remove.
+     * @return Teacher The current object (for fluent API support)
+     */
+    public function removeCourseMaterial($courseMaterial)
+    {
+        if ($this->getCourseMaterials()->contains($courseMaterial)) {
+            $this->collCourseMaterials->remove($this->collCourseMaterials->search($courseMaterial));
+            if (null === $this->courseMaterialsScheduledForDeletion) {
+                $this->courseMaterialsScheduledForDeletion = clone $this->collCourseMaterials;
+                $this->courseMaterialsScheduledForDeletion->clear();
+            }
+            $this->courseMaterialsScheduledForDeletion[]= clone $courseMaterial;
+            $courseMaterial->setTeacher(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Teacher is new, it will return
+     * an empty collection; or if this Teacher has previously
+     * been saved, it will retrieve related CourseMaterials from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Teacher.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|CourseMaterial[] List of CourseMaterial objects
+     */
+    public function getCourseMaterialsJoinCourse($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = CourseMaterialQuery::create(null, $criteria);
+        $query->joinWith('Course', $join_behavior);
+
+        return $this->getCourseMaterials($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Teacher is new, it will return
+     * an empty collection; or if this Teacher has previously
+     * been saved, it will retrieve related CourseMaterials from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Teacher.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|CourseMaterial[] List of CourseMaterial objects
+     */
+    public function getCourseMaterialsJoinCourseFolder($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = CourseMaterialQuery::create(null, $criteria);
+        $query->joinWith('CourseFolder', $join_behavior);
+
+        return $this->getCourseMaterials($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Teacher is new, it will return
+     * an empty collection; or if this Teacher has previously
+     * been saved, it will retrieve related CourseMaterials from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Teacher.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|CourseMaterial[] List of CourseMaterial objects
+     */
+    public function getCourseMaterialsJoinFile($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = CourseMaterialQuery::create(null, $criteria);
+        $query->joinWith('File', $join_behavior);
+
+        return $this->getCourseMaterials($query, $con);
+    }
+
+    /**
      * Clears out the collCourses collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -2830,6 +3175,11 @@ abstract class BaseTeacher extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collCourseMaterials) {
+                foreach ($this->collCourseMaterials as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collCourses) {
                 foreach ($this->collCourses as $o) {
                     $o->clearAllReferences($deep);
@@ -2857,6 +3207,10 @@ abstract class BaseTeacher extends BaseObject implements Persistent
             $this->collCourseTeachers->clearIterator();
         }
         $this->collCourseTeachers = null;
+        if ($this->collCourseMaterials instanceof PropelCollection) {
+            $this->collCourseMaterials->clearIterator();
+        }
+        $this->collCourseMaterials = null;
         if ($this->collCourses instanceof PropelCollection) {
             $this->collCourses->clearIterator();
         }

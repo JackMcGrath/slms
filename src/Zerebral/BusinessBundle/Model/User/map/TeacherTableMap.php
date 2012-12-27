@@ -64,6 +64,7 @@ class TeacherTableMap extends TableMap
         $this->addRelation('CreatedByTeacher', 'Zerebral\\BusinessBundle\\Model\\Course\\Course', RelationMap::ONE_TO_MANY, array('id' => 'created_by', ), 'CASCADE', 'CASCADE', 'CreatedByTeachers');
         $this->addRelation('Discipline', 'Zerebral\\BusinessBundle\\Model\\Course\\Discipline', RelationMap::ONE_TO_MANY, array('id' => 'teacher_id', ), 'CASCADE', 'CASCADE', 'Disciplines');
         $this->addRelation('CourseTeacher', 'Zerebral\\BusinessBundle\\Model\\Course\\CourseTeacher', RelationMap::ONE_TO_MANY, array('id' => 'teacher_id', ), 'CASCADE', 'CASCADE', 'CourseTeachers');
+        $this->addRelation('CourseMaterial', 'Zerebral\\BusinessBundle\\Model\\Material\\CourseMaterial', RelationMap::ONE_TO_MANY, array('id' => 'created_by', ), 'CASCADE', 'CASCADE', 'CourseMaterials');
         $this->addRelation('Course', 'Zerebral\\BusinessBundle\\Model\\Course\\Course', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'CASCADE', 'Courses');
     } // buildRelations()
 
