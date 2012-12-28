@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<database name="default" defaultIdMethod="native" package="user" namespace="Zerebral\BusinessBundle\Model\Feed" defaultPhpNamingMethod="phpname">
+    <table name="feed_contents" phpName="FeedContent" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true" />
+        <column name="type" phpName="Type" type="CHAR" valueSet="video,image,website,text,assignment" sqlType="enum('video','image','website','text','assignment')" required="true" defaultValue="text" />
+        <column name="text" phpName="Text" type="LONGVARCHAR" required="false" />
+        <column name="link_url" phpName="LinkUrl" type="VARCHAR" size="150" required="false" />
+        <column name="link_title" phpName="LinkTitle" type="VARCHAR" size="100" required="false" />
+        <column name="link_description" phpName="LinkDescription" type="VARCHAR" size="255" required="false" />
+        <column name="link_thumbnail_url" phpName="LinkThumbnailUrl" type="VARCHAR" size="150" required="false" />
+    </table>
+    <table name="feed_items" phpName="FeedItem" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true" />
+        <column name="assignment_id" phpName="AssignmentId" type="INTEGER" sqlType="int(11) unsigned" required="false" />
+        <column name="course_id" phpName="CourseId" type="INTEGER" sqlType="int(11) unsigned" required="false" />
+        <column name="feed_content_id" phpName="FeedContentId" type="INTEGER" sqlType="int(11) unsigned" required="true" />
+        <column name="created_by" phpName="CreatedBy" type="INTEGER" sqlType="int(11) unsigned" required="true"/>
+        <column name="created_at" phpName="CreatedAt" type="TIMESTAMP" required="true" />
+        <foreign-key foreignTable="feed_contents" name="feed_items_feed_contents" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="feed_content_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="assignments" name="feed_items_assignments" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="assignment_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="courses" name="feed_items_courses" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="course_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="users" name="feed_items_users" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="created_by" foreign="id"/>
+        </foreign-key>
+    </table>
+    <table name="feed_comments" phpName="FeedComment" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true" />
+        <column name="feed_item_id" phpName="FeedItemId" type="INTEGER" sqlType="int(11) unsigned" required="true" />
+        <column name="feed_content_id" phpName="FeedContentId" type="INTEGER" sqlType="int(11) unsigned" required="true" />
+        <column name="created_by" phpName="CreatedBy" type="INTEGER" sqlType="int(11) unsigned" required="true"/>
+        <column name="created_at" phpName="CreatedAt" type="TIMESTAMP" required="true" />
+        <foreign-key foreignTable="feed_items" name="feed_comments_feed_items" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="feed_item_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="feed_contents" name="feed_comments_feed_contents" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="feed_content_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="users" name="feed_comments_users" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="created_by" foreign="id"/>
+        </foreign-key>
+    </table>
+</database>
