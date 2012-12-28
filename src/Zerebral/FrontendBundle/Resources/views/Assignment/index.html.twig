@@ -23,7 +23,7 @@
                     <div class="list-item span12">
                         <div class="symbol pull-left">
                             {% if is_granted('ROLE_STUDENT') %}
-                                <img class="rounded" src="{{ get_file_storage_link(assignment.teacher.user.getAvatar()) | imagine_filter('thumbnail') }}"/>
+                                <img class="rounded" src="{{ get_file_storage_link(assignment.teacher.user.getAvatarFile()) | imagine_filter('thumbnail') }}"/>
                             {% else %}
                                 <div class="rounded count-badge">-</div>
                             {% endif %}
