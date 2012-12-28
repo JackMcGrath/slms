@@ -163,7 +163,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
         }
 
         foreach ($course->getCourseMaterials($c) as $material) {
-            $dayMaterials[$material->getCreatedAt('U')][] = $material;
+            $dayMaterials[strtotime($material->getCreatedAt('Y-m-d'))][] = $material;
         }
 
         return array(
@@ -175,8 +175,6 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
             'target' => 'courses'
         );
     }
-
-
 
     /**
      * @Route("/members/{id}", name="course_members")

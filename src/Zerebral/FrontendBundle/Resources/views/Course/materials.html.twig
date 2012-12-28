@@ -31,14 +31,17 @@
                             </div>
                             <div class="details">
                                 <div class="title">
-                                    <h3>{{ material.file.name }}</h3>
+                                    <h3><a href="{{ get_file_storage_link(material.file) }}">{{ material.file.name }}</a></h3>
                                 </div>
                                 <div class="description">{{ material.description }}</div>
                                 <div class="info">
-                                    by {{ material.teacher.fullName }} {% if material.courseFolder %}in <a href="{{ path('course_materials_folder', {id: course.id, folderId: material.folderId}) }}" class="folder"><i class="icon-small-folder"></i>{{ material.courseFolder.name }}</a>{% endif %} {{ material.file.size | bytes_to_human }} <span class="separator">/</span>
-                                    <div class="manage-buttons">
-                                        <a href="#"><i class="icon-small-pencil"></i>Edit</a> <a href="#"><i class="icon-small-trash-bin"></i>Delete</a>
-                                    </div>
+                                    by {{ material.teacher.fullName }} {% if material.courseFolder %}in <a href="{{ path('course_materials_folder', {id: course.id, folderId: material.folderId}) }}" class="folder"><i class="icon-small-folder"></i>{{ material.courseFolder.name }}</a>{% endif %} {{ material.file.size | bytes_to_human }}
+                                    {% if is_granted('ROLE_TEACHER') %}
+                                        <span class="separator">/</span>
+                                        <div class="manage-buttons">
+                                            <a href="#"><i class="icon-small-trash-bin"></i>Delete</a>
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -74,13 +77,15 @@
                         <li {{ folder and courseFolder.id == folder.id ? 'class="active"' : '' }} folderId="{{ courseFolder.id }}" courseId="{{ course.id }}" folderName="{{ courseFolder.name }}">
                             <i class="marker">&#9656;</i>
                             <a href="{{ path('course_materials_folder', {id: course.id, folderId: courseFolder.id}) }}">{{ courseFolder.name }}</a>
-                            <div class="manage">
-                                <i class="manage-buttons-gears icon-small-gears"></i>
-                                <div class="manage-buttons invisible">
-                                    {% if is_granted('EDIT', courseFolder) %}<a href="#" class="edit"><i class="icon-small-pencil"></i>Edit</a>{% endif %}
-                                    {% if is_granted('DELETE', courseFolder) %}<a href="{{ path('delete_folder', {id: courseFolder.id}) }}" class="delete"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
+                            {% if is_granted('ROLE_TEACHER') %}
+                                <div class="manage">
+                                    <i class="manage-buttons-gears icon-small-gears"></i>
+                                    <div class="manage-buttons invisible">
+                                        {% if is_granted('EDIT', courseFolder) %}<a href="#" class="edit"><i class="icon-small-pencil"></i>Edit</a>{% endif %}
+                                        {% if is_granted('DELETE', courseFolder) %}<a href="{{ path('delete_folder', {id: courseFolder.id}) }}" class="delete"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
+                                    </div>
                                 </div>
-                            </div>
+                            {% endif %}
                         </li>
                     {% endfor %}
                 </ul>
