@@ -31,6 +31,7 @@ FoldersWidget.prototype = {
 
         this.target.find('a.delete').live('click', $.proxy(this.onDelete, this));
         this.target.find('a.edit').live('click', $.proxy(this.onEdit, this));
+        $('.top-buttons .create-folder').bind('click', $.proxy(this.onEdit, this))
 
         $('.folder-form').zerebralAjaxForm();
     },
@@ -47,9 +48,12 @@ FoldersWidget.prototype = {
     },
 
     onOpenForm: function($target) {
-        $('#folder_id').val($target.attr('folderId'));
-        $('#folder_course_id').val($target.attr('courseId'));
-        $('#folder_name').val($target.attr('folderName'));
+        if ($target) {
+            $('#folder_id').val($target.attr('folderId'));
+            $('#folder_name').val($target.attr('folderName'));
+        }
+        $('#folder_course_id').val(this.container.options.courseId);
+
     }
 };
 

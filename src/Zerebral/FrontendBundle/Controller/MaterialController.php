@@ -45,12 +45,14 @@ class MaterialController extends \Zerebral\CommonBundle\Component\Controller
 
         $form->bind($this->getRequest());
         if ($form->isValid()) {
+            #TODO need to refactor
             $folder = \Zerebral\BusinessBundle\Model\Material\CourseFolderQuery::create()->findPk($form['id']->getData());
-            if ($folder) {
-                $folder->setName($form['name']->getData());
-                $folder->setCourseId($form['course_id']->getData());
-                $folder->save();
+            if (!$folder) {
+                $folder = new \Zerebral\BusinessBundle\Model\Material\CourseFolder();
             }
+            $folder->setName($form['name']->getData());
+            $folder->setCourseId($form['course_id']->getData());
+            $folder->save();
 
             return new JsonResponse(array(
                 'redirect' => $this->getRequest()->headers->get('referer')
