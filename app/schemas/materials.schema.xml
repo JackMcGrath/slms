@@ -69,10 +69,10 @@
         <foreign-key foreignTable="courses" name="course_materials_courses" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="course_id" foreign="id"/>
         </foreign-key>
-        <foreign-key foreignTable="course_folders" name="course_materials_course_folders" onDelete="CASCADE" onUpdate="CASCADE">
+        <foreign-key foreignTable="course_folders" name="course_materials_course_folder" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="folder_id" foreign="id"/>
         </foreign-key>
-        <foreign-key foreignTable="files" name="course_materials_files" onDelete="CASCADE" onUpdate="CASCADE">
+        <foreign-key foreignTable="files" name="course_materials_file" phpName="File" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="file_id" foreign="id"/>
         </foreign-key>
         <index name="course_materials_courses">
