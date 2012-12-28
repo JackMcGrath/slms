@@ -79,7 +79,7 @@
 
 {% block member %}
     <div class="member">
-        <div class="avatar"><img src="{{ get_file_storage_link(member.user.getAvatar()) | imagine_filter('thumbnail') }}"/></div>
+        <div class="avatar"><img src="{{ get_file_storage_link(member.user.getAvatarFile()) | imagine_filter('thumbnail') }}"/></div>
         <div class="info">
             <a href="#">{{ member.fullName }}</a>
 

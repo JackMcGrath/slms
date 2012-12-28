@@ -26,7 +26,8 @@ class UserProfileType extends AbstractType
         $builder->add('gender', 'choice', array('required' => false, 'choices' => array('male' => 'Male', 'female' => 'Female')));
         $builder->add('avatar', new \Zerebral\FrontendBundle\Form\Type\FileType(), array(
             'storage' => $this->getFileStorage(),
-            'by_reference' => true
+            'by_reference' => true,
+            'required' => false
         ));
     }
 
