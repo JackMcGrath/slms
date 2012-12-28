@@ -51,8 +51,8 @@
         <div class="right-navbar pull-left">
             {% if is_granted('ROLE_TEACHER') %}
                 <div class="top-buttons">
-                    <a href="{{ path('assignment_add', {courseId: course.id}) }}" class="btn big-button upload-file">upload file</a>
-                    <a href="{{ path('assignments') }}" class="btn big-button">create folder</a>
+                    <a href="#uploadMaterialModal" class="btn big-button upload-file" data-toggle="modal" data-target="#uploadMaterialModal">upload file</a>
+                    <a href="#" class="btn big-button create-folder">create folder</a>
                 </div>
             {% endif %}
 
@@ -91,7 +91,7 @@
     </div>
 
     <div class="modal hide fade" id="editFolderModal">
-        <form class="form-vertical folder-form" action="{{ path('ajax_course_join') }}" method="post" {{ form_enctype(folderRenameForm) }} novalidate>
+        <form class="form-vertical folder-form" action="{{ path('ajax_edit_folder') }}" method="post" {{ form_enctype(folderRenameForm) }} novalidate>
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h3>Rename folder</h3>
@@ -115,5 +115,46 @@
         </form>
     </div>
 
+    <div class="modal hide fade" id="uploadMaterialModal">
+        <form method="post" {{ form_enctype(courseMaterialForm) }} class="upload-material" action="{{ path('ajax_course_material_upload', {id: course.id}) }}">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3>Upload material files</h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-inline upload-folder">
+                    {{ form_row(courseMaterialForm.courseMaterialFolder, {
+                        label: 'Choose folder',
+                        form_type: 'horizontal',
+                        placeholder: 'Folder name',
+                        attr: {
+                            class: 'input-xlarge'
+                        }
+                    }) }}
+
+                </div>
+                <div class="clearfix"></div>
+
+                <ul class="uploadedFiles">
+                    <div class="clearfix"></div>
+                    <a id="addUploadFile" href="#">Add another file</a> <span class="gray">(Maximum size: 1MB)</span>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <input type="submit" class="btn btn-danger" value="Upload" />
+                <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Cancel</a>
+            </div>
+            {{ form_widget(courseMaterialForm._token) }}
+        </form>
+    </div>
+
+    <script type="text/javascript">
+        $(document).on('init', function () {
+            var controllerOptions = {
+                courseId: {{ course.id }}
+            };
+            controller.init(controllerOptions);
+        });
+    </script>
 
 {% endblock %}

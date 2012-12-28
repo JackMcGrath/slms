@@ -134,3 +134,12 @@ Zerebral\BusinessBundle\Model\Material\CourseFolder:
         course_id:
             - NotBlank: ~
 
+Zerebral\BusinessBundle\Model\Material\CourseMaterial:
+    getters:
+        file:
+            - Valid: ~
+            - NotNull:
+                message: File can not be empty
+        courseId:
+            - NotBlank:
+                message: Course id can not be blank

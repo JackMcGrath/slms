@@ -32,7 +32,7 @@ class MaterialController extends \Zerebral\CommonBundle\Component\Controller
     }
 
     /**
-     * @Route("/folders/edit", name="ajax_course_join")
+     * @Route("/folders/edit", name="ajax_edit_folder")
      * @PreAuthorize("hasRole('ROLE_TEACHER')")
      */
     public function editAction()
@@ -50,6 +50,38 @@ class MaterialController extends \Zerebral\CommonBundle\Component\Controller
                 $folder->setName($form['name']->getData());
                 $folder->setCourseId($form['course_id']->getData());
                 $folder->save();
+            }
+
+            return new JsonResponse(array(
+                'redirect' => $this->getRequest()->headers->get('referer')
+            ));
+        }
+
+        return new FormJsonResponse($form);
+    }
+
+    /**
+     * @Route("/materials/upload/{id}", name="ajax_course_material_upload")
+     * @ParamConverter("course")
+     *
+     * @PreAuthorize("hasRole('ROLE_TEACHER')")
+     * @Template()
+     */
+    public function uploadMaterialAction(Model\Course\Course $course) {
+        $courseMaterialsType = new FormType\CourseMaterialsType();
+        $courseMaterialsType->setFileStorage($this->container->get('zerebral.file_storage')->getFileStorage('local'));
+        $courseMaterialsType->setCourse($course);
+
+        $form = $this->createForm($courseMaterialsType);
+        $form->bind($this->getRequest());
+
+        if ($form->isValid()) {
+            $materials = $form->getData();
+
+            foreach ($materials['courseMaterials'] as $material) {
+                $material->setCreatedBy($this->getRoleUser()->getId());
+                $material->setCourseFolder($materials['courseMaterialFolder']);
+                $material->save();
             }
 
             return new JsonResponse(array(

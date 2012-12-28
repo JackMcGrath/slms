@@ -2,7 +2,7 @@ function Controller() {
 }
 
 Controller.prototype = {
-    delayed:false,
+    delayed:true,
     options:undefined,
     foldersWidget: undefined,
 
@@ -10,6 +10,7 @@ Controller.prototype = {
     init:function (options) {
         this.options = options || {};
         this.foldersWidget = new FoldersWidget(this, $('.right-navbar .block.folders'));
+        this.upload = new UploadForm(this, $('#uploadMaterialModal'));
     }
 };
 
@@ -49,5 +50,72 @@ FoldersWidget.prototype = {
         $('#folder_id').val($target.attr('folderId'));
         $('#folder_course_id').val($target.attr('courseId'));
         $('#folder_name').val($target.attr('folderName'));
+    }
+};
+
+var UploadForm = function (container, target) {
+    this.container = container;
+    this.target = target;
+    this.bind();
+};
+
+UploadForm.prototype = {
+    selectedFolder: '',
+    fileFieldIndex: 0,
+
+    bind:function () {
+        var self = this;
+
+        this.target.find('#addUploadFile').bind('click', $.proxy(this.onAddFile, this));
+        this.target.find('.upload-folder select').bind('change', $.proxy(this.onChangeFolder, this));
+        this.target.find('li a.remove').live('click', $.proxy(this.onRemoveFile, this));
+
+        this.target.on('show', function(e) {
+            $(this).find('ul.uploadedFiles li').remove();
+            self.fileFieldIndex = 0;
+            self.onAddFile();
+        });
+
+        $('.upload-material').zerebralAjaxForm();
+        $('.optional-model').optionalModel();
+    },
+
+    onAddFile: function() {
+        var ul = this.target.find('.uploadedFiles');
+
+        var newLi = $('<li class="control-group"></li>');
+        var newFileInput = $('<input type="file" name="course_materials[courseMaterials][' + this.fileFieldIndex + '][file][uploadedFile]" />');
+        var newDescInput = $('<input type="text" name="course_materials[courseMaterials][' + this.fileFieldIndex + '][description]" placeholder="Description (optional)" />');
+        var courseIdInput = $('<input type="hidden" name="course_materials[courseMaterials][' + this.fileFieldIndex + '][courseId]" value="' + this.container.options.courseId + '" />');
+        //var folderIdInput = $('<input type="hidden" class="upload-folder-id" name="course_materials[courseMaterials][' + this.fileFieldIndex + '][folderId]" value="' + this.selectedFolder + '" />');
+        newLi.append(newFileInput).append(newDescInput).append(courseIdInput);
+        if (this.fileFieldIndex == 0) {
+            ul.prepend(newLi);
+        } else {
+            ul.find('li').last().after(newLi);
+        }
+        this.fileFieldIndex ++;
+        this.showRemoveButton();
+    },
+
+    onRemoveFile: function(e) {
+        e.preventDefault();
+        $(e.target).parents('li').remove();
+        this.fileFieldIndex --;
+        this.showRemoveButton();
+
+    },
+
+    onChangeFolder: function(e) {
+        var folderId = $(e.target).val();
+        this.selectedFolder = folderId;
+        this.target.find('.upload-folder-id').val(this.selectedFolder);
+    },
+
+    showRemoveButton: function() {
+        this.target.find('.uploadedFiles li .remove').remove();
+        if (this.fileFieldIndex > 1) {
+            this.target.find('.uploadedFiles li').prepend('<a class="close remove" href="#">&times;</a>');
+        }
     }
 };

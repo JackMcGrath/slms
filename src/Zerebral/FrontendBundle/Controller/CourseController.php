@@ -151,6 +151,10 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
         $folderType = new FormType\FolderType();
         $folderForm = $this->createForm($folderType);
 
+        $courseMaterialType = new FormType\CourseMaterialsType();
+        $courseMaterialType->setCourse($course);
+        $courseMaterialForm = $this->createForm($courseMaterialType);
+
 
         $dayMaterials = array();
         $c = new \Criteria();
@@ -165,6 +169,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
         return array(
             'dayMaterials' => $dayMaterials,
             'folderRenameForm' => $folderForm->createView(),
+            'courseMaterialForm' => $courseMaterialForm->createView(),
             'folder' => $folder,
             'course' => $course,
             'target' => 'courses'

@@ -57,12 +57,26 @@ div#upload_files_div {
     }
 }
 
-#uploadModal {
+#uploadModal, #uploadMaterialModal {
     ul {
         list-style-type: none;
         li.error {
             input[type="text"] {
                 border-color: #CCCCCC;
+            }
+        }
+    }
+    ul.uploadedFiles {
+        margin-left: 0px;
+        input[type="file"] {
+            margin-bottom: 7px;
+            margin-right: 10px;
+        }
+        li {
+            display: inline-block;
+            a.close {
+                margin-left: 10px;
+                margin-top: 8px;
             }
         }
     }
