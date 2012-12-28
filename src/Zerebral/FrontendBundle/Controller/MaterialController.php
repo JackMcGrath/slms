@@ -91,4 +91,9 @@ class MaterialController extends \Zerebral\CommonBundle\Component\Controller
 
         return new FormJsonResponse($form);
     }
+
+    public function deleteAction()
+    {
+
+    }
 }
