@@ -51,6 +51,7 @@ class Teacher extends BaseTeacher
         $c = new \Criteria();
         $c->addJoin(\Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer::ID, \Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentPeer::ASSIGNMENT_ID, \Criteria::LEFT_JOIN);
         $c->add('student_assignments.id', null, \Criteria::ISNULL);
+        $c->addDescendingOrderByColumn('due_at');
 
         return $course->getAssignments($c);
     }
