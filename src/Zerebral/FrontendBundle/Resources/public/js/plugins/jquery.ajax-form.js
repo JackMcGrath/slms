@@ -29,12 +29,15 @@ ZerebralAjaxForm.prototype = {
 
         if (response.has_errors) {
             $.each(response.errors, function(elementName, errors) {
-                form
-                    .find('[name="' + elementName.replace(/\[/g,'\\[').replace(/\]/g,'\\]') + '"]')
-                        .parents('.control-group')
-                            .addClass('error')
-                    .end()
-                    .after('<span class="help-inline">' + errors.join('<br>') + '</span>');
+                var errorHtml = '<span class="help-inline">' + errors.join('<br>') + '</span>';
+                var element = form.find('[name^="' + elementName.replace(/\[/g,'\\[').replace(/\]/g,'\\]') + '"]').last();
+                element.parents('.control-group').addClass('error');
+                var control = element.parents('.controls');
+                if (control.length) {
+                    control.append(errorHtml);
+                } else {
+                    element.parent().append(errorHtml);
+                }
             });
         }
     },

@@ -129,7 +129,7 @@ Zerebral\BusinessBundle\Model\Course\CourseScheduleDay:
 Zerebral\BusinessBundle\Model\Material\CourseFolder:
     constraints:
         - Propel\PropelBundle\Validator\Constraints\UniqueObject:
-            fields: [id,name]
+            fields: [course_id,name]
             message: You already have folder with this name
     getters:
         name:
