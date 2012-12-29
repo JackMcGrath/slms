@@ -12,8 +12,6 @@ class FolderType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('name', 'text', array('required' => true, 'max_length' => 255));
-        $builder->add('id', 'hidden', array('required' => false));
-        $builder->add('course_id', 'hidden', array('required' => true));
     }
 
     public function getName()

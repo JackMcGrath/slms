@@ -127,15 +127,11 @@ Zerebral\BusinessBundle\Model\Course\CourseScheduleDay:
                 message: Time is required.
 
 Zerebral\BusinessBundle\Model\Material\CourseFolder:
-    constraints:
-        - Propel\PropelBundle\Validator\Constraints\UniqueObject:
-            fields: [name, course_id]
-            message: Folder already exists
-    properties:
+    getters:
         name:
             - NotBlank:
                 message: Name can not be blank
-        course_id:
+        course:
             - NotBlank: ~
 
 Zerebral\BusinessBundle\Model\Material\CourseMaterial:

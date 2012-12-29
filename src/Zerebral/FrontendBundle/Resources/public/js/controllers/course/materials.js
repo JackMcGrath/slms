@@ -48,11 +48,17 @@ FoldersWidget.prototype = {
     },
 
     onOpenForm: function($target) {
-        if ($target) {
-            $('#folder_id').val($target.attr('folderId'));
+
+        var form = $('#editFolderModal form');
+        // if rename folder
+        if ($target.length) {
+            form.attr('action', form.data('action-edit') + '/' + $target.attr('folderId'));
             $('#folder_name').val($target.attr('folderName'));
+            form.find('h3').text('Rename folder');
+        } else {
+            form.attr('action', form.data('action-add'));
+            form.find('h3').text('Create new folder');
         }
-        $('#folder_course_id').val(this.container.options.courseId);
 
     }
 };
