@@ -29,4 +29,8 @@ class Assignment extends BaseAssignment
         return parent::preDelete($con);
     }
 
+    public function getFeedItem() {
+        return $this->getFeedItems()->getFirst();
+    }
+
 }

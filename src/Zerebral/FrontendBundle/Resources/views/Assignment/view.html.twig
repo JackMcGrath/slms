@@ -61,24 +61,28 @@
 
             <div class="feed">
                 <div class="form">
-                    <textarea id="comment_input" placeholder="Share what's new..." ></textarea>
-                    <div class="controls">
-                        <div class="attached-link">
-                            <input id="attached-link-field" type="text" />
-                            <div class="attached-link-delete" style="">
-                                <i class="icon-small-trash-bin"></i> <a class="gray" href="#">Delete</a>
+                    <form id="ajaxFeedCommentForm" method="post" {{ form_enctype(feedCommentForm) }} action="{{ path('ajax_feed_add_comment', {feedItemId: assignment.feedItem.id }) }}">
+                        <textarea id="comment_input" name="feed_comment[feedContent][text]" placeholder="Share what's new..." ></textarea>
+                        <div class="controls">
+                            <div class="attached-link">
+                                <input id="attached-link-field" type="text" name="feed_comment[feedContent][link_url]" placeholder="Enter link..." />
+                                <input id="comment-type" type="hidden" name="feed_comment[feedContent][type]" value="text" />
+                                <div class="attached-link-delete" style="">
+                                    <i class="icon-small-trash-bin"></i> <a class="gray" href="#">Delete</a>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="buttons">
+                                <input type="submit" class="btn post-button" value="Post message" />
+                                <div class="attach-links">
+                                    <a class="attach-link" data-link-type="image" href="#"><img src="/img/feed_image_icon.png" alt="Add Image" /></a>
+                                    <a class="attach-link" data-link-type="video" href="#"><img src="/img/feed_video_icon.png" alt="Add Video" /></a>
+                                    <a class="attach-link" data-link-type="website" href="#"><img src="/img/feed_website_icon.png" alt="Add Link" /></a>
+                                </div>
                             </div>
                         </div>
-                        <div class="clearfix"></div>
-                        <div class="buttons">
-                            <input type="button" class="btn post-button" value="Post message" />
-                            <div class="attach-links">
-                                <a class="attach-link" href="#"><img src="/img/feed_image_icon.png" alt="Add Image" /></a>
-                                <a class="attach-link" href="#"><img src="/img/feed_video_icon.png" alt="Add Video" /></a>
-                                <a class="attach-link" href="#"><img src="/img/feed_website_icon.png" alt="Add Link" /></a>
-                            </div>
-                        </div>
-                    </div>
+                        {{ form_widget(feedCommentForm._token) }}
+                    </form>
                 </div>
             </div>
             <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>

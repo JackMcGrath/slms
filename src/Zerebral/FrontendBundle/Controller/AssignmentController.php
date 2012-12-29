@@ -72,8 +72,12 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
         }
 
 
+        $feedCommentFormType = new FormType\FeedCommentType();
+        $feedCommentForm = $this->createForm($feedCommentFormType, null);
+
         $return = array(
             'course' => $assignment->getCourse(),
+            'feedCommentForm' => $feedCommentForm->createView(),
             'assignment' => $assignment,
             'user' => $this->getRoleUser(),
             'target' => 'assignments'

@@ -43,7 +43,7 @@ class FeedContentTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('type', 'Type', 'CHAR', true, null, 'text');
+        $this->addColumn('type', 'Type', 'CHAR', true, null, null);
         $this->addColumn('text', 'Text', 'LONGVARCHAR', false, null, null);
         $this->addColumn('link_url', 'LinkUrl', 'VARCHAR', false, 150, null);
         $this->addColumn('link_title', 'LinkTitle', 'VARCHAR', false, 100, null);
@@ -57,8 +57,8 @@ class FeedContentTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('FeedItem', 'Zerebral\\BusinessBundle\\Model\\Feed\\FeedItem', RelationMap::ONE_TO_MANY, array('id' => 'feed_content_id', ), 'CASCADE', 'CASCADE', 'FeedItems');
-        $this->addRelation('FeedComment', 'Zerebral\\BusinessBundle\\Model\\Feed\\FeedComment', RelationMap::ONE_TO_MANY, array('id' => 'feed_content_id', ), 'CASCADE', 'CASCADE', 'FeedComments');
+        $this->addRelation('FeedItem', 'Zerebral\\BusinessBundle\\Model\\Feed\\FeedItem', RelationMap::ONE_TO_MANY, array('id' => 'feed_content_id', ), null, null, 'FeedItems');
+        $this->addRelation('FeedComment', 'Zerebral\\BusinessBundle\\Model\\Feed\\FeedComment', RelationMap::ONE_TO_MANY, array('id' => 'feed_content_id', ), null, null, 'FeedComments');
     } // buildRelations()
 
     /**

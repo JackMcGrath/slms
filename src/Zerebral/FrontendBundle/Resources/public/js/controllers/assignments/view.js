@@ -80,15 +80,18 @@ $(document).ready(function(){
     $('.attach-link').click(function(e) {
         e.preventDefault();
         $(e.target).parent().parent().hide();
+        $(e.target).parent().parent().parent().parent().find('#comment-type').val($(e.target).parent().data('linkType'));
         $(e.target).parent().parent().parent().parent().find('.attached-link').slideDown();
     });
 
     $('.attached-link-delete a').click(function(e) {
         e.preventDefault();
         $(e.target).parent().parent().slideUp();
+        $(e.target).parent().parent().parent().find('#comment-type').val('text');
         $(e.target).parent().parent().parent().find('.attach-links').show();
 
     });
+    $('#ajaxFeedCommentForm').zerebralAjaxForm();
 
     $('#ajaxUploadSolutionsForm').zerebralAjaxForm();
 
