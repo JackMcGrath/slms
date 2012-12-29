@@ -127,11 +127,11 @@ Zerebral\BusinessBundle\Model\Course\CourseScheduleDay:
                 message: Time is required.
 
 Zerebral\BusinessBundle\Model\Material\CourseFolder:
-    properties:
+    getters:
         name:
             - NotBlank:
                 message: Name can not be blank
-        course_id:
+        course:
             - NotBlank: ~
 
 Zerebral\BusinessBundle\Model\Material\CourseMaterial:

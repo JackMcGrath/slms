@@ -22,6 +22,7 @@ class MaterialController extends \Zerebral\CommonBundle\Component\Controller
 {
     /**
      * @Route("/folders/delete/{id}", name="delete_folder")
+     * @ParamConverter("folder")
      * @PreAuthorize("hasRole('ROLE_TEACHER')")
      */
     public function deleteFolderAction(Model\Material\CourseFolder $folder)
@@ -32,12 +33,23 @@ class MaterialController extends \Zerebral\CommonBundle\Component\Controller
     }
 
     /**
-     * @Route("/folders/edit", name="ajax_edit_folder")
+     * @Route("/folders/add/{courseId}", name="ajax_add_folder")
+     * @Route("/folders/edit/{courseId}/{id}", name="ajax_edit_folder")
+     *
+     * @ParamConverter("folder", options={"mapping": {"id": "id"}})
+     * @ParamConverter("course", options={"mapping": {"courseId": "id"}})
+     *
      * @PreAuthorize("hasRole('ROLE_TEACHER')")
      */
-    public function editAction()
+    public function editFolderAction(Model\Material\CourseFolder $folder = null, Model\Course\Course $course = null)
     {
-        $form = $this->createForm(new FormType\FolderType());
+
+        if (empty($folder)) {
+            $folder = new Model\Material\CourseFolder();
+            $folder->setCourse($course);
+        }
+
+        $form = $this->createForm(new FormType\FolderType(), $folder);
 
         if (!$this->getRequest()->isXmlHttpRequest()) {
             throw $this->createNotFoundException();
@@ -45,13 +57,6 @@ class MaterialController extends \Zerebral\CommonBundle\Component\Controller
 
         $form->bind($this->getRequest());
         if ($form->isValid()) {
-            #TODO need to refactor
-            $folder = \Zerebral\BusinessBundle\Model\Material\CourseFolderQuery::create()->findPk($form['id']->getData());
-            if (!$folder) {
-                $folder = new \Zerebral\BusinessBundle\Model\Material\CourseFolder();
-            }
-            $folder->setName($form['name']->getData());
-            $folder->setCourseId($form['course_id']->getData());
             $folder->save();
 
             return new JsonResponse(array(

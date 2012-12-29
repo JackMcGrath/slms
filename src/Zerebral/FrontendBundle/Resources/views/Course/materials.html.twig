@@ -96,7 +96,7 @@
     </div>
 
     <div class="modal hide fade" id="editFolderModal">
-        <form class="form-vertical folder-form" action="{{ path('ajax_edit_folder') }}" method="post" {{ form_enctype(folderRenameForm) }} novalidate>
+        <form class="form-vertical folder-form" data-action-edit="{{ path('ajax_edit_folder', {courseId: course.id, id: ''}) }}" data-action-add="{{ path('ajax_add_folder', {courseId: course.id}) }}" method="post" {{ form_enctype(folderRenameForm) }} novalidate>
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h3>Rename folder</h3>
