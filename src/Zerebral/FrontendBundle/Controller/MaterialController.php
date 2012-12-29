@@ -49,7 +49,7 @@ class MaterialController extends \Zerebral\CommonBundle\Component\Controller
             $folder->setCourse($course);
         }
 
-        $form = $this->createForm(new FormType\FolderType(), $folder);
+        $form = $this->createForm(new FormType\CourseFolderType(), $folder);
 
         if (!$this->getRequest()->isXmlHttpRequest()) {
             throw $this->createNotFoundException();

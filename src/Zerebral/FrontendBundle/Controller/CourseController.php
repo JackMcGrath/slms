@@ -153,7 +153,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function materialsAction(Model\Course\Course $course, Model\Material\CourseFolder $folder = null)
     {
-        $folderType = new FormType\FolderType();
+        $folderType = new FormType\CourseFolderType();
         $folderForm = $this->createForm($folderType);
 
         $courseMaterialType = new FormType\CourseMaterialsType();

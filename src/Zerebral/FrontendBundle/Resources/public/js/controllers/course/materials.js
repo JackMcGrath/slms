@@ -50,6 +50,8 @@ FoldersWidget.prototype = {
     onOpenForm: function($target) {
 
         var form = $('#editFolderModal form');
+        form.find('.control-group').removeClass('error');
+        form.find('.control-group .help-inline').remove();
         // if rename folder
         if ($target.length) {
             form.attr('action', form.data('action-edit') + '/' + $target.attr('folderId'));

@@ -35,13 +35,13 @@ class FormJsonResponse extends JsonResponse
             $propertyPath = str_replace(array('[', ']'), '', $child->getPropertyPath());
             if (count($child->all()) > 0) {
                 $this->getErrors($child, $data, ($name . '[' . $propertyPath . ']'));
-            } else {
-                if (count($child->getErrors()) > 0) {
-                    $propertyPath = $name . '[' . $propertyPath . ']';
-                    $data['errors'][$propertyPath] = array();
-                    foreach($child->getErrors()as $error) {
-                        $data['errors'][$propertyPath][] = $error->getMessage();
-                    }
+            }
+
+            if (count($child->getErrors()) > 0) {
+                $propertyPath = $name . '[' . $propertyPath . ']';
+                $data['errors'][$propertyPath] = array();
+                foreach($child->getErrors()as $error) {
+                    $data['errors'][$propertyPath][] = $error->getMessage();
                 }
             }
         }

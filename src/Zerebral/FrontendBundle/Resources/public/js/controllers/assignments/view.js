@@ -14,7 +14,7 @@ $(document).ready(function(){
     $('#addUploadFile').click(function(e) {
         e.preventDefault();
 
-        var ul = $(e.target).parent();
+        var ul = $(e.target).parents('form').find('.uploadedFiles');
         var fileFieldsCount = ul.find('li').length;
         var uploadedFileLisCount = $('.solutions-widget li.file').length;
         var index = fileFieldsCount + uploadedFileLisCount;
@@ -29,7 +29,6 @@ $(document).ready(function(){
         } else {
             $(e.target).prev().append(newLi);
         }
-
     });
 
     $('#submitSolutionsButton').click(function(e) {
