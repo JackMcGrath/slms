@@ -14,6 +14,8 @@ use \PropelObjectCollection;
 use \PropelPDO;
 use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\QueryEvent;
+use Zerebral\BusinessBundle\Model\Feed\FeedComment;
+use Zerebral\BusinessBundle\Model\Feed\FeedItem;
 use Zerebral\BusinessBundle\Model\File\File;
 use Zerebral\BusinessBundle\Model\User\Student;
 use Zerebral\BusinessBundle\Model\User\Teacher;
@@ -59,6 +61,14 @@ use Zerebral\BusinessBundle\Model\User\UserQuery;
  * @method UserQuery leftJoinAvatar($relationAlias = null) Adds a LEFT JOIN clause to the query using the Avatar relation
  * @method UserQuery rightJoinAvatar($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Avatar relation
  * @method UserQuery innerJoinAvatar($relationAlias = null) Adds a INNER JOIN clause to the query using the Avatar relation
+ *
+ * @method UserQuery leftJoinFeedItem($relationAlias = null) Adds a LEFT JOIN clause to the query using the FeedItem relation
+ * @method UserQuery rightJoinFeedItem($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FeedItem relation
+ * @method UserQuery innerJoinFeedItem($relationAlias = null) Adds a INNER JOIN clause to the query using the FeedItem relation
+ *
+ * @method UserQuery leftJoinFeedComment($relationAlias = null) Adds a LEFT JOIN clause to the query using the FeedComment relation
+ * @method UserQuery rightJoinFeedComment($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FeedComment relation
+ * @method UserQuery innerJoinFeedComment($relationAlias = null) Adds a INNER JOIN clause to the query using the FeedComment relation
  *
  * @method UserQuery leftJoinStudent($relationAlias = null) Adds a LEFT JOIN clause to the query using the Student relation
  * @method UserQuery rightJoinStudent($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Student relation
@@ -822,6 +832,154 @@ abstract class BaseUserQuery extends ModelCriteria
         return $this
             ->joinAvatar($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Avatar', '\Zerebral\BusinessBundle\Model\File\FileQuery');
+    }
+
+    /**
+     * Filter the query by a related FeedItem object
+     *
+     * @param   FeedItem|PropelObjectCollection $feedItem  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   UserQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByFeedItem($feedItem, $comparison = null)
+    {
+        if ($feedItem instanceof FeedItem) {
+            return $this
+                ->addUsingAlias(UserPeer::ID, $feedItem->getCreatedBy(), $comparison);
+        } elseif ($feedItem instanceof PropelObjectCollection) {
+            return $this
+                ->useFeedItemQuery()
+                ->filterByPrimaryKeys($feedItem->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByFeedItem() only accepts arguments of type FeedItem or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the FeedItem relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return UserQuery The current query, for fluid interface
+     */
+    public function joinFeedItem($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('FeedItem');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'FeedItem');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the FeedItem relation FeedItem object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Zerebral\BusinessBundle\Model\Feed\FeedItemQuery A secondary query class using the current class as primary query
+     */
+    public function useFeedItemQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinFeedItem($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'FeedItem', '\Zerebral\BusinessBundle\Model\Feed\FeedItemQuery');
+    }
+
+    /**
+     * Filter the query by a related FeedComment object
+     *
+     * @param   FeedComment|PropelObjectCollection $feedComment  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   UserQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByFeedComment($feedComment, $comparison = null)
+    {
+        if ($feedComment instanceof FeedComment) {
+            return $this
+                ->addUsingAlias(UserPeer::ID, $feedComment->getCreatedBy(), $comparison);
+        } elseif ($feedComment instanceof PropelObjectCollection) {
+            return $this
+                ->useFeedCommentQuery()
+                ->filterByPrimaryKeys($feedComment->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByFeedComment() only accepts arguments of type FeedComment or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the FeedComment relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return UserQuery The current query, for fluid interface
+     */
+    public function joinFeedComment($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('FeedComment');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'FeedComment');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the FeedComment relation FeedComment object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Zerebral\BusinessBundle\Model\Feed\FeedCommentQuery A secondary query class using the current class as primary query
+     */
+    public function useFeedCommentQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinFeedComment($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'FeedComment', '\Zerebral\BusinessBundle\Model\Feed\FeedCommentQuery');
     }
 
     /**

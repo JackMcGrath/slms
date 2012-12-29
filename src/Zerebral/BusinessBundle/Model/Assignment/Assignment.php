@@ -29,4 +29,9 @@ class Assignment extends BaseAssignment
         return parent::preDelete($con);
     }
 
+    /** @return \Zerebral\BusinessBundle\Model\Feed\FeedItem */
+    public function getFeedItem() {
+        return $this->getFeedItems()->getFirst();
+    }
+
 }
