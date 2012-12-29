@@ -22,7 +22,7 @@
 
             <div class="span9 items-list{% if is_granted('ROLE_TEACHER') %} teacher-role{% endif %}">
                 {% if assignments and assignments.count %}
-                    <div class="small-title">Assignments</div>
+                    <div class="small-title">Scheduled</div>
                     {% for assignment in assignments %}
                         {{ block('assignment') }}
                     {% endfor %}
@@ -38,7 +38,7 @@
                 {% endif %}
 
                 {% if draftAssignment and draftAssignment.count %}
-                    <div class="small-title">Draft</div>
+                    <div class="small-title">Drafts</div>
                     {% for assignment in draftAssignment %}
                         {{ block('assignment') }}
                     {% endfor %}

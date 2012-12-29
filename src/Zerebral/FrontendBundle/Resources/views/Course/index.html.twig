@@ -54,7 +54,9 @@
                         </div>
 
                         <div class="timetable">
-                            <div class="duration span4"><i class="icon-small-calendar"></i> <b>Start:</b> {{ course.start | date('d/m') }} &nbsp;&nbsp; <b>End:</b> {{ course.end | date('d/m') }}</div>
+                            {% if course.start %}
+                                <div class="duration span4"><i class="icon-small-calendar"></i> <b>Start:</b> {{ course.start | date('d/m') }} &nbsp;&nbsp; <b>End:</b> {{ course.end | date('d/m') }}</div>
+                            {% endif %}
                             <div class="time span8">
                                 {% if course.getCourseScheduleDays|length %}
                                     <i class="icon-small-clipboard pull-left"></i>
