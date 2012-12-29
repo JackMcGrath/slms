@@ -61,7 +61,7 @@ class AssignmentType extends AbstractType
                 'invalid_message' => 'Category is required',
 
                 'create_new_label' => 'Create new category',
-                'choose_exists_label' => 'Choose exists category',
+                'choose_exists_label' => 'Choose existing category',
                 'placeholder' => 'Category name',
             )
         );

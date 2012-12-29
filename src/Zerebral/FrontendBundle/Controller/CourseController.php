@@ -166,6 +166,8 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
             $dayMaterials[strtotime($material->getCreatedAt('Y-m-d'))][] = $material;
         }
 
+        ksort($dayMaterials);
+
         return array(
             'dayMaterials' => $dayMaterials,
             'folderRenameForm' => $folderForm->createView(),

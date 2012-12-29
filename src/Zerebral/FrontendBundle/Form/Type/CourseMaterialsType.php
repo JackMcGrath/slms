@@ -61,7 +61,7 @@ class CourseMaterialsType extends AbstractType
             'required' => false,
             'empty_value' => "No folder",
             'create_new_label' => 'Create new folder',
-            'choose_exists_label' => 'Choose exists folder'
+            'choose_exists_label' => 'Choose existing folder'
         ));
 
     }
