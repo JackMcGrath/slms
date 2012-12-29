@@ -20,6 +20,7 @@ use Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery;
 use Zerebral\BusinessBundle\Model\Assignment\StudentAssignment;
 use Zerebral\BusinessBundle\Model\Course\Course;
+use Zerebral\BusinessBundle\Model\Feed\FeedItem;
 use Zerebral\BusinessBundle\Model\File\File;
 use Zerebral\BusinessBundle\Model\File\FileReferences;
 use Zerebral\BusinessBundle\Model\User\Student;
@@ -63,6 +64,10 @@ use Zerebral\BusinessBundle\Model\User\Teacher;
  * @method AssignmentQuery leftJoinStudentAssignment($relationAlias = null) Adds a LEFT JOIN clause to the query using the StudentAssignment relation
  * @method AssignmentQuery rightJoinStudentAssignment($relationAlias = null) Adds a RIGHT JOIN clause to the query using the StudentAssignment relation
  * @method AssignmentQuery innerJoinStudentAssignment($relationAlias = null) Adds a INNER JOIN clause to the query using the StudentAssignment relation
+ *
+ * @method AssignmentQuery leftJoinFeedItem($relationAlias = null) Adds a LEFT JOIN clause to the query using the FeedItem relation
+ * @method AssignmentQuery rightJoinFeedItem($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FeedItem relation
+ * @method AssignmentQuery innerJoinFeedItem($relationAlias = null) Adds a INNER JOIN clause to the query using the FeedItem relation
  *
  * @method AssignmentQuery leftJoinFileReferences($relationAlias = null) Adds a LEFT JOIN clause to the query using the FileReferences relation
  * @method AssignmentQuery rightJoinFileReferences($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FileReferences relation
@@ -876,6 +881,80 @@ abstract class BaseAssignmentQuery extends ModelCriteria
         return $this
             ->joinStudentAssignment($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'StudentAssignment', '\Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentQuery');
+    }
+
+    /**
+     * Filter the query by a related FeedItem object
+     *
+     * @param   FeedItem|PropelObjectCollection $feedItem  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   AssignmentQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByFeedItem($feedItem, $comparison = null)
+    {
+        if ($feedItem instanceof FeedItem) {
+            return $this
+                ->addUsingAlias(AssignmentPeer::ID, $feedItem->getAssignmentId(), $comparison);
+        } elseif ($feedItem instanceof PropelObjectCollection) {
+            return $this
+                ->useFeedItemQuery()
+                ->filterByPrimaryKeys($feedItem->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByFeedItem() only accepts arguments of type FeedItem or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the FeedItem relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return AssignmentQuery The current query, for fluid interface
+     */
+    public function joinFeedItem($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('FeedItem');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'FeedItem');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the FeedItem relation FeedItem object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Zerebral\BusinessBundle\Model\Feed\FeedItemQuery A secondary query class using the current class as primary query
+     */
+    public function useFeedItemQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinFeedItem($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'FeedItem', '\Zerebral\BusinessBundle\Model\Feed\FeedItemQuery');
     }
 
     /**

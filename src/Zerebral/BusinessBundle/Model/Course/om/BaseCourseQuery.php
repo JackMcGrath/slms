@@ -24,6 +24,7 @@ use Zerebral\BusinessBundle\Model\Course\CourseStudent;
 use Zerebral\BusinessBundle\Model\Course\CourseTeacher;
 use Zerebral\BusinessBundle\Model\Course\Discipline;
 use Zerebral\BusinessBundle\Model\Course\GradeLevel;
+use Zerebral\BusinessBundle\Model\Feed\FeedItem;
 use Zerebral\BusinessBundle\Model\Material\CourseFolder;
 use Zerebral\BusinessBundle\Model\Material\CourseMaterial;
 use Zerebral\BusinessBundle\Model\User\Student;
@@ -89,6 +90,10 @@ use Zerebral\BusinessBundle\Model\User\Teacher;
  * @method CourseQuery leftJoinCourseScheduleDay($relationAlias = null) Adds a LEFT JOIN clause to the query using the CourseScheduleDay relation
  * @method CourseQuery rightJoinCourseScheduleDay($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CourseScheduleDay relation
  * @method CourseQuery innerJoinCourseScheduleDay($relationAlias = null) Adds a INNER JOIN clause to the query using the CourseScheduleDay relation
+ *
+ * @method CourseQuery leftJoinFeedItem($relationAlias = null) Adds a LEFT JOIN clause to the query using the FeedItem relation
+ * @method CourseQuery rightJoinFeedItem($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FeedItem relation
+ * @method CourseQuery innerJoinFeedItem($relationAlias = null) Adds a INNER JOIN clause to the query using the FeedItem relation
  *
  * @method CourseQuery leftJoinCourseFolder($relationAlias = null) Adds a LEFT JOIN clause to the query using the CourseFolder relation
  * @method CourseQuery rightJoinCourseFolder($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CourseFolder relation
@@ -1325,6 +1330,80 @@ abstract class BaseCourseQuery extends ModelCriteria
         return $this
             ->joinCourseScheduleDay($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'CourseScheduleDay', '\Zerebral\BusinessBundle\Model\Course\CourseScheduleDayQuery');
+    }
+
+    /**
+     * Filter the query by a related FeedItem object
+     *
+     * @param   FeedItem|PropelObjectCollection $feedItem  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   CourseQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByFeedItem($feedItem, $comparison = null)
+    {
+        if ($feedItem instanceof FeedItem) {
+            return $this
+                ->addUsingAlias(CoursePeer::ID, $feedItem->getCourseId(), $comparison);
+        } elseif ($feedItem instanceof PropelObjectCollection) {
+            return $this
+                ->useFeedItemQuery()
+                ->filterByPrimaryKeys($feedItem->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByFeedItem() only accepts arguments of type FeedItem or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the FeedItem relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return CourseQuery The current query, for fluid interface
+     */
+    public function joinFeedItem($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('FeedItem');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'FeedItem');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the FeedItem relation FeedItem object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Zerebral\BusinessBundle\Model\Feed\FeedItemQuery A secondary query class using the current class as primary query
+     */
+    public function useFeedItemQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinFeedItem($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'FeedItem', '\Zerebral\BusinessBundle\Model\Feed\FeedItemQuery');
     }
 
     /**

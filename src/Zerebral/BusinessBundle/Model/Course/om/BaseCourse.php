@@ -34,6 +34,8 @@ use Zerebral\BusinessBundle\Model\Course\Discipline;
 use Zerebral\BusinessBundle\Model\Course\DisciplineQuery;
 use Zerebral\BusinessBundle\Model\Course\GradeLevel;
 use Zerebral\BusinessBundle\Model\Course\GradeLevelQuery;
+use Zerebral\BusinessBundle\Model\Feed\FeedItem;
+use Zerebral\BusinessBundle\Model\Feed\FeedItemQuery;
 use Zerebral\BusinessBundle\Model\Material\CourseFolder;
 use Zerebral\BusinessBundle\Model\Material\CourseFolderQuery;
 use Zerebral\BusinessBundle\Model\Material\CourseMaterial;
@@ -176,6 +178,12 @@ abstract class BaseCourse extends BaseObject implements Persistent
     protected $collCourseScheduleDaysPartial;
 
     /**
+     * @var        PropelObjectCollection|FeedItem[] Collection to store aggregation of FeedItem objects.
+     */
+    protected $collFeedItems;
+    protected $collFeedItemsPartial;
+
+    /**
      * @var        PropelObjectCollection|CourseFolder[] Collection to store aggregation of CourseFolder objects.
      */
     protected $collCourseFolders;
@@ -252,6 +260,12 @@ abstract class BaseCourse extends BaseObject implements Persistent
      * @var		PropelObjectCollection
      */
     protected $courseScheduleDaysScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $feedItemsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -881,6 +895,8 @@ abstract class BaseCourse extends BaseObject implements Persistent
 
             $this->collCourseScheduleDays = null;
 
+            $this->collFeedItems = null;
+
             $this->collCourseFolders = null;
 
             $this->collCourseMaterials = null;
@@ -1173,6 +1189,24 @@ abstract class BaseCourse extends BaseObject implements Persistent
 
             if ($this->collCourseScheduleDays !== null) {
                 foreach ($this->collCourseScheduleDays as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->feedItemsScheduledForDeletion !== null) {
+                if (!$this->feedItemsScheduledForDeletion->isEmpty()) {
+                    foreach ($this->feedItemsScheduledForDeletion as $feedItem) {
+                        // need to save related object because we set the relation to null
+                        $feedItem->save($con);
+                    }
+                    $this->feedItemsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collFeedItems !== null) {
+                foreach ($this->collFeedItems as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1479,6 +1513,14 @@ abstract class BaseCourse extends BaseObject implements Persistent
                     }
                 }
 
+                if ($this->collFeedItems !== null) {
+                    foreach ($this->collFeedItems as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
                 if ($this->collCourseFolders !== null) {
                     foreach ($this->collCourseFolders as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
@@ -1628,6 +1670,9 @@ abstract class BaseCourse extends BaseObject implements Persistent
             }
             if (null !== $this->collCourseScheduleDays) {
                 $result['CourseScheduleDays'] = $this->collCourseScheduleDays->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collFeedItems) {
+                $result['FeedItems'] = $this->collFeedItems->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collCourseFolders) {
                 $result['CourseFolders'] = $this->collCourseFolders->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1867,6 +1912,12 @@ abstract class BaseCourse extends BaseObject implements Persistent
             foreach ($this->getCourseScheduleDays() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addCourseScheduleDay($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getFeedItems() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addFeedItem($relObj->copy($deepCopy));
                 }
             }
 
@@ -2113,6 +2164,9 @@ abstract class BaseCourse extends BaseObject implements Persistent
         }
         if ('CourseScheduleDay' == $relationName) {
             $this->initCourseScheduleDays();
+        }
+        if ('FeedItem' == $relationName) {
+            $this->initFeedItems();
         }
         if ('CourseFolder' == $relationName) {
             $this->initCourseFolders();
@@ -3333,6 +3387,298 @@ abstract class BaseCourse extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collFeedItems collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Course The current object (for fluent API support)
+     * @see        addFeedItems()
+     */
+    public function clearFeedItems()
+    {
+        $this->collFeedItems = null; // important to set this to null since that means it is uninitialized
+        $this->collFeedItemsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collFeedItems collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialFeedItems($v = true)
+    {
+        $this->collFeedItemsPartial = $v;
+    }
+
+    /**
+     * Initializes the collFeedItems collection.
+     *
+     * By default this just sets the collFeedItems collection to an empty array (like clearcollFeedItems());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initFeedItems($overrideExisting = true)
+    {
+        if (null !== $this->collFeedItems && !$overrideExisting) {
+            return;
+        }
+        $this->collFeedItems = new PropelObjectCollection();
+        $this->collFeedItems->setModel('FeedItem');
+    }
+
+    /**
+     * Gets an array of FeedItem objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Course is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|FeedItem[] List of FeedItem objects
+     * @throws PropelException
+     */
+    public function getFeedItems($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collFeedItemsPartial && !$this->isNew();
+        if (null === $this->collFeedItems || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collFeedItems) {
+                // return empty collection
+                $this->initFeedItems();
+            } else {
+                $collFeedItems = FeedItemQuery::create(null, $criteria)
+                    ->filterByCourse($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collFeedItemsPartial && count($collFeedItems)) {
+                      $this->initFeedItems(false);
+
+                      foreach($collFeedItems as $obj) {
+                        if (false == $this->collFeedItems->contains($obj)) {
+                          $this->collFeedItems->append($obj);
+                        }
+                      }
+
+                      $this->collFeedItemsPartial = true;
+                    }
+
+                    return $collFeedItems;
+                }
+
+                if($partial && $this->collFeedItems) {
+                    foreach($this->collFeedItems as $obj) {
+                        if($obj->isNew()) {
+                            $collFeedItems[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collFeedItems = $collFeedItems;
+                $this->collFeedItemsPartial = false;
+            }
+        }
+
+        return $this->collFeedItems;
+    }
+
+    /**
+     * Sets a collection of FeedItem objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $feedItems A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Course The current object (for fluent API support)
+     */
+    public function setFeedItems(PropelCollection $feedItems, PropelPDO $con = null)
+    {
+        $feedItemsToDelete = $this->getFeedItems(new Criteria(), $con)->diff($feedItems);
+
+        $this->feedItemsScheduledForDeletion = unserialize(serialize($feedItemsToDelete));
+
+        foreach ($feedItemsToDelete as $feedItemRemoved) {
+            $feedItemRemoved->setCourse(null);
+        }
+
+        $this->collFeedItems = null;
+        foreach ($feedItems as $feedItem) {
+            $this->addFeedItem($feedItem);
+        }
+
+        $this->collFeedItems = $feedItems;
+        $this->collFeedItemsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related FeedItem objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related FeedItem objects.
+     * @throws PropelException
+     */
+    public function countFeedItems(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collFeedItemsPartial && !$this->isNew();
+        if (null === $this->collFeedItems || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collFeedItems) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getFeedItems());
+            }
+            $query = FeedItemQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByCourse($this)
+                ->count($con);
+        }
+
+        return count($this->collFeedItems);
+    }
+
+    /**
+     * Method called to associate a FeedItem object to this object
+     * through the FeedItem foreign key attribute.
+     *
+     * @param    FeedItem $l FeedItem
+     * @return Course The current object (for fluent API support)
+     */
+    public function addFeedItem(FeedItem $l)
+    {
+        if ($this->collFeedItems === null) {
+            $this->initFeedItems();
+            $this->collFeedItemsPartial = true;
+        }
+        if (!in_array($l, $this->collFeedItems->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddFeedItem($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	FeedItem $feedItem The feedItem object to add.
+     */
+    protected function doAddFeedItem($feedItem)
+    {
+        $this->collFeedItems[]= $feedItem;
+        $feedItem->setCourse($this);
+    }
+
+    /**
+     * @param	FeedItem $feedItem The feedItem object to remove.
+     * @return Course The current object (for fluent API support)
+     */
+    public function removeFeedItem($feedItem)
+    {
+        if ($this->getFeedItems()->contains($feedItem)) {
+            $this->collFeedItems->remove($this->collFeedItems->search($feedItem));
+            if (null === $this->feedItemsScheduledForDeletion) {
+                $this->feedItemsScheduledForDeletion = clone $this->collFeedItems;
+                $this->feedItemsScheduledForDeletion->clear();
+            }
+            $this->feedItemsScheduledForDeletion[]= $feedItem;
+            $feedItem->setCourse(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Course is new, it will return
+     * an empty collection; or if this Course has previously
+     * been saved, it will retrieve related FeedItems from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Course.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|FeedItem[] List of FeedItem objects
+     */
+    public function getFeedItemsJoinFeedContent($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = FeedItemQuery::create(null, $criteria);
+        $query->joinWith('FeedContent', $join_behavior);
+
+        return $this->getFeedItems($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Course is new, it will return
+     * an empty collection; or if this Course has previously
+     * been saved, it will retrieve related FeedItems from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Course.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|FeedItem[] List of FeedItem objects
+     */
+    public function getFeedItemsJoinAssignment($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = FeedItemQuery::create(null, $criteria);
+        $query->joinWith('Assignment', $join_behavior);
+
+        return $this->getFeedItems($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Course is new, it will return
+     * an empty collection; or if this Course has previously
+     * been saved, it will retrieve related FeedItems from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Course.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|FeedItem[] List of FeedItem objects
+     */
+    public function getFeedItemsJoinUser($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = FeedItemQuery::create(null, $criteria);
+        $query->joinWith('User', $join_behavior);
+
+        return $this->getFeedItems($query, $con);
+    }
+
+    /**
      * Clears out the collCourseFolders collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -4256,6 +4602,11 @@ abstract class BaseCourse extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collFeedItems) {
+                foreach ($this->collFeedItems as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collCourseFolders) {
                 foreach ($this->collCourseFolders as $o) {
                     $o->clearAllReferences($deep);
@@ -4298,6 +4649,10 @@ abstract class BaseCourse extends BaseObject implements Persistent
             $this->collCourseScheduleDays->clearIterator();
         }
         $this->collCourseScheduleDays = null;
+        if ($this->collFeedItems instanceof PropelCollection) {
+            $this->collFeedItems->clearIterator();
+        }
+        $this->collFeedItems = null;
         if ($this->collCourseFolders instanceof PropelCollection) {
             $this->collCourseFolders->clearIterator();
         }
