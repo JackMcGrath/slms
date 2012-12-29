@@ -1,8 +1,6 @@
-Subject: Zerebral - Invitation Notice
-
 Hello,
 
-{{ user.getFirstName }} {{ user.getLastName }} has just invited you to join {{ course.getName }}. Click http://{{ host }}{{ path("course_join", {accessCode: course.getAccessCode}) }} to join.
+{{ user.fullName }} has just invited you to join {{ course.getName }}. Click http://{{ host }}{{ path("course_join", {accessCode: course.getAccessCode}) }} to join.
 
 
 Sincerely,

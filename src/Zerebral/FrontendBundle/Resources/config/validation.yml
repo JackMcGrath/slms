@@ -125,3 +125,21 @@ Zerebral\BusinessBundle\Model\Course\CourseScheduleDay:
         time_to:
             - NotBlank:
                 message: Time is required.
+
+Zerebral\BusinessBundle\Model\Material\CourseFolder:
+    getters:
+        name:
+            - NotBlank:
+                message: Name can not be blank
+        course:
+            - NotBlank: ~
+
+Zerebral\BusinessBundle\Model\Material\CourseMaterial:
+    getters:
+        file:
+            - Valid: ~
+            - NotNull:
+                message: File can not be empty
+        courseId:
+            - NotBlank:
+                message: Course id can not be blank

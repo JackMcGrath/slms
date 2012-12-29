@@ -282,6 +282,10 @@
         }
     }
 
+    .small-title {
+        margin-top: 20px;
+    }
+
     .right-navbar {
         width: 280px;
     }
@@ -374,12 +378,14 @@
                 margin-left: 20px;
                 .title {
                     h3 {
-                        color: #222222;
                         font-size: 16px;
                         font-weight: bold;
                         display: inline-block;
                         vertical-align: middle;
                         line-height: 20px;
+                        a {
+                            color: #222222;
+                        }
                     }
                     span {
                         margin-left: 5px;
@@ -417,5 +423,42 @@
                 vertical-align: top;
             }
         }
+    }
+    .right-navbar {
+        .folders {
+            .manage {
+                float: right;
+                .manage-buttons-gears {
+                    float: right;
+                    margin-top: 0;
+                    display: inline-block;
+                }
+                .manage-buttons {
+                    margin-top: 0;
+                    float: right;
+                }
+            }
+
+        }
+    }
+}
+#uploadMaterialModal {
+    .uploadedFiles {
+        margin-left: 0;
+    }
+    .upload-folder {
+        margin-bottom: 20px;
+        label {
+            margin-right: 20px;
+        }
+    }
+    .control-group.error {
+        .help-inline {
+            display: block;
+        }
+    }
+    .optional-model {
+        vertical-align: middle;
+        line-height: 30px;
     }
 }

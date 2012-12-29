@@ -32,14 +32,20 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function indexAction()
     {
-        $provider = new CourseAssignmentEventsProvider($this->getRoleUser()->getAssignments());
+        $assignments = $this->getRoleUser()->getAssignmentsDueDate(false);
+        $assignmentsNoDueDate = $this->getRoleUser()->getAssignmentsDueDate(true);
+        $draftAssignment = $this->getUser()->isTeacher() ? $this->getRoleUser()->getAssignmentsDraft() : null;
+
+        $provider = new CourseAssignmentEventsProvider($assignments);
         $currentMonth = new Calendar(time(), $provider);
         $nextMonth = new Calendar(strtotime("+1 month"), $provider);
 
         return array(
             'currentMonth' => $currentMonth,
             'nextMonth' => $nextMonth,
-            'assignments' => $this->getRoleUser()->getAssignments(),
+            'assignments' => $assignments,
+            'assignmentsNoDueDate' => $assignmentsNoDueDate,
+            'draftAssignment' => $draftAssignment,
             'target' => 'assignments'
         );
     }

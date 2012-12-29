@@ -29,7 +29,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function indexAction()
     {
-        $provider = new CourseAssignmentEventsProvider($this->getRoleUser()->getAssignments());
+        $provider = new CourseAssignmentEventsProvider($assignments = $this->getRoleUser()->getAssignmentsDueDate(false));
         $currentMonth = new Calendar(time(), $provider);
         $nextMonth = new Calendar(strtotime("+1 month"), $provider);
 
@@ -124,7 +124,10 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function assignmentsAction(Model\Course\Course $course)
     {
-        $assignments = $this->getRoleUser()->getCourseAssignments($course);
+        $assignments = $this->getRoleUser()->getCourseAssignmentsDueDate($course, false);
+        $assignmentsNoDueDate = $this->getRoleUser()->getCourseAssignmentsDueDate($course, true);
+        $draftAssignment = $this->getUser()->isTeacher() ? $this->getRoleUser()->getCourseAssignmentsDraft($course) : null;
+
         $provider = new AssignmentEventsProvider($assignments);
         $currentMonth = new \Zerebral\CommonBundle\Component\Calendar\Calendar(time(), $provider);
         $nextMonth = new \Zerebral\CommonBundle\Component\Calendar\Calendar(strtotime("+1 month"), $provider);
@@ -133,6 +136,8 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
             'currentMonth' => $currentMonth,
             'nextMonth' => $nextMonth,
             'assignments' => $assignments,
+            'assignmentsNoDueDate' => $assignmentsNoDueDate,
+            'draftAssignment' => $draftAssignment,
             'course' => $course,
             'target' => 'courses'
         );
@@ -148,26 +153,35 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function materialsAction(Model\Course\Course $course, Model\Material\CourseFolder $folder = null)
     {
-        $dayMaterials = array();
+        $folderType = new FormType\FolderType();
+        $folderForm = $this->createForm($folderType);
 
+        $courseMaterialType = new FormType\CourseMaterialsType();
+        $courseMaterialType->setCourse($course);
+        $courseMaterialForm = $this->createForm($courseMaterialType);
+
+
+        $dayMaterials = array();
         $c = new \Criteria();
         if ($folder) {
             $c->add('folder_id', $folder->getId(), \Criteria::EQUAL);
         }
 
         foreach ($course->getCourseMaterials($c) as $material) {
-            $dayMaterials[$material->getCreatedAt('U')][] = $material;
+            $dayMaterials[strtotime($material->getCreatedAt('Y-m-d'))][] = $material;
         }
+
+        ksort($dayMaterials);
 
         return array(
             'dayMaterials' => $dayMaterials,
+            'folderRenameForm' => $folderForm->createView(),
+            'courseMaterialForm' => $courseMaterialForm->createView(),
             'folder' => $folder,
             'course' => $course,
             'target' => 'courses'
         );
     }
-
-
 
     /**
      * @Route("/members/{id}", name="course_members")

@@ -281,15 +281,18 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
      */
     public function getUpcomingAssignments($course = null)
     {
-        $criteries = array('dueAtLess', 'dueAtGreat');
+        $criteries = array('dueAtLess', 'dueAtGreat', 'students');
         $c = new \Criteria();
-        $c->addCond('dueAtLess', 'due_at', date('Y-m-d H:i:s', strtotime('+14 days')), \Criteria::LESS_EQUAL);
-        $c->addCond('dueAtGreat', 'due_at', date('Y-m-d H:i:s'), \Criteria::GREATER_EQUAL);
+        $c->addCond('dueAtLess', 'due_at', date('Y-m-d', strtotime('+14 days')), \Criteria::LESS_EQUAL);
+        $c->addCond('dueAtGreat', 'due_at', date('Y-m-d'), \Criteria::GREATER_EQUAL);
         if ($course) {
             $c->addCond('courseId', 'course_id', $course->getId());
             $criteries[] = 'courseId';
         }
-
+        $c->addJoin(\Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer::ID, \Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentPeer::ASSIGNMENT_ID, \Criteria::LEFT_JOIN);
+        $c->addCond('students', 'student_assignments.id', null, \Criteria::ISNOTNULL);
+        $c->addGroupByColumn('assignments.id');
+        
         $c->combine($criteries, \Criteria::LOGICAL_AND);
         $c->addDescendingOrderByColumn('due_at');
         return $this->getRoleModel()->getAssignments($c);
