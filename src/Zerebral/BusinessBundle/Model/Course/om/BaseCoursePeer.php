@@ -41,13 +41,13 @@ abstract class BaseCoursePeer
     const TM_CLASS = 'CourseTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 9;
+    const NUM_COLUMNS = 11;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 9;
+    const NUM_HYDRATE_COLUMNS = 11;
 
     /** the column name for the id field */
     const ID = 'courses.id';
@@ -66,6 +66,12 @@ abstract class BaseCoursePeer
 
     /** the column name for the access_code field */
     const ACCESS_CODE = 'courses.access_code';
+
+    /** the column name for the start field */
+    const START = 'courses.start';
+
+    /** the column name for the end field */
+    const END = 'courses.end';
 
     /** the column name for the created_by field */
     const CREATED_BY = 'courses.created_by';
@@ -95,12 +101,12 @@ abstract class BaseCoursePeer
      * e.g. CoursePeer::$fieldNames[CoursePeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'DisciplineId', 'GradeLevelId', 'Name', 'Description', 'AccessCode', 'CreatedBy', 'CreatedAt', 'UpdatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'disciplineId', 'gradeLevelId', 'name', 'description', 'accessCode', 'createdBy', 'createdAt', 'updatedAt', ),
-        BasePeer::TYPE_COLNAME => array (CoursePeer::ID, CoursePeer::DISCIPLINE_ID, CoursePeer::GRADE_LEVEL_ID, CoursePeer::NAME, CoursePeer::DESCRIPTION, CoursePeer::ACCESS_CODE, CoursePeer::CREATED_BY, CoursePeer::CREATED_AT, CoursePeer::UPDATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'DISCIPLINE_ID', 'GRADE_LEVEL_ID', 'NAME', 'DESCRIPTION', 'ACCESS_CODE', 'CREATED_BY', 'CREATED_AT', 'UPDATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'discipline_id', 'grade_level_id', 'name', 'description', 'access_code', 'created_by', 'created_at', 'updated_at', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'DisciplineId', 'GradeLevelId', 'Name', 'Description', 'AccessCode', 'Start', 'End', 'CreatedBy', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'disciplineId', 'gradeLevelId', 'name', 'description', 'accessCode', 'start', 'end', 'createdBy', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (CoursePeer::ID, CoursePeer::DISCIPLINE_ID, CoursePeer::GRADE_LEVEL_ID, CoursePeer::NAME, CoursePeer::DESCRIPTION, CoursePeer::ACCESS_CODE, CoursePeer::START, CoursePeer::END, CoursePeer::CREATED_BY, CoursePeer::CREATED_AT, CoursePeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'DISCIPLINE_ID', 'GRADE_LEVEL_ID', 'NAME', 'DESCRIPTION', 'ACCESS_CODE', 'START', 'END', 'CREATED_BY', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'discipline_id', 'grade_level_id', 'name', 'description', 'access_code', 'start', 'end', 'created_by', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
     );
 
     /**
@@ -110,12 +116,12 @@ abstract class BaseCoursePeer
      * e.g. CoursePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'DisciplineId' => 1, 'GradeLevelId' => 2, 'Name' => 3, 'Description' => 4, 'AccessCode' => 5, 'CreatedBy' => 6, 'CreatedAt' => 7, 'UpdatedAt' => 8, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'disciplineId' => 1, 'gradeLevelId' => 2, 'name' => 3, 'description' => 4, 'accessCode' => 5, 'createdBy' => 6, 'createdAt' => 7, 'updatedAt' => 8, ),
-        BasePeer::TYPE_COLNAME => array (CoursePeer::ID => 0, CoursePeer::DISCIPLINE_ID => 1, CoursePeer::GRADE_LEVEL_ID => 2, CoursePeer::NAME => 3, CoursePeer::DESCRIPTION => 4, CoursePeer::ACCESS_CODE => 5, CoursePeer::CREATED_BY => 6, CoursePeer::CREATED_AT => 7, CoursePeer::UPDATED_AT => 8, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'DISCIPLINE_ID' => 1, 'GRADE_LEVEL_ID' => 2, 'NAME' => 3, 'DESCRIPTION' => 4, 'ACCESS_CODE' => 5, 'CREATED_BY' => 6, 'CREATED_AT' => 7, 'UPDATED_AT' => 8, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'discipline_id' => 1, 'grade_level_id' => 2, 'name' => 3, 'description' => 4, 'access_code' => 5, 'created_by' => 6, 'created_at' => 7, 'updated_at' => 8, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'DisciplineId' => 1, 'GradeLevelId' => 2, 'Name' => 3, 'Description' => 4, 'AccessCode' => 5, 'Start' => 6, 'End' => 7, 'CreatedBy' => 8, 'CreatedAt' => 9, 'UpdatedAt' => 10, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'disciplineId' => 1, 'gradeLevelId' => 2, 'name' => 3, 'description' => 4, 'accessCode' => 5, 'start' => 6, 'end' => 7, 'createdBy' => 8, 'createdAt' => 9, 'updatedAt' => 10, ),
+        BasePeer::TYPE_COLNAME => array (CoursePeer::ID => 0, CoursePeer::DISCIPLINE_ID => 1, CoursePeer::GRADE_LEVEL_ID => 2, CoursePeer::NAME => 3, CoursePeer::DESCRIPTION => 4, CoursePeer::ACCESS_CODE => 5, CoursePeer::START => 6, CoursePeer::END => 7, CoursePeer::CREATED_BY => 8, CoursePeer::CREATED_AT => 9, CoursePeer::UPDATED_AT => 10, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'DISCIPLINE_ID' => 1, 'GRADE_LEVEL_ID' => 2, 'NAME' => 3, 'DESCRIPTION' => 4, 'ACCESS_CODE' => 5, 'START' => 6, 'END' => 7, 'CREATED_BY' => 8, 'CREATED_AT' => 9, 'UPDATED_AT' => 10, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'discipline_id' => 1, 'grade_level_id' => 2, 'name' => 3, 'description' => 4, 'access_code' => 5, 'start' => 6, 'end' => 7, 'created_by' => 8, 'created_at' => 9, 'updated_at' => 10, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
     );
 
     /**
@@ -195,6 +201,8 @@ abstract class BaseCoursePeer
             $criteria->addSelectColumn(CoursePeer::NAME);
             $criteria->addSelectColumn(CoursePeer::DESCRIPTION);
             $criteria->addSelectColumn(CoursePeer::ACCESS_CODE);
+            $criteria->addSelectColumn(CoursePeer::START);
+            $criteria->addSelectColumn(CoursePeer::END);
             $criteria->addSelectColumn(CoursePeer::CREATED_BY);
             $criteria->addSelectColumn(CoursePeer::CREATED_AT);
             $criteria->addSelectColumn(CoursePeer::UPDATED_AT);
@@ -205,6 +213,8 @@ abstract class BaseCoursePeer
             $criteria->addSelectColumn($alias . '.name');
             $criteria->addSelectColumn($alias . '.description');
             $criteria->addSelectColumn($alias . '.access_code');
+            $criteria->addSelectColumn($alias . '.start');
+            $criteria->addSelectColumn($alias . '.end');
             $criteria->addSelectColumn($alias . '.created_by');
             $criteria->addSelectColumn($alias . '.created_at');
             $criteria->addSelectColumn($alias . '.updated_at');

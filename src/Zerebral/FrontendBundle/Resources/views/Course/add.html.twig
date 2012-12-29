@@ -85,6 +85,27 @@
                     }
                 }) }}
 
+                <div class="form-inline">
+                    {{ form_row(form.start, {
+                        label: 'Start date',
+                        form_type: 'horizontal',
+                        empty_disabled: true,
+                        attr: {
+                            class: 'icon-new-calendar image-background input-small'
+                        }
+                    }) }}
+
+                    {{ form_row(form.end, {
+                        label: 'End date',
+                        form_type: 'horizontal',
+                        empty_disabled: true,
+                        attr: {
+                            class: 'icon-new-calendar image-background input-small'
+                        }
+                    }) }}
+                </div>
+                <div class="clearfix"></div>
+
                 <h5 class="form-subtitle">Schedule</h5>
 
                 <div id="schedule-fields-list" data-prototype="{{ form_widget(form.courseScheduleDays.vars.prototype) | e }}" class="collection-container">
