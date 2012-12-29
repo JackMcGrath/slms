@@ -6,6 +6,8 @@
             {% if commentsForm is defined %}
                 {{ self.comment_form(commentsForm) }}
             {% endif %}
+        {% else %}
+            <div class="empty"> No comments yet. Be the first to leave one!</div>
         {% endfor %}
     </div>
 {% endmacro %}
