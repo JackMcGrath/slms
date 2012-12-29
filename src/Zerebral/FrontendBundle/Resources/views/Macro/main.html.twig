@@ -70,3 +70,23 @@
     <div class="clearfix"></div>
 </div>
 {% endmacro %}
+
+{% macro courseSchedule(course) %}
+    {% if course.start or course.end or course.getCourseScheduleDays.count %}
+        <div class="timetable">
+            {% if course.start or course.end %}
+                <div class="duration span4"><i class="icon-small-calendar"></i> {% if course.start %}<b>Start:</b> {{ course.start | date('d/m') }} &nbsp;&nbsp;{% endif %} {% if course.end %}<b>End:</b> {{ course.end | date('d/m') }}{% endif %}</div>
+            {% endif %}
+            <div class="time span8">
+                {% if course.getCourseScheduleDays|length %}
+                    <i class="icon-small-clipboard pull-left"></i>
+                {% endif %}
+                <ul>
+                    {% for schedule in course.getCourseScheduleDays %}
+                        <li><b>{{ schedule.getWeekDay|slice(0, 3) }}:</b> {{ schedule.getTimeFrom|date('h:i a') }} - {{ schedule.getTimeTo|date('h:i a') }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
