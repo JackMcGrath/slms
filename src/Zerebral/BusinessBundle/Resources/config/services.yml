@@ -12,3 +12,13 @@ services:
         public:     false
         tags:
             -       { name: security.voter }
+
+    zerebral.model_event_subscriber:
+        class:      Zerebral\BusinessBundle\EventHandler\ModelEventSubscriber
+        tags:
+            -       { name: propel.event }
+
+    zerebral.feed_event_subscriber:
+        class:      Zerebral\BusinessBundle\EventHandler\FeedEventSubscriber
+        tags:
+            -       { name: propel.event }
