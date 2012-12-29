@@ -32,6 +32,44 @@ class Student extends BaseStudent
         return $assignments;
     }
 
+    /**
+     * @param \Zerebral\BusinessBundle\Model\Course\Course $course
+     * @param null $ongoing if null - get all, false - only with due_at, true - only without due at
+     * @return \PropelObjectCollection
+     */
+    public function getCourseAssignmentsDueDate(\Zerebral\BusinessBundle\Model\Course\Course $course, $ongoing = null)
+    {
+        $c = new \Criteria();
+        $c->addDescendingOrderByColumn('due_at');
+        if ($ongoing === false) {
+            $c->add('due_at', null, \Criteria::ISNOTNULL);
+        } else if ($ongoing === true) {
+            $c->add('due_at', null, \Criteria::ISNULL);
+        }
+
+        $assignments = new \PropelObjectCollection();
+        $assignments->setModel('Zerebral\BusinessBundle\Model\Assignment\Assignment');
+        foreach ($this->getAssignments($c) as $assignment) {
+            if ($assignment->getCourseId() == $course->getId()) {
+                $assignments->append($assignment);
+            }
+        }
+        return $assignments;
+    }
+
+    public function getAssignmentsDueDate($ongoing = null)
+    {
+        $c = new \Criteria();
+        $c->addDescendingOrderByColumn('due_at');
+        if ($ongoing === false) {
+            $c->add('due_at', null, \Criteria::ISNOTNULL);
+        } else if ($ongoing === true) {
+            $c->add('due_at', null, \Criteria::ISNULL);
+        }
+
+        return $this->getAssignments($c);
+    }
+
     public function hasCourse(\Zerebral\BusinessBundle\Model\Course\Course $course)
     {
         foreach($this->getCourses() as $course){

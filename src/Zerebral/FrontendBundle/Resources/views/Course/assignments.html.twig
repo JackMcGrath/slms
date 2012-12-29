@@ -21,50 +21,29 @@
             <hr/>
 
             <div class="span9 items-list{% if is_granted('ROLE_TEACHER') %} teacher-role{% endif %}">
-                {% for assignment in assignments %}
-                    <div class="list-item span12">
-                        <div class="symbol pull-left">
-                            {% if is_granted('ROLE_STUDENT') %}
-                                <img class="rounded" src="http://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?s=48"/>
-                            {% else %}
-                                <div class="rounded count-badge">-</div>
-                            {% endif %}
-                        </div>
-                        <div class="details pull-left">
-                            {% if is_granted('ROLE_TEACHER') %}
-                                <i class="manage-buttons-gears icon-small-gears"></i>
-                                <div class="manage-buttons invisible">
-                                    {% if is_granted('EDIT', assignment) %}<a href="{{ path('assignment_edit', {id: assignment.id, courseId: course.id}) }}"><i class="icon-small-pencil"></i>Edit</a>{% endif %}
-                                    {% if is_granted('DELETE', assignment) %}<a href="{{ path('course_assignment_delete', {id: assignment.id, courseId: course.id}) }}" class="delete-confirm"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
-                                </div>
+                {% if assignments and assignments.count %}
+                    <div class="small-title">Assignments</div>
+                    {% for assignment in assignments %}
+                        {{ block('assignment') }}
+                    {% endfor %}
+                    <div class="clearfix"></div>
+                {% endif %}
 
-                            {% endif %}
-                            <h4><a href="{{ path('assignment_view', {id: assignment.id}) }}">{{ assignment.name }}</a></h4>
-                            <div class="stat">
-                                {% if is_granted('ROLE_STUDENT') %}
-                                    <div class="instructor-name">Instructor <b>{{ assignment.teacher.fullName }}</b></div>
-                                    <div class="due-at"><i class="icon-small-clock"></i> Due <small>{{ assignment.dueAt | date('Hi') == '0000' ? assignment.dueAt | date('D, M d') : assignment.dueAt | date('D, M d h:i a') }}</small></div>
-                                    <div><span class="badge">-</span><a href="#">Comments</a></span></div>
-                                {% else %}
-                                    <div class="due-at"><i class="icon-small-clock"></i> Due <small>{{ assignment.dueAt | date('Hi') == '0000' ? assignment.dueAt | date('D, M d') : assignment.dueAt | date('D, M d h:i a') }}</small></div>
-                                    <div><span class="badge">{{ assignment.students.count }}</span><a href="">Assignments</a></div>
-                                    <div><span class="badge">-</span><a href="">Completed</a></div>
-                                    <div><span class="badge badge-inverse">-</span><a href="">Remaining</a></div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        {% if is_granted('ROLE_STUDENT') %}
-                            <div class="grade pull-right text-center">
-                                <h4>Grading: {{ assignment.id + 20 }}</h4>
-                                {% if assignment.id <= 10 %}
-                                    <span class="label label-important">Failed</span>
-                                {% else %}
-                                    <span class="label label-success">Success</span>
-                                {% endif %}
-                            </div>
-                        {% endif %}
-                    </div>
-                {% endfor %}
+                {% if assignmentsNoDueDate and assignmentsNoDueDate.count %}
+                    <div class="small-title">No due date</div>
+                    {% for assignment in assignmentsNoDueDate %}
+                        {{ block('assignment') }}
+                    {% endfor %}
+                    <div class="clearfix"></div>
+                {% endif %}
+
+                {% if draftAssignment and draftAssignment.count %}
+                    <div class="small-title">Draft</div>
+                    {% for assignment in draftAssignment %}
+                        {{ block('assignment') }}
+                    {% endfor %}
+                    <div class="clearfix"></div>
+                {% endif %}
             </div>
         </div>
 
@@ -85,4 +64,49 @@
     </div>
 
 
+{% endblock %}
+
+{% block assignment %}
+    <div class="list-item span12">
+        <div class="symbol pull-left">
+            {% if is_granted('ROLE_STUDENT') %}
+                <img class="rounded" src="http://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?s=48"/>
+            {% else %}
+                <div class="rounded count-badge">-</div>
+            {% endif %}
+        </div>
+        <div class="details pull-left">
+            {% if is_granted('ROLE_TEACHER') %}
+                <i class="manage-buttons-gears icon-small-gears"></i>
+                <div class="manage-buttons invisible">
+                    {% if is_granted('EDIT', assignment) %}<a href="{{ path('assignment_edit', {id: assignment.id, courseId: course.id}) }}"><i class="icon-small-pencil"></i>Edit</a>{% endif %}
+                    {% if is_granted('DELETE', assignment) %}<a href="{{ path('course_assignment_delete', {id: assignment.id, courseId: course.id}) }}" class="delete-confirm"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
+                </div>
+
+            {% endif %}
+            <h4><a href="{{ path('assignment_view', {id: assignment.id}) }}">{{ assignment.name }}</a></h4>
+            <div class="stat">
+                {% if is_granted('ROLE_STUDENT') %}
+                    <div class="instructor-name">Instructor <b>{{ assignment.teacher.fullName }}</b></div>
+                    {% if assignment.dueAt %}<div class="due-at"><i class="icon-small-clock"></i> Due <small>{{ assignment.dueAt | date('Hi') == '0000' ? assignment.dueAt | date('D, M d') : assignment.dueAt | date('D, M d h:i a') }}</small></div>{% endif %}
+                    <div><span class="badge">-</span><a href="#">Comments</a></span></div>
+                {% else %}
+                    {% if assignment.dueAt %}<div class="due-at"><i class="icon-small-clock"></i> Due <small>{{ assignment.dueAt | date('Hi') == '0000' ? assignment.dueAt | date('D, M d') : assignment.dueAt | date('D, M d h:i a') }}</small></div>{% endif %}
+                    <div><span class="badge">{{ assignment.students.count }}</span><a href="">Assignments</a></div>
+                    <div><span class="badge">-</span><a href="">Completed</a></div>
+                    <div><span class="badge badge-inverse">-</span><a href="">Remaining</a></div>
+                {% endif %}
+            </div>
+        </div>
+        {% if is_granted('ROLE_STUDENT') %}
+            <div class="grade pull-right text-center">
+                <h4>Grading: {{ assignment.id + 20 }}</h4>
+                {% if assignment.id <= 10 %}
+                    <span class="label label-important">Failed</span>
+                {% else %}
+                    <span class="label label-success">Success</span>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
 {% endblock %}
