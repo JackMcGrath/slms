@@ -101,6 +101,18 @@ abstract class BaseCourse extends BaseObject implements Persistent
     protected $access_code;
 
     /**
+     * The value for the start field.
+     * @var        string
+     */
+    protected $start;
+
+    /**
+     * The value for the end field.
+     * @var        string
+     */
+    protected $end;
+
+    /**
      * The value for the created_by field.
      * @var        int
      */
@@ -311,6 +323,86 @@ abstract class BaseCourse extends BaseObject implements Persistent
     public function getAccessCode()
     {
         return $this->access_code;
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [start] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null, and 0 if column value is 0000-00-00
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getStart($format = null)
+    {
+        if ($this->start === null) {
+            return null;
+        }
+
+        if ($this->start === '0000-00-00') {
+            // while technically this is not a default value of null,
+            // this seems to be closest in meaning.
+            return null;
+        }
+
+        try {
+            $dt = new DateTime($this->start);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->start, true), $x);
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [end] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null, and 0 if column value is 0000-00-00
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getEnd($format = null)
+    {
+        if ($this->end === null) {
+            return null;
+        }
+
+        if ($this->end === '0000-00-00') {
+            // while technically this is not a default value of null,
+            // this seems to be closest in meaning.
+            return null;
+        }
+
+        try {
+            $dt = new DateTime($this->end);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->end, true), $x);
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -538,6 +630,52 @@ abstract class BaseCourse extends BaseObject implements Persistent
     } // setAccessCode()
 
     /**
+     * Sets the value of [start] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return Course The current object (for fluent API support)
+     */
+    public function setStart($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->start !== null || $dt !== null) {
+            $currentDateAsString = ($this->start !== null && $tmpDt = new DateTime($this->start)) ? $tmpDt->format('Y-m-d') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->start = $newDateAsString;
+                $this->modifiedColumns[] = CoursePeer::START;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setStart()
+
+    /**
+     * Sets the value of [end] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return Course The current object (for fluent API support)
+     */
+    public function setEnd($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->end !== null || $dt !== null) {
+            $currentDateAsString = ($this->end !== null && $tmpDt = new DateTime($this->end)) ? $tmpDt->format('Y-m-d') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->end = $newDateAsString;
+                $this->modifiedColumns[] = CoursePeer::END;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setEnd()
+
+    /**
      * Set the value of [created_by] column.
      *
      * @param int $v new value
@@ -646,9 +784,11 @@ abstract class BaseCourse extends BaseObject implements Persistent
             $this->name = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
             $this->description = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
             $this->access_code = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-            $this->created_by = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
-            $this->created_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
-            $this->updated_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+            $this->start = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+            $this->end = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+            $this->created_by = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+            $this->created_at = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+            $this->updated_at = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -657,7 +797,7 @@ abstract class BaseCourse extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 9; // 9 = CoursePeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 11; // 11 = CoursePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Course object", $e);
@@ -1117,6 +1257,12 @@ abstract class BaseCourse extends BaseObject implements Persistent
         if ($this->isColumnModified(CoursePeer::ACCESS_CODE)) {
             $modifiedColumns[':p' . $index++]  = '`access_code`';
         }
+        if ($this->isColumnModified(CoursePeer::START)) {
+            $modifiedColumns[':p' . $index++]  = '`start`';
+        }
+        if ($this->isColumnModified(CoursePeer::END)) {
+            $modifiedColumns[':p' . $index++]  = '`end`';
+        }
         if ($this->isColumnModified(CoursePeer::CREATED_BY)) {
             $modifiedColumns[':p' . $index++]  = '`created_by`';
         }
@@ -1154,6 +1300,12 @@ abstract class BaseCourse extends BaseObject implements Persistent
                         break;
                     case '`access_code`':
                         $stmt->bindValue($identifier, $this->access_code, PDO::PARAM_STR);
+                        break;
+                    case '`start`':
+                        $stmt->bindValue($identifier, $this->start, PDO::PARAM_STR);
+                        break;
+                    case '`end`':
+                        $stmt->bindValue($identifier, $this->end, PDO::PARAM_STR);
                         break;
                     case '`created_by`':
                         $stmt->bindValue($identifier, $this->created_by, PDO::PARAM_INT);
@@ -1397,12 +1549,18 @@ abstract class BaseCourse extends BaseObject implements Persistent
                 return $this->getAccessCode();
                 break;
             case 6:
-                return $this->getCreatedBy();
+                return $this->getStart();
                 break;
             case 7:
-                return $this->getCreatedAt();
+                return $this->getEnd();
                 break;
             case 8:
+                return $this->getCreatedBy();
+                break;
+            case 9:
+                return $this->getCreatedAt();
+                break;
+            case 10:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1440,9 +1598,11 @@ abstract class BaseCourse extends BaseObject implements Persistent
             $keys[3] => $this->getName(),
             $keys[4] => $this->getDescription(),
             $keys[5] => $this->getAccessCode(),
-            $keys[6] => $this->getCreatedBy(),
-            $keys[7] => $this->getCreatedAt(),
-            $keys[8] => $this->getUpdatedAt(),
+            $keys[6] => $this->getStart(),
+            $keys[7] => $this->getEnd(),
+            $keys[8] => $this->getCreatedBy(),
+            $keys[9] => $this->getCreatedAt(),
+            $keys[10] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aCreatedByTeacher) {
@@ -1528,12 +1688,18 @@ abstract class BaseCourse extends BaseObject implements Persistent
                 $this->setAccessCode($value);
                 break;
             case 6:
-                $this->setCreatedBy($value);
+                $this->setStart($value);
                 break;
             case 7:
-                $this->setCreatedAt($value);
+                $this->setEnd($value);
                 break;
             case 8:
+                $this->setCreatedBy($value);
+                break;
+            case 9:
+                $this->setCreatedAt($value);
+                break;
+            case 10:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1566,9 +1732,11 @@ abstract class BaseCourse extends BaseObject implements Persistent
         if (array_key_exists($keys[3], $arr)) $this->setName($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setDescription($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setAccessCode($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setCreatedBy($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setCreatedAt($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setUpdatedAt($arr[$keys[8]]);
+        if (array_key_exists($keys[6], $arr)) $this->setStart($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setEnd($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setCreatedBy($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setCreatedAt($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setUpdatedAt($arr[$keys[10]]);
     }
 
     /**
@@ -1586,6 +1754,8 @@ abstract class BaseCourse extends BaseObject implements Persistent
         if ($this->isColumnModified(CoursePeer::NAME)) $criteria->add(CoursePeer::NAME, $this->name);
         if ($this->isColumnModified(CoursePeer::DESCRIPTION)) $criteria->add(CoursePeer::DESCRIPTION, $this->description);
         if ($this->isColumnModified(CoursePeer::ACCESS_CODE)) $criteria->add(CoursePeer::ACCESS_CODE, $this->access_code);
+        if ($this->isColumnModified(CoursePeer::START)) $criteria->add(CoursePeer::START, $this->start);
+        if ($this->isColumnModified(CoursePeer::END)) $criteria->add(CoursePeer::END, $this->end);
         if ($this->isColumnModified(CoursePeer::CREATED_BY)) $criteria->add(CoursePeer::CREATED_BY, $this->created_by);
         if ($this->isColumnModified(CoursePeer::CREATED_AT)) $criteria->add(CoursePeer::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(CoursePeer::UPDATED_AT)) $criteria->add(CoursePeer::UPDATED_AT, $this->updated_at);
@@ -1657,6 +1827,8 @@ abstract class BaseCourse extends BaseObject implements Persistent
         $copyObj->setName($this->getName());
         $copyObj->setDescription($this->getDescription());
         $copyObj->setAccessCode($this->getAccessCode());
+        $copyObj->setStart($this->getStart());
+        $copyObj->setEnd($this->getEnd());
         $copyObj->setCreatedBy($this->getCreatedBy());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
@@ -4034,6 +4206,8 @@ abstract class BaseCourse extends BaseObject implements Persistent
         $this->name = null;
         $this->description = null;
         $this->access_code = null;
+        $this->start = null;
+        $this->end = null;
         $this->created_by = null;
         $this->created_at = null;
         $this->updated_at = null;

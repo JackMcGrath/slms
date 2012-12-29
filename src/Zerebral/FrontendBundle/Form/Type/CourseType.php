@@ -70,6 +70,17 @@ class CourseType extends AbstractType
             ),
         ));
 
+        $builder->add('start', 'date', array(
+            'required' => false,
+            'widget' => 'single_text',
+            'format' => 'MM/dd/yyyy',
+
+        ));
+        $builder->add('end', 'date', array(
+            'required' => false,
+            'widget' => 'single_text',
+            'format' => 'MM/dd/yyyy',
+        ));
     }
 
     public function getName()

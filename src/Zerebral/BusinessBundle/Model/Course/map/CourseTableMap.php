@@ -48,6 +48,8 @@ class CourseTableMap extends TableMap
         $this->addColumn('name', 'Name', 'VARCHAR', true, 100, null);
         $this->addColumn('description', 'Description', 'LONGVARCHAR', false, null, null);
         $this->addColumn('access_code', 'AccessCode', 'VARCHAR', false, 32, null);
+        $this->addColumn('start', 'Start', 'DATE', false, null, null);
+        $this->addColumn('end', 'End', 'DATE', false, null, null);
         $this->addForeignKey('created_by', 'CreatedBy', 'INTEGER', 'teachers', 'id', true, null, null);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', true, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
