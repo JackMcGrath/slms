@@ -127,6 +127,10 @@ Zerebral\BusinessBundle\Model\Course\CourseScheduleDay:
                 message: Time is required.
 
 Zerebral\BusinessBundle\Model\Material\CourseFolder:
+    constraints:
+        - Propel\PropelBundle\Validator\Constraints\UniqueObject:
+            fields: [id,name]
+            message: You already have folder with this name
     getters:
         name:
             - NotBlank:
