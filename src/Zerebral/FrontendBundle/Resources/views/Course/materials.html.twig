@@ -39,7 +39,7 @@
                                     {% if is_granted('ROLE_TEACHER') %}
                                         <span class="separator">/</span>
                                         <div class="manage-buttons">
-                                            <a href="#"><i class="icon-small-trash-bin"></i>Delete</a>
+                                            <a href="{{ path('delete_course_material', {id: material.id}) }}"><i class="icon-small-trash-bin"></i>Delete</a>
                                         </div>
                                     {% endif %}
                                 </div>

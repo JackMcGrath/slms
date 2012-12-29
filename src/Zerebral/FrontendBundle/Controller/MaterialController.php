@@ -94,8 +94,15 @@ class MaterialController extends \Zerebral\CommonBundle\Component\Controller
         return new FormJsonResponse($form);
     }
 
-    public function deleteAction()
+    /**
+     * @Route("/materials/delete/{id}", name="delete_course_material")
+     * @PreAuthorize("hasRole('ROLE_TEACHER')")
+     */
+    public function deleteAction(Model\Material\CourseMaterial $material)
     {
-
+        $file = $material->getFile();
+        $material->delete();
+        $file->delete();
+        return $this->redirect($this->getRequest()->headers->get('referer'));
     }
 }

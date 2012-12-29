@@ -24,7 +24,8 @@ class FolderType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Zerebral\BusinessBundle\Model\Material\CourseFolder'
+            'data_class' => 'Zerebral\BusinessBundle\Model\Material\CourseFolder',
+            'error_mapping' => array('.' => 'name')
         ));
     }
 }
