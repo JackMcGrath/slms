@@ -117,7 +117,7 @@ class InviteController extends \Zerebral\CommonBundle\Component\Controller
 
             foreach ($emails as $email) {
                 $message = \Swift_Message::newInstance()
-                    ->setSubject('Course invitation')
+                    ->setSubject('Zerebral - Invitation Notice')
                     ->setFrom('hello@zerebral.com')
                     ->setTo($email)
                     ->setBody(
