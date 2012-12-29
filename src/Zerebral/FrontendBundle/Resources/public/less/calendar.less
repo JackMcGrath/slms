@@ -17,14 +17,22 @@
         a {
             .rounded;
         }
-    }
-    td.active.today {
-        a {
-            background: #b74a47;
-            color: white;
-            border: 2px solid #b74a47;
+
+        &.today {
+            a {
+                background: #b74a47;
+                color: white;
+                border: 2px solid #b74a47 !important;
+            }
+        }
+
+        &.past {
+            a {
+                border: 2px solid #8fc58d;
+            }
         }
     }
+
     .rounded {
         padding: 0px;
         border: 2px solid #b74a47;
@@ -54,7 +62,7 @@
                 cursor: pointer;
                 text-decoration: none;
                 .rounded;
-                border-color: #999999;
+                border-color: #999999 !important;
             }
         }
     }
