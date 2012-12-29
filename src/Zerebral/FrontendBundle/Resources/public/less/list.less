@@ -40,15 +40,16 @@
             &:first-child {
 
             }
-            &:last-child {
+            &:last-child, &.last {
                 border-bottom: none;
             }
+
             .details {
                 i[class*="icon-"] {
                     background-position: 0;
                 }
                 margin-left: 20px;
-                width: 570px;
+                max-width: 570px;
                 h4 {
                     margin-bottom: 7px;
                     small {
@@ -63,6 +64,7 @@
                     margin-top: 7px;
                     margin-bottom: 5px;
                     text-align: right;
+                    width: 570px;
                     a {
                         color: #8c8c8c;
                         margin-left: 8px;

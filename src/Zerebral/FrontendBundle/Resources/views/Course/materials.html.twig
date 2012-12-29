@@ -15,7 +15,7 @@
         <div class="span6 main-list-block">
             <div class="row-fluid">
                 <h2 class="pull-left form-title">
-                    {{ course.name }} <small><a href="{{ path('course_materials', {id: course.id}) }}">Syllabus</a> {{ folder ? '/ ' ~ folder.name : '' }}</small>
+                    {{ course.name }} <small><a href="{{ path('course_materials', {courseId: course.id}) }}">Syllabus</a> {{ folder ? '/ ' ~ folder.name : '' }}</small>
                 </h2>
             </div>
             <hr/>
@@ -72,7 +72,7 @@
                 <h4>Folders</h4>
 
                 <ul class="marker">
-                    <li {{ folder == null ? 'class="active"' : '' }}><i class="marker">&#9656;</i><a href="{{ path('course_materials', {id: course.id}) }}">All files</a></li>
+                    <li {{ folder == null ? 'class="active"' : '' }}><i class="marker">&#9656;</i><a href="{{ path('course_materials', {courseId: course.id}) }}">All files</a></li>
                     {% for courseFolder in course.courseFolders %}
                         <li {{ folder and courseFolder.id == folder.id ? 'class="active"' : '' }} folderId="{{ courseFolder.id }}" courseId="{{ course.id }}" folderName="{{ courseFolder.name }}">
                             <i class="marker">&#9656;</i>

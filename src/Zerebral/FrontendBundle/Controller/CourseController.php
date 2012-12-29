@@ -144,10 +144,10 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     }
 
     /**
-     * @Route("/syllabus/{id}", name="course_materials")
+     * @Route("/syllabus/{courseId}", name="course_materials")
      * @Route("/syllabus/{id}/{folderId}", name="course_materials_folder")
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
-     * @ParamConverter("course", options={"mapping": {"id": "id"}})
+     * @ParamConverter("course", options={"mapping": {"courseId": "id"}})
      * @ParamConverter("folder", options={"mapping": {"folderId": "id"}})
      * @Template()
      */
