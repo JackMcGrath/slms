@@ -29,7 +29,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function indexAction()
     {
-        $provider = new CourseAssignmentEventsProvider($this->getRoleUser()->getAssignments());
+        $provider = new CourseAssignmentEventsProvider($assignments = $this->getRoleUser()->getAssignmentsDueDate(false));
         $currentMonth = new Calendar(time(), $provider);
         $nextMonth = new Calendar(strtotime("+1 month"), $provider);
 
