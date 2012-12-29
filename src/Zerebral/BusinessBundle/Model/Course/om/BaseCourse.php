@@ -34,6 +34,8 @@ use Zerebral\BusinessBundle\Model\Course\Discipline;
 use Zerebral\BusinessBundle\Model\Course\DisciplineQuery;
 use Zerebral\BusinessBundle\Model\Course\GradeLevel;
 use Zerebral\BusinessBundle\Model\Course\GradeLevelQuery;
+use Zerebral\BusinessBundle\Model\Feed\FeedItem;
+use Zerebral\BusinessBundle\Model\Feed\FeedItemQuery;
 use Zerebral\BusinessBundle\Model\Material\CourseFolder;
 use Zerebral\BusinessBundle\Model\Material\CourseFolderQuery;
 use Zerebral\BusinessBundle\Model\Material\CourseMaterial;
@@ -101,6 +103,18 @@ abstract class BaseCourse extends BaseObject implements Persistent
     protected $access_code;
 
     /**
+     * The value for the start field.
+     * @var        string
+     */
+    protected $start;
+
+    /**
+     * The value for the end field.
+     * @var        string
+     */
+    protected $end;
+
+    /**
      * The value for the created_by field.
      * @var        int
      */
@@ -162,6 +176,12 @@ abstract class BaseCourse extends BaseObject implements Persistent
      */
     protected $collCourseScheduleDays;
     protected $collCourseScheduleDaysPartial;
+
+    /**
+     * @var        PropelObjectCollection|FeedItem[] Collection to store aggregation of FeedItem objects.
+     */
+    protected $collFeedItems;
+    protected $collFeedItemsPartial;
 
     /**
      * @var        PropelObjectCollection|CourseFolder[] Collection to store aggregation of CourseFolder objects.
@@ -245,6 +265,12 @@ abstract class BaseCourse extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
+    protected $feedItemsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
     protected $courseFoldersScheduledForDeletion = null;
 
     /**
@@ -311,6 +337,86 @@ abstract class BaseCourse extends BaseObject implements Persistent
     public function getAccessCode()
     {
         return $this->access_code;
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [start] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null, and 0 if column value is 0000-00-00
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getStart($format = null)
+    {
+        if ($this->start === null) {
+            return null;
+        }
+
+        if ($this->start === '0000-00-00') {
+            // while technically this is not a default value of null,
+            // this seems to be closest in meaning.
+            return null;
+        }
+
+        try {
+            $dt = new DateTime($this->start);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->start, true), $x);
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [end] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null, and 0 if column value is 0000-00-00
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getEnd($format = null)
+    {
+        if ($this->end === null) {
+            return null;
+        }
+
+        if ($this->end === '0000-00-00') {
+            // while technically this is not a default value of null,
+            // this seems to be closest in meaning.
+            return null;
+        }
+
+        try {
+            $dt = new DateTime($this->end);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->end, true), $x);
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -538,6 +644,52 @@ abstract class BaseCourse extends BaseObject implements Persistent
     } // setAccessCode()
 
     /**
+     * Sets the value of [start] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return Course The current object (for fluent API support)
+     */
+    public function setStart($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->start !== null || $dt !== null) {
+            $currentDateAsString = ($this->start !== null && $tmpDt = new DateTime($this->start)) ? $tmpDt->format('Y-m-d') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->start = $newDateAsString;
+                $this->modifiedColumns[] = CoursePeer::START;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setStart()
+
+    /**
+     * Sets the value of [end] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return Course The current object (for fluent API support)
+     */
+    public function setEnd($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->end !== null || $dt !== null) {
+            $currentDateAsString = ($this->end !== null && $tmpDt = new DateTime($this->end)) ? $tmpDt->format('Y-m-d') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->end = $newDateAsString;
+                $this->modifiedColumns[] = CoursePeer::END;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setEnd()
+
+    /**
      * Set the value of [created_by] column.
      *
      * @param int $v new value
@@ -646,9 +798,11 @@ abstract class BaseCourse extends BaseObject implements Persistent
             $this->name = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
             $this->description = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
             $this->access_code = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-            $this->created_by = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
-            $this->created_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
-            $this->updated_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+            $this->start = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+            $this->end = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+            $this->created_by = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+            $this->created_at = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+            $this->updated_at = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -657,7 +811,7 @@ abstract class BaseCourse extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 9; // 9 = CoursePeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 11; // 11 = CoursePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Course object", $e);
@@ -740,6 +894,8 @@ abstract class BaseCourse extends BaseObject implements Persistent
             $this->collCourseTeachers = null;
 
             $this->collCourseScheduleDays = null;
+
+            $this->collFeedItems = null;
 
             $this->collCourseFolders = null;
 
@@ -1039,6 +1195,24 @@ abstract class BaseCourse extends BaseObject implements Persistent
                 }
             }
 
+            if ($this->feedItemsScheduledForDeletion !== null) {
+                if (!$this->feedItemsScheduledForDeletion->isEmpty()) {
+                    foreach ($this->feedItemsScheduledForDeletion as $feedItem) {
+                        // need to save related object because we set the relation to null
+                        $feedItem->save($con);
+                    }
+                    $this->feedItemsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collFeedItems !== null) {
+                foreach ($this->collFeedItems as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             if ($this->courseFoldersScheduledForDeletion !== null) {
                 if (!$this->courseFoldersScheduledForDeletion->isEmpty()) {
                     CourseFolderQuery::create()
@@ -1117,6 +1291,12 @@ abstract class BaseCourse extends BaseObject implements Persistent
         if ($this->isColumnModified(CoursePeer::ACCESS_CODE)) {
             $modifiedColumns[':p' . $index++]  = '`access_code`';
         }
+        if ($this->isColumnModified(CoursePeer::START)) {
+            $modifiedColumns[':p' . $index++]  = '`start`';
+        }
+        if ($this->isColumnModified(CoursePeer::END)) {
+            $modifiedColumns[':p' . $index++]  = '`end`';
+        }
         if ($this->isColumnModified(CoursePeer::CREATED_BY)) {
             $modifiedColumns[':p' . $index++]  = '`created_by`';
         }
@@ -1154,6 +1334,12 @@ abstract class BaseCourse extends BaseObject implements Persistent
                         break;
                     case '`access_code`':
                         $stmt->bindValue($identifier, $this->access_code, PDO::PARAM_STR);
+                        break;
+                    case '`start`':
+                        $stmt->bindValue($identifier, $this->start, PDO::PARAM_STR);
+                        break;
+                    case '`end`':
+                        $stmt->bindValue($identifier, $this->end, PDO::PARAM_STR);
                         break;
                     case '`created_by`':
                         $stmt->bindValue($identifier, $this->created_by, PDO::PARAM_INT);
@@ -1327,6 +1513,14 @@ abstract class BaseCourse extends BaseObject implements Persistent
                     }
                 }
 
+                if ($this->collFeedItems !== null) {
+                    foreach ($this->collFeedItems as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
                 if ($this->collCourseFolders !== null) {
                     foreach ($this->collCourseFolders as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
@@ -1397,12 +1591,18 @@ abstract class BaseCourse extends BaseObject implements Persistent
                 return $this->getAccessCode();
                 break;
             case 6:
-                return $this->getCreatedBy();
+                return $this->getStart();
                 break;
             case 7:
-                return $this->getCreatedAt();
+                return $this->getEnd();
                 break;
             case 8:
+                return $this->getCreatedBy();
+                break;
+            case 9:
+                return $this->getCreatedAt();
+                break;
+            case 10:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1440,9 +1640,11 @@ abstract class BaseCourse extends BaseObject implements Persistent
             $keys[3] => $this->getName(),
             $keys[4] => $this->getDescription(),
             $keys[5] => $this->getAccessCode(),
-            $keys[6] => $this->getCreatedBy(),
-            $keys[7] => $this->getCreatedAt(),
-            $keys[8] => $this->getUpdatedAt(),
+            $keys[6] => $this->getStart(),
+            $keys[7] => $this->getEnd(),
+            $keys[8] => $this->getCreatedBy(),
+            $keys[9] => $this->getCreatedAt(),
+            $keys[10] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aCreatedByTeacher) {
@@ -1468,6 +1670,9 @@ abstract class BaseCourse extends BaseObject implements Persistent
             }
             if (null !== $this->collCourseScheduleDays) {
                 $result['CourseScheduleDays'] = $this->collCourseScheduleDays->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collFeedItems) {
+                $result['FeedItems'] = $this->collFeedItems->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collCourseFolders) {
                 $result['CourseFolders'] = $this->collCourseFolders->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1528,12 +1733,18 @@ abstract class BaseCourse extends BaseObject implements Persistent
                 $this->setAccessCode($value);
                 break;
             case 6:
-                $this->setCreatedBy($value);
+                $this->setStart($value);
                 break;
             case 7:
-                $this->setCreatedAt($value);
+                $this->setEnd($value);
                 break;
             case 8:
+                $this->setCreatedBy($value);
+                break;
+            case 9:
+                $this->setCreatedAt($value);
+                break;
+            case 10:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1566,9 +1777,11 @@ abstract class BaseCourse extends BaseObject implements Persistent
         if (array_key_exists($keys[3], $arr)) $this->setName($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setDescription($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setAccessCode($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setCreatedBy($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setCreatedAt($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setUpdatedAt($arr[$keys[8]]);
+        if (array_key_exists($keys[6], $arr)) $this->setStart($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setEnd($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setCreatedBy($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setCreatedAt($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setUpdatedAt($arr[$keys[10]]);
     }
 
     /**
@@ -1586,6 +1799,8 @@ abstract class BaseCourse extends BaseObject implements Persistent
         if ($this->isColumnModified(CoursePeer::NAME)) $criteria->add(CoursePeer::NAME, $this->name);
         if ($this->isColumnModified(CoursePeer::DESCRIPTION)) $criteria->add(CoursePeer::DESCRIPTION, $this->description);
         if ($this->isColumnModified(CoursePeer::ACCESS_CODE)) $criteria->add(CoursePeer::ACCESS_CODE, $this->access_code);
+        if ($this->isColumnModified(CoursePeer::START)) $criteria->add(CoursePeer::START, $this->start);
+        if ($this->isColumnModified(CoursePeer::END)) $criteria->add(CoursePeer::END, $this->end);
         if ($this->isColumnModified(CoursePeer::CREATED_BY)) $criteria->add(CoursePeer::CREATED_BY, $this->created_by);
         if ($this->isColumnModified(CoursePeer::CREATED_AT)) $criteria->add(CoursePeer::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(CoursePeer::UPDATED_AT)) $criteria->add(CoursePeer::UPDATED_AT, $this->updated_at);
@@ -1657,6 +1872,8 @@ abstract class BaseCourse extends BaseObject implements Persistent
         $copyObj->setName($this->getName());
         $copyObj->setDescription($this->getDescription());
         $copyObj->setAccessCode($this->getAccessCode());
+        $copyObj->setStart($this->getStart());
+        $copyObj->setEnd($this->getEnd());
         $copyObj->setCreatedBy($this->getCreatedBy());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
@@ -1695,6 +1912,12 @@ abstract class BaseCourse extends BaseObject implements Persistent
             foreach ($this->getCourseScheduleDays() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addCourseScheduleDay($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getFeedItems() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addFeedItem($relObj->copy($deepCopy));
                 }
             }
 
@@ -1941,6 +2164,9 @@ abstract class BaseCourse extends BaseObject implements Persistent
         }
         if ('CourseScheduleDay' == $relationName) {
             $this->initCourseScheduleDays();
+        }
+        if ('FeedItem' == $relationName) {
+            $this->initFeedItems();
         }
         if ('CourseFolder' == $relationName) {
             $this->initCourseFolders();
@@ -3161,6 +3387,298 @@ abstract class BaseCourse extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collFeedItems collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Course The current object (for fluent API support)
+     * @see        addFeedItems()
+     */
+    public function clearFeedItems()
+    {
+        $this->collFeedItems = null; // important to set this to null since that means it is uninitialized
+        $this->collFeedItemsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collFeedItems collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialFeedItems($v = true)
+    {
+        $this->collFeedItemsPartial = $v;
+    }
+
+    /**
+     * Initializes the collFeedItems collection.
+     *
+     * By default this just sets the collFeedItems collection to an empty array (like clearcollFeedItems());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initFeedItems($overrideExisting = true)
+    {
+        if (null !== $this->collFeedItems && !$overrideExisting) {
+            return;
+        }
+        $this->collFeedItems = new PropelObjectCollection();
+        $this->collFeedItems->setModel('FeedItem');
+    }
+
+    /**
+     * Gets an array of FeedItem objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Course is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|FeedItem[] List of FeedItem objects
+     * @throws PropelException
+     */
+    public function getFeedItems($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collFeedItemsPartial && !$this->isNew();
+        if (null === $this->collFeedItems || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collFeedItems) {
+                // return empty collection
+                $this->initFeedItems();
+            } else {
+                $collFeedItems = FeedItemQuery::create(null, $criteria)
+                    ->filterByCourse($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collFeedItemsPartial && count($collFeedItems)) {
+                      $this->initFeedItems(false);
+
+                      foreach($collFeedItems as $obj) {
+                        if (false == $this->collFeedItems->contains($obj)) {
+                          $this->collFeedItems->append($obj);
+                        }
+                      }
+
+                      $this->collFeedItemsPartial = true;
+                    }
+
+                    return $collFeedItems;
+                }
+
+                if($partial && $this->collFeedItems) {
+                    foreach($this->collFeedItems as $obj) {
+                        if($obj->isNew()) {
+                            $collFeedItems[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collFeedItems = $collFeedItems;
+                $this->collFeedItemsPartial = false;
+            }
+        }
+
+        return $this->collFeedItems;
+    }
+
+    /**
+     * Sets a collection of FeedItem objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $feedItems A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Course The current object (for fluent API support)
+     */
+    public function setFeedItems(PropelCollection $feedItems, PropelPDO $con = null)
+    {
+        $feedItemsToDelete = $this->getFeedItems(new Criteria(), $con)->diff($feedItems);
+
+        $this->feedItemsScheduledForDeletion = unserialize(serialize($feedItemsToDelete));
+
+        foreach ($feedItemsToDelete as $feedItemRemoved) {
+            $feedItemRemoved->setCourse(null);
+        }
+
+        $this->collFeedItems = null;
+        foreach ($feedItems as $feedItem) {
+            $this->addFeedItem($feedItem);
+        }
+
+        $this->collFeedItems = $feedItems;
+        $this->collFeedItemsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related FeedItem objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related FeedItem objects.
+     * @throws PropelException
+     */
+    public function countFeedItems(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collFeedItemsPartial && !$this->isNew();
+        if (null === $this->collFeedItems || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collFeedItems) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getFeedItems());
+            }
+            $query = FeedItemQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByCourse($this)
+                ->count($con);
+        }
+
+        return count($this->collFeedItems);
+    }
+
+    /**
+     * Method called to associate a FeedItem object to this object
+     * through the FeedItem foreign key attribute.
+     *
+     * @param    FeedItem $l FeedItem
+     * @return Course The current object (for fluent API support)
+     */
+    public function addFeedItem(FeedItem $l)
+    {
+        if ($this->collFeedItems === null) {
+            $this->initFeedItems();
+            $this->collFeedItemsPartial = true;
+        }
+        if (!in_array($l, $this->collFeedItems->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddFeedItem($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	FeedItem $feedItem The feedItem object to add.
+     */
+    protected function doAddFeedItem($feedItem)
+    {
+        $this->collFeedItems[]= $feedItem;
+        $feedItem->setCourse($this);
+    }
+
+    /**
+     * @param	FeedItem $feedItem The feedItem object to remove.
+     * @return Course The current object (for fluent API support)
+     */
+    public function removeFeedItem($feedItem)
+    {
+        if ($this->getFeedItems()->contains($feedItem)) {
+            $this->collFeedItems->remove($this->collFeedItems->search($feedItem));
+            if (null === $this->feedItemsScheduledForDeletion) {
+                $this->feedItemsScheduledForDeletion = clone $this->collFeedItems;
+                $this->feedItemsScheduledForDeletion->clear();
+            }
+            $this->feedItemsScheduledForDeletion[]= $feedItem;
+            $feedItem->setCourse(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Course is new, it will return
+     * an empty collection; or if this Course has previously
+     * been saved, it will retrieve related FeedItems from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Course.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|FeedItem[] List of FeedItem objects
+     */
+    public function getFeedItemsJoinFeedContent($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = FeedItemQuery::create(null, $criteria);
+        $query->joinWith('FeedContent', $join_behavior);
+
+        return $this->getFeedItems($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Course is new, it will return
+     * an empty collection; or if this Course has previously
+     * been saved, it will retrieve related FeedItems from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Course.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|FeedItem[] List of FeedItem objects
+     */
+    public function getFeedItemsJoinAssignment($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = FeedItemQuery::create(null, $criteria);
+        $query->joinWith('Assignment', $join_behavior);
+
+        return $this->getFeedItems($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Course is new, it will return
+     * an empty collection; or if this Course has previously
+     * been saved, it will retrieve related FeedItems from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Course.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|FeedItem[] List of FeedItem objects
+     */
+    public function getFeedItemsJoinUser($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = FeedItemQuery::create(null, $criteria);
+        $query->joinWith('User', $join_behavior);
+
+        return $this->getFeedItems($query, $con);
+    }
+
+    /**
      * Clears out the collCourseFolders collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -4034,6 +4552,8 @@ abstract class BaseCourse extends BaseObject implements Persistent
         $this->name = null;
         $this->description = null;
         $this->access_code = null;
+        $this->start = null;
+        $this->end = null;
         $this->created_by = null;
         $this->created_at = null;
         $this->updated_at = null;
@@ -4082,6 +4602,11 @@ abstract class BaseCourse extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collFeedItems) {
+                foreach ($this->collFeedItems as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collCourseFolders) {
                 foreach ($this->collCourseFolders as $o) {
                     $o->clearAllReferences($deep);
@@ -4124,6 +4649,10 @@ abstract class BaseCourse extends BaseObject implements Persistent
             $this->collCourseScheduleDays->clearIterator();
         }
         $this->collCourseScheduleDays = null;
+        if ($this->collFeedItems instanceof PropelCollection) {
+            $this->collFeedItems->clearIterator();
+        }
+        $this->collFeedItems = null;
         if ($this->collCourseFolders instanceof PropelCollection) {
             $this->collCourseFolders->clearIterator();
         }

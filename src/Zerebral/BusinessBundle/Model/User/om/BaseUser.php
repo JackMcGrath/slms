@@ -17,6 +17,10 @@ use \PropelObjectCollection;
 use \PropelPDO;
 use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\ModelEvent;
+use Zerebral\BusinessBundle\Model\Feed\FeedComment;
+use Zerebral\BusinessBundle\Model\Feed\FeedCommentQuery;
+use Zerebral\BusinessBundle\Model\Feed\FeedItem;
+use Zerebral\BusinessBundle\Model\Feed\FeedItemQuery;
 use Zerebral\BusinessBundle\Model\File\File;
 use Zerebral\BusinessBundle\Model\File\FileQuery;
 use Zerebral\BusinessBundle\Model\User\Student;
@@ -139,6 +143,18 @@ abstract class BaseUser extends BaseObject implements Persistent
     protected $aAvatar;
 
     /**
+     * @var        PropelObjectCollection|FeedItem[] Collection to store aggregation of FeedItem objects.
+     */
+    protected $collFeedItems;
+    protected $collFeedItemsPartial;
+
+    /**
+     * @var        PropelObjectCollection|FeedComment[] Collection to store aggregation of FeedComment objects.
+     */
+    protected $collFeedComments;
+    protected $collFeedCommentsPartial;
+
+    /**
      * @var        PropelObjectCollection|Student[] Collection to store aggregation of Student objects.
      */
     protected $collStudents;
@@ -163,6 +179,18 @@ abstract class BaseUser extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $feedItemsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $feedCommentsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -864,6 +892,10 @@ abstract class BaseUser extends BaseObject implements Persistent
         if ($deep) {  // also de-associate any related objects?
 
             $this->aAvatar = null;
+            $this->collFeedItems = null;
+
+            $this->collFeedComments = null;
+
             $this->collStudents = null;
 
             $this->collTeachers = null;
@@ -1018,6 +1050,40 @@ abstract class BaseUser extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->feedItemsScheduledForDeletion !== null) {
+                if (!$this->feedItemsScheduledForDeletion->isEmpty()) {
+                    FeedItemQuery::create()
+                        ->filterByPrimaryKeys($this->feedItemsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->feedItemsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collFeedItems !== null) {
+                foreach ($this->collFeedItems as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->feedCommentsScheduledForDeletion !== null) {
+                if (!$this->feedCommentsScheduledForDeletion->isEmpty()) {
+                    FeedCommentQuery::create()
+                        ->filterByPrimaryKeys($this->feedCommentsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->feedCommentsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collFeedComments !== null) {
+                foreach ($this->collFeedComments as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             if ($this->studentsScheduledForDeletion !== null) {
@@ -1286,6 +1352,22 @@ abstract class BaseUser extends BaseObject implements Persistent
             }
 
 
+                if ($this->collFeedItems !== null) {
+                    foreach ($this->collFeedItems as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collFeedComments !== null) {
+                    foreach ($this->collFeedComments as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
                 if ($this->collStudents !== null) {
                     foreach ($this->collStudents as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
@@ -1426,6 +1508,12 @@ abstract class BaseUser extends BaseObject implements Persistent
         if ($includeForeignObjects) {
             if (null !== $this->aAvatar) {
                 $result['Avatar'] = $this->aAvatar->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->collFeedItems) {
+                $result['FeedItems'] = $this->collFeedItems->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collFeedComments) {
+                $result['FeedComments'] = $this->collFeedComments->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collStudents) {
                 $result['Students'] = $this->collStudents->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1656,6 +1744,18 @@ abstract class BaseUser extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
+            foreach ($this->getFeedItems() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addFeedItem($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getFeedComments() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addFeedComment($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getStudents() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addStudent($relObj->copy($deepCopy));
@@ -1781,12 +1881,577 @@ abstract class BaseUser extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
+        if ('FeedItem' == $relationName) {
+            $this->initFeedItems();
+        }
+        if ('FeedComment' == $relationName) {
+            $this->initFeedComments();
+        }
         if ('Student' == $relationName) {
             $this->initStudents();
         }
         if ('Teacher' == $relationName) {
             $this->initTeachers();
         }
+    }
+
+    /**
+     * Clears out the collFeedItems collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return User The current object (for fluent API support)
+     * @see        addFeedItems()
+     */
+    public function clearFeedItems()
+    {
+        $this->collFeedItems = null; // important to set this to null since that means it is uninitialized
+        $this->collFeedItemsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collFeedItems collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialFeedItems($v = true)
+    {
+        $this->collFeedItemsPartial = $v;
+    }
+
+    /**
+     * Initializes the collFeedItems collection.
+     *
+     * By default this just sets the collFeedItems collection to an empty array (like clearcollFeedItems());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initFeedItems($overrideExisting = true)
+    {
+        if (null !== $this->collFeedItems && !$overrideExisting) {
+            return;
+        }
+        $this->collFeedItems = new PropelObjectCollection();
+        $this->collFeedItems->setModel('FeedItem');
+    }
+
+    /**
+     * Gets an array of FeedItem objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this User is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|FeedItem[] List of FeedItem objects
+     * @throws PropelException
+     */
+    public function getFeedItems($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collFeedItemsPartial && !$this->isNew();
+        if (null === $this->collFeedItems || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collFeedItems) {
+                // return empty collection
+                $this->initFeedItems();
+            } else {
+                $collFeedItems = FeedItemQuery::create(null, $criteria)
+                    ->filterByUser($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collFeedItemsPartial && count($collFeedItems)) {
+                      $this->initFeedItems(false);
+
+                      foreach($collFeedItems as $obj) {
+                        if (false == $this->collFeedItems->contains($obj)) {
+                          $this->collFeedItems->append($obj);
+                        }
+                      }
+
+                      $this->collFeedItemsPartial = true;
+                    }
+
+                    return $collFeedItems;
+                }
+
+                if($partial && $this->collFeedItems) {
+                    foreach($this->collFeedItems as $obj) {
+                        if($obj->isNew()) {
+                            $collFeedItems[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collFeedItems = $collFeedItems;
+                $this->collFeedItemsPartial = false;
+            }
+        }
+
+        return $this->collFeedItems;
+    }
+
+    /**
+     * Sets a collection of FeedItem objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $feedItems A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return User The current object (for fluent API support)
+     */
+    public function setFeedItems(PropelCollection $feedItems, PropelPDO $con = null)
+    {
+        $feedItemsToDelete = $this->getFeedItems(new Criteria(), $con)->diff($feedItems);
+
+        $this->feedItemsScheduledForDeletion = unserialize(serialize($feedItemsToDelete));
+
+        foreach ($feedItemsToDelete as $feedItemRemoved) {
+            $feedItemRemoved->setUser(null);
+        }
+
+        $this->collFeedItems = null;
+        foreach ($feedItems as $feedItem) {
+            $this->addFeedItem($feedItem);
+        }
+
+        $this->collFeedItems = $feedItems;
+        $this->collFeedItemsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related FeedItem objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related FeedItem objects.
+     * @throws PropelException
+     */
+    public function countFeedItems(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collFeedItemsPartial && !$this->isNew();
+        if (null === $this->collFeedItems || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collFeedItems) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getFeedItems());
+            }
+            $query = FeedItemQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByUser($this)
+                ->count($con);
+        }
+
+        return count($this->collFeedItems);
+    }
+
+    /**
+     * Method called to associate a FeedItem object to this object
+     * through the FeedItem foreign key attribute.
+     *
+     * @param    FeedItem $l FeedItem
+     * @return User The current object (for fluent API support)
+     */
+    public function addFeedItem(FeedItem $l)
+    {
+        if ($this->collFeedItems === null) {
+            $this->initFeedItems();
+            $this->collFeedItemsPartial = true;
+        }
+        if (!in_array($l, $this->collFeedItems->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddFeedItem($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	FeedItem $feedItem The feedItem object to add.
+     */
+    protected function doAddFeedItem($feedItem)
+    {
+        $this->collFeedItems[]= $feedItem;
+        $feedItem->setUser($this);
+    }
+
+    /**
+     * @param	FeedItem $feedItem The feedItem object to remove.
+     * @return User The current object (for fluent API support)
+     */
+    public function removeFeedItem($feedItem)
+    {
+        if ($this->getFeedItems()->contains($feedItem)) {
+            $this->collFeedItems->remove($this->collFeedItems->search($feedItem));
+            if (null === $this->feedItemsScheduledForDeletion) {
+                $this->feedItemsScheduledForDeletion = clone $this->collFeedItems;
+                $this->feedItemsScheduledForDeletion->clear();
+            }
+            $this->feedItemsScheduledForDeletion[]= clone $feedItem;
+            $feedItem->setUser(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this User is new, it will return
+     * an empty collection; or if this User has previously
+     * been saved, it will retrieve related FeedItems from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in User.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|FeedItem[] List of FeedItem objects
+     */
+    public function getFeedItemsJoinFeedContent($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = FeedItemQuery::create(null, $criteria);
+        $query->joinWith('FeedContent', $join_behavior);
+
+        return $this->getFeedItems($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this User is new, it will return
+     * an empty collection; or if this User has previously
+     * been saved, it will retrieve related FeedItems from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in User.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|FeedItem[] List of FeedItem objects
+     */
+    public function getFeedItemsJoinAssignment($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = FeedItemQuery::create(null, $criteria);
+        $query->joinWith('Assignment', $join_behavior);
+
+        return $this->getFeedItems($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this User is new, it will return
+     * an empty collection; or if this User has previously
+     * been saved, it will retrieve related FeedItems from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in User.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|FeedItem[] List of FeedItem objects
+     */
+    public function getFeedItemsJoinCourse($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = FeedItemQuery::create(null, $criteria);
+        $query->joinWith('Course', $join_behavior);
+
+        return $this->getFeedItems($query, $con);
+    }
+
+    /**
+     * Clears out the collFeedComments collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return User The current object (for fluent API support)
+     * @see        addFeedComments()
+     */
+    public function clearFeedComments()
+    {
+        $this->collFeedComments = null; // important to set this to null since that means it is uninitialized
+        $this->collFeedCommentsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collFeedComments collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialFeedComments($v = true)
+    {
+        $this->collFeedCommentsPartial = $v;
+    }
+
+    /**
+     * Initializes the collFeedComments collection.
+     *
+     * By default this just sets the collFeedComments collection to an empty array (like clearcollFeedComments());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initFeedComments($overrideExisting = true)
+    {
+        if (null !== $this->collFeedComments && !$overrideExisting) {
+            return;
+        }
+        $this->collFeedComments = new PropelObjectCollection();
+        $this->collFeedComments->setModel('FeedComment');
+    }
+
+    /**
+     * Gets an array of FeedComment objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this User is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|FeedComment[] List of FeedComment objects
+     * @throws PropelException
+     */
+    public function getFeedComments($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collFeedCommentsPartial && !$this->isNew();
+        if (null === $this->collFeedComments || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collFeedComments) {
+                // return empty collection
+                $this->initFeedComments();
+            } else {
+                $collFeedComments = FeedCommentQuery::create(null, $criteria)
+                    ->filterByUser($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collFeedCommentsPartial && count($collFeedComments)) {
+                      $this->initFeedComments(false);
+
+                      foreach($collFeedComments as $obj) {
+                        if (false == $this->collFeedComments->contains($obj)) {
+                          $this->collFeedComments->append($obj);
+                        }
+                      }
+
+                      $this->collFeedCommentsPartial = true;
+                    }
+
+                    return $collFeedComments;
+                }
+
+                if($partial && $this->collFeedComments) {
+                    foreach($this->collFeedComments as $obj) {
+                        if($obj->isNew()) {
+                            $collFeedComments[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collFeedComments = $collFeedComments;
+                $this->collFeedCommentsPartial = false;
+            }
+        }
+
+        return $this->collFeedComments;
+    }
+
+    /**
+     * Sets a collection of FeedComment objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $feedComments A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return User The current object (for fluent API support)
+     */
+    public function setFeedComments(PropelCollection $feedComments, PropelPDO $con = null)
+    {
+        $feedCommentsToDelete = $this->getFeedComments(new Criteria(), $con)->diff($feedComments);
+
+        $this->feedCommentsScheduledForDeletion = unserialize(serialize($feedCommentsToDelete));
+
+        foreach ($feedCommentsToDelete as $feedCommentRemoved) {
+            $feedCommentRemoved->setUser(null);
+        }
+
+        $this->collFeedComments = null;
+        foreach ($feedComments as $feedComment) {
+            $this->addFeedComment($feedComment);
+        }
+
+        $this->collFeedComments = $feedComments;
+        $this->collFeedCommentsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related FeedComment objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related FeedComment objects.
+     * @throws PropelException
+     */
+    public function countFeedComments(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collFeedCommentsPartial && !$this->isNew();
+        if (null === $this->collFeedComments || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collFeedComments) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getFeedComments());
+            }
+            $query = FeedCommentQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByUser($this)
+                ->count($con);
+        }
+
+        return count($this->collFeedComments);
+    }
+
+    /**
+     * Method called to associate a FeedComment object to this object
+     * through the FeedComment foreign key attribute.
+     *
+     * @param    FeedComment $l FeedComment
+     * @return User The current object (for fluent API support)
+     */
+    public function addFeedComment(FeedComment $l)
+    {
+        if ($this->collFeedComments === null) {
+            $this->initFeedComments();
+            $this->collFeedCommentsPartial = true;
+        }
+        if (!in_array($l, $this->collFeedComments->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddFeedComment($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	FeedComment $feedComment The feedComment object to add.
+     */
+    protected function doAddFeedComment($feedComment)
+    {
+        $this->collFeedComments[]= $feedComment;
+        $feedComment->setUser($this);
+    }
+
+    /**
+     * @param	FeedComment $feedComment The feedComment object to remove.
+     * @return User The current object (for fluent API support)
+     */
+    public function removeFeedComment($feedComment)
+    {
+        if ($this->getFeedComments()->contains($feedComment)) {
+            $this->collFeedComments->remove($this->collFeedComments->search($feedComment));
+            if (null === $this->feedCommentsScheduledForDeletion) {
+                $this->feedCommentsScheduledForDeletion = clone $this->collFeedComments;
+                $this->feedCommentsScheduledForDeletion->clear();
+            }
+            $this->feedCommentsScheduledForDeletion[]= clone $feedComment;
+            $feedComment->setUser(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this User is new, it will return
+     * an empty collection; or if this User has previously
+     * been saved, it will retrieve related FeedComments from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in User.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|FeedComment[] List of FeedComment objects
+     */
+    public function getFeedCommentsJoinFeedItem($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = FeedCommentQuery::create(null, $criteria);
+        $query->joinWith('FeedItem', $join_behavior);
+
+        return $this->getFeedComments($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this User is new, it will return
+     * an empty collection; or if this User has previously
+     * been saved, it will retrieve related FeedComments from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in User.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|FeedComment[] List of FeedComment objects
+     */
+    public function getFeedCommentsJoinFeedContent($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = FeedCommentQuery::create(null, $criteria);
+        $query->joinWith('FeedContent', $join_behavior);
+
+        return $this->getFeedComments($query, $con);
     }
 
     /**
@@ -2263,6 +2928,16 @@ abstract class BaseUser extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collFeedItems) {
+                foreach ($this->collFeedItems as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collFeedComments) {
+                foreach ($this->collFeedComments as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collStudents) {
                 foreach ($this->collStudents as $o) {
                     $o->clearAllReferences($deep);
@@ -2275,6 +2950,14 @@ abstract class BaseUser extends BaseObject implements Persistent
             }
         } // if ($deep)
 
+        if ($this->collFeedItems instanceof PropelCollection) {
+            $this->collFeedItems->clearIterator();
+        }
+        $this->collFeedItems = null;
+        if ($this->collFeedComments instanceof PropelCollection) {
+            $this->collFeedComments->clearIterator();
+        }
+        $this->collFeedComments = null;
         if ($this->collStudents instanceof PropelCollection) {
             $this->collStudents->clearIterator();
         }

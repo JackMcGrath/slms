@@ -24,6 +24,7 @@ use Zerebral\BusinessBundle\Model\Course\CourseStudent;
 use Zerebral\BusinessBundle\Model\Course\CourseTeacher;
 use Zerebral\BusinessBundle\Model\Course\Discipline;
 use Zerebral\BusinessBundle\Model\Course\GradeLevel;
+use Zerebral\BusinessBundle\Model\Feed\FeedItem;
 use Zerebral\BusinessBundle\Model\Material\CourseFolder;
 use Zerebral\BusinessBundle\Model\Material\CourseMaterial;
 use Zerebral\BusinessBundle\Model\User\Student;
@@ -36,6 +37,8 @@ use Zerebral\BusinessBundle\Model\User\Teacher;
  * @method CourseQuery orderByName($order = Criteria::ASC) Order by the name column
  * @method CourseQuery orderByDescription($order = Criteria::ASC) Order by the description column
  * @method CourseQuery orderByAccessCode($order = Criteria::ASC) Order by the access_code column
+ * @method CourseQuery orderByStart($order = Criteria::ASC) Order by the start column
+ * @method CourseQuery orderByEnd($order = Criteria::ASC) Order by the end column
  * @method CourseQuery orderByCreatedBy($order = Criteria::ASC) Order by the created_by column
  * @method CourseQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method CourseQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
@@ -46,6 +49,8 @@ use Zerebral\BusinessBundle\Model\User\Teacher;
  * @method CourseQuery groupByName() Group by the name column
  * @method CourseQuery groupByDescription() Group by the description column
  * @method CourseQuery groupByAccessCode() Group by the access_code column
+ * @method CourseQuery groupByStart() Group by the start column
+ * @method CourseQuery groupByEnd() Group by the end column
  * @method CourseQuery groupByCreatedBy() Group by the created_by column
  * @method CourseQuery groupByCreatedAt() Group by the created_at column
  * @method CourseQuery groupByUpdatedAt() Group by the updated_at column
@@ -86,6 +91,10 @@ use Zerebral\BusinessBundle\Model\User\Teacher;
  * @method CourseQuery rightJoinCourseScheduleDay($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CourseScheduleDay relation
  * @method CourseQuery innerJoinCourseScheduleDay($relationAlias = null) Adds a INNER JOIN clause to the query using the CourseScheduleDay relation
  *
+ * @method CourseQuery leftJoinFeedItem($relationAlias = null) Adds a LEFT JOIN clause to the query using the FeedItem relation
+ * @method CourseQuery rightJoinFeedItem($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FeedItem relation
+ * @method CourseQuery innerJoinFeedItem($relationAlias = null) Adds a INNER JOIN clause to the query using the FeedItem relation
+ *
  * @method CourseQuery leftJoinCourseFolder($relationAlias = null) Adds a LEFT JOIN clause to the query using the CourseFolder relation
  * @method CourseQuery rightJoinCourseFolder($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CourseFolder relation
  * @method CourseQuery innerJoinCourseFolder($relationAlias = null) Adds a INNER JOIN clause to the query using the CourseFolder relation
@@ -102,6 +111,8 @@ use Zerebral\BusinessBundle\Model\User\Teacher;
  * @method Course findOneByName(string $name) Return the first Course filtered by the name column
  * @method Course findOneByDescription(string $description) Return the first Course filtered by the description column
  * @method Course findOneByAccessCode(string $access_code) Return the first Course filtered by the access_code column
+ * @method Course findOneByStart(string $start) Return the first Course filtered by the start column
+ * @method Course findOneByEnd(string $end) Return the first Course filtered by the end column
  * @method Course findOneByCreatedBy(int $created_by) Return the first Course filtered by the created_by column
  * @method Course findOneByCreatedAt(string $created_at) Return the first Course filtered by the created_at column
  * @method Course findOneByUpdatedAt(string $updated_at) Return the first Course filtered by the updated_at column
@@ -112,6 +123,8 @@ use Zerebral\BusinessBundle\Model\User\Teacher;
  * @method array findByName(string $name) Return Course objects filtered by the name column
  * @method array findByDescription(string $description) Return Course objects filtered by the description column
  * @method array findByAccessCode(string $access_code) Return Course objects filtered by the access_code column
+ * @method array findByStart(string $start) Return Course objects filtered by the start column
+ * @method array findByEnd(string $end) Return Course objects filtered by the end column
  * @method array findByCreatedBy(int $created_by) Return Course objects filtered by the created_by column
  * @method array findByCreatedAt(string $created_at) Return Course objects filtered by the created_at column
  * @method array findByUpdatedAt(string $updated_at) Return Course objects filtered by the updated_at column
@@ -217,7 +230,7 @@ abstract class BaseCourseQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `discipline_id`, `grade_level_id`, `name`, `description`, `access_code`, `created_by`, `created_at`, `updated_at` FROM `courses` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `discipline_id`, `grade_level_id`, `name`, `description`, `access_code`, `start`, `end`, `created_by`, `created_at`, `updated_at` FROM `courses` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -504,6 +517,92 @@ abstract class BaseCourseQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CoursePeer::ACCESS_CODE, $accessCode, $comparison);
+    }
+
+    /**
+     * Filter the query on the start column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByStart('2011-03-14'); // WHERE start = '2011-03-14'
+     * $query->filterByStart('now'); // WHERE start = '2011-03-14'
+     * $query->filterByStart(array('max' => 'yesterday')); // WHERE start > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $start The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return CourseQuery The current query, for fluid interface
+     */
+    public function filterByStart($start = null, $comparison = null)
+    {
+        if (is_array($start)) {
+            $useMinMax = false;
+            if (isset($start['min'])) {
+                $this->addUsingAlias(CoursePeer::START, $start['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($start['max'])) {
+                $this->addUsingAlias(CoursePeer::START, $start['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CoursePeer::START, $start, $comparison);
+    }
+
+    /**
+     * Filter the query on the end column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByEnd('2011-03-14'); // WHERE end = '2011-03-14'
+     * $query->filterByEnd('now'); // WHERE end = '2011-03-14'
+     * $query->filterByEnd(array('max' => 'yesterday')); // WHERE end > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $end The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return CourseQuery The current query, for fluid interface
+     */
+    public function filterByEnd($end = null, $comparison = null)
+    {
+        if (is_array($end)) {
+            $useMinMax = false;
+            if (isset($end['min'])) {
+                $this->addUsingAlias(CoursePeer::END, $end['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($end['max'])) {
+                $this->addUsingAlias(CoursePeer::END, $end['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CoursePeer::END, $end, $comparison);
     }
 
     /**
@@ -1231,6 +1330,80 @@ abstract class BaseCourseQuery extends ModelCriteria
         return $this
             ->joinCourseScheduleDay($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'CourseScheduleDay', '\Zerebral\BusinessBundle\Model\Course\CourseScheduleDayQuery');
+    }
+
+    /**
+     * Filter the query by a related FeedItem object
+     *
+     * @param   FeedItem|PropelObjectCollection $feedItem  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   CourseQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByFeedItem($feedItem, $comparison = null)
+    {
+        if ($feedItem instanceof FeedItem) {
+            return $this
+                ->addUsingAlias(CoursePeer::ID, $feedItem->getCourseId(), $comparison);
+        } elseif ($feedItem instanceof PropelObjectCollection) {
+            return $this
+                ->useFeedItemQuery()
+                ->filterByPrimaryKeys($feedItem->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByFeedItem() only accepts arguments of type FeedItem or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the FeedItem relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return CourseQuery The current query, for fluid interface
+     */
+    public function joinFeedItem($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('FeedItem');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'FeedItem');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the FeedItem relation FeedItem object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Zerebral\BusinessBundle\Model\Feed\FeedItemQuery A secondary query class using the current class as primary query
+     */
+    public function useFeedItemQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinFeedItem($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'FeedItem', '\Zerebral\BusinessBundle\Model\Feed\FeedItemQuery');
     }
 
     /**

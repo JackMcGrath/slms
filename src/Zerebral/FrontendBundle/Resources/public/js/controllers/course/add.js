@@ -6,6 +6,8 @@ $(document).ready(function(){
         defaultTime: 'value'
     });
 
+    $('.icon-new-calendar').datepicker();
+
     var collectionHolder = $('#schedule-fields-list');
     collectionHolder.find('.form-inline').each(function() {
         addScheduleDayDeleteLink($(this));

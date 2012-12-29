@@ -48,6 +48,8 @@ class CourseTableMap extends TableMap
         $this->addColumn('name', 'Name', 'VARCHAR', true, 100, null);
         $this->addColumn('description', 'Description', 'LONGVARCHAR', false, null, null);
         $this->addColumn('access_code', 'AccessCode', 'VARCHAR', false, 32, null);
+        $this->addColumn('start', 'Start', 'DATE', false, null, null);
+        $this->addColumn('end', 'End', 'DATE', false, null, null);
         $this->addForeignKey('created_by', 'CreatedBy', 'INTEGER', 'teachers', 'id', true, null, null);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', true, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
@@ -79,6 +81,7 @@ class CourseTableMap extends TableMap
         $this->addRelation('CourseStudent', 'Zerebral\\BusinessBundle\\Model\\Course\\CourseStudent', RelationMap::ONE_TO_MANY, array('id' => 'course_id', ), 'CASCADE', 'CASCADE', 'CourseStudents');
         $this->addRelation('CourseTeacher', 'Zerebral\\BusinessBundle\\Model\\Course\\CourseTeacher', RelationMap::ONE_TO_MANY, array('id' => 'course_id', ), 'CASCADE', 'CASCADE', 'CourseTeachers');
         $this->addRelation('CourseScheduleDay', 'Zerebral\\BusinessBundle\\Model\\Course\\CourseScheduleDay', RelationMap::ONE_TO_MANY, array('id' => 'course_id', ), 'CASCADE', 'CASCADE', 'CourseScheduleDays');
+        $this->addRelation('FeedItem', 'Zerebral\\BusinessBundle\\Model\\Feed\\FeedItem', RelationMap::ONE_TO_MANY, array('id' => 'course_id', ), null, null, 'FeedItems');
         $this->addRelation('CourseFolder', 'Zerebral\\BusinessBundle\\Model\\Material\\CourseFolder', RelationMap::ONE_TO_MANY, array('id' => 'course_id', ), 'CASCADE', 'CASCADE', 'CourseFolders');
         $this->addRelation('CourseMaterial', 'Zerebral\\BusinessBundle\\Model\\Material\\CourseMaterial', RelationMap::ONE_TO_MANY, array('id' => 'course_id', ), 'CASCADE', 'CASCADE', 'CourseMaterials');
         $this->addRelation('Student', 'Zerebral\\BusinessBundle\\Model\\User\\Student', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'CASCADE', 'Students');

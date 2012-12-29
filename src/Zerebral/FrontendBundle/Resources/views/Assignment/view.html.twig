@@ -1,6 +1,7 @@
 {% extends 'ZerebralFrontendBundle::layout.html.twig' %}
 {% import "ZerebralFrontendBundle:Macro:flashMessages.html.twig" as flashMessages %}
 {% import "ZerebralFrontendBundle:Macro:main.html.twig" as mainPartials %}
+{% import "ZerebralFrontendBundle:Macro:feed.html.twig" as feedPartials %}
 
 {% block content %}
     {% javascripts
@@ -57,6 +58,9 @@
                     </ul>
                 </div>
             </div>
+
+
+            {{ feedPartials.feed(feedCommentForm, path('ajax_feed_add_comment', {feedItemId: assignment.feedItem.id }), assignment.feedItem.feedComments, assignment.teacher.user.id) }}
         </div>
 
         <div class="right-navbar pull-left">
