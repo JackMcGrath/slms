@@ -84,8 +84,19 @@
                         {{ form_widget(feedCommentForm._token) }}
                     </form>
                 </div>
+                <div class="comments">
+                    {% for comment in assignment.feedItem.feedComments %}
+                        <div class="comment">
+                            <div class="avatar"><img class="rounded" src="{{ get_file_storage_link(comment.user.getAvatarFile()) | imagine_filter('thumbnail') }}" /> </div>
+                            <div class="content">
+                                <div class="author">{{ comment.user.fullName }} <span class="gray">{{ time_diff(comment.createdAt) }}</span></div>
+                                <div class="text {% if comment.user.id == assignment.feedItem.user.id %}by_author{% endif %}">{{ comment.feedContent.text }}</div>
+                                <div class="link"><a href="{{ comment.feedContent.linkUrl }}">{{ comment.feedContent.linkUrl }}</a></div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
-            <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
         </div>
 
         <div class="right-navbar pull-left">
