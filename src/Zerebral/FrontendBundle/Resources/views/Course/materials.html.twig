@@ -39,7 +39,7 @@
                                     {% if is_granted('ROLE_TEACHER') %}
                                         <span class="separator">/</span>
                                         <div class="manage-buttons">
-                                            <a href="#"><i class="icon-small-trash-bin"></i>Delete</a>
+                                            <a href="{{ path('delete_course_material', {id: material.id}) }}" class="delete-confirm" confirm="Do you really want to delete file?" ><i class="icon-small-trash-bin"></i>Delete</a>
                                         </div>
                                     {% endif %}
                                 </div>
@@ -96,7 +96,7 @@
     </div>
 
     <div class="modal hide fade" id="editFolderModal">
-        <form class="form-vertical folder-form" action="{{ path('ajax_edit_folder') }}" method="post" {{ form_enctype(folderRenameForm) }} novalidate>
+        <form class="form-vertical folder-form" data-action-edit="{{ path('ajax_edit_folder', {courseId: course.id, id: ''}) }}" data-action-add="{{ path('ajax_add_folder', {courseId: course.id}) }}" method="post" {{ form_enctype(folderRenameForm) }} novalidate>
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h3>Rename folder</h3>
@@ -124,7 +124,7 @@
         <form method="post" {{ form_enctype(courseMaterialForm) }} class="upload-material" action="{{ path('ajax_course_material_upload', {id: course.id}) }}">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h3>Upload material files</h3>
+                <h3>Upload syllabus files</h3>
             </div>
             <div class="modal-body">
                 <div class="form-inline upload-folder">
