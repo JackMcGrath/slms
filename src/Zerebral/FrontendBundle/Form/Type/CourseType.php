@@ -46,7 +46,7 @@ class CourseType extends AbstractType
                 'invalid_message' => 'Course subject is required',
 
                 'create_new_label' => 'Create new subject area',
-                'choose_exists_label' => 'Choose exists subject area',
+                'choose_exists_label' => 'Choose existing subject area',
                 'placeholder' => 'Subject area title',
             )
         );
