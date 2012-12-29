@@ -1,19 +1,40 @@
 .feed {
     .form {
+        padding-bottom: 20px;
         #comment_input {
             resize: none;
             position: relative;
-//            width: 579px;
-            width: 621px;
-//            height: 18px;
-            height: 81px;
-            margin: 20px 20px 10px 20px;
-//            padding-right: 96px;
-            padding-left: 6px;
-            padding-right: 6px;
-//            background-image: url('/img/feed_comment_input_background.png');
-//            background-repeat: no-repeat;
-//            background-position: right;
+            width: 571px;
+            height: 18px;
+            padding-right: 96px;
+            margin-bottom: 0px;
+            background-image: url('/img/feed_comment_input_background.png');
+            background-repeat: no-repeat;
+            background-position: right;
+        }
+        .controls {
+            padding-left: 20px;
+            padding-right: 20px;
+            display: none;
+            .attach-links {
+                height: 30px;
+                display: inline-block;
+                float: right;
+                a.attach-links {
+                    margin-top: 4px;
+                    display: inline-block;
+                }
+            }
+            .attached-link {
+                display: none;
+                .attached-link-delete {
+                    float: right;
+                    padding-top: 10px;
+                }
+                #attached-link-field {
+                    width: 540px;
+                }
+            }
         }
     }
 }
