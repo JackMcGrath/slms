@@ -77,6 +77,7 @@ class CourseMaterialsType extends AbstractType
         $resolver->setDefaults(
             array(
                 'cascade_validation' => true,
+                'csrf_protection' => false,
             )
         );
     }
