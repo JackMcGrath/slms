@@ -37,6 +37,12 @@ Zerebral\BusinessBundle\Model\User\User:
                 choices: [teacher, student]
 
 Zerebral\BusinessBundle\Model\Course\Course:
+    constraints:
+        - Zerebral\CommonBundle\Validator\Constraints\DateComparator:
+            targetField: end
+            sourceField: start
+            comparator: greater
+            message: Course end date should be greater course start date
     getters:
         name:
             - NotBlank:
