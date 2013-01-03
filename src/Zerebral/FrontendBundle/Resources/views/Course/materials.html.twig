@@ -23,9 +23,9 @@
             <div class="span9 items-list{% if is_granted('ROLE_TEACHER') %} teacher-role{% endif %}">
                 {% for groupTitle,materials in dayMaterials %}
                     {% if materialGrouping == 'date' %}
-                        <div class="date">{{ groupTitle | date('l, d F Y') }}</div>
+                        <div class="small-title">{{ groupTitle | date('l, d F Y') }}</div>
                     {% elseif materialGrouping == 'folder' %}
-                        <div class="date">{{ groupTitle }}</div>
+                        <div class="small-title">{{ groupTitle }}</div>
                     {% endif %}
 
                     {% for material in materials %}
@@ -82,7 +82,7 @@
                     {% for courseFolder in course.courseFolders %}
                         <li {{ folder and courseFolder.id == folder.id ? 'class="active"' : '' }} folderId="{{ courseFolder.id }}" courseId="{{ course.id }}" folderName="{{ courseFolder.name }}">
                             <i class="marker">&#9656;</i>
-                            <a href="{{ path('course_materials_folder', {id: course.id, folderId: courseFolder.id}) }}">{{ courseFolder.name }}</a>
+                            <a href="{{ path('course_materials_folder', {id: course.id, folderId: courseFolder.id}) }}" class="folder-name">{{ courseFolder.name }}</a>
                             {% if is_granted('ROLE_TEACHER') %}
                                 <div class="manage">
                                     <i class="manage-buttons-gears icon-small-gears"></i>
