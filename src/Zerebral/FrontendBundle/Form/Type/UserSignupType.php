@@ -16,9 +16,9 @@ class UserSignupType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('firstName', 'text', array('required' => false));
-        $builder->add('lastName', 'text', array('required' => false));
-        $builder->add('email', 'email', array('required' => false));
+        $builder->add('firstName', 'text', array('required' => false, 'max_length' => 100));
+        $builder->add('lastName', 'text', array('required' => false, 'max_length' => 100));
+        $builder->add('email', 'email', array('required' => false, 'max_length' => 100));
         $builder->add('plainPassword', 'password', array('required' => false));
         $builder->add('passwordConfirmation', 'password', array('required' => false));
         $builder->add('role', 'choice', array(
