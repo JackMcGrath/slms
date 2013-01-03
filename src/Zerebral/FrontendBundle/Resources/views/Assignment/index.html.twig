@@ -60,7 +60,7 @@
 {% endblock %}
 
 {% block assignment %}
-    <div class="list-item span12">
+    <div class="list-item span12{{ loop.last ? ' last' : '' }}">
         <div class="symbol pull-left">
             {% if is_granted('ROLE_STUDENT') %}
                 <img class="rounded" src="{{ get_file_storage_link(assignment.teacher.user.getAvatarFile()) | imagine_filter('thumbnail') }}"/>
@@ -85,8 +85,8 @@
                 {% else %}
                     <div class="due-at"><i class="icon-small-clock"></i> Due <small>{{ assignment.dueAt | date('Hi') == '0000' ? assignment.dueAt | date('D, M d') : assignment.dueAt | date('D, M d h:i a') }}</small></div>
                     <div><span class="badge">{{ assignment.students.count }}</span><a href="">Assignments</a></div>
-                    <div><span class="badge">-</span><a href="">Completed</a></div>
-                    <div><span class="badge badge-inverse">-</span><a href="">Remaining</a></div>
+                    <div><span class="badge">{{ assignment.hasVirtualColumn('completedCount') ? assignment.getVirtualColumn('completedCount') : '-' }}</span><a href="">Completed</a></div>
+                    <div><span class="badge badge-inverse">{{ assignment.hasVirtualColumn('remainingCount') ? assignment.getVirtualColumn('remainingCount') : '-' }}</span><a href="">Remaining</a></div>
                 {% endif %}
             </div>
         </div>

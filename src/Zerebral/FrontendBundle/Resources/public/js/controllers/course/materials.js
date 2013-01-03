@@ -11,6 +11,7 @@ Controller.prototype = {
         this.options = options || {};
         this.foldersWidget = new FoldersWidget(this, $('.right-navbar .block.folders'));
         this.upload = new UploadForm(this, $('#uploadMaterialModal'));
+        this.sorting = new Sorting(this, $('.right-navbar .sorting'));
     }
 };
 
@@ -50,6 +51,8 @@ FoldersWidget.prototype = {
     onOpenForm: function($target) {
 
         var form = $('#editFolderModal form');
+        form.find('.control-group').removeClass('error');
+        form.find('.control-group .help-inline').remove();
         // if rename folder
         if ($target.length) {
             form.attr('action', form.data('action-edit') + '/' + $target.attr('folderId'));
@@ -127,5 +130,22 @@ UploadForm.prototype = {
         if (this.fileFieldIndex > 1) {
             this.target.find('.uploadedFiles li').prepend('<a class="close remove" href="#">&times;</a>');
         }
+    }
+};
+
+var Sorting = function (container, target) {
+    this.container = container;
+    this.target = target;
+    this.bind();
+};
+
+Sorting.prototype = {
+    bind:function () {
+        var self = this;
+        this.target.find('li input[type="radio"]').bind('change', $.proxy(this.onChangeSorting, this));
+    },
+
+    onChangeSorting: function(e) {
+        this.target.find('form').submit();
     }
 };

@@ -167,39 +167,59 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     }
 
     /**
-     * @Route("/syllabus/{id}", name="course_materials")
+     * @Route("/syllabus/{courseId}", name="course_materials")
      * @Route("/syllabus/{id}/{folderId}", name="course_materials_folder")
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
-     * @ParamConverter("course", options={"mapping": {"id": "id"}})
+     * @ParamConverter("course", options={"mapping": {"courseId": "id"}})
      * @ParamConverter("folder", options={"mapping": {"folderId": "id"}})
      * @Template()
      */
     public function materialsAction(Model\Course\Course $course, Model\Material\CourseFolder $folder = null)
     {
-        $folderType = new FormType\FolderType();
+        $session = $this->getRequest()->getSession();
+
+        $folderType = new FormType\CourseFolderType();
         $folderForm = $this->createForm($folderType);
 
         $courseMaterialType = new FormType\CourseMaterialsType();
         $courseMaterialType->setCourse($course);
         $courseMaterialForm = $this->createForm($courseMaterialType);
 
-
         $dayMaterials = array();
         $c = new \Criteria();
         if ($folder) {
             $c->add('folder_id', $folder->getId(), \Criteria::EQUAL);
         }
+        $c->addJoin(\Zerebral\BusinessBundle\Model\Material\CourseMaterialPeer::FILE_ID, \Zerebral\BusinessBundle\Model\File\FilePeer::ID, \Criteria::LEFT_JOIN);
+        $c->addAscendingOrderByColumn('LOWER(files.name)');
+
+        $materialGrouping = $this->getRequest()->get('MaterialGrouping') ?: ($session->has('MaterialGrouping') ? $session->get('MaterialGrouping') : 'date');
+        $session->set('MaterialGrouping', $materialGrouping);
 
         foreach ($course->getCourseMaterials($c) as $material) {
-            $dayMaterials[strtotime($material->getCreatedAt('Y-m-d'))][] = $material;
+            if ($materialGrouping == 'date') {
+                $dayMaterials[strtotime($material->getCreatedAt('Y-m-d'))][] = $material;
+            } else if ($materialGrouping == 'folder') {
+                $folderName = $material->getCourseFolder() ? $material->getCourseFolder()->getName() : 'No folder';
+                $dayMaterials[$folderName][] = $material;
+            } else {
+                $dayMaterials[][] = $material;
+            }
         }
 
         ksort($dayMaterials);
+        //Move array without folder to end of array
+        if ($materialGrouping == 'folder' && array_key_exists('No folder', $dayMaterials)) {
+            $noFolder = $dayMaterials['No folder'];
+            unset($dayMaterials['No folder']);
+            $dayMaterials['No folder'] = $noFolder;
+        }
 
         return array(
             'dayMaterials' => $dayMaterials,
             'folderRenameForm' => $folderForm->createView(),
             'courseMaterialForm' => $courseMaterialForm->createView(),
+            'materialGrouping' => $materialGrouping,
             'folder' => $folder,
             'course' => $course,
             'target' => 'courses'

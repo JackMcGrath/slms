@@ -49,7 +49,7 @@ class MaterialController extends \Zerebral\CommonBundle\Component\Controller
             $folder->setCourse($course);
         }
 
-        $form = $this->createForm(new FormType\FolderType(), $folder);
+        $form = $this->createForm(new FormType\CourseFolderType(), $folder);
 
         if (!$this->getRequest()->isXmlHttpRequest()) {
             throw $this->createNotFoundException();
@@ -74,7 +74,8 @@ class MaterialController extends \Zerebral\CommonBundle\Component\Controller
      * @PreAuthorize("hasRole('ROLE_TEACHER')")
      * @Template()
      */
-    public function uploadMaterialAction(Model\Course\Course $course) {
+    public function uploadMaterialAction(Model\Course\Course $course)
+    {
         $courseMaterialsType = new FormType\CourseMaterialsType();
         $courseMaterialsType->setFileStorage($this->container->get('zerebral.file_storage')->getFileStorage('local'));
         $courseMaterialsType->setCourse($course);

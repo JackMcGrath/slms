@@ -61,7 +61,8 @@ class CourseMaterialsType extends AbstractType
             'required' => false,
             'empty_value' => "No folder",
             'create_new_label' => 'Create new folder',
-            'choose_exists_label' => 'Choose existing folder'
+            'choose_exists_label' => 'Choose existing folder',
+            'cascade_validation' => true,
         ));
 
     }
@@ -76,6 +77,7 @@ class CourseMaterialsType extends AbstractType
         $resolver->setDefaults(
             array(
                 'cascade_validation' => true,
+                'csrf_protection' => false,
             )
         );
     }

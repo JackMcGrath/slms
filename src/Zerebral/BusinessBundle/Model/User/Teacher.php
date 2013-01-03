@@ -31,19 +31,21 @@ class Teacher extends BaseTeacher
      */
     public function getCourseAssignmentsDueDate(\Zerebral\BusinessBundle\Model\Course\Course $course, $ongoing = null)
     {
-        $c = new \Criteria();
-        $c->addDescendingOrderByColumn('due_at');
-        if ($ongoing === false) {
-            $c->addCond('dueAt', 'due_at', null, \Criteria::ISNOTNULL);
-        } else if ($ongoing === true) {
-            $c->addCond('dueAt', 'due_at', null, \Criteria::ISNULL);
-        }
-        $c->addJoin(\Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer::ID, \Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentPeer::ASSIGNMENT_ID, \Criteria::LEFT_JOIN);
-        $c->addCond('students', 'student_assignments.id', null, \Criteria::ISNOTNULL);
-        $c->combine(array('students', 'dueAt'), \Criteria::LOGICAL_AND);
-        $c->addGroupByColumn('assignments.id');
-
-        return $course->getAssignments($c);
+        $assignments = \Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery::create()->getCourseAssignmentsDueDate($course, $ongoing);
+        return $assignments->find();
+//        $c = new \Criteria();
+//        $c->addDescendingOrderByColumn('due_at');
+//        if ($ongoing === false) {
+//            $c->addCond('dueAt', 'due_at', null, \Criteria::ISNOTNULL);
+//        } else if ($ongoing === true) {
+//            $c->addCond('dueAt', 'due_at', null, \Criteria::ISNULL);
+//        }
+//        $c->addJoin(\Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer::ID, \Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentPeer::ASSIGNMENT_ID, \Criteria::LEFT_JOIN);
+//        $c->addCond('students', 'student_assignments.id', null, \Criteria::ISNOTNULL);
+//        $c->combine(array('students', 'dueAt'), \Criteria::LOGICAL_AND);
+//        $c->addGroupByColumn('assignments.id');
+//
+//        return $course->getAssignments($c);
     }
 
     public function getCourseAssignmentsDraft(\Zerebral\BusinessBundle\Model\Course\Course $course)
@@ -58,19 +60,8 @@ class Teacher extends BaseTeacher
 
     public function getAssignmentsDueDate($ongoing = null)
     {
-        $c = new \Criteria();
-        $c->addDescendingOrderByColumn('due_at');
-        if ($ongoing === false) {
-            $c->addCond('dueAt', 'due_at', null, \Criteria::ISNOTNULL);
-        } else if ($ongoing === true) {
-            $c->addCond('dueAt', 'due_at', null, \Criteria::ISNULL);
-        }
-        $c->addJoin(\Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer::ID, \Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentPeer::ASSIGNMENT_ID, \Criteria::LEFT_JOIN);
-        $c->addCond('students', 'student_assignments.id', null, \Criteria::ISNOTNULL);
-        $c->combine(array('students', 'dueAt'), \Criteria::LOGICAL_AND);
-        $c->addGroupByColumn('assignments.id');
-
-        return $this->getAssignments($c);
+        $assignments = \Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery::create()->getCourseAssignmentsDueDate(null, $ongoing);
+        return $assignments->find();
     }
 
     public function getAssignmentsDraft()
@@ -78,6 +69,7 @@ class Teacher extends BaseTeacher
         $c = new \Criteria();
         $c->addJoin(\Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer::ID, \Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentPeer::ASSIGNMENT_ID, \Criteria::LEFT_JOIN);
         $c->add('student_assignments.id', null, \Criteria::ISNULL);
+        $c->addDescendingOrderByColumn('due_at');
 
         return $this->getAssignments($c);
     }
