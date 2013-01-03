@@ -58,9 +58,10 @@ class File extends BaseFile
      */
     public function setUploadedFile(UploadedFile $uploadedFile) {
         $this->uploadedFile = $uploadedFile;
+        $this->setName($uploadedFile->getClientOriginalName());
+
         if ($uploadedFile->getError() == UPLOAD_ERR_OK) {
             $this->setSourcePath($uploadedFile->getRealPath());
-            $this->setName($uploadedFile->getClientOriginalName());
         }
     }
 

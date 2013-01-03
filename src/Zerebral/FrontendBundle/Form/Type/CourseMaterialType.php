@@ -19,7 +19,7 @@ class CourseMaterialType extends AbstractType
 
         $builder->add('folderId', 'hidden');
         $builder->add('courseId', 'hidden');
-        $builder->add('description', 'text');
+        $builder->add('description', 'text', array('max_length' => 255));
     }
 
     public function getName()

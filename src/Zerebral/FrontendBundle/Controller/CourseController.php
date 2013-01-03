@@ -186,41 +186,16 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
         $courseMaterialType->setCourse($course);
         $courseMaterialForm = $this->createForm($courseMaterialType);
 
-        $dayMaterials = array();
-        $c = new \Criteria();
-        if ($folder) {
-            $c->add('folder_id', $folder->getId(), \Criteria::EQUAL);
-        }
-        $c->addJoin(\Zerebral\BusinessBundle\Model\Material\CourseMaterialPeer::FILE_ID, \Zerebral\BusinessBundle\Model\File\FilePeer::ID, \Criteria::LEFT_JOIN);
-        $c->addAscendingOrderByColumn('LOWER(files.name)');
+        $materialGroupingType = $this->getRequest()->get('MaterialGrouping') ?: ($session->has('MaterialGrouping') ? $session->get('MaterialGrouping') : 'date');
+        $session->set('MaterialGrouping', $materialGroupingType);
 
-        $materialGrouping = $this->getRequest()->get('MaterialGrouping') ?: ($session->has('MaterialGrouping') ? $session->get('MaterialGrouping') : 'date');
-        $session->set('MaterialGrouping', $materialGrouping);
-
-        foreach ($course->getCourseMaterials($c) as $material) {
-            if ($materialGrouping == 'date') {
-                $dayMaterials[strtotime($material->getCreatedAt('Y-m-d'))][] = $material;
-            } else if ($materialGrouping == 'folder') {
-                $folderName = $material->getCourseFolder() ? $material->getCourseFolder()->getName() : 'No folder';
-                $dayMaterials[$folderName][] = $material;
-            } else {
-                $dayMaterials[][] = $material;
-            }
-        }
-
-        ksort($dayMaterials);
-        //Move array without folder to end of array
-        if ($materialGrouping == 'folder' && array_key_exists('No folder', $dayMaterials)) {
-            $noFolder = $dayMaterials['No folder'];
-            unset($dayMaterials['No folder']);
-            $dayMaterials['No folder'] = $noFolder;
-        }
+        $materials = \Zerebral\BusinessBundle\Model\Material\CourseMaterialPeer::getGrouped($course, $materialGroupingType, $folder);
 
         return array(
-            'dayMaterials' => $dayMaterials,
+            'dayMaterials' => $materials,
             'folderRenameForm' => $folderForm->createView(),
             'courseMaterialForm' => $courseMaterialForm->createView(),
-            'materialGrouping' => $materialGrouping,
+            'materialGrouping' => $materialGroupingType,
             'folder' => $folder,
             'course' => $course,
             'target' => 'courses'

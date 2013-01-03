@@ -26,7 +26,7 @@ class CourseType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('name', 'text', array('required' => false));
+        $builder->add('name', 'text', array('required' => false, 'max_length' => 100));
         $builder->add('description', 'textarea', array('required' => false));
 
         $teacher = $this->teacher;
