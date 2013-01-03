@@ -185,6 +185,12 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
         }
 
         ksort($dayMaterials);
+        //Move array without folder to end of array
+        if ($materialGrouping == 'folder' && array_key_exists('No folder', $dayMaterials)) {
+            $noFolder = $dayMaterials['No folder'];
+            unset($dayMaterials['No folder']);
+            $dayMaterials['No folder'] = $noFolder;
+        }
 
         return array(
             'dayMaterials' => $dayMaterials,
