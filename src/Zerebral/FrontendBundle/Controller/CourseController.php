@@ -66,6 +66,29 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     }
 
     /**
+     * @Route("/feed/{id}", name="course_feed")
+     * @ParamConverter("course")
+     * @SecureParam(name="course", permissions="VIEW")
+     *
+     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @Template()
+     */
+    public function feedAction(Model\Course\Course $course)
+    {
+        $feedItemFormType = new FormType\FeedItemType();
+        $feedItemForm = $this->createForm($feedItemFormType, null);
+
+        $upcomingAssignments = $this->getRoleUser()->getUpcomingAssignments($course);
+
+        return array(
+            'course' => $course,
+            'upcomingAssignments' => $upcomingAssignments,
+            'feedItemForm' => $feedItemForm->createView(),
+            'target' => 'feed',
+        );
+    }
+
+    /**
      * @Route("/add", name="course_add")
      * @Route("/edit/{id}", name="course_edit")
      * @ParamConverter("course")

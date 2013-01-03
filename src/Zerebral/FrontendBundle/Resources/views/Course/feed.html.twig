@@ -1,0 +1,76 @@
+{% extends 'ZerebralFrontendBundle::layout.html.twig' %}
+{% import "ZerebralFrontendBundle:Macro:main.html.twig" as mainPartials %}
+
+{% block content %}
+    {% javascripts
+    '@ZerebralFrontendBundle/Resources/public/js/controllers/course/view.js'
+    output='js/compiled/course_view.js' %}
+    <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+    <div class="top-second-navbar">
+        {{ mainPartials.topMenu('feed', course) }}
+    </div>
+
+    <div class="row-fluid courses-list course-details">
+        <div class="span6 main-list-block">
+            <div class="row-fluid manage">
+                <h2 class="pull-left form-title">
+                    {{ course.name }} <small>recent updates</small>
+                </h2>
+                {% if is_granted('ROLE_TEACHER') %}
+                    <i class="manage-buttons-gears icon-small-gears pull-right"></i>
+                    <div class="manage-buttons invisible pull-right">
+                        {% if is_granted('EDIT', course) %}<a href="{{ path('course_edit', {id: course.id}) }}"><i class="icon-small-pencil"></i>Edit</a>{% endif %}
+                        {% if is_granted('DELETE', course) %}<a href="{{ path('course_delete', {id: course.id}) }}" class="delete-confirm"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
+                    </div>
+                {% endif %}
+            </div>
+            <hr/>
+
+            <div class="timetable">
+                {% if course.start %}
+                    <div class="duration span4"><i class="icon-small-calendar"></i> <b>Start:</b> {{ course.start | date('d/m') }} &nbsp;&nbsp; <b>End:</b> {{ course.end | date('d/m') }}</div>
+                {% endif %}
+                <div class="time span8">
+                    {% if course.getCourseScheduleDays|length %}
+                        <i class="icon-small-clipboard pull-left"></i>
+                    {% endif %}
+                    <ul>
+                        {% for schedule in course.getCourseScheduleDays %}
+                            <li><b>{{ schedule.getWeekDay|slice(0, 3) }}:</b> {{ schedule.getTimeFrom|date('h:i a') }} - {{ schedule.getTimeTo|date('h:i a') }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="description">
+                {% autoescape false %}
+                {{ course.description }}
+                {% endautoescape %}
+            </div>
+        </div>
+        <div class="right-navbar pull-left">
+            {% if is_granted('ADD_ASSIGNMENT', course) %}
+                <a href="{{ path('assignment_add', {courseId: course.id}) }}" class="btn create-course big-button top-buttons">create assignment</a>
+            {% endif %}
+
+            <div class="block upcoming-assignments">
+                {{ mainPartials.upcomingAssignments(upcomingAssignments) }}
+            </div>
+
+            <div class="block recent-materials">
+                <h4>Recent materials</h4>
+                <ul>
+                    <li><i class="icon-file"></i> <a href="">Homework_1.doc</a></li>
+                    <li><i class="icon-file"></i> <a href="">Homework_2.doc</a></li>
+                    <li><i class="icon-file"></i> <a href="">Homework_3.doc</a></li>
+                    <li><i class="icon-file"></i> <a href="">Homework_4.doc</a></li>
+                </ul>
+            </div>
+
+            <div class="block teacher-profile">
+                {{ mainPartials.teacherShortInfo(course.teacher) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
