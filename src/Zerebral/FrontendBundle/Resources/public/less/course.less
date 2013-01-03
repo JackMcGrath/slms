@@ -145,9 +145,6 @@
 }
 
 .edit-course {
-    .course-name {
-        font-size: 16px;
-    }
     .alert {
         margin-bottom: @baseLineHeight + 25;
     }
@@ -376,6 +373,8 @@
             .details {
                 display: inline-block;
                 margin-left: 20px;
+                width: @listWidth - 75;
+                overflow: hidden;
                 .title {
                     h3 {
                         font-size: 16px;
@@ -426,6 +425,13 @@
     }
     .right-navbar {
         .folders {
+            li {
+                a.folder-name {
+                    width: 170px;
+                    overflow: hidden;
+                    display: inline-block;
+                }
+            }
             .manage {
                 float: right;
                 .manage-buttons-gears {

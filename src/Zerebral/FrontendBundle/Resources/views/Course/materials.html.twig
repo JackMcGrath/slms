@@ -21,10 +21,14 @@
             <hr/>
 
             <div class="span9 items-list{% if is_granted('ROLE_TEACHER') %} teacher-role{% endif %}">
-                {% for date,day in dayMaterials %}
-                    <div class="date">{{ date | date('l, d F Y') }}</div>
+                {% for groupTitle,materials in dayMaterials %}
+                    {% if materialGrouping == 'date' %}
+                        <div class="small-title">{{ groupTitle | date('l, d F Y') }}</div>
+                    {% elseif materialGrouping == 'folder' %}
+                        <div class="small-title">{{ groupTitle }}</div>
+                    {% endif %}
 
-                    {% for material in day %}
+                    {% for material in materials %}
                         <div class="material-item{{ loop.last ? ' last' : '' }}">
                             <div class="type">
                                 <img src="/img/{{ get_file_icon(material.file).name }}" width="30"/>
@@ -59,13 +63,15 @@
                 </div>
             {% endif %}
 
-            <div class="block">
+            <div class="block sorting">
                 <h4>sort by</h4>
-                <ul class="radio">
-                    <li><label><input type="radio" name="MaterialFilter"/> Date and time</label></li>
-                    <li><label><input type="radio" name="MaterialFilter"/> A-Z</label></li>
-                    <li><label><input type="radio" name="MaterialFilter"/> Folder</label></li>
-                </ul>
+                <form method="post" action="">
+                    <ul class="radio">
+                        <li><label><input type="radio" name="MaterialGrouping" value="date" {{ materialGrouping == 'date' ? 'checked' : '' }}/> Date and time</label></li>
+                        <li><label><input type="radio" name="MaterialGrouping" value="alphabetically" {{ materialGrouping == 'alphabetically' ? 'checked' : '' }}/> A-Z</label></li>
+                        <li><label><input type="radio" name="MaterialGrouping" value="folder" {{ materialGrouping == 'folder' ? 'checked' : '' }}/> Folder</label></li>
+                    </ul>
+                </form>
             </div>
 
             <div class="block folders">
@@ -76,7 +82,7 @@
                     {% for courseFolder in course.courseFolders %}
                         <li {{ folder and courseFolder.id == folder.id ? 'class="active"' : '' }} folderId="{{ courseFolder.id }}" courseId="{{ course.id }}" folderName="{{ courseFolder.name }}">
                             <i class="marker">&#9656;</i>
-                            <a href="{{ path('course_materials_folder', {id: course.id, folderId: courseFolder.id}) }}">{{ courseFolder.name }}</a>
+                            <a href="{{ path('course_materials_folder', {id: course.id, folderId: courseFolder.id}) }}" class="folder-name">{{ courseFolder.name }}</a>
                             {% if is_granted('ROLE_TEACHER') %}
                                 <div class="manage">
                                     <i class="manage-buttons-gears icon-small-gears"></i>

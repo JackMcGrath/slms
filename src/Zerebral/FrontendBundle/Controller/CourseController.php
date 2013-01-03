@@ -153,6 +153,8 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function materialsAction(Model\Course\Course $course, Model\Material\CourseFolder $folder = null)
     {
+        $session = $this->getRequest()->getSession();
+
         $folderType = new FormType\CourseFolderType();
         $folderForm = $this->createForm($folderType);
 
@@ -160,23 +162,16 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
         $courseMaterialType->setCourse($course);
         $courseMaterialForm = $this->createForm($courseMaterialType);
 
+        $materialGroupingType = $this->getRequest()->get('MaterialGrouping') ?: ($session->has('MaterialGrouping') ? $session->get('MaterialGrouping') : 'date');
+        $session->set('MaterialGrouping', $materialGroupingType);
 
-        $dayMaterials = array();
-        $c = new \Criteria();
-        if ($folder) {
-            $c->add('folder_id', $folder->getId(), \Criteria::EQUAL);
-        }
-
-        foreach ($course->getCourseMaterials($c) as $material) {
-            $dayMaterials[strtotime($material->getCreatedAt('Y-m-d'))][] = $material;
-        }
-
-        ksort($dayMaterials);
+        $materials = \Zerebral\BusinessBundle\Model\Material\CourseMaterialPeer::getGrouped($course, $materialGroupingType, $folder);
 
         return array(
-            'dayMaterials' => $dayMaterials,
+            'dayMaterials' => $materials,
             'folderRenameForm' => $folderForm->createView(),
             'courseMaterialForm' => $courseMaterialForm->createView(),
+            'materialGrouping' => $materialGroupingType,
             'folder' => $folder,
             'course' => $course,
             'target' => 'courses'

@@ -34,4 +34,5 @@ class Assignment extends BaseAssignment
         return $this->getFeedItems()->getFirst();
     }
 
+
 }
