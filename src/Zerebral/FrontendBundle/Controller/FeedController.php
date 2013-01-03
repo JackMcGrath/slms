@@ -15,9 +15,8 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 
 use Zerebral\FrontendBundle\Form\Type as FormType;
 
-use Zerebral\BusinessBundle\Model\Feed\FeedComment;
 use Zerebral\BusinessBundle\Model\Feed\FeedItem;
-use Zerebral\BusinessBundle\Model\Feed\FeedContent;
+use Zerebral\BusinessBundle\Model\Course\Course;
 
 /**
  * @Route("/feed")
@@ -54,5 +53,41 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
         }
 
         return new FormJsonResponse($feedCommentForm);
+    }
+
+    /**
+     * @Route         ("/add-feed-item/{courseId}", name="ajax_course_add_feed_item")
+     *
+     * @param         \Zerebral\BusinessBundle\Model\Course\Course
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Zerebral\CommonBundle\HttpFoundation\FormJsonResponse
+     * @ParamConverter("course", options={"mapping": {"courseId": "id"}})
+     */
+    public function addFeedItemAction(\Zerebral\BusinessBundle\Model\Course\Course $course)
+    {
+        $feedItemFormType = new FormType\FeedItemType();
+        $feedItemForm = $this->createForm($feedItemFormType, null);
+
+
+        $feedItemForm->bind($this->getRequest());
+
+        if ($feedItemForm->isValid()) {
+
+            $feedItem = $feedItemForm->getData();
+            $feedItem->setCreatedBy($this->getUser()->getId());
+            $course->addFeedItem($feedItem);
+            $course->save();
+
+            return new JsonResponse(array(
+                'redirect' => $this->generateUrl(
+                    'course_feed',
+                    array(
+                        'id' => $course->getId()
+                    )
+                )
+            ));
+        }
+
+        return new FormJsonResponse($feedItemForm);
     }
 }

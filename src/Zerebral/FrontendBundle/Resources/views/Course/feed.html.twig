@@ -1,10 +1,11 @@
 {% extends 'ZerebralFrontendBundle::layout.html.twig' %}
 {% import "ZerebralFrontendBundle:Macro:main.html.twig" as mainPartials %}
+{% import "ZerebralFrontendBundle:Macro:feed.html.twig" as feedPartials %}
 
 {% block content %}
     {% javascripts
-    '@ZerebralFrontendBundle/Resources/public/js/controllers/course/view.js'
-    output='js/compiled/course_view.js' %}
+    '@ZerebralFrontendBundle/Resources/public/js/controllers/course/feed.js'
+    output='js/compiled/course_feed.js' %}
     <script type="text/javascript" src="{{ asset_url }}"></script>
     {% endjavascripts %}
     <div class="top-second-navbar">
@@ -27,27 +28,20 @@
             </div>
             <hr/>
 
-            <div class="timetable">
-                {% if course.start %}
-                    <div class="duration span4"><i class="icon-small-calendar"></i> <b>Start:</b> {{ course.start | date('d/m') }} &nbsp;&nbsp; <b>End:</b> {{ course.end | date('d/m') }}</div>
-                {% endif %}
-                <div class="time span8">
-                    {% if course.getCourseScheduleDays|length %}
-                        <i class="icon-small-clipboard pull-left"></i>
-                    {% endif %}
-                    <ul>
-                        {% for schedule in course.getCourseScheduleDays %}
-                            <li><b>{{ schedule.getWeekDay|slice(0, 3) }}:</b> {{ schedule.getTimeFrom|date('h:i a') }} - {{ schedule.getTimeTo|date('h:i a') }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
+            <br />
 
             <div class="description">
                 {% autoescape false %}
                 {{ course.description }}
                 {% endautoescape %}
             </div>
+
+            <br />
+            <div class="feed">
+                {{ feedPartials.course_details_feed(feedItemForm, path('ajax_course_add_feed_item', {courseId: course.id }), feedItems) }}
+            </div>
+
+
         </div>
         <div class="right-navbar pull-left">
             {% if is_granted('ADD_ASSIGNMENT', course) %}
