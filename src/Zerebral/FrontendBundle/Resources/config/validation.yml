@@ -9,10 +9,12 @@ Zerebral\BusinessBundle\Model\User\User:
             - NotBlank:
                 groups: [signup]
                 message: Enter your first name.
+            - MaxLength: 100
         lastName:
             - NotBlank:
                 groups: [signup]
                 message: Enter your last name.
+            - MaxLength: 100
         email:
             - NotBlank:
                 groups: [signup]
@@ -20,6 +22,7 @@ Zerebral\BusinessBundle\Model\User\User:
             - Email:
                 groups: [signup]
                 message: Doesn't look like a valid email.
+            - MaxLength: 100
         avatar:
             - Valid: ~
         plainPassword:
@@ -47,6 +50,7 @@ Zerebral\BusinessBundle\Model\Course\Course:
         name:
             - NotBlank:
                 message: Enter your course name. You can change it later.
+            - MaxLength: 100
         description:
             - NotBlank:
                 message: Enter course description.Provide any useful information for students enrolled in this course.
@@ -86,6 +90,7 @@ Zerebral\BusinessBundle\Model\Assignment\Assignment:
         name:
             - NotBlank:
                 message: Enter your assignment name. You can change it later.
+            - MaxLength: 200
         description:
             - NotBlank:
                 message: Enter assignment description. Any useful information from the student point of view.
@@ -141,11 +146,14 @@ Zerebral\BusinessBundle\Model\Material\CourseFolder:
         name:
             - NotBlank:
                 message: Name can not be blank
+            - MaxLength: 255
         course:
             - NotBlank: ~
 
 Zerebral\BusinessBundle\Model\Material\CourseMaterial:
     getters:
+        description:
+            - MaxLength: 255
         file:
             - Valid: ~
             - NotNull:
