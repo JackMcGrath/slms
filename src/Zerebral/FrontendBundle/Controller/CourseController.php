@@ -153,6 +153,8 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function materialsAction(Model\Course\Course $course, Model\Material\CourseFolder $folder = null)
     {
+        $session = $this->getRequest()->getSession();
+
         $folderType = new FormType\CourseFolderType();
         $folderForm = $this->createForm($folderType);
 
@@ -160,15 +162,26 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
         $courseMaterialType->setCourse($course);
         $courseMaterialForm = $this->createForm($courseMaterialType);
 
-
         $dayMaterials = array();
         $c = new \Criteria();
         if ($folder) {
             $c->add('folder_id', $folder->getId(), \Criteria::EQUAL);
         }
+        $c->addJoin(\Zerebral\BusinessBundle\Model\Material\CourseMaterialPeer::FILE_ID, \Zerebral\BusinessBundle\Model\File\FilePeer::ID, \Criteria::LEFT_JOIN);
+        $c->addAscendingOrderByColumn('LOWER(files.name)');
+
+        $materialGrouping = $this->getRequest()->get('MaterialGrouping') ?: ($session->has('MaterialGrouping') ? $session->get('MaterialGrouping') : 'date');
+        $session->set('MaterialGrouping', $materialGrouping);
 
         foreach ($course->getCourseMaterials($c) as $material) {
-            $dayMaterials[strtotime($material->getCreatedAt('Y-m-d'))][] = $material;
+            if ($materialGrouping == 'date') {
+                $dayMaterials[strtotime($material->getCreatedAt('Y-m-d'))][] = $material;
+            } else if ($materialGrouping == 'folder') {
+                $folderName = $material->getCourseFolder() ? $material->getCourseFolder()->getName() : 'No folder';
+                $dayMaterials[$folderName][] = $material;
+            } else {
+                $dayMaterials[][] = $material;
+            }
         }
 
         ksort($dayMaterials);
@@ -177,6 +190,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
             'dayMaterials' => $dayMaterials,
             'folderRenameForm' => $folderForm->createView(),
             'courseMaterialForm' => $courseMaterialForm->createView(),
+            'materialGrouping' => $materialGrouping,
             'folder' => $folder,
             'course' => $course,
             'target' => 'courses'
