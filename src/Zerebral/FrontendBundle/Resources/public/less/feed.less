@@ -50,6 +50,20 @@
             text-align: center;
             color: #696969;
         }
+        .comment {
+            &:hover {
+                .content {
+                    .is_author {
+                        .timestamp {
+                            display: none;
+                        }
+                        .delete-link {
+                            display: block;
+                        }
+                    }
+                }
+            }
+        }
         .item {
             clear: both;
             min-height: 80px;
@@ -71,6 +85,13 @@
                     }
                     .timestamp {
                         float: right;
+                        font-size: 11px;
+                        margin-right: 10px;
+                    }
+                    .delete-link {
+                        display: none;
+                        float: right;
+                        font-size: 11px;
                         margin-right: 10px;
                     }
                 }
