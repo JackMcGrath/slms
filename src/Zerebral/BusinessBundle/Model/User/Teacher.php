@@ -60,7 +60,7 @@ class Teacher extends BaseTeacher
 
     public function getAssignmentsDueDate($ongoing = null)
     {
-        $assignments = \Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery::create()->getCourseAssignmentsDueDate(null, $ongoing);
+        $assignments = \Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery::create()->getCourseAssignmentsDueDate(null, $ongoing, $this);
         return $assignments->find();
     }
 
