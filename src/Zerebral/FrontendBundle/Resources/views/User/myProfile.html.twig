@@ -87,10 +87,14 @@
                 </div>
 
                 <div class="span4 pull-right">
+                    {% set isValidFile = form.user.avatar.uploadedFile.vars.errors|length == 0 %}
+
                     <div class="profile-avatar pull-right span12">
+                        {% if isValidFile %}
                         <img class="span12" src="{{ get_file_storage_link(user.getAvatarFile()) | imagine_filter('big_thumbnail') }}"/>
-                        <a id="show_avatar_file_field" href="#">Change your avatar</a>
-                        <div class="hidden-avatar-div">
+                        {% endif %}
+                        <a id="show_avatar_file_field" href="#" class="{{ isValidFile ? '' : 'hidden' }}">Change your avatar</a>
+                        <div class="hidden-avatar-div" style="{{ isValidFile ? '' : 'display:block;' }}">
                             {{ form_widget(form.user.avatar) }}
                         </div>
                     </div>
