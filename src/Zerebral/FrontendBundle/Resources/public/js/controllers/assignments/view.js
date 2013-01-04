@@ -60,38 +60,8 @@ $(document).ready(function(){
         }
     });
 
-
-    $('#comment_input').click(function(e) {
-        $(e.target).css('background-image', 'none').animate({
-            width: 621,
-//            top: 60,
-            'margin-top': 20,
-            'margin-bottom': 10,
-            'margin-left': 20,
-            'margin-right': 20,
-            'padding-left': 6,
-            'padding-right': 6,
-            height: '+120'
-        }, 300);
-        $(e.target).parent().css('background-color', '#f3f3f3').find('.controls').show();
-    });
-
-    $('.attach-link').click(function(e) {
-        e.preventDefault();
-        $(e.target).parent().parent().hide();
-        $(e.target).parent().parent().parent().parent().find('#comment-type').val($(e.target).parent().data('linkType'));
-        $(e.target).parent().parent().parent().parent().find('.attached-link').slideDown();
-    });
-
-    $('.attached-link-delete a').click(function(e) {
-        e.preventDefault();
-        $(e.target).parent().parent().slideUp();
-        $(e.target).parent().parent().parent().find('#comment-type').val('text');
-        $(e.target).parent().parent().parent().find('.attach-links').show();
-
-    });
-    $('#ajaxFeedCommentForm').zerebralAjaxForm();
-
     $('#ajaxUploadSolutionsForm').zerebralAjaxForm();
+
+    $('.feed').zerebralFeedBlock();
 
 });

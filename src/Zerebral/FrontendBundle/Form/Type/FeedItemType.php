@@ -10,9 +10,7 @@ use Symfony\Component\Validator\Constraints\Collection;
 
 class FeedItemType extends AbstractType {
     public function buildForm(FormBuilderInterface $builder, array $options) {
-        $builder->add('assignmentId', 'text', array('required' => false));
-        $builder->add('courseId', 'text', array('required' => false));
-        $builder->add('feedContentId', 'text', array('required' => true));
+        $builder->add('feedContent', new FeedContentType(), array('required' => true));
     }
 
     public function getName() {
