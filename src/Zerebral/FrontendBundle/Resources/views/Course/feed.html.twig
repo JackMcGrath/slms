@@ -26,21 +26,11 @@
                     </div>
                 {% endif %}
             </div>
-            <hr/>
 
             <br />
-
-            <div class="description">
-                {% autoescape false %}
-                {{ course.description }}
-                {% endautoescape %}
-            </div>
-
-            <br />
-            <div class="feed">
+            <div class="course-details-feed feed">
                 {{ feedPartials.course_details_feed(feedItemForm, path('ajax_course_add_feed_item', {courseId: course.id }), feedItems) }}
             </div>
-
 
         </div>
         <div class="right-navbar pull-left">
