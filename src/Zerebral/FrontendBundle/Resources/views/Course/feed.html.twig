@@ -1,0 +1,60 @@
+{% extends 'ZerebralFrontendBundle::layout.html.twig' %}
+{% import "ZerebralFrontendBundle:Macro:main.html.twig" as mainPartials %}
+{% import "ZerebralFrontendBundle:Macro:feed.html.twig" as feedPartials %}
+
+{% block content %}
+    {% javascripts
+    '@ZerebralFrontendBundle/Resources/public/js/controllers/course/feed.js'
+    output='js/compiled/course_feed.js' %}
+    <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+    <div class="top-second-navbar">
+        {{ mainPartials.topMenu('feed', course) }}
+    </div>
+
+    <div class="row-fluid courses-list course-details">
+        <div class="span6 main-list-block">
+            <div class="row-fluid manage">
+                <h2 class="pull-left form-title">
+                    {{ course.name }} <small>recent updates</small>
+                </h2>
+                {% if is_granted('ROLE_TEACHER') %}
+                    <i class="manage-buttons-gears icon-small-gears pull-right"></i>
+                    <div class="manage-buttons invisible pull-right">
+                        {% if is_granted('EDIT', course) %}<a href="{{ path('course_edit', {id: course.id}) }}"><i class="icon-small-pencil"></i>Edit</a>{% endif %}
+                        {% if is_granted('DELETE', course) %}<a href="{{ path('course_delete', {id: course.id}) }}" class="delete-confirm"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <br />
+            <div class="course-details-feed feed">
+                {{ feedPartials.course_details_feed(feedItemForm, path('ajax_course_add_feed_item', {courseId: course.id }), feedItems) }}
+            </div>
+
+        </div>
+        <div class="right-navbar pull-left">
+            {% if is_granted('ADD_ASSIGNMENT', course) %}
+                <a href="{{ path('assignment_add', {courseId: course.id}) }}" class="btn create-course big-button top-buttons">create assignment</a>
+            {% endif %}
+
+            <div class="block upcoming-assignments">
+                {{ mainPartials.upcomingAssignments(upcomingAssignments) }}
+            </div>
+
+            <div class="block recent-materials">
+                <h4>Recent materials</h4>
+                <ul>
+                    <li><i class="icon-file"></i> <a href="">Homework_1.doc</a></li>
+                    <li><i class="icon-file"></i> <a href="">Homework_2.doc</a></li>
+                    <li><i class="icon-file"></i> <a href="">Homework_3.doc</a></li>
+                    <li><i class="icon-file"></i> <a href="">Homework_4.doc</a></li>
+                </ul>
+            </div>
+
+            <div class="block teacher-profile">
+                {{ mainPartials.teacherShortInfo(course.teacher) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

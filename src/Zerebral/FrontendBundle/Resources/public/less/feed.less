@@ -11,6 +11,7 @@
             background-image: url('/img/feed_comment_input_background.png');
             background-repeat: no-repeat;
             background-position: right;
+            background-position-y: -2px;
         }
         .controls {
             padding-left: 20px;
@@ -37,15 +38,33 @@
             }
             .buttons {
                 padding-bottom: 10px;
+                .cancel-link {
+                    top: 2px;
+                    position: relative;
+                }
             }
         }
     }
-    .comments {
+    .comments, .feed-items {
         .empty {
             text-align: center;
             color: #696969;
         }
         .comment {
+            &:hover {
+                .content {
+                    .is_author {
+                        .timestamp {
+                            display: none;
+                        }
+                        .delete-link {
+                            display: block;
+                        }
+                    }
+                }
+            }
+        }
+        .item {
             clear: both;
             min-height: 80px;
             border-bottom: 1px solid #f3f3f3;
@@ -64,6 +83,17 @@
                         font-weight: normal;
                         color: #bbbbbb;
                     }
+                    .timestamp {
+                        float: right;
+                        font-size: 11px;
+                        margin-right: 10px;
+                    }
+                    .delete-link {
+                        display: none;
+                        float: right;
+                        font-size: 11px;
+                        margin-right: 10px;
+                    }
                 }
                 .text {
                 }
@@ -72,5 +102,61 @@
                 }
             }
         }
+    }
+    .feed-items {
+        .feed-item {
+            .content {
+                .author {
+                    .gray {
+                        color: #8c8c8c;
+                    }
+                }
+                .text {
+                    color: #b74a47;
+                    font-weight: bold;
+                    font-size: 13px;
+                    line-height: 1.5;
+                }
+            }
+            .comments {
+                margin-left: 70px;
+                .comment {
+                    background-color: #F8F8F8;
+                    margin-bottom: 5px;
+                    padding: 10px;
+                    min-height: 27px;
+                    .avatar {
+                        clear: both;
+                        width: 27px;
+                        margin-right: 10px;
+                        float: left;
+                    }
+                    .content {
+                        float: left;
+                        margin-left: 0px;
+                        max-width: 440px;
+                        margin-bottom: 0;
+                        .comment-input {
+                            margin-bottom: 0;
+                            width: 520px;
+                            resize: none;
+                            height: 18px;
+                        }
+                    }
+                    .timestamp {
+                        float:right;
+                        font-size: 11px;
+                        width: 100px;
+                        text-align: right;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.course-details-feed {
+    .form {
+        padding-bottom: 0;
     }
 }

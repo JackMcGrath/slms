@@ -20,6 +20,7 @@ use Zerebral\BusinessBundle\Model as Model;
 use \Criteria;
 
 use Zerebral\CommonBundle\Component\Calendar\Calendar;
+
 /**
  * @Route("/assignments")
  */
@@ -97,18 +98,11 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
      * @ParamConverter("studentAssignment")
      *
      * @PreAuthorize("hasRole('ROLE_STUDENT')")
+     * @SecureParam(name="studentAssignment", permissions="UPLOAD")
      * @Template()
      */
-    public function uploadSolutionAction(Model\Assignment\StudentAssignment $studentAssignment) {
-
-        if ($studentAssignment->getStudentId() !== $this->getRoleUser()->getId()) {
-            throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, 'Assignment is not belong to current user');
-        }
-
-        if ($studentAssignment->getIsSubmitted()) {
-            throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, 'You cannot modify solutions after assignment publishing');
-        }
-
+    public function uploadSolutionAction(Model\Assignment\StudentAssignment $studentAssignment)
+    {
         $assignmentSolutionType = new FormType\AssignmentSolutionType();
         $assignmentSolutionType->setFileStorage($this->container->get('zerebral.file_storage')->getFileStorage('local'));
 
@@ -136,18 +130,11 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
      * @ParamConverter("file", options={"mapping": {"fileId": "id"}})
      *
      * @PreAuthorize("hasRole('ROLE_STUDENT')")
+     * @SecureParam(name="studentAssignment", permissions="REMOVE")
      * @Template()
      */
-    public function removeSolutionAction(Model\Assignment\StudentAssignment $studentAssignment, \Zerebral\BusinessBundle\Model\File\File $file) {
-
-        if ($studentAssignment->getStudentId() !== $this->getRoleUser()->getId()) {
-            throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, 'Assignment is not belong to current user');
-        }
-
-        if ($studentAssignment->getIsSubmitted()) {
-            throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, 'You cannot modify solutions after assignment publishing');
-        }
-
+    public function removeSolutionAction(Model\Assignment\StudentAssignment $studentAssignment, \Zerebral\BusinessBundle\Model\File\File $file)
+    {
         $fileStudentAssignment = $file->getstudentAssignmentReferenceIds();
         if ((count($fileStudentAssignment) === 1) && ($fileStudentAssignment[0]->getId() === $studentAssignment->getId())) {
             $file->delete();
@@ -162,20 +149,21 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
      * @ParamConverter("studentAssignment")
      *
      * @PreAuthorize("hasRole('ROLE_STUDENT')")
+     * @SecureParam(name="studentAssignment", permissions="SUBMIT")
      * @Template()
      */
-    public function submitSolutionsAction(Model\Assignment\StudentAssignment $studentAssignment) {
-        if ($studentAssignment->getStudentId() !== $this->getRoleUser()->getId()) {
-            throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, 'Assignment is not belong to current user');
-        }
-
+    public function submitSolutionsAction(Model\Assignment\StudentAssignment $studentAssignment)
+    {
         $studentAssignment->setIsSubmitted(1);
         $studentAssignment->save();
-        $this->setFlash('student_assignment_solutions_submit', 'Solutions for assignment <b>' . $studentAssignment->getAssignment()->getName() . '</b> were successfully submitted');
+        $this->setFlash(
+            'student_assignment_solutions_submit',
+                'Solutions for assignment <b>' . $studentAssignment->getAssignment()->getName() . '</b> were successfully submitted'
+        );
         return $this->redirect($this->generateUrl('assignment_view', array('id' => $studentAssignment->getAssignmentId())));
     }
 
-   /**
+    /**
      * @Route("/add/{courseId}", name="assignment_add")
      * @Route("/edit/{courseId}/{id}", name="assignment_edit")
      * @ParamConverter("assignment", options={"mapping": {"id": "id"}})
@@ -212,7 +200,7 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
 
                 // @todo redo with collection type
                 $studentAssignments = new \PropelCollection();
-                foreach($this->getRequest()->get('students', array()) as $studentId){
+                foreach ($this->getRequest()->get('students', array()) as $studentId) {
                     $studentAssignment = new \Zerebral\BusinessBundle\Model\Assignment\StudentAssignment();
                     $studentAssignment->setStudentId($studentId);
                     $studentAssignment->setAssignment($assignment);
@@ -238,7 +226,6 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
     /**
      * @Route("/delete/{id}", name="assignment_delete")
      * @Route("/delete/{id}/{courseId}", name="course_assignment_delete")
-
      * @ParamConverter("assignment", options={"mapping": {"id": "id"}})
      * @ParamConverter("course", options={"mapping": {"courseId": "id"}})
      *
@@ -249,7 +236,10 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
     public function deleteAction(Model\Assignment\Assignment $assignment, Model\Course\Course $course = null)
     {
         $assignment->delete();
-        $this->setFlash('delete_assignment_success', 'Assignment <b>' . $assignment->getName() . '</b> has been successfully deleted from course ' . $assignment->getCourse()->getName() . '.');
+        $this->setFlash(
+            'delete_assignment_success',
+                'Assignment <b>' . $assignment->getName() . '</b> has been successfully deleted from course ' . $assignment->getCourse()->getName() . '.'
+        );
         if ($course) {
             return $this->redirect($this->generateUrl('course_assignments', array('id' => $course->getId())));
         } else {

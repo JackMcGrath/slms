@@ -31,9 +31,6 @@
             {{ flashMessages.show('student_assignment_solutions_submit', 'success') }}
             <div class="">
                 <div class="info">
-                    <div class="avatar pull-right">
-                        <img class="rounded" src="http://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?s=50"/>
-                    </div>
                     <h3>{{ assignment.name }}</h3>
                     <ul>
                         <li><span>From:</span> {{ assignment.teacher.fullName }}</li>
@@ -60,7 +57,7 @@
             </div>
 
 
-            {{ feedPartials.feed(feedCommentForm, path('ajax_feed_add_comment', {feedItemId: assignment.feedItem.id }), assignment.feedItem.feedComments, assignment.teacher.user.id) }}
+            {{ feedPartials.assignment_details_feed(feedCommentForm, path('ajax_feed_add_comment', {feedItemId: assignment.feedItem.id }), assignment.feedItem.feedComments, app.user) }}
         </div>
 
         <div class="right-navbar pull-left">
@@ -68,7 +65,8 @@
                 <h4>Grading: 20</h4> <span class="label label-important">Failed</span> <i class="info-icon icon-small-info"></i>
             </div>
 
-            {% if user.isStudent() %}
+
+            {% if is_granted('UPLOAD_SOLUTION', assignment) or (studentAssignment is defined and is_granted('VIEW', studentAssignment)) %}
             <div class="block solutions">
                 <div class="solutions-widget">
                     <h4>Solution files</h4>
