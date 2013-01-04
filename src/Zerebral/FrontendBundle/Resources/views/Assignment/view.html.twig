@@ -65,7 +65,8 @@
                 <h4>Grading: 20</h4> <span class="label label-important">Failed</span> <i class="info-icon icon-small-info"></i>
             </div>
 
-            {% if user.isStudent() %}
+
+            {% if is_granted('UPLOAD_SOLUTION', assignment) or (studentAssignment is defined and is_granted('VIEW', studentAssignment)) %}
             <div class="block solutions">
                 <div class="solutions-widget">
                     <h4>Solution files</h4>

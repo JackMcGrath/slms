@@ -38,7 +38,7 @@ abstract class ModelAccessVoter implements VoterInterface
     public function vote(TokenInterface $token, $object, array $attributes)
     {
 
-        if (is_null($object)) {
+        if (is_null($object) || !is_object($object)) {
             return VoterInterface::ACCESS_ABSTAIN;
         }
 

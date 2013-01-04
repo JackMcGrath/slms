@@ -23,7 +23,7 @@ class AssignmentAccessVoter extends \Zerebral\CommonBundle\Security\ModelAccessV
 
     protected function getSupportedAttributes()
     {
-        return array('EDIT', 'VIEW', 'DELETE');
+        return array('EDIT', 'VIEW', 'DELETE', 'UPLOAD_SOLUTION');
     }
 
     protected function getModelClass()
@@ -38,6 +38,12 @@ class AssignmentAccessVoter extends \Zerebral\CommonBundle\Security\ModelAccessV
      */
     public function isGranted(TokenInterface $token, $assignment, $attribute)
     {
+        $user = $token->getUser();
+
+        if (strtoupper($attribute) == 'UPLOAD_SOLUTION' && $user->getRole() != User::ROLE_STUDENT) {
+            return false;
+        }
+
         return $this->getCourseAccessVoter()->isGranted($token, $assignment->getCourse(), $attribute);
     }
 }
