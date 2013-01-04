@@ -1,31 +1,9 @@
-{% macro comments(comments, authorId, commentsForm) %}
-    {% import _self as self %}
-    <div class="comments">
-        {% for comment in comments %}
-            {{ self.comment_text_block(comment, authorId) }}
-        {% else %}
-            <div class="empty"> No comments yet. Be the first to leave one!</div>
-        {% endfor %}
-    </div>
-{% endmacro %}
-
-{% macro comment_text_block(comment, authorId) %}
-    <div class="comment item">
-        <div class="avatar"><img class="rounded" src="{{ get_file_storage_link(comment.user.getAvatarFile()) | imagine_filter('thumbnail') }}" /> </div>
-        <div class="content">
-            <div class="author">{{ comment.user.fullName }} <span class="gray timestamp">{{ time_diff(comment.createdAt) }}</span></div>
-            <div class="text {% if comment.user.id == authorId %}by_author{% endif %}">{{ comment.feedContent.text }}</div>
-            <div class="link"><a href="{{ comment.feedContent.linkUrl }}">{{ comment.feedContent.linkUrl }}</a></div>
-        </div>
-    </div>
-{% endmacro %}
-
-
-{% macro item_form(form, formPath) %}
-    <div class="form">
-        <form id="ajaxFeedCommentForm" method="post" {{ form_enctype(form) }} action="{{ formPath }}">
-            <textarea id="comment_input" name="feed_comment[feedContent][text]" placeholder="Share what's new..." ></textarea>
-            <div class="controls">
+{% macro assignment_details_feed(form, formPath, comments, user) %}
+<div class="feed">
+    <div class="form" style="background-color: #f3f3f3;">
+        <form style="margin: 0;" id="ajaxFeedCommentForm" method="post" {{ form_enctype(form) }} action="{{ formPath }}">
+            <textarea style="background-image: none; width: 621px; margin-top: 20px; margin-bottom: 10px; margin-left: 20px; margin-right: 20px; padding-left: 6px; padding-right: 6px; height: 120px;" id="comment_input" name="feed_comment[feedContent][text]" placeholder="Leave a new comment" ></textarea>
+            <div class="controls" style="display: block;">
                 <div class="attached-link">
                     <input id="attached-link-field" type="text" name="feed_comment[feedContent][link_url]" placeholder="Enter link..." />
                     <input id="comment-type" type="hidden" name="feed_comment[feedContent][type]" value="text" />
@@ -35,7 +13,7 @@
                 </div>
                 <div class="clearfix"></div>
                 <div class="buttons">
-                    <input type="submit" class="btn post-button" value="Post message" />&nbsp;&nbsp;&nbsp;<a href="#" class="cancel-link">Cancel</a>
+                    <input type="submit" class="btn post-button" value="Post message" /><!--&nbsp;&nbsp;&nbsp;<a href="#" class="cancel-link">Cancel</a>-->
                     <div class="attach-links">
                         <a class="attach-link" data-link-type="image" href="#"><img src="/img/feed_image_icon.png" alt="Add Image" /></a>
                         <a class="attach-link" data-link-type="video" href="#"><img src="/img/feed_video_icon.png" alt="Add Video" /></a>
@@ -46,36 +24,27 @@
             {{ form_widget(form._token) }}
         </form>
     </div>
-{% endmacro %}
-
-{% macro feed(itemForm, itemFormPath, comments, authorId, commentForm, commentFormPath) %}
-    {% import _self as self %}
-    <div class="feed">
-        {{ self.item_form(itemForm, itemFormPath) }}
-        {{ self.comments(comments, authorId) }}
+    <div class="comments">
+        {% for comment in comments %}
+        <div class="comment item">
+            <div class="avatar"><img class="rounded" src="{{ get_file_storage_link(comment.user.getAvatarFile()) | imagine_filter('thumbnail') }}" /> </div>
+            <div class="content">
+                <div class="author {% if user.id == comment.user.id %} is_author {% endif %}">
+                    {{ comment.user.fullName }} <span class="gray timestamp">{{ time_diff(comment.createdAt) }}</span>
+                    {% if user.id == comment.user.id %}<span class="gray delete-link"><i class="icon-small-trash-bin"></i>Delete</span>{% endif %}
+                </div>
+                <div class="text">{{ comment.feedContent.text }}</div>
+                <div class="link"><a href="{{ comment.feedContent.linkUrl }}">{{ comment.feedContent.linkUrl }}</a></div>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty"> No comments yet. Be the first to leave one!</div>
+        {% endfor %}
     </div>
+</div>
 {% endmacro %}
-
-
-
-
-
-
-
 
 <!--      CourseDetails   --->
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 {% macro feed_item_assignment_block(feedItem) %}
@@ -146,12 +115,12 @@
                             <div class="clearfix"></div>
                         </div>
                     {% endfor %}
-                    {% if feedItem.feedComments|length > 1 %}
+                    {% if feedItem.feedComments|length > 0 %}
                     <div class="comment">
                         <div class="avatar"><img class="rounded" src="{{ get_file_storage_link(app.user.getAvatarFile()) | imagine_filter('small_thumbnail') }}" /></div>
                         <div class="content" style="max-width: 560px;">
                             <form action="{{ path('ajax_feed_add_comment', {feedItemId: feedItem.id }) }}" method="post" style="margin: 0;">
-                                <textarea class="comment-input"></textarea>
+                                <textarea class="comment-input" placeholder="Leave a new comment"></textarea>
                                 <div class="buttons" style="display: none;">
                                     <input type="submit" class="btn btn-danger" value="Post" style="display: block; margin-top: 5px; float: left;"/>&nbsp;&nbsp;&nbsp;<a href="#" style="position: relative; top: 11px;" class="cancel-link">Cancel</a>
                                 </div>

@@ -49,6 +49,22 @@
         .empty {
             text-align: center;
             color: #696969;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .comment {
+            &:hover {
+                .content {
+                    .is_author {
+                        .timestamp {
+                            display: none;
+                        }
+                        .delete-link {
+                            display: block;
+                        }
+                    }
+                }
+            }
         }
         .item {
             clear: both;
@@ -71,6 +87,13 @@
                     }
                     .timestamp {
                         float: right;
+                        font-size: 11px;
+                        margin-right: 10px;
+                    }
+                    .delete-link {
+                        display: none;
+                        float: right;
+                        font-size: 11px;
                         margin-right: 10px;
                     }
                 }
