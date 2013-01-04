@@ -13,6 +13,7 @@ use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\PeerEvent;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer;
 use Zerebral\BusinessBundle\Model\Course\CoursePeer;
+use Zerebral\BusinessBundle\Model\Feed\FeedCommentPeer;
 use Zerebral\BusinessBundle\Model\Feed\FeedContentPeer;
 use Zerebral\BusinessBundle\Model\Feed\FeedItem;
 use Zerebral\BusinessBundle\Model\Feed\FeedItemPeer;
@@ -386,6 +387,9 @@ abstract class BaseFeedItemPeer
      */
     public static function clearRelatedInstancePool()
     {
+        // Invalidate objects in FeedCommentPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        FeedCommentPeer::clearInstancePool();
     }
 
     /**
