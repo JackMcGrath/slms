@@ -38,7 +38,7 @@
                                 {% if is_granted('EDIT', course) %}<a href="{{ path('course_members', {id: course.id}) }}"><i class="icon-small-people"></i>Edit members</a>{% endif %}
                             </div>
                         {% endif %}
-                        <h4><a href="{{ path('course_view', {id: course.id}) }}">{{ course.name }}</a> <small><i class="icon-small-clock"></i> last updated {{ time_diff(course.updatedAt) }}</small></h4>
+                        <h4><a href="{{ path('course_feed', {id: course.id}) }}">{{ course.name }}</a> <small><i class="icon-small-clock"></i> last updated {{ time_diff(course.updatedAt) }}</small></h4>
                         <div class="stat">
                             {% if is_granted('ROLE_STUDENT') %}
                                 <div class="instructor-name">Instructor <b>{{ course.teacher.fullName }}</b></div>
