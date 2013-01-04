@@ -4,6 +4,12 @@ Zerebral\BusinessBundle\Model\User\User:
             fields: email
             groups: [signup]
             message: This email is already taken!
+        - Zerebral\CommonBundle\Validator\Constraints\Compare:
+            targetField: passwordConfirmation
+            sourceField: plainPassword
+            comparator: equals
+            message: Looks like a mistype. The passwords must match.
+            groups: [signup]
     getters:
         firstName:
             - NotBlank:
@@ -32,8 +38,6 @@ Zerebral\BusinessBundle\Model\User\User:
         passwordConfirmation:
             - NotBlank:
                 groups: [signup]
-            - Zerebral\FrontendBundle\Form\Validator\SignupConfirmPassword:
-                groups: [signup]
         role:
             - Choice:
                 groups: [signup]
@@ -41,7 +45,7 @@ Zerebral\BusinessBundle\Model\User\User:
 
 Zerebral\BusinessBundle\Model\Course\Course:
     constraints:
-        - Zerebral\CommonBundle\Validator\Constraints\DateComparator:
+        - Zerebral\CommonBundle\Validator\Constraints\DateCompare:
             targetField: end
             sourceField: start
             comparator: greater
