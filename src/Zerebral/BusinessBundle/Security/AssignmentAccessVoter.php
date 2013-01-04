@@ -44,6 +44,15 @@ class AssignmentAccessVoter extends \Zerebral\CommonBundle\Security\ModelAccessV
             return false;
         }
 
+        if ($user->getRole() == User::ROLE_STUDENT) {
+            foreach ($assignment->getStudentAssignments() as $assignmentStudent) {
+                if ($assignmentStudent->getStudentId() == $user->getStudent()->getId()) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         return $this->getCourseAccessVoter()->isGranted($token, $assignment->getCourse(), $attribute);
     }
 }
