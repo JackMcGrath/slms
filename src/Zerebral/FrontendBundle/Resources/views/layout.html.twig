@@ -110,14 +110,19 @@
                     <li class="{{ target is defined and target == 'calendar' ? 'active' : ''}}"><div class="menu-item"><i class="icon-big-calendar"></i>Calendar</div></li>
                     <li class="{{ target is defined and target == 'members' ? 'active' : ''}}">
                         <div class="menu-item">
-                            {% if course is defined %}
+                            {% if course is defined and course %}
                                 <a href="{{ path('course_members', {id: course.id}) }}"><i class="icon-big-members"></i>Members</a>
                             {% else %}
                                 <i class="icon-big-members"></i>Members
                             {% endif %}
                         </div>
                     </li>
-                    <li class="{{ target is defined and target == 'files' ? 'active' : ''}}"><div class="menu-item"><i class="icon-big-folder"></i>Files</div></li>
+                    <li class="{{ target is defined and target == 'files' ? 'active' : ''}}">
+                        <div class="menu-item">
+                            <a href="{{ path('assignment_solutions') }}"><i class="icon-big-folder"></i>Files</a>
+                        </div>
+                    </li>
+
                 </ul>
             </div>
         </div>

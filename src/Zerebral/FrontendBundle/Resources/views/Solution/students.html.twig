@@ -1,0 +1,64 @@
+{% extends 'ZerebralFrontendBundle::layout.html.twig' %}
+{% import "ZerebralFrontendBundle:Macro:main.html.twig" as mainPartials %}
+
+{% block content %}
+    {% javascripts
+    '@ZerebralFrontendBundle/Resources/public/js/controllers/course/assignments.js'
+    output='js/compiled/course.js' %}
+    <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+
+    <div class="row-fluid assignments-list solutions-students-list">
+        <div class="span6 main-list-block">
+            <div class="row-fluid">
+                <h2 class="pull-left form-title">
+                    Files
+                    <small>
+
+                            <a href="{{ path('course_assignment_solutions', {courseId: course.id}) }}">{{ course.name }} </a>
+                            / {{ assignment.name  }}
+
+
+                    </small>
+                </h2>
+            </div>
+            <hr/>
+
+            <div class="span9 items-list">
+                {% for solution in solutions %}
+                    <div class="list-item span12{{ loop.last ? ' last' : '' }}">
+                        <div class="pull-left">
+                            <i class="icon-blue-folder"></i>
+                        </div>
+                        <div class="details pull-left">
+
+                            <h4><a href="">{{ solution.student.fullName }}</a></h4>
+                            <div class="stat">
+                                {% if solution.isSubmitted %}<div class="due-at"><i class="icon-small-clock"></i> Submitted on <small>{{ solution.createdAt | date('Hi') == '0000' ? solution.createdAt | date('D, M d') : solution.createdAt | date('D, M d h:i a') }}</small></div>{% endif %}
+                            </div>
+                            {% if solution.hasVirtualColumn('filesCount') and solution.getVirtualColumn('filesCount') > 0 %}
+                                <div class="download-all pull-right"><a href="#"><i class="icon-download-zip"></i>Download {{ solution.getVirtualColumn('filesCount') }} files</a></div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="right-navbar pull-left">
+            <div class="block sorting">
+                <h4>sort by</h4>
+                <form method="post" action="">
+                    <ul class="radio">
+                        <li><label><input type="radio" name="FileGrouping" value="date" {{ fileGrouping == 'date' ? 'checked' : '' }}/> Date and time</label></li>
+                        <li><label><input type="radio" name="FileGrouping" value="alphabetically" {{ fileGrouping == 'alphabetically' ? 'checked' : '' }}/> A-Z</label></li>
+                        <li><label><input type="radio" name="FileGrouping" value="folder" {{ fileGrouping == 'folder' ? 'checked' : '' }}/> Folder</label></li>
+                    </ul>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+
+{% endblock %}

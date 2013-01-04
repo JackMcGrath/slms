@@ -84,7 +84,7 @@
                     <div><span class="badge">-</span><a href="#">Comments</a></span></div>
                 {% else %}
                     <div class="due-at"><i class="icon-small-clock"></i> Due <small>{{ assignment.dueAt | date('Hi') == '0000' ? assignment.dueAt | date('D, M d') : assignment.dueAt | date('D, M d h:i a') }}</small></div>
-                    <div><span class="badge">{{ assignment.students.count }}</span><a href="">Assignments</a></div>
+                    {#<div><span class="badge">{{ assignment.students.count }}</span><a href="">Assignments</a></div>#}
                     <div><span class="badge">{{ assignment.hasVirtualColumn('completedCount') ? assignment.getVirtualColumn('completedCount') : '-' }}</span><a href="">Completed</a></div>
                     <div><span class="badge badge-inverse">{{ assignment.hasVirtualColumn('remainingCount') ? assignment.getVirtualColumn('remainingCount') : '-' }}</span><a href="">Remaining</a></div>
                 {% endif %}
