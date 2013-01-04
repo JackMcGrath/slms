@@ -57,8 +57,8 @@ class FeedContentTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('FeedItem', 'Zerebral\\BusinessBundle\\Model\\Feed\\FeedItem', RelationMap::ONE_TO_MANY, array('id' => 'feed_content_id', ), null, null, 'FeedItems');
-        $this->addRelation('FeedComment', 'Zerebral\\BusinessBundle\\Model\\Feed\\FeedComment', RelationMap::ONE_TO_MANY, array('id' => 'feed_content_id', ), null, null, 'FeedComments');
+        $this->addRelation('FeedItem', 'Zerebral\\BusinessBundle\\Model\\Feed\\FeedItem', RelationMap::ONE_TO_MANY, array('id' => 'feed_content_id', ), 'CASCADE', 'CASCADE', 'FeedItems');
+        $this->addRelation('FeedComment', 'Zerebral\\BusinessBundle\\Model\\Feed\\FeedComment', RelationMap::ONE_TO_MANY, array('id' => 'feed_content_id', ), 'CASCADE', 'CASCADE', 'FeedComments');
     } // buildRelations()
 
     /**
