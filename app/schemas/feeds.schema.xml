@@ -16,16 +16,16 @@
         <column name="feed_content_id" phpName="FeedContentId" type="INTEGER" sqlType="int(11) unsigned" required="true" />
         <column name="created_by" phpName="CreatedBy" type="INTEGER" sqlType="int(11) unsigned" required="true"/>
         <column name="created_at" phpName="CreatedAt" type="TIMESTAMP" required="true" />
-        <foreign-key foreignTable="feed_contents" name="feed_items_feed_contents">
+        <foreign-key foreignTable="feed_contents" name="feed_items_feed_contents" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="feed_content_id" foreign="id"/>
         </foreign-key>
-        <foreign-key foreignTable="assignments" name="feed_items_assignments">
+        <foreign-key foreignTable="assignments" name="feed_items_assignments" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="assignment_id" foreign="id"/>
         </foreign-key>
-        <foreign-key foreignTable="courses" name="feed_items_courses">
+        <foreign-key foreignTable="courses" name="feed_items_courses" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="course_id" foreign="id"/>
         </foreign-key>
-        <foreign-key foreignTable="users" name="feed_items_users">
+        <foreign-key foreignTable="users" name="feed_items_users" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="created_by" foreign="id"/>
         </foreign-key>
     </table>
@@ -35,13 +35,13 @@
         <column name="feed_content_id" phpName="FeedContentId" type="INTEGER" sqlType="int(11) unsigned" required="true" />
         <column name="created_by" phpName="CreatedBy" type="INTEGER" sqlType="int(11) unsigned" required="true"/>
         <column name="created_at" phpName="CreatedAt" type="TIMESTAMP" required="true" />
-        <foreign-key foreignTable="feed_items" name="feed_comments_feed_items">
+        <foreign-key foreignTable="feed_items" name="feed_comments_feed_items" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="feed_item_id" foreign="id"/>
         </foreign-key>
-        <foreign-key foreignTable="feed_contents" name="feed_comments_feed_contents">
+        <foreign-key foreignTable="feed_contents" name="feed_comments_feed_contents" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="feed_content_id" foreign="id"/>
         </foreign-key>
-        <foreign-key foreignTable="users" name="feed_comments_users">
+        <foreign-key foreignTable="users" name="feed_comments_users" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="created_by" foreign="id"/>
         </foreign-key>
     </table>

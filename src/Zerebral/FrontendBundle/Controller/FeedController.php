@@ -26,6 +26,7 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
     /**
      * @Route("/add-comment/{feedItemId}", name="ajax_feed_add_comment")
      * @param \Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem
+     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @ParamConverter("feedItem", options={"mapping": {"feedItemId": "id"}})
      */
     public function addFeedCommentAction(\Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem)
@@ -59,7 +60,7 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
      * @Route         ("/add-feed-item/{courseId}", name="ajax_course_add_feed_item")
      *
      * @param         \Zerebral\BusinessBundle\Model\Course\Course
-     *
+     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Zerebral\CommonBundle\HttpFoundation\FormJsonResponse
      * @ParamConverter("course", options={"mapping": {"courseId": "id"}})
      */

@@ -11,6 +11,8 @@ use \PropelException;
 use \PropelPDO;
 use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\PeerEvent;
+use Zerebral\BusinessBundle\Model\Feed\FeedCommentPeer;
+use Zerebral\BusinessBundle\Model\Feed\FeedItemPeer;
 use Zerebral\BusinessBundle\Model\File\FilePeer;
 use Zerebral\BusinessBundle\Model\User\User;
 use Zerebral\BusinessBundle\Model\User\UserPeer;
@@ -423,6 +425,12 @@ abstract class BaseUserPeer
      */
     public static function clearRelatedInstancePool()
     {
+        // Invalidate objects in FeedItemPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        FeedItemPeer::clearInstancePool();
+        // Invalidate objects in FeedCommentPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        FeedCommentPeer::clearInstancePool();
     }
 
     /**
