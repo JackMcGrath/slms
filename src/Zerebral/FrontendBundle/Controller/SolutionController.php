@@ -30,13 +30,12 @@ class SolutionController extends \Zerebral\CommonBundle\Component\Controller
     public function indexAction(Model\Course\Course $course = null)
     {
         $session = $this->getRequest()->getSession();
-        $fileGroupingType = $this->getRequest()->get('FileGrouping') ?: ($session->has('FileGrouping') ? $session->get('FileGrouping') : 'date');
-        $session->set('FileGrouping', $fileGroupingType);
+        $fileGroupingType = $this->getRequest()->get('SolutionFileGrouping') ?: ($session->has('SolutionFileGrouping') ? $session->get('SolutionFileGrouping') : 'date');
+        $session->set('SolutionFileGrouping', $fileGroupingType);
 
         $assignments = AssignmentQuery::create()->getCourseAssignmentsDueDate($course, null, $this->getRoleUser());
         switch ($fileGroupingType) {
             case "date": $assignments->orderBy('due_at', \Criteria::DESC); break;
-            case "name":
             case "assignment": $assignments->addAscendingOrderByColumn("LOWER(assignments.name)"); break;
             case "course": $assignments->addAscendingOrderByColumn("LOWER(courses.name)"); break;
         }
@@ -62,16 +61,14 @@ class SolutionController extends \Zerebral\CommonBundle\Component\Controller
     public function studentsAction(Model\Assignment\Assignment $assignment)
     {
         $session = $this->getRequest()->getSession();
-        $fileGroupingType = $this->getRequest()->get('FileGrouping') ?: ($session->has('FileGrouping') ? $session->get('FileGrouping') : 'date');
-        $session->set('FileGrouping', $fileGroupingType);
+        $fileGroupingType = $this->getRequest()->get('StudentFileGrouping') ?: ($session->has('StudentFileGrouping') ? $session->get('StudentFileGrouping') : 'date');
+        $session->set('StudentFileGrouping', $fileGroupingType);
 
         $solutions = StudentAssignmentQuery::create()->findStudentsByAssignmentId($assignment->getId());
 
         switch ($fileGroupingType) {
             case "date": $solutions->orderBy('created_at', \Criteria::DESC); break;
-            case "course":
-            case "name":
-            case "assignment": $solutions->addAscendingOrderByColumn("LOWER(User.first_name)"); break;
+            case "name": $solutions->addAscendingOrderByColumn("LOWER(User.first_name)"); break;
         }
         $solutions = $solutions->find();
 
