@@ -3,8 +3,8 @@
 
 {% block content %}
     {% javascripts
-    '@ZerebralFrontendBundle/Resources/public/js/controllers/course/assignments.js'
-    output='js/compiled/course.js' %}
+    '@ZerebralFrontendBundle/Resources/public/js/controllers/solutions/index.js'
+    output='js/compiled/solutions.js' %}
     <script type="text/javascript" src="{{ asset_url }}" xmlns="http://www.w3.org/1999/html"></script>
     {% endjavascripts %}
 
@@ -40,9 +40,9 @@
                 <h4>sort by</h4>
                 <form method="post" action="">
                     <ul class="radio">
-                        <li><label><input type="radio" name="FileGrouping" value="date" {{ fileGrouping == 'date' ? 'checked' : '' }}/> Date and time</label></li>
-                        <li><label><input type="radio" name="FileGrouping" value="alphabetically" {{ fileGrouping == 'alphabetically' ? 'checked' : '' }}/> A-Z</label></li>
-                        <li><label><input type="radio" name="FileGrouping" value="folder" {{ fileGrouping == 'folder' ? 'checked' : '' }}/> Folder</label></li>
+                        <li><label><input type="radio" name="FileGrouping" value="date" {{ fileGrouping == 'date' ? 'checked' : '' }}/> Due date</label></li>
+                        <li><label><input type="radio" name="FileGrouping" value="assignment" {{ fileGrouping == 'assignment' or fileGrouping == 'name' ? 'checked' : '' }}/> Assignment name</label></li>
+                        <li><label><input type="radio" name="FileGrouping" value="course" {{ fileGrouping == 'course' ? 'checked' : '' }}/> Course name</label></li>
                     </ul>
                 </form>
             </div>
