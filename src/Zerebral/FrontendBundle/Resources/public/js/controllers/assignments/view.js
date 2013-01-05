@@ -23,12 +23,21 @@ $(document).ready(function(){
         var newLi = $('<li class="control-group"></li>');
         var newFileInput = $('<input type="file" name="assignment_solution[files][' + index + '][uploadedFile]" />');
         var newDescInput = $('<input type="text" name="assignment_solution[files][' + index + '][description]" placeholder="Description (optional)" />');
+        var removeFile = $('<a href="#" class="delete"><i class="icon-small-trash-bin"></i></a>');
+
         newLi.append(newFileInput).append(newDescInput);
+
         if (fileFieldsCount == 0) {
             ul.prepend(newLi);
         } else {
+            newLi.append(removeFile);
             $(e.target).prev().append(newLi);
         }
+
+        removeFile.click(function(e) {
+            e.preventDefault();
+            $(e.target).parents('li').remove();
+        });
     });
 
     $('#submitSolutionsButton').click(function(e) {
@@ -63,5 +72,4 @@ $(document).ready(function(){
     $('#ajaxUploadSolutionsForm').zerebralAjaxForm();
 
     $('.feed').zerebralFeedBlock();
-
 });

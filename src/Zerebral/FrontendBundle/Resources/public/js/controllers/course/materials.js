@@ -100,6 +100,7 @@ UploadForm.prototype = {
         var newFileInput = $('<input type="file" name="course_materials[courseMaterials][' + this.fileFieldIndex + '][file][uploadedFile]" />');
         var newDescInput = $('<input type="text" maxlength="255" name="course_materials[courseMaterials][' + this.fileFieldIndex + '][description]" placeholder="Description (optional)" />');
         var courseIdInput = $('<input type="hidden" name="course_materials[courseMaterials][' + this.fileFieldIndex + '][courseId]" value="' + this.container.options.courseId + '" />');
+
         //var folderIdInput = $('<input type="hidden" class="upload-folder-id" name="course_materials[courseMaterials][' + this.fileFieldIndex + '][folderId]" value="' + this.selectedFolder + '" />');
         newLi.append(newFileInput).append(newDescInput).append(courseIdInput);
         if (this.fileFieldIndex == 0) {

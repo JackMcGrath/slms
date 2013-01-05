@@ -22,7 +22,8 @@
         "real-chocopanda/glorpen-propel-event-bundle": "*",
         "knplabs/knp-time-bundle": "*",
         "frequence-web/calendr-bundle": "*",
-        "liip/imagine-bundle": "*"
+        "liip/imagine-bundle": "*",
+        "monolog/monolog": "1.2.1"
     },
     "scripts": {
         "post-install-cmd": [

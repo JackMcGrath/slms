@@ -56,11 +56,11 @@ class FeedItemTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('FeedContent', 'Zerebral\\BusinessBundle\\Model\\Feed\\FeedContent', RelationMap::MANY_TO_ONE, array('feed_content_id' => 'id', ), null, null);
-        $this->addRelation('Assignment', 'Zerebral\\BusinessBundle\\Model\\Assignment\\Assignment', RelationMap::MANY_TO_ONE, array('assignment_id' => 'id', ), null, null);
-        $this->addRelation('Course', 'Zerebral\\BusinessBundle\\Model\\Course\\Course', RelationMap::MANY_TO_ONE, array('course_id' => 'id', ), null, null);
-        $this->addRelation('User', 'Zerebral\\BusinessBundle\\Model\\User\\User', RelationMap::MANY_TO_ONE, array('created_by' => 'id', ), null, null);
-        $this->addRelation('FeedComment', 'Zerebral\\BusinessBundle\\Model\\Feed\\FeedComment', RelationMap::ONE_TO_MANY, array('id' => 'feed_item_id', ), null, null, 'FeedComments');
+        $this->addRelation('FeedContent', 'Zerebral\\BusinessBundle\\Model\\Feed\\FeedContent', RelationMap::MANY_TO_ONE, array('feed_content_id' => 'id', ), 'CASCADE', 'CASCADE');
+        $this->addRelation('Assignment', 'Zerebral\\BusinessBundle\\Model\\Assignment\\Assignment', RelationMap::MANY_TO_ONE, array('assignment_id' => 'id', ), 'CASCADE', 'CASCADE');
+        $this->addRelation('Course', 'Zerebral\\BusinessBundle\\Model\\Course\\Course', RelationMap::MANY_TO_ONE, array('course_id' => 'id', ), 'CASCADE', 'CASCADE');
+        $this->addRelation('User', 'Zerebral\\BusinessBundle\\Model\\User\\User', RelationMap::MANY_TO_ONE, array('created_by' => 'id', ), 'CASCADE', 'CASCADE');
+        $this->addRelation('FeedComment', 'Zerebral\\BusinessBundle\\Model\\Feed\\FeedComment', RelationMap::ONE_TO_MANY, array('id' => 'feed_item_id', ), 'CASCADE', 'CASCADE', 'FeedComments');
     } // buildRelations()
 
     /**
