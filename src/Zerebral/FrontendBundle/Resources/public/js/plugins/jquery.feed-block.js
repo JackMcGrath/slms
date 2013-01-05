@@ -99,3 +99,52 @@ ZerebralCourseDetailFeedBlock.prototype = {
 $.registry('zerebralCourseDetailFeedBlock', ZerebralCourseDetailFeedBlock, {
     methods: ['init']
 });
+
+
+
+
+//    ASSIGNMENT
+var ZerebralAssignmentDetailFeedBlock = function(element, options) {
+    var self = this;
+    self.element = element;
+    self.feedCommentFormDiv = element.find('.feed-comment-form');
+    self.feedCommentForm = element.find('#ajaxFeedCommentForm');
+    self.options = options;
+};
+
+ZerebralAssignmentDetailFeedBlock.prototype = {
+    element: undefined,
+    options: undefined,
+
+    feedCommentFormDiv: undefined,
+    feedCommentForm: undefined,
+
+
+    init: function() {
+        var self = this;
+        this.feedCommentFormDiv.find('.attach-link').click($.proxy(self.setFeedItemFormType, self));
+        this.feedCommentFormDiv.find('.attached-link-delete a').click($.proxy(self.resetMainFormType, self));
+
+        this.feedCommentForm.zerebralAjaxForm();
+    },
+
+    setFeedItemFormType: function(event) {
+        event.preventDefault();
+        var link = $(event.target);
+        this.feedCommentForm.find('.attach-links').hide();
+        this.feedCommentForm.find('input.comment-type').val(link.parent().data('linkType'));
+        this.feedCommentForm.find('.attached-link').slideDown();
+    },
+    resetMainFormType: function(event) {
+        event.preventDefault();
+        var link = $(event.target);
+        this.feedCommentForm.find('.attached-link').slideUp();
+        this.feedCommentForm.find('input.comment-type').val('text');
+        this.feedCommentForm.find('.attach-links').show();
+    },
+    _: ''
+};
+
+$.registry('zerebralAssignmentDetailFeedBlock', ZerebralAssignmentDetailFeedBlock, {
+    methods: ['init']
+});
