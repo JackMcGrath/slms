@@ -40,9 +40,9 @@
                 <h4>sort by</h4>
                 <form method="post" action="">
                     <ul class="radio">
-                        <li><label><input type="radio" name="FileGrouping" value="date" {{ fileGrouping == 'date' ? 'checked' : '' }}/> Due date</label></li>
-                        <li><label><input type="radio" name="FileGrouping" value="assignment" {{ fileGrouping == 'assignment' or fileGrouping == 'name' ? 'checked' : '' }}/> Assignment name</label></li>
-                        <li><label><input type="radio" name="FileGrouping" value="course" {{ fileGrouping == 'course' ? 'checked' : '' }}/> Course name</label></li>
+                        <li><label><input type="radio" name="SolutionFileGrouping" value="date" {{ fileGrouping == 'date' ? 'checked' : '' }}/> Due date</label></li>
+                        <li><label><input type="radio" name="SolutionFileGrouping" value="assignment" {{ fileGrouping == 'assignment' ? 'checked' : '' }}/> Assignment name</label></li>
+                        <li><label><input type="radio" name="SolutionFileGrouping" value="course" {{ fileGrouping == 'course' ? 'checked' : '' }}/> Course name</label></li>
                     </ul>
                 </form>
             </div>
