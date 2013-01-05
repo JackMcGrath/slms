@@ -1,36 +1,42 @@
-var ZerebralFeedBlock = function(element, options) {
+var ZerebralCourseDetailFeedBlock = function(element, options) {
     var self = this;
     self.element = element;
-    self.mainFormInput = element.find('#comment_input');
-    self.mainForm = element.find('#ajaxFeedCommentForm');
+    self.feedItemFormTextarea = element.find('.feed-item-textarea');
+    self.feedItemForm = element.find('#ajaxFeedItemForm');
+    self.feedItemFormDiv = element.find('.feed-item-form');
+
+    self.commentsDiv = element.find('.feed-item .comments');
     self.options = options;
 };
 
-ZerebralFeedBlock.prototype = {
+ZerebralCourseDetailFeedBlock.prototype = {
     element: undefined,
     options: undefined,
 
-    mainFormInput: undefined,
+    feedItemFormTextarea: undefined,
+    feedItemForm: undefined,
+    feedItemFormDiv: undefined,
+    commentsDiv: undefined,
 
 
     init: function() {
         var self = this;
-        this.mainFormInput.click(this.expandMainForm);
-        this.element.find('.attach-link').click(this.setMainFormType);
-        this.element.find('.attached-link-delete a').click(this.resetMainFormType);
-        this.element.find('.comment-input').click(this.expandCommentForm);
-        this.element.find('.form .buttons .cancel-link').click(function(event) {
-            event.preventDefault();
-            self.collapseMainForm(self.mainFormInput);
-        });
-        this.element.find('.comment .buttons .cancel-link').click(self.collapseCommentForm);
-        this.mainForm.zerebralAjaxForm();
+        this.feedItemFormTextarea.click($.proxy(self.expandFeedItemForm, self));
+        this.feedItemFormDiv.find('.buttons .cancel-link').click($.proxy(self.collapseFeedItemForm, self));
+        this.feedItemFormDiv.find('.attach-link').click($.proxy(self.setFeedItemFormType, self));
+        this.feedItemFormDiv.find('.attached-link-delete a').click($.proxy(self.resetMainFormType, self));
+
+
+
+        this.commentsDiv.find('.comment-input').click($.proxy(self.expandCommentForm, self));
+        this.commentsDiv.find('.comment .buttons .cancel-link').click($.proxy(self.collapseCommentForm, self));
+        this.feedItemForm.zerebralAjaxForm();
     },
 
-    expandMainForm: function(event) {
-        var input = $(event.target);
-        input.data('background-image', input.css('background-image'));
-        input.css('background-image', 'none').animate({
+    expandFeedItemForm: function(event) {
+        var textarea = $(event.target);
+        textarea.data('background-image', textarea.css('background-image'));
+        textarea.css('background-image', 'none').animate({
             width: 621,
             'margin-top': 20,
             'margin-bottom': 10,
@@ -40,33 +46,36 @@ ZerebralFeedBlock.prototype = {
             'padding-right': 6,
             height: '+120'
         }, 300);
-        input.parent().css('background-color', '#f3f3f3').find('.controls').show();
+        this.feedItemForm.css('background-color', '#f3f3f3').find('.feed-item-form-controls').show();
     },
-    collapseMainForm: function(input) {
-        input.parent().animate({'background-color': 'transparent'}).find('.controls').hide();;
-        input.animate({
+    collapseFeedItemForm: function(event) {
+        event.preventDefault();
+
+        var self = this;
+        this.feedItemFormTextarea.parent().animate({'background-color': 'transparent'}).find('.feed-item-form-controls').hide();
+        this.feedItemFormTextarea.animate({
             width: 571,
             margin: 0,
             'padding-right': 96,
             height: 18
         }, 500, function() {
-            input.css('background-image', input.data('background-image'));
+            self.feedItemFormTextarea.css('background-image', self.feedItemFormTextarea.data('background-image'));
         });
 
     },
-    setMainFormType: function(event) {
+    setFeedItemFormType: function(event) {
         event.preventDefault();
         var link = $(event.target);
-        link.parent().parent().hide();
-        link.parent().parent().parent().parent().find('#comment-type').val(link.parent().data('linkType'));
-        link.parent().parent().parent().parent().find('.attached-link').slideDown();
+        this.feedItemForm.find('.attach-links').hide();
+        this.feedItemForm.find('input.comment-type').val(link.parent().data('linkType'));
+        this.feedItemForm.find('.attached-link').slideDown();
     },
     resetMainFormType: function(event) {
         event.preventDefault();
         var link = $(event.target);
-        link.parent().parent().slideUp();
-        link.parent().parent().parent().find('#comment-type').val('text');
-        link.parent().parent().parent().find('.attach-links').show();
+        this.feedItemForm.find('.attached-link').slideUp();
+        this.feedItemForm.find('input.comment-type').val('text');
+        this.feedItemForm.find('.attach-links').show();
     },
     expandCommentForm: function(event) {
         var input = $(event.target);
@@ -87,6 +96,6 @@ ZerebralFeedBlock.prototype = {
     _: ''
 };
 
-$.registry('zerebralFeedBlock', ZerebralFeedBlock, {
+$.registry('zerebralCourseDetailFeedBlock', ZerebralCourseDetailFeedBlock, {
     methods: ['init']
 });

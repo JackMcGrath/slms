@@ -48,13 +48,12 @@
 
 
 {% macro feed_item_assignment_block(feedItem) %}
-    <div class="author">{{ feedItem.user.fullName }}<span class="gray">created new assignment</span>&nbsp;&nbsp;<a style="color: #333333;" href="{{ path('assignment_view', {id: feedItem.assignment.id}) }}">{{ feedItem.assignment.name }}</a> <span class="gray timestamp">{{ time_diff(feedItem.createdAt) }}</span></div>
+    <div class="author">{{ feedItem.user.fullName }}<span class="gray"> created new assignment </span><a style="color: #333333;" href="{{ path('assignment_view', {id: feedItem.assignment.id}) }}">{{ feedItem.assignment.name }}</a> <span class="gray timestamp">{{ time_diff(feedItem.createdAt) }}</span></div>
     <div class="text">
         {% autoescape 'html' %}
         {{ feedItem.assignment.description|striptags|slice(0, 100) }}
         {% endautoescape %}
     </div>
-    <div class="link"><a href=""></a></div>
 {% endmacro %}
 
 {% macro feed_item_text_block(feedItem) %}
@@ -68,15 +67,16 @@
 
 
 
-{% macro course_details_feed(formItemForm, formItemFormPath, feedItems) %}
+{% macro course_details_feed(feedItemForm, feedItemFormPath, feedItems, feedCommentForm, feedCommentPath) %}
     {% import _self as self %}
-    <div class="form">
-        <form id="ajaxFeedCommentForm" method="post" {{ form_enctype(formItemForm) }} action="{{ formItemFormPath }}">
-            <textarea id="comment_input" name="feed_item[feedContent][text]" placeholder="Share what's new..." ></textarea>
-            <div class="controls">
+    <div class="course-details-feed">
+    <div class="feed-item-form">
+        <form id="ajaxFeedItemForm" method="post" {{ form_enctype(feedItemForm) }} action="{{ feedItemFormPath }}">
+            <textarea class="feed-item-textarea" name="feed_item[feedContent][text]" placeholder="Share what's new..." ></textarea>
+            <div class="feed-item-form-controls">
                 <div class="attached-link">
-                    <input id="attached-link-field" type="text" name="feed_item[feedContent][link_url]" placeholder="Enter link..." />
-                    <input id="comment-type" type="hidden" name="feed_item[feedContent][type]" value="text" />
+                    <input class="attached-link-field" type="text" name="feed_item[feedContent][link_url]" placeholder="Enter link..." />
+                    <input class="comment-type" type="hidden" name="feed_item[feedContent][type]" value="text" />
                     <div class="attached-link-delete" style="">
                         <i class="icon-small-trash-bin"></i> <a class="gray" href="#">Delete</a>
                     </div>
@@ -91,13 +91,13 @@
                     </div>
                 </div>
             </div>
-            {{ form_widget(formItemForm._token) }}
+            {{ form_widget(feedItemForm._token) }}
         </form>
     </div>
     <hr />
     <div class="feed-items">
         {% for feedItem in feedItems %}
-            <div class="feed-item item">
+            <div class="feed-item">
                 <div class="avatar"><img class="rounded" src="{{ get_file_storage_link(feedItem.user.getAvatarFile()) | imagine_filter('thumbnail') }}"></div>
                 <div class="content">
                     {% if feedItem.feedContent.type == 'assignment' %}
@@ -106,6 +106,7 @@
                         {{ self.feed_item_text_block(feedItem) }}
                     {% endif %}
                 </div>
+                <div class="comments-button"><i class="icon-comment"></i> <span class="gray">Comment</span></div>
                 <div class="comments">
                     {% for comment in feedItem.feedComments %}
                         <div class="comment">
@@ -118,11 +119,11 @@
                     {% if feedItem.feedComments|length > 0 %}
                     <div class="comment">
                         <div class="avatar"><img class="rounded" src="{{ get_file_storage_link(app.user.getAvatarFile()) | imagine_filter('small_thumbnail') }}" /></div>
-                        <div class="content" style="max-width: 560px;">
-                            <form action="{{ path('ajax_feed_add_comment', {feedItemId: feedItem.id }) }}" method="post" style="margin: 0;">
+                        <div class="content">
+                            <form class="feed-item-comment-form" action="{{ path('ajax_feed_add_comment', {feedItemId: feedItem.id }) }}" method="post" style="margin: 0;">
                                 <textarea class="comment-input" placeholder="Leave a new comment"></textarea>
                                 <div class="buttons" style="display: none;">
-                                    <input type="submit" class="btn btn-danger" value="Post" style="display: block; margin-top: 5px; float: left;"/>&nbsp;&nbsp;&nbsp;<a href="#" style="position: relative; top: 11px;" class="cancel-link">Cancel</a>
+                                    <input type="submit" class="btn btn-danger" value="Post" />&nbsp;&nbsp;&nbsp;<a href="#" class="cancel-link">Cancel</a>
                                 </div>
                             </form>
                         </div>
@@ -131,7 +132,10 @@
                     {% endif %}
                 </div>
             </div>
+        {% else %}
+            <div class="empty">No updates yet!</div>
         {% endfor %}
+    </div>
     </div>
 {% endmacro %}
 

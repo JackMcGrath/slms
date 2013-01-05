@@ -1,7 +1,170 @@
-.feed {
-    .form {
-        padding-bottom: 10px;
-        #comment_input {
+//.feed {
+//    .form {
+//        padding-bottom: 10px;
+//        #comment_input {
+//            resize: none;
+//            position: relative;
+//            width: 571px;
+//            height: 18px;
+//            padding-right: 96px;
+//            margin-bottom: 0px;
+//            background-image: url('/img/feed_comment_input_background.png');
+//            background-repeat: no-repeat;
+//            background-position: right;
+//            background-position-y: -2px;
+//        }
+//        .controls {
+//            padding-left: 20px;
+//            padding-right: 20px;
+//            display: none;
+//            .attach-links {
+//                height: 30px;
+//                display: inline-block;
+//                float: right;
+//                a.attach-links {
+//                    margin-top: 4px;
+//                    display: inline-block;
+//                }
+//            }
+//            .attached-link {
+//                display: none;
+//                .attached-link-delete {
+//                    float: right;
+//                    padding-top: 10px;
+//                }
+//                #attached-link-field {
+//                    width: 540px;
+//                }
+//            }
+//            .buttons {
+//                padding-bottom: 10px;
+//                .cancel-link {
+//                    top: 2px;
+//                    position: relative;
+//                }
+//            }
+//        }
+//    }
+//    .comments, .feed-items {
+//        .empty {
+//            text-align: center;
+//            color: #696969;
+//            margin-top: 20px;
+//            margin-bottom: 20px;
+//        }
+//        .comment {
+//            &:hover {
+//                .content {
+//                    .is_author {
+//                        .timestamp {
+//                            display: none;
+//                        }
+//                        .delete-link {
+//                            display: block;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        .item {
+//            clear: both;
+//            min-height: 80px;
+//            border-bottom: 1px solid #f3f3f3;
+//            margin-top: 20px;
+//            .avatar {
+//                width: 70px;
+//                float: left;
+//            }
+//            .content {
+//                margin-left: 70px;
+//                .author {
+//                    font-weight: bold;
+//                    .gray {
+//                        margin-left: 6px;
+//                        font-weight: normal;
+//                        color: #bbbbbb;
+//                    }
+//                    .timestamp {
+//                        float: right;
+//                        font-size: 11px;
+//                        margin-right: 10px;
+//                    }
+//                    .delete-link {
+//                        display: none;
+//                        float: right;
+//                        font-size: 11px;
+//                        margin-right: 10px;
+//                    }
+//                }
+//                .text {
+//                }
+//                .by_author {
+//                    color: #c77371;
+//                }
+//            }
+//        }
+//    }
+//    .feed-items {
+//        .feed-item {
+//            .content {
+//                margin-bottom: 10px;
+//                .author {
+//                    .gray {
+//                        color: #8c8c8c;
+//                    }
+//                }
+//                .text {
+//                    color: #b74a47;
+//                    font-weight: bold;
+//                    font-size: 13px;
+//                    line-height: 1.5;
+//                }
+//            }
+//            .comments-button {
+//                margin-left: 70px;
+//                margin-bottom: 10px;
+//            }
+//            .comments {
+//                margin-left: 70px;
+//                .comment {
+//                    background-color: #F8F8F8;
+//                    margin-bottom: 5px;
+//                    padding: 10px;
+//                    min-height: 27px;
+//                    .avatar {
+//                        clear: both;
+//                        width: 27px;
+//                        margin-right: 10px;
+//                        float: left;
+//                    }
+//                    .content {
+//                        float: left;
+//                        margin-left: 0px;
+//                        max-width: 440px;
+//                        margin-bottom: 0;
+//                        .comment-input {
+//                            margin-bottom: 0;
+//                            width: 520px;
+//                            resize: none;
+//                            height: 18px;
+//                        }
+//                    }
+//                    .timestamp {
+//                        float:right;
+//                        font-size: 11px;
+//                        width: 100px;
+//                        text-align: right;
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
+
+.course-details-feed {
+    .feed-item-form {
+        padding-bottom: 0;
+        .feed-item-textarea {
             resize: none;
             position: relative;
             width: 571px;
@@ -13,7 +176,7 @@
             background-position: right;
             background-position-y: -2px;
         }
-        .controls {
+        .feed-item-form-controls {
             padding-left: 20px;
             padding-right: 20px;
             display: none;
@@ -32,7 +195,7 @@
                     float: right;
                     padding-top: 10px;
                 }
-                #attached-link-field {
+                .attached-link-field {
                     width: 540px;
                 }
             }
@@ -45,72 +208,30 @@
             }
         }
     }
-    .comments, .feed-items {
+    .feed-items {
         .empty {
             text-align: center;
             color: #696969;
             margin-top: 20px;
             margin-bottom: 20px;
         }
-        .comment {
-            &:hover {
-                .content {
-                    .is_author {
-                        .timestamp {
-                            display: none;
-                        }
-                        .delete-link {
-                            display: block;
-                        }
-                    }
-                }
-            }
-        }
-        .item {
+        .feed-item {
             clear: both;
             min-height: 80px;
             border-bottom: 1px solid #f3f3f3;
             margin-top: 20px;
+
             .avatar {
                 width: 70px;
                 float: left;
             }
             .content {
-                margin-left: 70px;
-                margin-bottom: 20px;
+                margin-bottom: 10px;
                 .author {
                     font-weight: bold;
                     .gray {
-                        margin-left: 6px;
-                        font-weight: normal;
-                        color: #bbbbbb;
-                    }
-                    .timestamp {
-                        float: right;
-                        font-size: 11px;
-                        margin-right: 10px;
-                    }
-                    .delete-link {
-                        display: none;
-                        float: right;
-                        font-size: 11px;
-                        margin-right: 10px;
-                    }
-                }
-                .text {
-                }
-                .by_author {
-                    color: #c77371;
-                }
-            }
-        }
-    }
-    .feed-items {
-        .feed-item {
-            .content {
-                .author {
-                    .gray {
                         color: #8c8c8c;
+                        font-weight: normal;
                     }
                 }
                 .text {
@@ -119,6 +240,16 @@
                     font-size: 13px;
                     line-height: 1.5;
                 }
+                .timestamp {
+                    float: right;
+                    font-size: 11px;
+                    font-weight: normal;
+                    margin-right: 10px;
+                }
+            }
+            .comments-button {
+                margin-left: 70px;
+                margin-bottom: 10px;
             }
             .comments {
                 margin-left: 70px;
@@ -136,13 +267,24 @@
                     .content {
                         float: left;
                         margin-left: 0px;
-                        max-width: 440px;
+                        max-width: 560px;
                         margin-bottom: 0;
                         .comment-input {
                             margin-bottom: 0;
                             width: 520px;
                             resize: none;
                             height: 18px;
+                        }
+                        .buttons {
+                            input {
+                                display: block;
+                                margin-top: 5px;
+                                float: left;
+                            }
+                            a.cancel-link {
+                                position: relative;
+                                top: 11px;
+                            }
                         }
                     }
                     .timestamp {
@@ -157,8 +299,3 @@
     }
 }
 
-.course-details-feed {
-    .form {
-        padding-bottom: 0;
-    }
-}
