@@ -80,11 +80,15 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
 
         $upcomingAssignments = $this->getRoleUser()->getUpcomingAssignments($course);
 
+        $feedCommentFormType = new FormType\FeedCommentType();
+        $feedCommentForm = $this->createForm($feedCommentFormType, null);
+
         return array(
             'course' => $course,
             'upcomingAssignments' => $upcomingAssignments,
             'feedItemForm' => $feedItemForm->createView(),
             'feedItems' => $course->getFeedItems(),
+            'feedCommentForm' => $feedCommentForm->createView(),
             'target' => 'feed',
         );
     }

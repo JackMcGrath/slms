@@ -71,5 +71,5 @@ $(document).ready(function(){
 
     $('#ajaxUploadSolutionsForm').zerebralAjaxForm();
 
-    $('.feed').zerebralFeedBlock();
+    $('.assignment-details-feed').zerebralAssignmentDetailFeedBlock();
 });
