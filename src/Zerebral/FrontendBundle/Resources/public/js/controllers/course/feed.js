@@ -5,5 +5,5 @@ $(document).ready(function(){
         $(this).find('.manage-buttons').css('visibility', 'hidden').prev().show();
     });
 
-    $('.feed').zerebralFeedBlock();
+    $('.course-details-feed').zerebralCourseDetailFeedBlock();
 });

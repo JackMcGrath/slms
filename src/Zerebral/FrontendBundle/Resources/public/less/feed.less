@@ -1,22 +1,25 @@
-.feed {
-    .form {
+.assignment-details-feed {
+    .feed-comment-form {
+        background-color: #f3f3f3;
         padding-bottom: 10px;
-        #comment_input {
-            resize: none;
-            position: relative;
-            width: 571px;
-            height: 18px;
-            padding-right: 96px;
-            margin-bottom: 0px;
-            background-image: url('/img/feed_comment_input_background.png');
-            background-repeat: no-repeat;
-            background-position: right;
-            background-position-y: -2px;
+        form {
+            margin: 0;
         }
-        .controls {
+        .feed-comment-textarea {
+            background-image: none;
+            resize: none;
+            width: 621px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            margin-left: 20px;
+            margin-right: 20px;
+            padding-left: 6px;
+            padding-right: 6px;
+            height: 120px;
+        }
+        .feed-comment-form-controls {
             padding-left: 20px;
             padding-right: 20px;
-            display: none;
             .attach-links {
                 height: 30px;
                 display: inline-block;
@@ -32,7 +35,7 @@
                     float: right;
                     padding-top: 10px;
                 }
-                #attached-link-field {
+                .attached-link-field {
                     width: 540px;
                 }
             }
@@ -45,7 +48,7 @@
             }
         }
     }
-    .comments, .feed-items {
+    .comments {
         .empty {
             text-align: center;
             color: #696969;
@@ -53,20 +56,6 @@
             margin-bottom: 20px;
         }
         .comment {
-            &:hover {
-                .content {
-                    .is_author {
-                        .timestamp {
-                            display: none;
-                        }
-                        .delete-link {
-                            display: block;
-                        }
-                    }
-                }
-            }
-        }
-        .item {
             clear: both;
             min-height: 80px;
             border-bottom: 1px solid #f3f3f3;
@@ -77,7 +66,6 @@
             }
             .content {
                 margin-left: 70px;
-                margin-bottom: 20px;
                 .author {
                     font-weight: bold;
                     .gray {
@@ -103,14 +91,93 @@
                     color: #c77371;
                 }
             }
+            &:hover {
+                .content {
+                    .is_author {
+                        .timestamp {
+                            display: none;
+                        }
+                        .delete-link {
+                            display: block;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.course-details-feed {
+    .feed-item-form {
+        padding-bottom: 0;
+        .feed-item-textarea {
+            resize: none;
+            position: relative;
+            width: 571px;
+            height: 18px;
+            padding-right: 96px;
+            margin-bottom: 0px;
+            background-image: url('/img/feed_comment_input_background.png');
+            background-repeat: no-repeat;
+            background-position: right;
+            background-position-y: -2px;
+        }
+        .feed-item-form-controls {
+            padding-left: 20px;
+            padding-right: 20px;
+            display: none;
+            .attach-links {
+                height: 30px;
+                display: inline-block;
+                float: right;
+                a.attach-links {
+                    margin-top: 4px;
+                    display: inline-block;
+                }
+            }
+            .attached-link {
+                display: none;
+                .attached-link-delete {
+                    float: right;
+                    padding-top: 10px;
+                }
+                .attached-link-field {
+                    width: 540px;
+                }
+            }
+            .buttons {
+                padding-bottom: 10px;
+                .cancel-link {
+                    top: 2px;
+                    position: relative;
+                }
+            }
         }
     }
     .feed-items {
+        .empty {
+            text-align: center;
+            color: #696969;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
         .feed-item {
+            clear: both;
+            min-height: 80px;
+            border-bottom: 1px solid #f3f3f3;
+            margin-top: 20px;
+
+            .avatar {
+                width: 70px;
+                float: left;
+            }
             .content {
+                margin-bottom: 10px;
                 .author {
+                    font-weight: bold;
                     .gray {
                         color: #8c8c8c;
+                        font-weight: normal;
                     }
                 }
                 .text {
@@ -118,6 +185,19 @@
                     font-weight: bold;
                     font-size: 13px;
                     line-height: 1.5;
+                }
+                .timestamp {
+                    float: right;
+                    font-size: 11px;
+                    font-weight: normal;
+                    margin-right: 10px;
+                }
+            }
+            .comments-button {
+                margin-left: 70px;
+                margin-bottom: 10px;
+                a.show-comment-form-link {
+                    color: #656565;
                 }
             }
             .comments {
@@ -138,11 +218,25 @@
                         margin-left: 0px;
                         max-width: 440px;
                         margin-bottom: 0;
+                        .feed-item-comment-form {
+                            margin: 0;
+                        }
                         .comment-input {
                             margin-bottom: 0;
                             width: 520px;
                             resize: none;
                             height: 18px;
+                        }
+                        .buttons {
+                            input {
+                                display: block;
+                                margin-top: 5px;
+                                float: left;
+                            }
+                            a.cancel-link {
+                                position: relative;
+                                top: 11px;
+                            }
                         }
                     }
                     .timestamp {
@@ -157,8 +251,3 @@
     }
 }
 
-.course-details-feed {
-    .form {
-        padding-bottom: 0;
-    }
-}

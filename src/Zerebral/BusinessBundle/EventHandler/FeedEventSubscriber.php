@@ -28,7 +28,7 @@ class FeedEventSubscriber implements \Symfony\Component\EventDispatcher\EventSub
         $feedContent->setType('assignment');
 
         $feedItem = new FeedItem();
-        $feedItem->setAssignment($assignment);
+        $feedItem->setAssignmentId($assignment->getId());
         $feedItem->setCourse($assignment->getCourse());
         $feedItem->setCreatedBy($assignment->getTeacher()->getUser()->getId());
         $feedItem->setFeedContent($feedContent);

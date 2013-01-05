@@ -88,7 +88,7 @@
                                     <i class="manage-buttons-gears icon-small-gears"></i>
                                     <div class="manage-buttons invisible">
                                         {% if is_granted('EDIT', courseFolder) %}<a href="#" class="edit"><i class="icon-small-pencil"></i>Edit</a>{% endif %}
-                                        {% if is_granted('DELETE', courseFolder) %}<a href="{{ path('delete_folder', {id: courseFolder.id}) }}" class="delete"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
+                                        {% if is_granted('DELETE', courseFolder) %}<a href="{{ path('course_material_folder_delete', {id: courseFolder.id}) }}" class="delete"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
                                     </div>
                                 </div>
                             {% endif %}
@@ -101,30 +101,32 @@
 
     </div>
 
-    <div class="modal hide fade" id="editFolderModal">
-        <form class="form-vertical folder-form" data-action-edit="{{ path('ajax_edit_folder', {courseId: course.id, id: ''}) }}" data-action-add="{{ path('ajax_add_folder', {courseId: course.id}) }}" method="post" {{ form_enctype(folderRenameForm) }} novalidate>
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h3>Rename folder</h3>
-            </div>
-            <div class="modal-body">
-                {{ form_row(folderRenameForm.name, {
-                    label: 'Name',
-                    form_type: 'horizontal',
-                    placeholder: 'Folder name',
-                    attr: {
-                        class: 'input-xlarge'
-                    }
-                }) }}
+    {% render url('course_material_folder_form', {courseId: course.id}) %}
 
-                {{ form_rest(folderRenameForm) }}
+    {#<div class="modal hide fade" id="editFolderModal">#}
+        {#<form class="form-vertical folder-form" data-action-edit="{{ path('ajax_edit_folder', {courseId: course.id, id: ''}) }}" data-action-add="{{ path('ajax_add_folder', {courseId: course.id}) }}" method="post" {{ form_enctype(folderRenameForm) }} novalidate>#}
+            {#<div class="modal-header">#}
+                {#<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>#}
+                {#<h3>Rename folder</h3>#}
+            {#</div>#}
+            {#<div class="modal-body">#}
+                {#{{ form_row(folderRenameForm.name, {#}
+                    {#label: 'Name',#}
+                    {#form_type: 'horizontal',#}
+                    {#placeholder: 'Folder name',#}
+                    {#attr: {#}
+                        {#class: 'input-xlarge'#}
+                    {#}#}
+                {#}) }}#}
 
-            </div>
-            <div class="modal-footer">
-                <button type="submit" class="btn btn-danger">Save</button>
-            </div>
-        </form>
-    </div>
+                {#{{ form_rest(folderRenameForm) }}#}
+
+            {#</div>#}
+            {#<div class="modal-footer">#}
+                {#<button type="submit" class="btn btn-danger">Save</button>#}
+            {#</div>#}
+        {#</form>#}
+    {#</div>#}
 
     <div class="modal hide fade" id="uploadMaterialModal">
         <form method="post" {{ form_enctype(courseMaterialForm) }} class="upload-material" action="{{ path('ajax_course_material_upload', {id: course.id}) }}">
