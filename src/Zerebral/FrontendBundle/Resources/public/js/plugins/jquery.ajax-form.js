@@ -11,7 +11,7 @@ ZerebralAjaxForm.prototype = {
 
     init: function() {
         $(this.element).ajaxForm({
-            success: $.proxy(this.onSuccess, this),
+            success: this.options['onSuccess'] || $.proxy(this.onSuccess, this),
             dataType: 'json'
         })
     },
