@@ -1,0 +1,25 @@
+<div class="modal hide fade" id="editFolderModal">
+    <form class="form-vertical folder-form" data-action-edit="{{ path('ajax_course_material_folder_edit', {courseId: course.id, id: ''}) }}"
+          data-action-add="{{ path('ajax_course_material_folder_form_add', {courseId: course.id}) }}" method="post" {{ form_enctype(form) }} novalidate>
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h3>Rename folder</h3>
+        </div>
+        <div class="modal-body">
+            {{ form_row(form.name, {
+            label: 'Name',
+            form_type: 'horizontal',
+            placeholder: 'Folder name',
+            attr: {
+            class: 'input-xlarge'
+            }
+            }) }}
+
+            {{ form_rest(form) }}
+
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-danger">Save</button>
+        </div>
+    </form>
+</div>

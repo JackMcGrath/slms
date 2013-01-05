@@ -21,53 +21,6 @@ use Zerebral\BusinessBundle\Model as Model;
 class MaterialController extends \Zerebral\CommonBundle\Component\Controller
 {
     /**
-     * @Route("/folders/delete/{id}", name="delete_folder")
-     * @ParamConverter("folder")
-     * @PreAuthorize("hasRole('ROLE_TEACHER')")
-     */
-    public function deleteFolderAction(Model\Material\CourseFolder $folder)
-    {
-        $folder->delete();
-        #TODO do not redirect to does not exist folder!!
-        return $this->redirect($this->getRequest()->headers->get('referer'));
-    }
-
-    /**
-     * @Route("/folders/add/{courseId}", name="ajax_add_folder")
-     * @Route("/folders/edit/{courseId}/{id}", name="ajax_edit_folder")
-     *
-     * @ParamConverter("folder", options={"mapping": {"id": "id"}})
-     * @ParamConverter("course", options={"mapping": {"courseId": "id"}})
-     *
-     * @PreAuthorize("hasRole('ROLE_TEACHER')")
-     */
-    public function editFolderAction(Model\Material\CourseFolder $folder = null, Model\Course\Course $course = null)
-    {
-
-        if (empty($folder)) {
-            $folder = new Model\Material\CourseFolder();
-            $folder->setCourse($course);
-        }
-
-        $form = $this->createForm(new FormType\CourseFolderType(), $folder);
-
-        if (!$this->getRequest()->isXmlHttpRequest()) {
-            throw $this->createNotFoundException();
-        }
-
-        $form->bind($this->getRequest());
-        if ($form->isValid()) {
-            $folder->save();
-
-            return new JsonResponse(array(
-                'redirect' => $this->getRequest()->headers->get('referer')
-            ));
-        }
-
-        return new FormJsonResponse($form);
-    }
-
-    /**
      * @Route("/materials/upload/{id}", name="ajax_course_material_upload")
      * @ParamConverter("course")
      *
