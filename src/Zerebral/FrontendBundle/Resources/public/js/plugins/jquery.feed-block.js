@@ -36,7 +36,15 @@ ZerebralCourseDetailFeedBlock.prototype = {
         this.itemsDiv.find('.show-comment-form-link').click($.proxy(self.showCommentForm, self));
 
         this.feedItemForm.zerebralAjaxForm();
-        this.commentsDiv.find('form').zerebralAjaxForm();
+        $.each(this.commentsDiv.find('form'), function(index, value) {
+            $(this).zerebralAjaxForm({
+                success: $.proxy(self.addCommentBlock, this),
+                error: function() {
+                    alert('Oops, seems like unknown error has appeared!');
+                },
+                dataType: 'html'
+            });
+        })
     },
 
     expandFeedItemForm: function(event) {
@@ -87,7 +95,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
         var input = $(event.target);
         input.animate({
             height: '+60'
-        });
+        }, 300);
         input.parent().find('.buttons').show();
     },
     collapseCommentForm: function(event) {
@@ -96,7 +104,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
         link.parent().hide();
         link.parents('form').find('.comment-input').animate({
             height: '18'
-        });
+        }, 300).val('');
 
     },
     showCommentForm: function(event) {
@@ -104,6 +112,13 @@ ZerebralCourseDetailFeedBlock.prototype = {
 
         var link = $(event.target);
         link.parents('.feed-item').find('.comment.hidden').removeClass('hidden');
+    },
+    addCommentBlock: function(response) {
+        $(this).parents('.comment').before(response);
+        var commentsCount = $(this).parents('.feed-item').find('.show-comment-form-link').data('commentsCount');
+        $(this).parents('.feed-item').find('.show-comment-form-link span').html((commentsCount + 1));
+        $(this).find('.cancel-link').click();
+
     },
     _: ''
 };

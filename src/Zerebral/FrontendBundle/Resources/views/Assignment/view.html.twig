@@ -1,7 +1,7 @@
 {% extends 'ZerebralFrontendBundle::layout.html.twig' %}
 {% import "ZerebralFrontendBundle:Macro:flashMessages.html.twig" as flashMessages %}
 {% import "ZerebralFrontendBundle:Macro:main.html.twig" as mainPartials %}
-{% import "ZerebralFrontendBundle:Macro:feed.html.twig" as feedPartials %}
+{% import "ZerebralFrontendBundle:Feed:feed.html.twig" as feed %}
 
 {% block content %}
     {% javascripts
@@ -57,7 +57,7 @@
             </div>
 
 
-            {{ feedPartials.assignment_details_feed(feedCommentForm, path('ajax_feed_add_comment', {feedItemId: assignment.feedItem.id }), assignment.feedItem.feedComments, app.user) }}
+            {{ feed.assignment_details_feed(feedCommentForm, path('ajax_feed_add_comment', {feedItemId: assignment.feedItem.id }), assignment.feedItem.feedComments, app.user) }}
         </div>
 
         <div class="right-navbar pull-left">

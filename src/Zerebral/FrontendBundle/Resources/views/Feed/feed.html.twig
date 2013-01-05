@@ -21,22 +21,11 @@
                     </div>
                 </div>
             </div>
-            {{ form_widget(feedCommentForm._token) }}
         </form>
     </div>
     <div class="comments">
         {% for comment in comments %}
-        <div class="comment">
-            <div class="avatar"><img class="rounded" src="{{ get_file_storage_link(comment.user.getAvatarFile()) | imagine_filter('thumbnail') }}" /> </div>
-            <div class="content">
-                <div class="author {% if app.user.id == comment.user.id %} is_author {% endif %}">
-                    {{ comment.user.fullName }} <span class="gray timestamp">{{ time_diff(comment.createdAt) }}</span>
-                    {% if app.user.id == comment.user.id %}<span class="gray delete-link"><i class="icon-small-trash-bin"></i>Delete</span>{% endif %}
-                </div>
-                <div class="text">{{ comment.feedContent.text }}</div>
-                <div class="link"><a href="{{ comment.feedContent.linkUrl }}">{{ comment.feedContent.linkUrl }}</a></div>
-            </div>
-        </div>
+            {% include "ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig" with {'type': 'assignmentDetailsFeed'} %}
         {% else %}
         <div class="empty"> No comments yet. Be the first to leave one!</div>
         {% endfor %}
@@ -45,26 +34,6 @@
 {% endmacro %}
 
 <!--      CourseDetails   --->
-
-
-{% macro feed_item_assignment_block(feedItem) %}
-    <div class="author">{{ feedItem.user.fullName }}<span class="gray"> created new assignment </span><a style="color: #333333;" href="{{ path('assignment_view', {id: feedItem.assignment.id}) }}">{{ feedItem.assignment.name }}</a> <span class="gray timestamp">{{ time_diff(feedItem.createdAt) }}</span></div>
-    <div class="text">
-        {% autoescape 'html' %}
-        {{ feedItem.assignment.description|striptags|slice(0, 100) }}
-        {% endautoescape %}
-    </div>
-{% endmacro %}
-
-{% macro feed_item_text_block(feedItem) %}
-    <div class="author">{{ feedItem.user.fullName }}<span class="gray timestamp">{{ time_diff(feedItem.createdAt) }}</span></div>
-    <div class="text">
-        {{ feedItem.feedContent.text }}
-    </div>
-    <div class="link"><a href=""></a></div>
-{% endmacro %}
-
-
 
 
 {% macro course_details_feed(feedItemForm, feedItemFormPath, feedItems, feedCommentForm) %}
@@ -100,21 +69,12 @@
             <div class="feed-item">
                 <div class="avatar"><img class="rounded" src="{{ get_file_storage_link(feedItem.user.getAvatarFile()) | imagine_filter('thumbnail') }}"></div>
                 <div class="content">
-                    {% if feedItem.feedContent.type == 'assignment' %}
-                        {{ self.feed_item_assignment_block(feedItem) }}
-                    {% else %}
-                        {{ self.feed_item_text_block(feedItem) }}
-                    {% endif %}
+                    {% include "ZerebralFrontendBundle:Feed:feedItemBlock.html.twig" %}
                 </div>
-                <div class="comments-button"><i class="icon-comment"></i> <a class="show-comment-form-link" href="#">Comment ({{ feedItem.feedComments|length }})</a></div>
+                <div class="comments-button"><i class="icon-comment"></i> <a class="show-comment-form-link" data-comments-count="{{ feedItem.feedComments|length }}" href="#">Comment (<span>{{ feedItem.feedComments|length }}</span>)</a></div>
                 <div class="comments">
                     {% for comment in feedItem.feedComments %}
-                        <div class="comment">
-                            <div class="avatar"><img class="rounded" src="{{ get_file_storage_link(comment.user.getAvatarFile()) | imagine_filter('small_thumbnail') }}" /></div>
-                            <div class="content"><b>{{ comment.user.fullName }}</b>&nbsp;{{ comment.feedContent.text }}</div>
-                            <div class="timestamp"><span class="gray">{{ time_diff(comment.createdAt) }}</span></div>
-                            <div class="clearfix"></div>
-                        </div>
+                        {% include "ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig" with {'type': 'courseDetailsFeed'} %}
                     {% endfor %}
 
                     <div class="comment {% if feedItem.feedComments|length == 0 %} hidden {% endif %}">
@@ -126,7 +86,6 @@
                                     <input type="submit" class="btn btn-danger" value="Post" />&nbsp;&nbsp;&nbsp;<a href="#" class="cancel-link">Cancel</a>
                                     <input class="comment-type" type="hidden" name="feed_comment[feedContent][type]" value="text" />
                                 </div>
-                                {{ form_widget(feedCommentForm._token) }}
                             </form>
                         </div>
                         <div class="clearfix"></div>

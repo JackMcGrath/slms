@@ -1,6 +1,6 @@
 {% extends 'ZerebralFrontendBundle::layout.html.twig' %}
 {% import "ZerebralFrontendBundle:Macro:main.html.twig" as mainPartials %}
-{% import "ZerebralFrontendBundle:Macro:feed.html.twig" as feedPartials %}
+{% import "ZerebralFrontendBundle:Feed:feed.html.twig" as feed %}
 
 {% block content %}
     {% javascripts
@@ -28,7 +28,7 @@
             </div>
 
             <br />
-            {{ feedPartials.course_details_feed(feedItemForm, path('ajax_course_add_feed_item', {courseId: course.id }), feedItems, feedCommentForm) }}
+            {{ feed.course_details_feed(feedItemForm, path('ajax_course_add_feed_item', {courseId: course.id }), feedItems, feedCommentForm) }}
 
         </div>
         <div class="right-navbar pull-left">

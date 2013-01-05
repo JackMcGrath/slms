@@ -1,0 +1,24 @@
+{% macro feed_item_assignment_block(feedItem) %}
+    <div class="author">{{ feedItem.user.fullName }}<span class="gray"> created new assignment </span><a style="color: #333333;" href="{{ path('assignment_view', {id: feedItem.assignment.id}) }}">{{ feedItem.assignment.name }}</a> <span class="gray timestamp">{{ time_diff(feedItem.createdAt) }}</span></div>
+    <div class="text">
+        {% autoescape 'html' %}
+        {{ feedItem.assignment.description|striptags|slice(0, 100) }}
+        {% endautoescape %}
+    </div>
+{% endmacro %}
+
+{% macro feed_item_text_block(feedItem) %}
+    <div class="author">{{ feedItem.user.fullName }}<span class="gray timestamp">{{ time_diff(feedItem.createdAt) }}</span></div>
+    <div class="text">
+        {{ feedItem.feedContent.text }}
+    </div>
+    <div class="link"><a href=""></a></div>
+{% endmacro %}
+
+
+{% import _self as self %}
+{% if feedItem.feedContent.type == 'assignment' %}
+    {{ self.feed_item_assignment_block(feedItem) }}
+{% else %}
+    {{ self.feed_item_text_block(feedItem) }}
+{% endif %}

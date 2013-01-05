@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Zerebral\FrontendBundle\Form\Type as FormType;
 
 use Zerebral\BusinessBundle\Model\Feed\FeedItem;
+use Zerebral\BusinessBundle\Model\Feed\FeedComment;
 use Zerebral\BusinessBundle\Model\Course\Course;
 
 /**
@@ -43,17 +44,11 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
             $feedComment->setCreatedBy($this->getUser()->getId());
             $feedItem->addFeedComment($feedComment);
             $feedItem->save();
-            return new JsonResponse(array(
-                'redirect' => $this->generateUrl(
-                    'assignment_view',
-                    array(
-                        'id' => $feedItem->getAssignment()->getId()
-                    )
-                )
-            ));
+
+            return $this->render('ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig', array('type' => 'courseDetailsFeed', 'comment' => $feedComment));
         }
 
-        return new FormJsonResponse($feedCommentForm);
+        return new FormJsonResponse($feedCommentForm, 500);
     }
 
     /**
@@ -89,6 +84,6 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
             ));
         }
 
-        return new FormJsonResponse($feedItemForm);
+        return new FormJsonResponse($feedItemForm, 500);
     }
 }
