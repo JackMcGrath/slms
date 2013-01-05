@@ -98,4 +98,20 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
 
         return new FormJsonResponse($feedItemForm, 500);
     }
+
+    /**
+     * @Route("/remove-feed-item/{feedItemId}", name="ajax_feed_remove_feed_item")
+     * @param \Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @ParamConverter("feedItem", options={"mapping": {"feedItemId": "id"}})
+     */
+    public function removeFeedItemAction(\Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem) {
+        if (($this->getUser()->getId() == $feedItem->getCreatedBy()) && ($feedItem->getFeedContent()->getType() != 'assignment')) {
+            $feedItem->delete();
+            return new JsonResponse(array());
+        } else {
+            return new JsonResponse(array('message' => 'You can\'t delete other feed items or assignments items'), 403);
+        }
+    }
 }

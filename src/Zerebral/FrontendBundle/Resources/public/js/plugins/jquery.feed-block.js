@@ -34,7 +34,8 @@ ZerebralCourseDetailFeedBlock.prototype = {
         this.feedItemsDiv.on('click', '.comment-input', $.proxy(self.expandCommentForm, self));
         this.feedItemsDiv.on('click', '.comment .buttons .cancel-link', $.proxy(self.collapseCommentForm, self));
         this.feedItemsDiv.on('click', '.show-comment-form-link', $.proxy(self.showCommentForm, self));
-        this.feedItemsDiv.on('click', 'a.delete-link', $.proxy(self.deleteCommentBlock, self));
+        this.feedItemsDiv.on('click', 'a.delete-link.delete-feed-item', $.proxy(self.deleteItemBlock, self));
+        this.feedItemsDiv.on('click', 'a.delete-link.delete-comment', $.proxy(self.deleteCommentBlock, self));
 
         this.feedItemForm.zerebralAjaxForm({
             success: $.proxy(self.addItemBlock, this),
@@ -136,6 +137,24 @@ ZerebralCourseDetailFeedBlock.prototype = {
         this.feedItemsDiv.find('.empty').remove().end().prepend(itemBlock);
         this.collapseFeedItemForm();
     },
+    deleteItemBlock: function(event) {
+        event.preventDefault();
+        var link = $(event.target);
+        if (window.confirm('Are you sure to delete post?')) {
+            var url = link.attr('href');
+            $.ajax({
+                url: url,
+                type: 'post',
+                dataType: 'json',
+                success: function(response) {
+                    link.parents('.feed-item').slideUp('fast', function() {
+                        link.parents('.feed-item').remove();
+                    });
+                },
+                error: function() {alert('Oops, seems like unknown error has appeared!') }
+            })
+        }
+    },
     addCommentBlock: function(response) {
         $(this).parents('.comment').before(response);
         var commentsCount = $(this).parents('.feed-item').find('.show-comment-form-link').data('commentsCount');
@@ -156,7 +175,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
                 success: function(response) {
                     var commentsCount = link.parents('.feed-item').find('.show-comment-form-link').data('commentsCount');
                     link.parents('.feed-item').find('.show-comment-form-link span').html((commentsCount - 1));
-                    var commentsCount = link.parents('.feed-item').find('.show-comment-form-link').data('commentsCount', commentsCount - 1);
+                    link.parents('.feed-item').find('.show-comment-form-link').data('commentsCount', commentsCount - 1);
                     link.parents('.comment').slideUp('fast', function() {
                         link.parents('.comment').remove();
                     });

@@ -173,6 +173,20 @@
             }
             .content {
                 margin-bottom: 10px;
+                &.is_author:hover {
+                    .delete-link {
+                        display: block;
+                    }
+                    .timestamp {
+                        display: none;
+                    }
+                }
+                .delete-link {
+                    float: right;
+                    margin-right: 10px;
+                    font-size: 11px;
+                    display: none;
+                }
                 .author {
                     font-weight: bold;
                     .gray {
@@ -209,7 +223,7 @@
                     min-height: 27px;
 
 
-                    &:hover {
+                    &.is_author:hover {
                         .timestamp {
                             display: none;
                         }
