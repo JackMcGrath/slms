@@ -22,7 +22,8 @@ class FeedCommentType extends AbstractType {
 
         $resolver->setDefaults(
             array(
-                'data_class' => 'Zerebral\BusinessBundle\Model\Feed\FeedComment'
+                'data_class' => 'Zerebral\BusinessBundle\Model\Feed\FeedComment',
+                'csrf_protection' => false,
             )
         );
     }

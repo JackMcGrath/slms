@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Zerebral\FrontendBundle\Form\Type as FormType;
 
 use Zerebral\BusinessBundle\Model\Feed\FeedItem;
+use Zerebral\BusinessBundle\Model\Feed\FeedComment;
 use Zerebral\BusinessBundle\Model\Course\Course;
 
 /**
@@ -26,6 +27,7 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
     /**
      * @Route("/add-comment/{feedItemId}", name="ajax_feed_add_comment")
      * @param \Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem
+     * @return \Symfony\Component\HttpFoundation\Response|\Zerebral\CommonBundle\HttpFoundation\FormJsonResponse
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @ParamConverter("feedItem", options={"mapping": {"feedItemId": "id"}})
      */
@@ -43,17 +45,29 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
             $feedComment->setCreatedBy($this->getUser()->getId());
             $feedItem->addFeedComment($feedComment);
             $feedItem->save();
-            return new JsonResponse(array(
-                'redirect' => $this->generateUrl(
-                    'assignment_view',
-                    array(
-                        'id' => $feedItem->getAssignment()->getId()
-                    )
-                )
-            ));
+
+            $feedType = $this->getRequest()->get('feedType', 'assignment');
+
+            return $this->render('ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig', array('feedType' => $feedType, 'comment' => $feedComment));
         }
 
-        return new FormJsonResponse($feedCommentForm);
+        return new FormJsonResponse($feedCommentForm, 500);
+    }
+
+    /**
+     * @Route("/remove-comment/{feedCommentId}", name="ajax_feed_remove_comment")
+     * @param \Zerebral\BusinessBundle\Model\Feed\FeedComment $feedComment
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @ParamConverter("feedComment", options={"mapping": {"feedCommentId": "id"}})
+     */
+    public function removeFeedCommentAction(\Zerebral\BusinessBundle\Model\Feed\FeedComment $feedComment) {
+        if ($this->getUser()->getId() == $feedComment->getCreatedBy()) {
+            $feedComment->delete();
+            return new JsonResponse(array());
+        } else {
+            return new JsonResponse(array('message' => 'You can\'t delete other comments'), 403);
+        }
     }
 
     /**
@@ -79,16 +93,25 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
             $course->addFeedItem($feedItem);
             $course->save();
 
-            return new JsonResponse(array(
-                'redirect' => $this->generateUrl(
-                    'course_feed',
-                    array(
-                        'id' => $course->getId()
-                    )
-                )
-            ));
+            return $this->render('ZerebralFrontendBundle:Feed:feedItemBlock.html.twig', array('feedItem' => $feedItem));
         }
 
-        return new FormJsonResponse($feedItemForm);
+        return new FormJsonResponse($feedItemForm, 500);
+    }
+
+    /**
+     * @Route("/remove-feed-item/{feedItemId}", name="ajax_feed_remove_feed_item")
+     * @param \Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @ParamConverter("feedItem", options={"mapping": {"feedItemId": "id"}})
+     */
+    public function removeFeedItemAction(\Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem) {
+        if (($this->getUser()->getId() == $feedItem->getCreatedBy()) && ($feedItem->getFeedContent()->getType() != 'assignment')) {
+            $feedItem->delete();
+            return new JsonResponse(array());
+        } else {
+            return new JsonResponse(array('message' => 'You can\'t delete other feed items or assignments items'), 403);
+        }
     }
 }
