@@ -173,6 +173,20 @@
             }
             .content {
                 margin-bottom: 10px;
+                &.is_author:hover {
+                    .delete-link {
+                        display: block;
+                    }
+                    .timestamp {
+                        display: none;
+                    }
+                }
+                .delete-link {
+                    float: right;
+                    margin-right: 10px;
+                    font-size: 11px;
+                    display: none;
+                }
                 .author {
                     font-weight: bold;
                     .gray {
@@ -207,6 +221,17 @@
                     margin-bottom: 5px;
                     padding: 10px;
                     min-height: 27px;
+
+
+                    &.is_author:hover {
+                        .timestamp {
+                            display: none;
+                        }
+                        .delete-link {
+                            display: block;
+                        }
+                    }
+
                     .avatar {
                         clear: both;
                         width: 27px;
@@ -244,6 +269,11 @@
                         font-size: 11px;
                         width: 100px;
                         text-align: right;
+                    }
+                    .delete-link {
+                        display: none;
+                        float: right;
+                        font-size: 11px;
                     }
                 }
             }

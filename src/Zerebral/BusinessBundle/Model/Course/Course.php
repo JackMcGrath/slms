@@ -63,4 +63,10 @@ class Course extends BaseCourse
 
         return false;
     }
+
+    public function getFeedItems($criteria = null, PropelPDO $con = null) {
+        $orderCriteria = new \Criteria();
+        $orderCriteria->addDescendingOrderByColumn('created_at');
+        return parent::getFeedItems($orderCriteria);
+    }
 }

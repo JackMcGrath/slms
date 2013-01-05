@@ -10,9 +10,12 @@ class StudentAssignmentQuery extends BaseStudentAssignmentQuery
     {
         $this->filterByAssignmentId($assignmentId);
         $this->filterByIsSubmitted(true);
-        $this->leftJoinFileReferences();
+        $this->innerJoinFileReferences();
+        $this->leftJoinStudent();
+        $this->leftJoin('Student.User User');
+
         $this->withColumn('COUNT(FileReferences.file_id)', 'filesCount');
-        $this->groupBy('FileReferences.file_id');
+        $this->groupBy('student_assignments.id');
 
         return $this;
     }

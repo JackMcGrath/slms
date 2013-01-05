@@ -3,8 +3,8 @@
 
 {% block content %}
     {% javascripts
-    '@ZerebralFrontendBundle/Resources/public/js/controllers/course/assignments.js'
-    output='js/compiled/course.js' %}
+    '@ZerebralFrontendBundle/Resources/public/js/controllers/solutions/index.js'
+    output='js/compiled/solutions.js' %}
     <script type="text/javascript" src="{{ asset_url }}"></script>
     {% endjavascripts %}
 
@@ -17,8 +17,6 @@
 
                             <a href="{{ path('course_assignment_solutions', {courseId: course.id}) }}">{{ course.name }} </a>
                             / {{ assignment.name  }}
-
-
                     </small>
                 </h2>
             </div>
@@ -51,8 +49,7 @@
                 <form method="post" action="">
                     <ul class="radio">
                         <li><label><input type="radio" name="FileGrouping" value="date" {{ fileGrouping == 'date' ? 'checked' : '' }}/> Date and time</label></li>
-                        <li><label><input type="radio" name="FileGrouping" value="alphabetically" {{ fileGrouping == 'alphabetically' ? 'checked' : '' }}/> A-Z</label></li>
-                        <li><label><input type="radio" name="FileGrouping" value="folder" {{ fileGrouping == 'folder' ? 'checked' : '' }}/> Folder</label></li>
+                        <li><label><input type="radio" name="FileGrouping" value="name" {{ fileGrouping == 'assignment' or fileGrouping == 'course' or fileGrouping == 'name'  ? 'checked' : '' }}/> Name</label></li>
                     </ul>
                 </form>
             </div>

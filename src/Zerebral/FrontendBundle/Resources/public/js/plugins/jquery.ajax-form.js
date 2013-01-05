@@ -10,10 +10,12 @@ ZerebralAjaxForm.prototype = {
     feedLoading: false,
 
     init: function() {
-        $(this.element).ajaxForm({
+        var options = $.extend({}, {
             success: $.proxy(this.onSuccess, this),
             dataType: 'json'
-        })
+        }, this.options);
+
+        $(this.element).ajaxForm(options);
     },
 
     onSuccess: function(response) {
