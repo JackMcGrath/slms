@@ -31,28 +31,21 @@ ZerebralCourseDetailFeedBlock.prototype = {
         this.feedItemFormDiv.find('.attached-link-delete a').click($.proxy(self.resetMainFormType, self));
 
 
-
-        this.commentsDiv.find('.comment-input').click($.proxy(self.expandCommentForm, self));
-        this.commentsDiv.find('.comment .buttons .cancel-link').click($.proxy(self.collapseCommentForm, self));
-
-        this.itemsDiv.find('.show-comment-form-link').click($.proxy(self.showCommentForm, self));
+        this.feedItemsDiv.on('click', '.comment-input', $.proxy(self.expandCommentForm, self));
+        this.feedItemsDiv.on('click', '.comment .buttons .cancel-link', $.proxy(self.collapseCommentForm, self));
+        this.feedItemsDiv.on('click', '.show-comment-form-link', $.proxy(self.showCommentForm, self));
 
         this.feedItemForm.zerebralAjaxForm({
             success: $.proxy(self.addItemBlock, this),
-            error: function() {
-                alert('Oops, seems like unknown error has appeared!');
-            },
+            error: function() { alert('Oops, seems like unknown error has appeared!'); },
             dataType: 'html'
         });
+
         $.each(this.commentsDiv.find('form'), function(index, value) {
             $(this).zerebralAjaxForm({
-                data: {
-                    feedType: 'course'
-                },
+                data: { feedType: 'course' },
                 success: $.proxy(self.addCommentBlock, this),
-                error: function() {
-                    alert('Oops, seems like unknown error has appeared!');
-                },
+                error: function() { alert('Oops, seems like unknown error has appeared!'); },
                 dataType: 'html'
             });
         })
@@ -130,7 +123,16 @@ ZerebralCourseDetailFeedBlock.prototype = {
         link.parents('.feed-item').find('.comment.hidden').removeClass('hidden');
     },
     addItemBlock: function(response) {
-        this.feedItemsDiv.find('.empty').remove().end().prepend(response);
+        var self = this;
+        var itemBlock = $(response);
+
+        itemBlock.find('form').zerebralAjaxForm({
+            data: { feedType: 'course' },
+            success: $.proxy(self.addCommentBlock, itemBlock.find('form')),
+            error: function() { alert('Oops, seems like unknown error has appeared!');},
+            dataType: 'html'
+        });
+        this.feedItemsDiv.find('.empty').remove().end().prepend(itemBlock);
         this.collapseFeedItemForm();
     },
     addCommentBlock: function(response) {
