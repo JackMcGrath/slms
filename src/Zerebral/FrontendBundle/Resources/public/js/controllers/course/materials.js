@@ -102,7 +102,7 @@ UploadForm.prototype = {
         var courseIdInput = $('<input type="hidden" name="course_materials[courseMaterials][' + this.fileFieldIndex + '][courseId]" value="' + this.container.options.courseId + '" />');
 
         //var folderIdInput = $('<input type="hidden" class="upload-folder-id" name="course_materials[courseMaterials][' + this.fileFieldIndex + '][folderId]" value="' + this.selectedFolder + '" />');
-        newLi.append(newFileInput).append(newDescInput).append(courseIdInput).append(deleteFile);
+        newLi.append(newFileInput).append(newDescInput).append(courseIdInput);
         if (this.fileFieldIndex == 0) {
             ul.prepend(newLi);
         } else {
