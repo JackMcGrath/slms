@@ -28,7 +28,7 @@
             </div>
 
             <br />
-            {{ feedPartials.course_details_feed(feedItemForm, path('ajax_course_add_feed_item', {courseId: course.id }), feedItems) }}
+            {{ feedPartials.course_details_feed(feedItemForm, path('ajax_course_add_feed_item', {courseId: course.id }), feedItems, feedCommentForm) }}
 
         </div>
         <div class="right-navbar pull-left">

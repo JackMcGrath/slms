@@ -67,7 +67,7 @@
 
 
 
-{% macro course_details_feed(feedItemForm, feedItemFormPath, feedItems, feedCommentForm, feedCommentPath) %}
+{% macro course_details_feed(feedItemForm, feedItemFormPath, feedItems, feedCommentForm) %}
     {% import _self as self %}
     <div class="course-details-feed">
     <div class="feed-item-form">
@@ -106,7 +106,7 @@
                         {{ self.feed_item_text_block(feedItem) }}
                     {% endif %}
                 </div>
-                <div class="comments-button"><i class="icon-comment"></i> <span class="gray">Comment</span></div>
+                <div class="comments-button"><i class="icon-comment"></i> <a class="show-comment-form-link" href="#">Comment ({{ feedItem.feedComments|length }})</a></div>
                 <div class="comments">
                     {% for comment in feedItem.feedComments %}
                         <div class="comment">
@@ -116,20 +116,21 @@
                             <div class="clearfix"></div>
                         </div>
                     {% endfor %}
-                    {% if feedItem.feedComments|length > 0 %}
-                    <div class="comment">
+
+                    <div class="comment {% if feedItem.feedComments|length == 0 %} hidden {% endif %}">
                         <div class="avatar"><img class="rounded" src="{{ get_file_storage_link(app.user.getAvatarFile()) | imagine_filter('small_thumbnail') }}" /></div>
                         <div class="content">
-                            <form class="feed-item-comment-form" action="{{ path('ajax_feed_add_comment', {feedItemId: feedItem.id }) }}" method="post" style="margin: 0;">
-                                <textarea class="comment-input" placeholder="Leave a new comment"></textarea>
+                            <form class="feed-item-comment-form" {{ form_enctype(feedCommentForm) }} action="{{ path('ajax_feed_add_comment', {feedItemId: feedItem.id}) }}" method="post">
+                                <textarea class="comment-input" name="feed_comment[feedContent][text]" placeholder="Leave a new comment"></textarea>
                                 <div class="buttons" style="display: none;">
                                     <input type="submit" class="btn btn-danger" value="Post" />&nbsp;&nbsp;&nbsp;<a href="#" class="cancel-link">Cancel</a>
+                                    <input class="comment-type" type="hidden" name="feed_comment[feedContent][type]" value="text" />
                                 </div>
+                                {{ form_widget(feedCommentForm._token) }}
                             </form>
                         </div>
                         <div class="clearfix"></div>
                     </div>
-                    {% endif %}
                 </div>
             </div>
         {% else %}

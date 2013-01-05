@@ -5,6 +5,7 @@ var ZerebralCourseDetailFeedBlock = function(element, options) {
     self.feedItemForm = element.find('#ajaxFeedItemForm');
     self.feedItemFormDiv = element.find('.feed-item-form');
 
+    self.itemsDiv = element.find('.feed-item');
     self.commentsDiv = element.find('.feed-item .comments');
     self.options = options;
 };
@@ -17,6 +18,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
     feedItemForm: undefined,
     feedItemFormDiv: undefined,
     commentsDiv: undefined,
+    itemsDiv: undefined,
 
 
     init: function() {
@@ -30,7 +32,11 @@ ZerebralCourseDetailFeedBlock.prototype = {
 
         this.commentsDiv.find('.comment-input').click($.proxy(self.expandCommentForm, self));
         this.commentsDiv.find('.comment .buttons .cancel-link').click($.proxy(self.collapseCommentForm, self));
+
+        this.itemsDiv.find('.show-comment-form-link').click($.proxy(self.showCommentForm, self));
+
         this.feedItemForm.zerebralAjaxForm();
+        this.commentsDiv.find('form').zerebralAjaxForm();
     },
 
     expandFeedItemForm: function(event) {
@@ -92,6 +98,12 @@ ZerebralCourseDetailFeedBlock.prototype = {
             height: '18'
         });
 
+    },
+    showCommentForm: function(event) {
+        event.preventDefault();
+
+        var link = $(event.target);
+        link.parents('.feed-item').find('.comment.hidden').removeClass('hidden');
     },
     _: ''
 };
