@@ -176,14 +176,13 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
         this.feedCommentFormDiv.find('.attach-link').click($.proxy(self.setFeedItemFormType, self));
         this.feedCommentFormDiv.find('.attached-link-delete a').click($.proxy(self.resetMainFormType, self));
 
+        this.feedCommentsDiv.on('click', 'a.delete-link', $.proxy(self.deleteCommentBlock, self));
+
+
         this.feedCommentForm.zerebralAjaxForm({
-            data: {
-                feedType: 'assignment'
-            },
+            data: { feedType: 'assignment' },
             success: $.proxy(self.addCommentBlock, this),
-            error: function() {
-                alert('Oops, seems like unknown error has appeared!');
-            },
+            error: function() { alert('Oops, seems like unknown error has appeared!'); },
             dataType: 'html'
         });
 
@@ -205,14 +204,36 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
         this.feedCommentForm.find('.attached-link-field').val('');
     },
     addCommentBlock: function(response) {
+        var commentBlock = $(response);
+        commentBlock.css('display', 'none');
         if (this.feedCommentsDiv.find('.comment:last').length > 0) {
-            this.feedCommentsDiv.find('.comment:last').after(response);
+            this.feedCommentsDiv.find('.comment:last').after(commentBlock);
         } else {
-            this.feedCommentsDiv.find('.empty').remove().end().append(response);
+            this.feedCommentsDiv.find('.empty').remove().end().append(commentBlock);
         }
+        commentBlock.slideDown();
         this.feedCommentFormDiv.find('textarea').val('');
         this.feedCommentFormDiv.find('.attached-link-delete a').click();
 
+    },
+    // @todo: Implement showing "empty comments" message if delete last comment
+    deleteCommentBlock: function(event) {
+        event.preventDefault();
+        var link = $(event.target);
+        if (window.confirm('Are you sure to delete comment?')) {
+            var url = link.attr('href');
+            $.ajax({
+                url: url,
+                type: 'post',
+                dataType: 'json',
+                success: function(response) {
+                    link.parents('.comment').slideUp('fast', function() {
+                        link.parents('.comment').remove();
+                    });
+                },
+                error: function() {alert('Oops, seems like unknown error has appeared!') }
+            })
+        }
     },
     _: ''
 };

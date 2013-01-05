@@ -27,6 +27,7 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
     /**
      * @Route("/add-comment/{feedItemId}", name="ajax_feed_add_comment")
      * @param \Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem
+     * @return \Symfony\Component\HttpFoundation\Response|\Zerebral\CommonBundle\HttpFoundation\FormJsonResponse
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @ParamConverter("feedItem", options={"mapping": {"feedItemId": "id"}})
      */
@@ -51,6 +52,22 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
         }
 
         return new FormJsonResponse($feedCommentForm, 500);
+    }
+
+    /**
+     * @Route("/remove-comment/{feedCommentId}", name="ajax_feed_remove_comment")
+     * @param \Zerebral\BusinessBundle\Model\Feed\FeedComment $feedComment
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @ParamConverter("feedComment", options={"mapping": {"feedCommentId": "id"}})
+     */
+    public function removeFeedCommentAction(\Zerebral\BusinessBundle\Model\Feed\FeedComment $feedComment) {
+        if ($this->getUser()->getId() == $feedComment->getCreatedBy()) {
+            $feedComment->delete();
+            return new JsonResponse(array());
+        } else {
+            return new JsonResponse(array('message' => 'You can\'t delete other comments'), 403);
+        }
     }
 
     /**

@@ -13,7 +13,7 @@
         <div class="content">
             <div class="author {% if app.user.id == comment.user.id %} is_author {% endif %}">
                 {{ comment.user.fullName }} <span class="gray timestamp">{{ time_diff(comment.createdAt) }}</span>
-                {% if app.user.id == comment.user.id %}<span class="gray delete-link"><i class="icon-small-trash-bin"></i>Delete</span>{% endif %}
+                {% if app.user.id == comment.user.id %}<a href="{{ path('ajax_feed_remove_comment', {feedCommentId: comment.id}) }}" class="gray delete-link"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
             </div>
             <div class="text">{{ comment.feedContent.text }}</div>
             <div class="link"><a href="{{ comment.feedContent.linkUrl }}">{{ comment.feedContent.linkUrl }}</a></div>
