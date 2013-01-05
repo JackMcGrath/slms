@@ -59,4 +59,40 @@ class SolutionController extends \Zerebral\CommonBundle\Component\Controller
             'target' => 'files'
         );
     }
+
+    /**
+     * @Route("/files/download/assignment/{assignmentId}", name="assignment_solutions_download")
+     * @Route("/files/download/student/{studentId}", name="student_solutions_download")
+     * @ParamConverter("assignment", options={"mapping": {"assignmentId": "id"}})
+     * @ParamConverter("student", options={"mapping": {"studentId": "id"}})
+     * @PreAuthorize("hasRole('ROLE_TEACHER')")
+     */
+    public function downloadZipAction(Model\Assignment\Assignment $assignment = null, Model\User\Student $student = null)
+    {
+        $zip = new \ZipArchive();
+
+        $filename = preg_replace(array("[\s]", "/[^a-z0-9_]/i"), array("_", ""), $assignment ? $assignment->getName() : $student->getFullName());
+        $filePath = "/data/zip_files/" . $filename . '_solutions_' . time() . '.zip';
+
+        if ($zip->open('.' . $filePath, \ZIPARCHIVE::CREATE)!==TRUE) {
+            throw new \Exception('Cannot open file ' . $filename);
+        }
+
+        $object = $assignment ?: $student;
+        if ($object) {
+            $localFileStorage = $this->container->get('zerebral.file_storage')->getFileStorage('local');
+            foreach ($object->getStudentAssignments() as $assignments) {
+                foreach ($assignments->getFiles() as $file) {
+                    $file->setFileStorage($localFileStorage);
+                    if (is_file($file->getAbsolutePath()))
+                        $zip->addFile($file->getAbsolutePath(), $file->getName());
+                    else
+                        throw new \Exception('One or more files can not be added because not exists.');
+                }
+            }
+        }
+
+        $zip->close();
+        return $this->redirect($filePath);
+    }
 }

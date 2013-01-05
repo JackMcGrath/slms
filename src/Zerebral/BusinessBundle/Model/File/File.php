@@ -52,6 +52,10 @@ class File extends BaseFile
         return $this->getFileStorage()->getWebPath() . $this->getName();
     }
 
+    public function getAbsolutePath() {
+        return $this->getFileStorage()->getPath() . '/' .  $this->getName();
+    }
+
     /**
      * @param \Symfony\Component\HttpFoundation\File\UploadedFile $uploadedFile
      * @throws \Exception
