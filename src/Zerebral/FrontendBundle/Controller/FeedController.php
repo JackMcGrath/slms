@@ -76,14 +76,7 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
             $course->addFeedItem($feedItem);
             $course->save();
 
-            return new JsonResponse(array(
-                'redirect' => $this->generateUrl(
-                    'course_feed',
-                    array(
-                        'id' => $course->getId()
-                    )
-                )
-            ));
+            return $this->render('ZerebralFrontendBundle:Feed:feedItemBlock.html.twig', array('feedItem' => $feedItem));
         }
 
         return new FormJsonResponse($feedItemForm, 500);

@@ -36,7 +36,7 @@
 <!--      CourseDetails   --->
 
 
-{% macro course_details_feed(feedItemForm, feedItemFormPath, feedItems, feedCommentForm) %}
+{% macro course_details_feed(feedItemForm, feedItemFormPath, feedItems) %}
     {% import _self as self %}
     <div class="course-details-feed">
     <div class="feed-item-form">
@@ -66,32 +66,7 @@
     <hr />
     <div class="feed-items">
         {% for feedItem in feedItems %}
-            <div class="feed-item">
-                <div class="avatar"><img class="rounded" src="{{ get_file_storage_link(feedItem.user.getAvatarFile()) | imagine_filter('thumbnail') }}"></div>
-                <div class="content">
-                    {% include "ZerebralFrontendBundle:Feed:feedItemBlock.html.twig" %}
-                </div>
-                <div class="comments-button"><i class="icon-comment"></i> <a class="show-comment-form-link" data-comments-count="{{ feedItem.feedComments|length }}" href="#">Comment (<span>{{ feedItem.feedComments|length }}</span>)</a></div>
-                <div class="comments">
-                    {% for comment in feedItem.feedComments %}
-                        {% include "ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig" with {'feedType': 'course'} %}
-                    {% endfor %}
-
-                    <div class="comment {% if feedItem.feedComments|length == 0 %} hidden {% endif %}">
-                        <div class="avatar"><img class="rounded" src="{{ get_file_storage_link(app.user.getAvatarFile()) | imagine_filter('small_thumbnail') }}" /></div>
-                        <div class="content">
-                            <form class="feed-item-comment-form" {{ form_enctype(feedCommentForm) }} action="{{ path('ajax_feed_add_comment', {feedItemId: feedItem.id}) }}" method="post">
-                                <textarea class="comment-input" name="feed_comment[feedContent][text]" placeholder="Leave a new comment"></textarea>
-                                <div class="buttons" style="display: none;">
-                                    <input type="submit" class="btn btn-danger" value="Post" />&nbsp;&nbsp;&nbsp;<a href="#" class="cancel-link">Cancel</a>
-                                    <input class="comment-type" type="hidden" name="feed_comment[feedContent][type]" value="text" />
-                                </div>
-                            </form>
-                        </div>
-                        <div class="clearfix"></div>
-                    </div>
-                </div>
-            </div>
+        {% include "ZerebralFrontendBundle:Feed:feedItemBlock.html.twig" %}
         {% else %}
             <div class="empty">No updates yet!</div>
         {% endfor %}

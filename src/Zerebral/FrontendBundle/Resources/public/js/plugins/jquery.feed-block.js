@@ -5,6 +5,7 @@ var ZerebralCourseDetailFeedBlock = function(element, options) {
     self.feedItemForm = element.find('#ajaxFeedItemForm');
     self.feedItemFormDiv = element.find('.feed-item-form');
 
+    self.feedItemsDiv = element.find('.feed-items');
     self.itemsDiv = element.find('.feed-item');
     self.commentsDiv = element.find('.feed-item .comments');
     self.options = options;
@@ -19,6 +20,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
     feedItemFormDiv: undefined,
     commentsDiv: undefined,
     itemsDiv: undefined,
+    feedItemsDiv: undefined,
 
 
     init: function() {
@@ -35,9 +37,18 @@ ZerebralCourseDetailFeedBlock.prototype = {
 
         this.itemsDiv.find('.show-comment-form-link').click($.proxy(self.showCommentForm, self));
 
-        this.feedItemForm.zerebralAjaxForm();
+        this.feedItemForm.zerebralAjaxForm({
+            success: $.proxy(self.addItemBlock, this),
+            error: function() {
+                alert('Oops, seems like unknown error has appeared!');
+            },
+            dataType: 'html'
+        });
         $.each(this.commentsDiv.find('form'), function(index, value) {
             $(this).zerebralAjaxForm({
+                data: {
+                    feedType: 'course'
+                },
                 success: $.proxy(self.addCommentBlock, this),
                 error: function() {
                     alert('Oops, seems like unknown error has appeared!');
@@ -47,10 +58,9 @@ ZerebralCourseDetailFeedBlock.prototype = {
         })
     },
 
-    expandFeedItemForm: function(event) {
-        var textarea = $(event.target);
-        textarea.data('background-image', textarea.css('background-image'));
-        textarea.css('background-image', 'none').animate({
+    expandFeedItemForm: function() {
+        this.feedItemFormTextarea.data('background-image', this.feedItemFormTextarea.css('background-image'));
+        this.feedItemFormTextarea.css('background-image', 'none').animate({
             width: 621,
             'margin-top': 20,
             'margin-bottom': 10,
@@ -63,10 +73,13 @@ ZerebralCourseDetailFeedBlock.prototype = {
         this.feedItemForm.css('background-color', '#f3f3f3').find('.feed-item-form-controls').show();
     },
     collapseFeedItemForm: function(event) {
-        event.preventDefault();
+        if (event) {
+            event.preventDefault();
+        }
 
         var self = this;
-        this.feedItemFormTextarea.parent().animate({'background-color': 'transparent'}).find('.feed-item-form-controls').hide();
+        self.resetMainFormType();
+        this.feedItemFormTextarea.val('').parent().animate({'background-color': 'transparent'}).find('.feed-item-form-controls').hide();
         this.feedItemFormTextarea.animate({
             width: 571,
             margin: 0,
@@ -83,14 +96,17 @@ ZerebralCourseDetailFeedBlock.prototype = {
         this.feedItemForm.find('.attach-links').hide();
         this.feedItemForm.find('input.comment-type').val(link.parent().data('linkType'));
         this.feedItemForm.find('.attached-link').slideDown();
+        this.feedItemForm.find('.attached-link-field').val('');
     },
     resetMainFormType: function(event) {
-        event.preventDefault();
-        var link = $(event.target);
+        if (event) {
+            event.preventDefault();
+        }
         this.feedItemForm.find('.attached-link').slideUp();
         this.feedItemForm.find('input.comment-type').val('text');
         this.feedItemForm.find('.attach-links').show();
     },
+
     expandCommentForm: function(event) {
         var input = $(event.target);
         input.animate({
@@ -112,6 +128,10 @@ ZerebralCourseDetailFeedBlock.prototype = {
 
         var link = $(event.target);
         link.parents('.feed-item').find('.comment.hidden').removeClass('hidden');
+    },
+    addItemBlock: function(response) {
+        this.feedItemsDiv.find('.empty').remove().end().prepend(response);
+        this.collapseFeedItemForm();
     },
     addCommentBlock: function(response) {
         $(this).parents('.comment').before(response);
@@ -180,6 +200,7 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
         this.feedCommentForm.find('.attached-link').slideUp();
         this.feedCommentForm.find('input.comment-type').val('text');
         this.feedCommentForm.find('.attach-links').show();
+        this.feedCommentForm.find('.attached-link-field').val('');
     },
     addCommentBlock: function(response) {
         if (this.feedCommentsDiv.find('.comment:last').length > 0) {
