@@ -207,6 +207,17 @@
                     margin-bottom: 5px;
                     padding: 10px;
                     min-height: 27px;
+
+
+                    &:hover {
+                        .timestamp {
+                            display: none;
+                        }
+                        .delete-link {
+                            display: block;
+                        }
+                    }
+
                     .avatar {
                         clear: both;
                         width: 27px;
@@ -244,6 +255,11 @@
                         font-size: 11px;
                         width: 100px;
                         text-align: right;
+                    }
+                    .delete-link {
+                        display: none;
+                        float: right;
+                        font-size: 11px;
                     }
                 }
             }

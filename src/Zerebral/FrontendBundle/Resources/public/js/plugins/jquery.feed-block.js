@@ -34,6 +34,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
         this.feedItemsDiv.on('click', '.comment-input', $.proxy(self.expandCommentForm, self));
         this.feedItemsDiv.on('click', '.comment .buttons .cancel-link', $.proxy(self.collapseCommentForm, self));
         this.feedItemsDiv.on('click', '.show-comment-form-link', $.proxy(self.showCommentForm, self));
+        this.feedItemsDiv.on('click', 'a.delete-link', $.proxy(self.deleteCommentBlock, self));
 
         this.feedItemForm.zerebralAjaxForm({
             success: $.proxy(self.addItemBlock, this),
@@ -139,8 +140,30 @@ ZerebralCourseDetailFeedBlock.prototype = {
         $(this).parents('.comment').before(response);
         var commentsCount = $(this).parents('.feed-item').find('.show-comment-form-link').data('commentsCount');
         $(this).parents('.feed-item').find('.show-comment-form-link span').html((commentsCount + 1));
+        $(this).parents('.feed-item').find('.show-comment-form-link').data('commentsCount', commentsCount + 1)
         $(this).find('.cancel-link').click();
 
+    },
+    deleteCommentBlock: function(event) {
+        event.preventDefault();
+        var link = $(event.target);
+        if (window.confirm('Are you sure to delete comment?')) {
+            var url = link.attr('href');
+            $.ajax({
+                url: url,
+                type: 'post',
+                dataType: 'json',
+                success: function(response) {
+                    var commentsCount = link.parents('.feed-item').find('.show-comment-form-link').data('commentsCount');
+                    link.parents('.feed-item').find('.show-comment-form-link span').html((commentsCount - 1));
+                    var commentsCount = link.parents('.feed-item').find('.show-comment-form-link').data('commentsCount', commentsCount - 1);
+                    link.parents('.comment').slideUp('fast', function() {
+                        link.parents('.comment').remove();
+                    });
+                },
+                error: function() {alert('Oops, seems like unknown error has appeared!') }
+            })
+        }
     },
     _: ''
 };
