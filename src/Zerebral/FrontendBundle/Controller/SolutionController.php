@@ -29,14 +29,26 @@ class SolutionController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function indexAction(Model\Course\Course $course = null)
     {
-        $assignments = AssignmentQuery::create()->getCourseAssignmentsDueDate($course, null, $this->getRoleUser())->find();
+        $session = $this->getRequest()->getSession();
+        $fileGroupingType = $this->getRequest()->get('FileGrouping') ?: ($session->has('FileGrouping') ? $session->get('FileGrouping') : 'date');
+        $session->set('FileGrouping', $fileGroupingType);
+
+        $assignments = AssignmentQuery::create()->getCourseAssignmentsDueDate($course, null, $this->getRoleUser());
+        switch ($fileGroupingType) {
+            case "date": $assignments->orderBy('due_at', \Criteria::DESC); break;
+            case "name":
+            case "assignment": $assignments->addAscendingOrderByColumn("LOWER(assignments.name)"); break;
+            case "course": $assignments->addAscendingOrderByColumn("LOWER(courses.name)"); break;
+        }
+
+        $assignments = $assignments->find();
         $courses = $this->getRoleUser()->getCourses();
 
         return array(
             'assignments' => $assignments,
             'courses' => $courses,
             'course' => $course,
-            'fileGrouping' => 'date',
+            'fileGrouping' => $fileGroupingType,
             'target' => 'files'
         );
     }
@@ -49,12 +61,24 @@ class SolutionController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function studentsAction(Model\Assignment\Assignment $assignment)
     {
-        $solutions = StudentAssignmentQuery::create()->findStudentsByAssignmentId($assignment->getId())->find();
+        $session = $this->getRequest()->getSession();
+        $fileGroupingType = $this->getRequest()->get('FileGrouping') ?: ($session->has('FileGrouping') ? $session->get('FileGrouping') : 'date');
+        $session->set('FileGrouping', $fileGroupingType);
+
+        $solutions = StudentAssignmentQuery::create()->findStudentsByAssignmentId($assignment->getId());
+
+        switch ($fileGroupingType) {
+            case "date": $solutions->orderBy('created_at', \Criteria::DESC); break;
+            case "course":
+            case "name":
+            case "assignment": $solutions->addAscendingOrderByColumn("LOWER(User.first_name)"); break;
+        }
+        $solutions = $solutions->find();
 
         return array(
             'assignment' => $assignment,
             'solutions' => $solutions,
-            'fileGrouping' => 'date',
+            'fileGrouping' => $fileGroupingType,
             'course' => $assignment->getCourse(),
             'target' => 'files'
         );
