@@ -24,16 +24,18 @@ class FeedEventSubscriber implements \Symfony\Component\EventDispatcher\EventSub
         /** @var $assignment \Zerebral\BusinessBundle\Model\Assignment\Assignment */
         $assignment = $event->getModel();
 
-        $feedContent = new FeedContent();
-        $feedContent->setType('assignment');
+        if (!$assignment->isNew() && !$assignment->isModified()) {
+            $feedContent = new FeedContent();
+            $feedContent->setType('assignment');
 
-        $feedItem = new FeedItem();
-        $feedItem->setAssignmentId($assignment->getId());
-        $feedItem->setCourse($assignment->getCourse());
-        $feedItem->setCreatedBy($assignment->getTeacher()->getUser()->getId());
-        $feedItem->setFeedContent($feedContent);
+            $feedItem = new FeedItem();
+            $feedItem->setAssignment($assignment);
+            $feedItem->setCourse($assignment->getCourse());
+            $feedItem->setCreatedBy($assignment->getTeacher()->getUser()->getId());
+            $feedItem->setFeedContent($feedContent);
 
-        $feedItem->save();
+            $feedItem->save();
+        }
     }
 
 }
