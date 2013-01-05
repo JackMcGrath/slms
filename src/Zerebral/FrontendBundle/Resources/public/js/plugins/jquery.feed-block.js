@@ -136,6 +136,7 @@ var ZerebralAssignmentDetailFeedBlock = function(element, options) {
     self.element = element;
     self.feedCommentFormDiv = element.find('.feed-comment-form');
     self.feedCommentForm = element.find('#ajaxFeedCommentForm');
+    self.feedCommentsDiv = element.find('.comments');
     self.options = options;
 };
 
@@ -145,14 +146,25 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
 
     feedCommentFormDiv: undefined,
     feedCommentForm: undefined,
+    feedCommentsDiv: undefined,
 
 
-    init: function() {
+        init: function() {
         var self = this;
         this.feedCommentFormDiv.find('.attach-link').click($.proxy(self.setFeedItemFormType, self));
         this.feedCommentFormDiv.find('.attached-link-delete a').click($.proxy(self.resetMainFormType, self));
 
-        this.feedCommentForm.zerebralAjaxForm();
+        this.feedCommentForm.zerebralAjaxForm({
+            data: {
+                feedType: 'assignment'
+            },
+            success: $.proxy(self.addCommentBlock, this),
+            error: function() {
+                alert('Oops, seems like unknown error has appeared!');
+            },
+            dataType: 'html'
+        });
+
     },
 
     setFeedItemFormType: function(event) {
@@ -168,6 +180,16 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
         this.feedCommentForm.find('.attached-link').slideUp();
         this.feedCommentForm.find('input.comment-type').val('text');
         this.feedCommentForm.find('.attach-links').show();
+    },
+    addCommentBlock: function(response) {
+        if (this.feedCommentsDiv.find('.comment:last').length > 0) {
+            this.feedCommentsDiv.find('.comment:last').after(response);
+        } else {
+            this.feedCommentsDiv.find('.empty').remove().end().append(response);
+        }
+        this.feedCommentFormDiv.find('textarea').val('');
+        this.feedCommentFormDiv.find('.attached-link-delete a').click();
+
     },
     _: ''
 };

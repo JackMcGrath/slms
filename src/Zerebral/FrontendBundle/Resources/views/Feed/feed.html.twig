@@ -25,7 +25,7 @@
     </div>
     <div class="comments">
         {% for comment in comments %}
-            {% include "ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig" with {'type': 'assignmentDetailsFeed'} %}
+            {% include "ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig" with {'feedType': 'assignment'} %}
         {% else %}
         <div class="empty"> No comments yet. Be the first to leave one!</div>
         {% endfor %}
@@ -74,7 +74,7 @@
                 <div class="comments-button"><i class="icon-comment"></i> <a class="show-comment-form-link" data-comments-count="{{ feedItem.feedComments|length }}" href="#">Comment (<span>{{ feedItem.feedComments|length }}</span>)</a></div>
                 <div class="comments">
                     {% for comment in feedItem.feedComments %}
-                        {% include "ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig" with {'type': 'courseDetailsFeed'} %}
+                        {% include "ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig" with {'feedType': 'course'} %}
                     {% endfor %}
 
                     <div class="comment {% if feedItem.feedComments|length == 0 %} hidden {% endif %}">

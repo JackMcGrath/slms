@@ -22,7 +22,7 @@
 {% endmacro %}
 
 {% import _self as self %}
-{% if type == 'courseDetailsFeed' %}
+{% if feedType == 'course' %}
     {{ self.course_details_comment_block(comment) }}
 {% else %}
     {{ self.assignment_details_comment_block(comment) }}
