@@ -86,7 +86,6 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
             'course' => $course,
             'upcomingAssignments' => $upcomingAssignments,
             'feedItemForm' => $feedItemForm->createView(),
-            'feedItems' => $course->getFeedItems(),
             'target' => 'feed',
         );
     }
