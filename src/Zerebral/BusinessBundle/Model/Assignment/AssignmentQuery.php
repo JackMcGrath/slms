@@ -8,7 +8,6 @@ class AssignmentQuery extends BaseAssignmentQuery
 {
     public function getCourseAssignmentsDueDate(\Zerebral\BusinessBundle\Model\Course\Course $course = null, $ongoing = null, \Zerebral\BusinessBundle\Model\User\Teacher $teacher = null)
     {
-
         if ($teacher) {
             $this->filterByTeacher($teacher);
         }
