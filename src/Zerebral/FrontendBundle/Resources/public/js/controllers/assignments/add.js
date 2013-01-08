@@ -16,7 +16,7 @@ $(document).ready(function(){
     $(document).on('click', '.remove-uploaded-file', function(e) {
         e.preventDefault();
         if (window.confirm('Are you sure to delete this attachment?')) {
-            $(e.target).parent().remove();
+            $(e.target).parents('div.file-item').remove();
         }
     });
 
