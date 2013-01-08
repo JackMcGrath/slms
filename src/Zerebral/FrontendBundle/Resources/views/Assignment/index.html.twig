@@ -37,6 +37,7 @@
 
                 {% if draftAssignment and draftAssignment.count %}
                     <div class="small-title">Drafts</div>
+                    {% set type = 'draft' %}
                     {% for assignment in draftAssignment %}
                         {{ block('assignment') }}
                     {% endfor %}
@@ -60,12 +61,28 @@
 {% endblock %}
 
 {% block assignment %}
+    {% set badgeClass = '' %}
+    {% if assignment.hasVirtualColumn('completedCount') %}
+        {% if assignment.getVirtualColumn('completedCount') == 0 %}
+            {% set badgeClass = '' %}
+        {% elseif  assignment.students.count - assignment.getVirtualColumn('completedCount') > 0%}
+            {% set badgeClass = 'warning' %}
+        {% elseif  assignment.students.count == assignment.getVirtualColumn('completedCount') %}
+            {% set badgeClass = 'success' %}
+        {% endif %}
+        {% endif %}
     <div class="list-item span12{{ loop.last ? ' last' : '' }}">
         <div class="symbol pull-left">
             {% if is_granted('ROLE_STUDENT') %}
                 <img class="rounded" src="{{ get_file_storage_link(assignment.teacher.user.getAvatarFile()) | imagine_filter('thumbnail') }}"/>
             {% else %}
-                <div class="rounded count-badge">-</div>
+                <div class="rounded count-badge {{ badgeClass }}">
+                {% if type is defined and type == 'draft' %}
+                    -
+                {% elseif assignment.hasVirtualColumn('completedCount') %}
+                    {{ assignment.getVirtualColumn('completedCount') }}
+                {% endif %}
+                    </div>
             {% endif %}
         </div>
         <div class="details pull-left">
@@ -80,10 +97,10 @@
             <div class="stat">
                 {% if is_granted('ROLE_STUDENT') %}
                     <div class="instructor-name">Instructor <b>{{ assignment.teacher.fullName }}</b></div>
-                    <div class="due-at"><i class="icon-small-clock"></i> Due <small>{{ assignment.dueAt | date('Hi') == '0000' ? assignment.dueAt | date('D, M d') : assignment.dueAt | date('D, M d h:i a') }}</small></div>
+                    {% if assignment.dueAt %}<div class="due-at"><i class="icon-small-clock"></i> Due <small>{{ assignment.dueAt | date('Hi') == '0000' ? assignment.dueAt | date('D, M d') : assignment.dueAt | date('D, M d h:i a') }}</small></div>{% endif %}
                     <div><span class="badge">-</span><a href="#">Comments</a></span></div>
                 {% else %}
-                    <div class="due-at"><i class="icon-small-clock"></i> Due <small>{{ assignment.dueAt | date('Hi') == '0000' ? assignment.dueAt | date('D, M d') : assignment.dueAt | date('D, M d h:i a') }}</small></div>
+                    {% if assignment.dueAt %}<div class="due-at"><i class="icon-small-clock"></i> Due <small>{{ assignment.dueAt | date('Hi') == '0000' ? assignment.dueAt | date('D, M d') : assignment.dueAt | date('D, M d h:i a') }}</small></div>{% endif %}
                     {#<div><span class="badge">{{ assignment.students.count }}</span><a href="">Assignments</a></div>#}
                     <div><span class="badge">{{ assignment.hasVirtualColumn('completedCount') ? assignment.getVirtualColumn('completedCount') : '-' }}</span><a href="">Completed</a></div>
                     <div><span class="badge badge-inverse">{{ assignment.hasVirtualColumn('remainingCount') ? assignment.getVirtualColumn('remainingCount') : '-' }}</span><a href="">Remaining</a></div>
