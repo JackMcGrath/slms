@@ -39,7 +39,7 @@
                                 </div>
                                 <div class="description">{{ material.description }}</div>
                                 <div class="info">
-                                    by {{ material.teacher.fullName }} {% if material.courseFolder %}in <a href="{{ path('course_materials_folder', {id: course.id, folderId: material.folderId}) }}" class="folder"><i class="icon-small-folder"></i>{{ material.courseFolder.name }}</a>{% endif %} {{ material.file.size | bytes_to_human }}
+                                    by {{ material.teacher.fullName }} {% if material.courseFolder %}in <a href="{{ path('course_materials_folder', {courseId: course.id, folderId: material.folderId}) }}" class="folder"><i class="icon-small-folder"></i>{{ material.courseFolder.name }}</a>{% endif %} {{ material.file.size | bytes_to_human }}
                                     {% if is_granted('ROLE_TEACHER') %}
                                         <span class="separator">/</span>
                                         <div class="manage-buttons">
@@ -82,7 +82,7 @@
                     {% for courseFolder in course.courseFolders %}
                         <li {{ folder and courseFolder.id == folder.id ? 'class="active"' : '' }} folderId="{{ courseFolder.id }}" courseId="{{ course.id }}" folderName="{{ courseFolder.name }}">
                             <i class="marker">&#9656;</i>
-                            <a href="{{ path('course_materials_folder', {id: course.id, folderId: courseFolder.id}) }}" class="folder-name">{{ courseFolder.name }}</a>
+                            <a href="{{ path('course_materials_folder', {courseId: course.id, folderId: courseFolder.id}) }}" class="folder-name">{{ courseFolder.name }}</a>
                             {% if is_granted('ROLE_TEACHER') %}
                                 <div class="manage">
                                     <i class="manage-buttons-gears icon-small-gears"></i>
@@ -101,7 +101,9 @@
 
     </div>
 
+    {% if is_granted('EDIT', course) %}
     {% render url('course_material_folder_form', {courseId: course.id}) %}
+    {% endif %}
 
     {#<div class="modal hide fade" id="editFolderModal">#}
         {#<form class="form-vertical folder-form" data-action-edit="{{ path('ajax_edit_folder', {courseId: course.id, id: ''}) }}" data-action-add="{{ path('ajax_add_folder', {courseId: course.id}) }}" method="post" {{ form_enctype(folderRenameForm) }} novalidate>#}
