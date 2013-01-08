@@ -56,10 +56,12 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     public function viewAction(Model\Course\Course $course)
     {
         $upcomingAssignments = $this->getRoleUser()->getUpcomingAssignments($course);
+        $recentMaterials = \Zerebral\BusinessBundle\Model\Material\CourseMaterialQuery::create()->findRecentCourseMaterials($course)->find();
 
         return array(
             'course' => $course,
             'upcomingAssignments' => $upcomingAssignments,
+            'recentMaterials' => $recentMaterials,
             'target' => 'courses',
             'showWelcomeMessage' => $this->getRequest()->get('showWelcomeMessage', false)
         );

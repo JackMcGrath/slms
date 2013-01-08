@@ -11,6 +11,8 @@ class FileStorageExtension extends \Twig_Extension {
     protected $fileStorageFactory;
 
     protected static $mimeTypeIconsPath = 'icons/files/pack_01/';
+    protected static $mimeTypeSmallIconsPath = 'icons/files/pack_small/';
+
     protected static $mimeTypeIcons = array(
         'text' => 'text.png',
         'application' => array(
@@ -63,7 +65,7 @@ class FileStorageExtension extends \Twig_Extension {
      *
      * @return \Zerebral\BusinessBundle\Model\File\File
      */
-    public function getFileIcon(File $file) {
+    public function getFileIcon(File $file, $size = null) {
         $mimeTypeArray = explode('/', $file->getMimeType());
         $icons = self::$mimeTypeIcons;
 
@@ -74,7 +76,8 @@ class FileStorageExtension extends \Twig_Extension {
         }
 
         $iconFile = new File();
-        $iconFile->setName(self::$mimeTypeIconsPath . $icon);
+        $mimeTypeIconsPath = $size == 'small' ? self::$mimeTypeSmallIconsPath : self::$mimeTypeIconsPath;
+        $iconFile->setName($mimeTypeIconsPath . $icon);
         $iconFile->setStorage('dummy');
 
         return $iconFile;
