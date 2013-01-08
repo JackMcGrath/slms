@@ -20,6 +20,7 @@ use Zerebral\BusinessBundle\Model as Model;
 use \Criteria;
 
 use Zerebral\CommonBundle\Component\Calendar\Calendar;
+use \Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentQuery;
 
 /**
  * @Route("/assignments")
@@ -201,7 +202,8 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
                 // @todo redo with collection type
                 $studentAssignments = new \PropelCollection();
                 foreach ($this->getRequest()->get('students', array()) as $studentId) {
-                    $studentAssignment = new \Zerebral\BusinessBundle\Model\Assignment\StudentAssignment();
+                    $studentAssignmentModel = StudentAssignmentQuery::create()->filterByAssignmentId($assignment->getId())->filterByStudentId($studentId)->findOne();
+                    $studentAssignment = $studentAssignmentModel ?: new \Zerebral\BusinessBundle\Model\Assignment\StudentAssignment();
                     $studentAssignment->setStudentId($studentId);
                     $studentAssignment->setAssignment($assignment);
                     $studentAssignments[] = $studentAssignment;
