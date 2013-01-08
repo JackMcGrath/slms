@@ -43,10 +43,9 @@
             <div class="block recent-materials">
                 <h4>Recent materials</h4>
                 <ul>
-                    <li><i class="icon-file"></i> <a href="">Homework_1.doc</a></li>
-                    <li><i class="icon-file"></i> <a href="">Homework_2.doc</a></li>
-                    <li><i class="icon-file"></i> <a href="">Homework_3.doc</a></li>
-                    <li><i class="icon-file"></i> <a href="">Homework_4.doc</a></li>
+                    {% for material in recentMaterials %}
+                        <li><a href="{{ get_file_storage_link(material.file) }}"><img src="/img/{{ get_file_icon(material.file, 'small').name }}"/>{{ material.file.name }}</a></li>
+                    {% endfor %}
                 </ul>
             </div>
 
