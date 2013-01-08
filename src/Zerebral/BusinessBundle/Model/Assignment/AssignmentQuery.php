@@ -27,8 +27,8 @@ class AssignmentQuery extends BaseAssignmentQuery
             $this->filterByCourseId($course->getId());
         }
 
-        $this->withColumn('COUNT(DISTINCT IF(student_assignments.is_submitted = 1, 1, null))', 'completedCount');
-        $this->withColumn('COUNT(DISTINCT student_assignments.id) - COUNT(DISTINCT IF(student_assignments.is_submitted = 1, 1, null))', 'remainingCount');
+        $this->withColumn('COUNT(DISTINCT IF(student_assignments.is_submitted = 1 AND `FileReference`.file_id is not null, student_assignments.id, null))', 'completedCount');
+        $this->withColumn('COUNT(DISTINCT student_assignments.id) - COUNT(DISTINCT IF(student_assignments.is_submitted = 1 AND `FileReference`.file_id is not null, student_assignments.id, null))', 'remainingCount');
         $this->withColumn('COUNT(DISTINCT IF(student_assignments.is_submitted = 1, `FileReference`.file_id , null))', 'filesCount');
 
         $this->addGroupByColumn('assignments.id');
