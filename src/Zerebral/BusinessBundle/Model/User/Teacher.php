@@ -32,6 +32,12 @@ class Teacher extends BaseTeacher
     public function getCourseAssignmentsDueDate(\Zerebral\BusinessBundle\Model\Course\Course $course, $ongoing = null)
     {
         $assignments = \Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery::create()->getCourseAssignmentsDueDate($course, $ongoing);
+        if ($ongoing == true) {
+            $assignments->addAscendingOrderByColumn('LOWER(assignments.name)');
+        } else {
+            $assignments->addDescendingOrderByColumn('assignments.due_at');
+        }
+
         return $assignments->find();
 //        $c = new \Criteria();
 //        $c->addDescendingOrderByColumn('due_at');

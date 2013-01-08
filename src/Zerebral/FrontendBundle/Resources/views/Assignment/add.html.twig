@@ -11,21 +11,17 @@
 {% endblock form_rows %}
 {% block file_widget %}
     {% spaceless %}
+        <div class="file-item">
         {% if value %}
             {% if value.name == '' %}
-                <div>
-                    <input type="file" name="assignment[files][{{ name }}][uploadedFile]" /> <i class="icon-small-trash-bin"></i><a class="remove-uploaded-file" href="#">remove</a> <span class="help-inline">Please select file for uploading</span>
-                </div>
+                <input type="file" name="assignment[files][{{ name }}][uploadedFile]" /> <i class="icon-small-trash-bin"></i><a class="remove-uploaded-file" href="#">remove</a> <span class="help-inline">Please select file for uploading</span>
             {% else %}
-                <div>
-                    <span>{{ value.name }}</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="hidden" name="assignment[files][{{ name }}][uploadedFile]" /><i class="icon-small-trash-bin"></i><a class="remove-uploaded-file" href="#">remove</a>
-                </div>
+                <span>{{ value.name }}</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="hidden" name="assignment[files][{{ name }}][uploadedFile]" /><a class="remove-uploaded-file" href="#"><i class="icon-small-trash-bin"></i></a>
             {% endif %}
         {% else %}
-            <div>
-                <input type="file" {{ block('widget_attributes') }} /> <i class="icon-small-trash-bin"></i><a class="remove-uploaded-file" href="#">remove</a>
-            </div>
+            <input type="file" {{ block('widget_attributes') }} /> <a class="remove-uploaded-file" href="#"><i class="icon-small-trash-bin"></i></a>
         {% endif %}
+        </div>
     {% endspaceless %}
 {% endblock file_widget %}
 

@@ -101,16 +101,25 @@
 
             .symbol {
                 .count-badge {
-                    background-color: #f4f4f4;
+                    //background-color: #f4f4f4;
+                    background-color: #999999;
                     font-weight: bold;
-                    color: #b74a47;
+                    //color: #b74a47;
+                    color: white;
                     width: 50px;
                     height: 50px;
                     font-size: 18px;
                     vertical-align: middle;
                     text-align: center;
                     line-height: 50px;
+                    &.success {
+                        background: #468847;
+                    }
+                    &.warning {
+                        background: #f6b14f;
+                    }
                 }
+
             }
         }
     }

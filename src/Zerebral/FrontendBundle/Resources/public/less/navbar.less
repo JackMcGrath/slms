@@ -121,10 +121,18 @@ div.right-navbar {
         ul {
             list-style: none outside none;
             margin-left: 0px;
+            .active() {
+                color: #b94a48;
+            }
             &.radio {
                 label {
                     line-height: 21px;
                     cursor: pointer;
+                }
+                li.active {
+                    label {
+                        .active;
+                    }
                 }
                 input {
                     vertical-align: top;
@@ -143,6 +151,9 @@ div.right-navbar {
                 li.active {
                     i.marker {
                         visibility: visible;
+                    }
+                    a {
+                        .active;
                     }
                 }
             }
