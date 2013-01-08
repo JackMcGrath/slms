@@ -26,7 +26,15 @@
 
 {% import _self as self %}
 {% if feedType == 'course' %}
-    {{ self.course_details_comment_block(comment) }}
+    {% for com in comment %}
+        {{ self.course_details_comment_block(com) }}
+    {% else %}
+        {{ self.course_details_comment_block(comment) }}
+    {% endfor %}
 {% else %}
-    {{ self.assignment_details_comment_block(comment) }}
+    {% for com in comment %}
+        {{ self.assignment_details_comment_block(com) }}
+    {% else %}
+        {{ self.assignment_details_comment_block(comment) }}
+    {% endfor %}
 {% endif %}
