@@ -118,17 +118,17 @@
                             {% endif %}
                         </div>
                     </li>
+                    {% if app.user.isTeacher %}
                     <li class="{{ target is defined and target == 'files' ? 'active' : ''}}">
                         <div class="menu-item">
                             <a href="{{ path('assignment_solutions') }}"><i class="icon-big-folder"></i>Files</a>
                         </div>
                     </li>
-
+                    {% endif %}
                 </ul>
             </div>
         </div>
         <div class="row-fluid main-content">
-
             <div class="pull-left primary">
                 {% block content %}
                 {% endblock %}
