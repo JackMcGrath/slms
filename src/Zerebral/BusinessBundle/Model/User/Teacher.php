@@ -33,25 +33,12 @@ class Teacher extends BaseTeacher
     {
         $assignments = \Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery::create()->getCourseAssignmentsDueDate($course, $ongoing);
         if ($ongoing == true) {
-            $assignments->addAscendingOrderByColumn('LOWER(assignments.name)');
+            $assignments->addDescendingOrderByColumn('remainingCount');
         } else {
             $assignments->addDescendingOrderByColumn('assignments.due_at');
         }
 
         return $assignments->find();
-//        $c = new \Criteria();
-//        $c->addDescendingOrderByColumn('due_at');
-//        if ($ongoing === false) {
-//            $c->addCond('dueAt', 'due_at', null, \Criteria::ISNOTNULL);
-//        } else if ($ongoing === true) {
-//            $c->addCond('dueAt', 'due_at', null, \Criteria::ISNULL);
-//        }
-//        $c->addJoin(\Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer::ID, \Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentPeer::ASSIGNMENT_ID, \Criteria::LEFT_JOIN);
-//        $c->addCond('students', 'student_assignments.id', null, \Criteria::ISNOTNULL);
-//        $c->combine(array('students', 'dueAt'), \Criteria::LOGICAL_AND);
-//        $c->addGroupByColumn('assignments.id');
-//
-//        return $course->getAssignments($c);
     }
 
     public function getCourseAssignmentsDraft(\Zerebral\BusinessBundle\Model\Course\Course $course)
@@ -67,6 +54,11 @@ class Teacher extends BaseTeacher
     public function getAssignmentsDueDate($ongoing = null)
     {
         $assignments = \Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery::create()->getCourseAssignmentsDueDate(null, $ongoing, $this);
+        if ($ongoing == true) {
+            $assignments->addDescendingOrderByColumn('remainingCount');
+        } else {
+            $assignments->addDescendingOrderByColumn('assignments.due_at');
+        }
         return $assignments->find();
     }
 
