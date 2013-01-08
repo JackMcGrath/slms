@@ -39,6 +39,7 @@
 
                 {% if draftAssignment and draftAssignment.count %}
                     <div class="small-title">Drafts</div>
+                    {% set type = 'draft' %}
                     {% for assignment in draftAssignment %}
                         {{ block('assignment') }}
                     {% endfor %}
@@ -67,12 +68,28 @@
 {% endblock %}
 
 {% block assignment %}
+    {% set badgeClass = '' %}
+    {% if assignment.hasVirtualColumn('completedCount') %}
+        {% if assignment.getVirtualColumn('completedCount') == 0 %}
+            {% set badgeClass = '' %}
+        {% elseif  assignment.students.count - assignment.getVirtualColumn('completedCount') > 0%}
+            {% set badgeClass = 'warning' %}
+        {% elseif  assignment.students.count == assignment.getVirtualColumn('completedCount') %}
+            {% set badgeClass = 'success' %}
+        {% endif %}
+    {% endif %}
     <div class="list-item span12{{ loop.last ? ' last' : '' }}">
         <div class="symbol pull-left">
             {% if is_granted('ROLE_STUDENT') %}
                 <img class="rounded" src="http://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?s=48"/>
             {% else %}
-                <div class="rounded count-badge">-</div>
+                <div class="rounded count-badge {{ badgeClass }}">
+                    {% if type is defined and type == 'draft' %}
+                        -
+                    {% elseif assignment.hasVirtualColumn('completedCount') %}
+                        {{ assignment.getVirtualColumn('completedCount') }}
+                    {% endif %}
+                </div>
             {% endif %}
         </div>
         <div class="details pull-left">
