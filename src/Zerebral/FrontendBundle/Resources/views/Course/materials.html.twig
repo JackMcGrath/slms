@@ -67,9 +67,9 @@
                 <h4>sort by</h4>
                 <form method="post" action="">
                     <ul class="radio">
-                        <li><label><input type="radio" name="MaterialGrouping" value="date" {{ materialGrouping == 'date' ? 'checked' : '' }}/> Date and time</label></li>
-                        <li><label><input type="radio" name="MaterialGrouping" value="alphabetically" {{ materialGrouping == 'alphabetically' ? 'checked' : '' }}/> A-Z</label></li>
-                        <li><label><input type="radio" name="MaterialGrouping" value="folder" {{ materialGrouping == 'folder' ? 'checked' : '' }}/> Folder</label></li>
+                        <li {{ materialGrouping == 'date' ? 'class="active"' : '' }}><label><input type="radio" name="MaterialGrouping" value="date" {{ materialGrouping == 'date' ? 'checked' : '' }}/> Date and time</label></li>
+                        <li {{ materialGrouping == 'alphabetically' ? 'class="active"' : '' }}><label><input type="radio" name="MaterialGrouping" value="alphabetically" {{ materialGrouping == 'alphabetically' ? 'checked' : '' }}/> A-Z</label></li>
+                        <li {{ materialGrouping == 'folder' ? 'class="active"' : '' }}><label><input type="radio" name="MaterialGrouping" value="folder" {{ materialGrouping == 'folder' ? 'checked' : '' }}/> Folder</label></li>
                     </ul>
                 </form>
             </div>
