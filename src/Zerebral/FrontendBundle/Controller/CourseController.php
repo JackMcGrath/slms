@@ -81,10 +81,12 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
         $feedItemForm = $this->createForm($feedItemFormType, null);
 
         $upcomingAssignments = $this->getRoleUser()->getUpcomingAssignments($course);
+        $recentMaterials = \Zerebral\BusinessBundle\Model\Material\CourseMaterialQuery::create()->findRecentCourseMaterials($course)->find();
 
         return array(
             'course' => $course,
             'upcomingAssignments' => $upcomingAssignments,
+            'recentMaterials' => $recentMaterials,
             'feedItemForm' => $feedItemForm->createView(),
             'feedItems' => $course->getFeedItems(),
             'target' => 'feed',
@@ -253,4 +255,6 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
             )
         );
     }
+
+
 }
