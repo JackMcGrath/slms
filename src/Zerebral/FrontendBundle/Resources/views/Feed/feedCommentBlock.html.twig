@@ -3,7 +3,7 @@
         <div class="avatar"><img class="rounded" src="{{ get_file_storage_link(comment.user.getAvatarFile()) | imagine_filter('small_thumbnail') }}" /></div>
         <div class="content"><b>{{ comment.user.fullName }}</b>&nbsp;{{ comment.feedContent.text }}</div>
         <div class="timestamp">
-            <span class="gray">{{ time_diff(comment.createdAt) }}</span>
+            <span class="gray" data-date="{{ comment.createdAt.format('Y-m-d H:i:s') }}">{{ time_diff(comment.createdAt) }}</span>
         </div>
         {% if app.user.id == comment.user.id %}<a href="{{ path('ajax_feed_remove_comment', {feedCommentId: comment.id}) }}" class="gray delete-link delete-comment"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
         <div class="clearfix"></div>
@@ -15,7 +15,7 @@
         <div class="avatar"><img class="rounded" src="{{ get_file_storage_link(comment.user.getAvatarFile()) | imagine_filter('thumbnail') }}" /> </div>
         <div class="content">
             <div class="author {% if app.user.id == comment.user.id %} is_author {% endif %}">
-                {{ comment.user.fullName }} <span class="gray timestamp">{{ time_diff(comment.createdAt) }}</span>
+                {{ comment.user.fullName }} <span class="gray timestamp" data-date="{{ comment.createdAt.format('Y-m-d H:i:s') }}">{{ time_diff(comment.createdAt) }}</span>
                 {% if app.user.id == comment.user.id %}<a href="{{ path('ajax_feed_remove_comment', {feedCommentId: comment.id}) }}" class="gray delete-link delete-comment"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
             </div>
             <div class="text">{{ comment.feedContent.text }}</div>
