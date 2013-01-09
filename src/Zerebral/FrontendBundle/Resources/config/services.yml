@@ -7,6 +7,10 @@ services:
         arguments:  [@zerebral.file_storage]
         tags:
             -  { name: twig.extension }
+    zerebral.twig.extension.plural:
+        class: Zerebral\FrontendBundle\Extension\PluralExtension
+        tags:
+            -  { name: twig.extension }
     twig.extension:
         class: Assetic\Extension\Twig
     zerebral.frontend.login_success_handler:

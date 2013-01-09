@@ -82,7 +82,7 @@
             </div>
         </div>
         {% if assignment.hasVirtualColumn('filesCount') and assignment.getVirtualColumn('filesCount') > 0 %}
-            <div class="download-all pull-right"><a href="{{ path('assignment_solutions_download', {assignmentId: assignment.id }) }}"><i class="icon-download-zip"></i>Download {{ assignment.getVirtualColumn('filesCount') }} files</a></div>
+            <div class="download-all pull-right"><a href="{{ path('assignment_solutions_download', {assignmentId: assignment.id }) }}"><i class="icon-download-zip"></i>Download {{ (assignment.getVirtualColumn('filesCount') ~ " file")|plural('', 's', 's') }}</a></div>
         {% endif %}
     </div>
 {% endblock %}
