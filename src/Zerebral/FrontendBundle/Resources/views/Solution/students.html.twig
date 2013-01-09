@@ -35,7 +35,7 @@
                                 {% if solution.isSubmitted %}<div class="due-at"><i class="icon-small-clock"></i> Submitted on <small>{{ solution.createdAt | date('Hi') == '0000' ? solution.createdAt | date('D, M d') : solution.createdAt | date('D, M d h:i a') }}</small></div>{% endif %}
                             </div>
                             {% if solution.hasVirtualColumn('filesCount') and solution.getVirtualColumn('filesCount') > 0 %}
-                                <div class="download-all pull-right"><a href="{{ path('student_solutions_download', {studentId: solution.studentId }) }}"><i class="icon-download-zip"></i>Download {{ solution.getVirtualColumn('filesCount') }} files</a></div>
+                                <div class="download-all pull-right"><a href="{{ path('student_solutions_download', {studentId: solution.studentId, assignmentId: solution.assignmentId }) }}"><i class="icon-download-zip"></i>Download {{ (solution.getVirtualColumn('filesCount') ~ " file")|plural('', 's', 's') }}</a></div>
                             {% endif %}
                         </div>
                     </div>

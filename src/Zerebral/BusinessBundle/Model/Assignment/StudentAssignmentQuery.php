@@ -19,4 +19,12 @@ class StudentAssignmentQuery extends BaseStudentAssignmentQuery
 
         return $this;
     }
+
+    public function findByAssignment($student, $assignment)
+    {
+        $this->filterByStudent($student);
+        $this->filterByAssignment($assignment);
+        $this->filterByIsSubmitted(true);
+        return $this;
+    }
 }

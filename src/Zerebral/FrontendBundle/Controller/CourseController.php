@@ -88,7 +88,6 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
             'upcomingAssignments' => $upcomingAssignments,
             'recentMaterials' => $recentMaterials,
             'feedItemForm' => $feedItemForm->createView(),
-            'feedItems' => $course->getFeedItems(),
             'target' => 'feed',
         );
     }
@@ -256,5 +255,14 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
         );
     }
 
+    /**
+     * @Route("/attendance/{id}", name="course_attendance")
+     * @PreAuthorize("hasRole('ROLE_TEACHER')")
+     * @ParamConverter("course")
+     * @Template()
+     */
+    public function attendanceAction(Model\Course\Course $course)
+    {
 
+    }
 }

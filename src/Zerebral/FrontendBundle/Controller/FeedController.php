@@ -47,7 +47,6 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
             $feedItem->save();
 
             $feedType = $this->getRequest()->get('feedType', 'assignment');
-
             return $this->render('ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig', array('feedType' => $feedType, 'comment' => $feedComment));
         }
 
@@ -61,7 +60,8 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @ParamConverter("feedComment", options={"mapping": {"feedCommentId": "id"}})
      */
-    public function removeFeedCommentAction(\Zerebral\BusinessBundle\Model\Feed\FeedComment $feedComment) {
+    public function removeFeedCommentAction(\Zerebral\BusinessBundle\Model\Feed\FeedComment $feedComment)
+    {
         if ($this->getUser()->getId() == $feedComment->getCreatedBy()) {
             $feedComment->delete();
             return new JsonResponse(array());
@@ -106,12 +106,46 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @ParamConverter("feedItem", options={"mapping": {"feedItemId": "id"}})
      */
-    public function removeFeedItemAction(\Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem) {
+    public function removeFeedItemAction(\Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem)
+    {
         if (($this->getUser()->getId() == $feedItem->getCreatedBy()) && ($feedItem->getFeedContent()->getType() != 'assignment')) {
             $feedItem->delete();
             return new JsonResponse(array());
         } else {
             return new JsonResponse(array('message' => 'You can\'t delete other feed items or assignments items'), 403);
         }
+    }
+
+    /**
+     * @Route("/load-comments/{feedItemId}", name="ajax_load_more_comments")
+     * @param \Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @ParamConverter("feedItem", options={"mapping": {"feedItemId": "id"}})
+     */
+    public function loadComments(\Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem)
+    {
+        $page = $this->getRequest()->get('page', 1);
+        $limit = 1;
+        $offset = (($page - 1) * $limit) + 3;
+        /** @var $commentsQuery \Zerebral\BusinessBundle\Model\Feed\FeedCommentQuery */
+        $commentsQuery = \Zerebral\BusinessBundle\Model\Feed\FeedCommentQuery::create()->filterByFeedItem($feedItem)->offset($offset)->limit($limit);
+        $commentsQuery->clearOrderByColumns()->addDescendingOrderByColumn('created_at');
+        $comments = $commentsQuery->find();
+
+
+
+        if (count($comments) > 0) {
+            $feedType = $this->getRequest()->get('feedType', 'course');
+            $content = $this->render('ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig', array('feedType' => $feedType, 'comment' => $comments))->getContent();
+            $lastPage = false;
+        } else {
+            $content = '';
+            $lastPage = true;
+        }
+       // $content = $commentsQuery->toString();
+
+        return new JsonResponse(array('success' => true, 'lastPage' => $lastPage, 'content' => $content));
+
     }
 }

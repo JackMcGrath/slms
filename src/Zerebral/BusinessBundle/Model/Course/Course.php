@@ -8,6 +8,9 @@ use Zerebral\BusinessBundle\Model\User\Student;
 use Zerebral\BusinessBundle\Model\User\Teacher;
 use Zerebral\BusinessBundle\Model\User\User;
 
+use Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentPeer;
+use Zerebral\BusinessBundle\Model\Feed\FeedItemPeer;
+
 class Course extends BaseCourse
 {
     /**
@@ -64,8 +67,18 @@ class Course extends BaseCourse
         return false;
     }
 
-    public function getFeedItems($criteria = null, PropelPDO $con = null) {
+    /**
+     * @param \Zerebral\BusinessBundle\Model\User\User $user
+     *
+     * @return \PropelObjectCollection|\Zerebral\BusinessBundle\Model\Feed\FeedItem[]
+     */
+    public function getFeedForUser(User $user)
+    {
         $orderCriteria = new \Criteria();
+        if ($user->isStudent()) {
+            $orderCriteria->addJoin(StudentAssignmentPeer::ASSIGNMENT_ID, FeedItemPeer::ASSIGNMENT_ID, \Criteria::LEFT_JOIN);
+            $orderCriteria->addAnd(StudentAssignmentPeer::STUDENT_ID, $user->getStudent()->getId(), '=');
+        }
         $orderCriteria->addDescendingOrderByColumn('created_at');
         return parent::getFeedItems($orderCriteria);
     }
