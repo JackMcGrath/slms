@@ -110,12 +110,10 @@ class SolutionController extends \Zerebral\CommonBundle\Component\Controller
             foreach ($assignments as $assignments) {
                 foreach ($assignments->getFiles() as $file) {
                     $file->setFileStorage($localFileStorage);
-                    var_dump($file->getAbsolutePath());
                     if (is_file($file->getAbsolutePath()))
                         $zip->addFile($file->getAbsolutePath(), $file->getName());
                     else
-                        die;
-                        //throw new \Exception('One or more files can not be added because not exists.');
+                        throw new \Exception('One or more files can not be added because not exists.');
                 }
             }
         }
