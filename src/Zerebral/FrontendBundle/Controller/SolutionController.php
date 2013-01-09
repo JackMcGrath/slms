@@ -83,12 +83,12 @@ class SolutionController extends \Zerebral\CommonBundle\Component\Controller
 
     /**
      * @Route("/files/download/assignment/{assignmentId}", name="assignment_solutions_download")
-     * @Route("/files/download/student/{studentId}", name="student_solutions_download")
+     * @Route("/files/download/student/{assignmentId}/{studentId}", name="student_solutions_download")
      * @ParamConverter("assignment", options={"mapping": {"assignmentId": "id"}})
      * @ParamConverter("student", options={"mapping": {"studentId": "id"}})
      * @PreAuthorize("hasRole('ROLE_TEACHER')")
      */
-    public function downloadZipAction(Model\Assignment\Assignment $assignment = null, Model\User\Student $student = null)
+    public function downloadZipAction(Model\Assignment\Assignment $assignment, Model\User\Student $student = null)
     {
         $zip = new \ZipArchive();
 
@@ -99,16 +99,23 @@ class SolutionController extends \Zerebral\CommonBundle\Component\Controller
             throw new \Exception('Cannot open file ' . $filename);
         }
 
-        $object = $assignment ?: $student;
-        if ($object) {
+        if ($student && $assignment) {
+            $assignments = StudentAssignmentQuery::create()->findByAssignment($student, $assignment)->find();
+        } else {
+            $assignments = $assignment->getStudentAssignments();
+        }
+
+        if ($assignments) {
             $localFileStorage = $this->container->get('zerebral.file_storage')->getFileStorage('local');
-            foreach ($object->getStudentAssignments() as $assignments) {
+            foreach ($assignments as $assignments) {
                 foreach ($assignments->getFiles() as $file) {
                     $file->setFileStorage($localFileStorage);
+                    var_dump($file->getAbsolutePath());
                     if (is_file($file->getAbsolutePath()))
                         $zip->addFile($file->getAbsolutePath(), $file->getName());
                     else
-                        throw new \Exception('One or more files can not be added because not exists.');
+                        die;
+                        //throw new \Exception('One or more files can not be added because not exists.');
                 }
             }
         }

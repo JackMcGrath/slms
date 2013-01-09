@@ -255,5 +255,14 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
         );
     }
 
+    /**
+     * @Route("/attendance/{id}", name="course_attendance")
+     * @PreAuthorize("hasRole('ROLE_TEACHER')")
+     * @ParamConverter("course")
+     * @Template()
+     */
+    public function attendanceAction(Model\Course\Course $course)
+    {
 
+    }
 }
