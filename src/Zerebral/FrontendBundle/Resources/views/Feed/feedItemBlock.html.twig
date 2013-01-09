@@ -1,5 +1,5 @@
 {% macro feed_item_assignment_block(feedItem) %}
-    <div class="author">{{ feedItem.user.fullName }}<span class="gray"> created new assignment </span><a style="color: #333333;" href="{{ path('assignment_view', {id: feedItem.assignment.id}) }}">{{ feedItem.assignment.name }}</a> <span class="gray timestamp">{{ time_diff(feedItem.createdAt) }}</span></div>
+    <div class="author">{{ feedItem.user.fullName }}<span class="gray"> created new assignment </span><a style="color: #333333;" href="{{ path('assignment_view', {id: feedItem.assignment.id}) }}">{{ feedItem.assignment.name }}</a> <span class="gray timestamp" data-date="{{ feedItem.createdAt.format('Y-m-d H:i:s') }}">{{ time_diff(feedItem.createdAt) }}</span></div>
     <div class="text">
         {% autoescape 'html' %}
         {{ feedItem.assignment.description|striptags|slice(0, 100) }}
@@ -8,7 +8,7 @@
 {% endmacro %}
 
 {% macro feed_item_text_block(feedItem) %}
-    <div class="author">{{ feedItem.user.fullName }}<span class="gray timestamp">{{ time_diff(feedItem.createdAt) }}</span></div>
+    <div class="author">{{ feedItem.user.fullName }}<span class="gray timestamp" data-date="{{ feedItem.createdAt.format('Y-m-d H:i:s') }}">{{ time_diff(feedItem.createdAt) }}</span></div>
     <div class="text">
         {{ feedItem.feedContent.text }}
     </div>
@@ -29,7 +29,13 @@
     </div>
     <div class="comments-button"><i class="icon-comment"></i> <a class="show-comment-form-link" data-comments-count="{{ feedItem.feedComments|length }}" href="#">Comment (<span>{{ feedItem.feedComments|length }}</span>)</a></div>
     <div class="comments">
-        {% for comment in feedItem.feedComments %}
+        {% set lastFeedComments = feedItem.lastFeedComments %}
+        {% if lastFeedComments|length < feedItem.feedComments|length %}
+            <div class="comment load-more">
+                <i class="icon-comment"></i>&nbsp;<a class="load-more-link" href="{{ path('ajax_load_more_comments', {feedItemId: feedItem.id}) }}" data-page="1">Show 10 more comments</a>
+            </div>
+        {% endif %}
+        {% for comment in lastFeedComments %}
             {% include "ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig" with {'feedType': 'course'} %}
         {% endfor %}
 

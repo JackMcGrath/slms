@@ -37,6 +37,8 @@ ZerebralCourseDetailFeedBlock.prototype = {
         this.feedItemsDiv.on('click', 'a.delete-link.delete-feed-item', $.proxy(self.deleteItemBlock, self));
         this.feedItemsDiv.on('click', 'a.delete-link.delete-comment', $.proxy(self.deleteCommentBlock, self));
 
+        this.commentsDiv.on('click', 'a.load-more-link', $.proxy(self.loadComments, self));
+
         this.feedItemForm.zerebralAjaxForm({
             success: $.proxy(self.addItemBlock, this),
             error: function() { alert('Oops, seems like unknown error has appeared!'); },
@@ -50,6 +52,34 @@ ZerebralCourseDetailFeedBlock.prototype = {
                 error: function() { alert('Oops, seems like unknown error has appeared!'); },
                 dataType: 'html'
             });
+        })
+    },
+
+    loadComments: function(event) {
+        event.preventDefault();
+        var link = $(event.target);
+        $.ajax({
+            type: 'get',
+            url: link.attr('href'),
+            data: {
+                page: link.data('page')
+            },
+            success: function(response) {
+                if (response.success) {
+                    link.parents('.comment').after('<p>' + response.content + '</p>');
+                    if (response.lastPage) {
+                        link.parents('.comment').slideUp('fast', function() {
+                            link.parents('.comment').remove();
+                        });
+                    } else {
+                        link.data('page', link.data('page') + 1);
+                    }
+                } else {
+                    this.error(response);
+                }
+            },
+            error: function() { alert('Oops, seems like unknown error has appeared!'); },
+            dataType: 'json'
         })
     },
 
