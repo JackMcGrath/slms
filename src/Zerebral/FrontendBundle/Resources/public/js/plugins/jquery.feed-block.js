@@ -58,27 +58,36 @@ ZerebralCourseDetailFeedBlock.prototype = {
     loadComments: function(event) {
         event.preventDefault();
         var link = $(event.target);
+        var loadingSpan = link.prev('span.load-more-link');
+        link.hide();
+        loadingSpan.removeClass('hidden');
         $.ajax({
             type: 'get',
             url: link.attr('href'),
             data: {
-                page: link.data('page')
+                page: link.data('page'),
+                lastCommentId: link.data('lastCommentId')
             },
             success: function(response) {
                 if (response.success) {
-                    link.parents('.comment').after('<p>' + response.content + '</p>');
                     if (response.lastPage) {
+                        link.html('No more comments');
                         link.parents('.comment').slideUp('fast', function() {
                             link.parents('.comment').remove();
                         });
                     } else {
                         link.data('page', link.data('page') + 1);
                     }
+                    link.parents('.comment').after(response.content);
                 } else {
                     this.error(response);
                 }
             },
             error: function() { alert('Oops, seems like unknown error has appeared!'); },
+            complete: function() {
+                loadingSpan.addClass('hidden');
+                link.show();
+            },
             dataType: 'json'
         })
     },
