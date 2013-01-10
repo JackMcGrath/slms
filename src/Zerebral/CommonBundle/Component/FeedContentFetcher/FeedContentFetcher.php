@@ -8,18 +8,51 @@ class FeedContentFetcher
 
     /** @var FeedContent */
     protected $feedContent;
+    protected $feedContentResponse;
+    protected $feedContentResponseMimeType;
+
+    protected $linkTitle;
+    protected $linkDescription;
+    protected $linkThumbmnailUrl;
 
     public static $urlRegexp = '/(https?\:\/\/|\s)[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})(\/+[a-z0-9_.\:\;-]*)*(\?[\&\%\|\+a-z0-9_=,\.\:\;-]*)?([\&\%\|\+&a-z0-9_=,\:\;\.-]*)([\!\#\/\&\%\|\+a-z0-9_=,\:\;\.-]*)}*/i';
     public static $metaTagsList = array('title', 'description', 'image_src', 'og:title', 'og:description', 'og:image');
 
-    protected $tempFileName;
-    protected $tempFileMimeType;
+    public function getLinkDescription()
+    {
+        return $this->linkDescription;
+    }
 
+    public function getLinkThumbmnailUrl()
+    {
+        return $this->linkThumbmnailUrl;
+    }
 
+    public function getLinkTitle()
+    {
+        return $this->linkTitle;
+    }
 
     public function __construct(FeedContent $feedContent)
     {
         $this->feedContent = $feedContent;
+
+        if (preg_match(self::$urlRegexp, $this->feedContent->getLinkUrl())) {
+            $this->loadUrl($this->feedContent->getLinkUrl());
+
+            if (strstr($this->feedContentResponseMimeType, 'text/html')) {
+                $responseMeta = $this->parseWebSite();
+
+                $this->linkTitle = $responseMeta['title'];
+                $this->linkDescription = $responseMeta['description'];
+                $this->linkThumbmnailUrl = $responseMeta['thumbnail_url'];
+
+                return true;
+            }
+        }
+
+        return false;
+
     }
 
 
@@ -38,10 +71,10 @@ class FeedContentFetcher
     }
 
 
-    protected function parseWebSite($html)
+    protected function parseWebSite()
     {
         $dom = new \DOMDocument();
-        @$dom->loadHTML(file_get_contents($html));
+        @$dom->loadHTML($this->feedContentResponse);
         $metaTags = $this->nodeListToArray($dom->getElementsByTagName('meta'));
 
 
@@ -50,17 +83,6 @@ class FeedContentFetcher
         $urlComponents['thumbnail_url'] = isset($metaTags['og:image']) ? $metaTags['og:image'] : (isset($metaTags['image_src']) ? $metaTags['image_src'] : $dom->getElementsByTagName('img')->item(0)->getAttribute('src'));
 
         return $urlComponents;
-    }
-
-
-    protected function saveToTempFile($content)
-    {
-        $tempFieName = tempnam(sys_get_temp_dir(), md5(rand(0, 1000)));
-        $tempFileDescriptor = fopen($tempFieName, 'w+');
-        fwrite($tempFileDescriptor, $content);
-        fclose($tempFileDescriptor);
-        $this->tempFileName = $tempFieName;
-        $this->tempFileMimeType = mime_content_type($tempFieName);
     }
 
     /** @todo: Handle all possible response codes */
@@ -80,30 +102,9 @@ class FeedContentFetcher
             CURLOPT_MAXREDIRS => 10             // stop after 10 redirects
         );
         curl_setopt_array($curlHandler, $options);
-        $response = curl_exec($curlHandler);
+        $this->feedContentResponse = curl_exec($curlHandler);
         $info = curl_getinfo($curlHandler, CURLINFO_CONTENT_TYPE);
         curl_close($curlHandler);
-
-        $this->saveToTempFile($response);
         $this->tempFileMimeType = $info;
-    }
-
-    public function fetch()
-    {
-        if (preg_match(self::$urlRegexp, $this->feedContent->getLinkUrl())) {
-            $this->loadUrl($this->feedContent->getLinkUrl());
-
-            if (strstr($this->tempFileMimeType, 'text/html')) {
-                $urlComponents = $this->parseWebSite($this->tempFileName);
-
-                $this->feedContent->setLinkTitle($urlComponents['title']);
-                $this->feedContent->setLinkDescription($urlComponents['description']);
-                $this->feedContent->setLinkThumbnailUrl($urlComponents['thumbnail_url']);
-
-                return true;
-            }
-        }
-
-        return false;
     }
 }
