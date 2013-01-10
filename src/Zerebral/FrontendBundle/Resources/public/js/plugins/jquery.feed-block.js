@@ -40,9 +40,21 @@ ZerebralCourseDetailFeedBlock.prototype = {
         this.commentsDiv.on('click', 'a.load-more-link', $.proxy(self.loadComments, self));
 
         this.feedItemForm.zerebralAjaxForm({
-            success: $.proxy(self.addItemBlock, this),
-            error: function() { alert('Oops, seems like unknown error has appeared!'); },
-            dataType: 'html'
+            dataType: 'json',
+            beforeSend: function() {
+                self.feedItemForm.find('.control-group').removeClass('error');
+            },
+            success: function(response) {
+                if (response['has_errors']) {
+                    for (var fieldName in response['errors']) {
+                        var field = self.feedItemForm.find('[name^="' + fieldName.replace(/\[/g,'\\[').replace(/\]/g,'\\]') + '"]').last();
+                        field.parents('.control-group').addClass('error');
+                    }
+                } else {
+                    self.addItemBlock(response['content']);
+                }
+            },
+            error: function() { alert('Oops, seems like unknown error has appeared!'); }
         });
 
         $.each(this.commentsDiv.find('form'), function(index, value) {
@@ -113,7 +125,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
 
         var self = this;
         self.resetMainFormType();
-        this.feedItemFormTextarea.val('').parent().animate({'background-color': 'transparent'}).find('.feed-item-form-controls').hide();
+        this.feedItemFormTextarea.val('').parents('form').animate({'background-color': 'transparent'}).find('.feed-item-form-controls').hide();
         this.feedItemFormTextarea.animate({
             width: 571,
             margin: 0,
@@ -166,7 +178,6 @@ ZerebralCourseDetailFeedBlock.prototype = {
     addItemBlock: function(response) {
         var self = this;
         var itemBlock = $(response);
-
         itemBlock.find('form').zerebralAjaxForm({
             data: { feedType: 'course' },
             success: $.proxy(self.addCommentBlock, itemBlock.find('form')),

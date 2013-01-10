@@ -165,3 +165,20 @@ Zerebral\BusinessBundle\Model\Material\CourseMaterial:
         courseId:
             - NotBlank:
                 message: Course id can not be blank
+
+Zerebral\BusinessBundle\Model\Feed\FeedItem:
+    getters:
+        feedContent:
+          - Valid: ~
+
+Zerebral\BusinessBundle\Model\Feed\FeedContent:
+    constraints:
+        - Zerebral\BusinessBundle\ContentFetcher\Validator\Constraints\FeedContent:
+            typeField: type
+            linkUrlField: linkUrl
+            linkDescriptionField: linkDescription
+            linkThumbnailUrlField: linkThumbnailUrl
+    getters:
+        text:
+          - NotBlank:
+              message: Please write comment text

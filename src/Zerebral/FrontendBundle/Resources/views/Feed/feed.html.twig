@@ -41,10 +41,14 @@
     <div class="course-details-feed">
     <div class="feed-item-form">
         <form id="ajaxFeedItemForm" method="post" {{ form_enctype(feedItemForm) }} action="{{ feedItemFormPath }}">
-            <textarea class="feed-item-textarea" name="feed_item[feedContent][text]" placeholder="Share what's new..." ></textarea>
+            <div class="control-group">
+                <textarea class="feed-item-textarea" name="feed_item[feedContent][text]" placeholder="Share what's new..." ></textarea>
+            </div>
             <div class="feed-item-form-controls">
                 <div class="attached-link">
-                    <input class="attached-link-field" type="text" name="feed_item[feedContent][link_url]" placeholder="Enter link..." />
+                    <div class="control-group">
+                        <input class="attached-link-field" type="text" name="feed_item[feedContent][linkUrl]" placeholder="Enter link..." />
+                    </div>
                     <input class="comment-type" type="hidden" name="feed_item[feedContent][type]" value="text" />
                     <div class="attached-link-delete" style="">
                         <i class="icon-small-trash-bin"></i> <a class="gray" href="#">Delete</a>
