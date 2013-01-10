@@ -32,7 +32,7 @@
         {% set lastFeedComments = feedItem.lastFeedComments %}
         {% if lastFeedComments|length < feedItem.feedComments|length %}
             <div class="comment load-more">
-                <i class="icon-comment"></i>&nbsp;<a class="load-more-link" href="{{ path('ajax_load_more_comments', {feedItemId: feedItem.id}) }}" data-page="1">Show 10 more comments</a>
+                <i class="icon-comment"></i>&nbsp;<span class="load-more-link hidden">Loading...</span><a class="load-more-link" href="{{ path('ajax_load_more_comments', {feedItemId: feedItem.id}) }}" data-loaded-count="{{ lastFeedComments|length }}" data-total-count="{{  feedItem.feedComments|length }}" data-last-comment-id="{{ lastFeedComments.first.id }}">Show more comments</a>
             </div>
         {% endif %}
         {% for comment in lastFeedComments %}

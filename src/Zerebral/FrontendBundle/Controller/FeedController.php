@@ -19,6 +19,9 @@ use Zerebral\BusinessBundle\Model\Feed\FeedItem;
 use Zerebral\BusinessBundle\Model\Feed\FeedComment;
 use Zerebral\BusinessBundle\Model\Course\Course;
 
+use Zerebral\BusinessBundle\Model\Feed\FeedCommentQuery;
+use Zerebral\BusinessBundle\Model\Feed\FeedCommentPeer;
+
 /**
  * @Route("/feed")
  */
@@ -125,27 +128,23 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function loadComments(\Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem)
     {
-        $page = $this->getRequest()->get('page', 1);
-        $limit = 1;
-        $offset = (($page - 1) * $limit) + 3;
+        $page = 1;
+        $lastCommentId = $this->getRequest()->get('lastCommentId', 0);
+
         /** @var $commentsQuery \Zerebral\BusinessBundle\Model\Feed\FeedCommentQuery */
-        $commentsQuery = \Zerebral\BusinessBundle\Model\Feed\FeedCommentQuery::create()->filterByFeedItem($feedItem)->offset($offset)->limit($limit);
-        $commentsQuery->clearOrderByColumns()->addDescendingOrderByColumn('created_at');
-        $comments = $commentsQuery->find();
+        $commentsQuery = FeedCommentQuery::create()
+                            ->clearOrderByColumns()
+                            ->addDescendingOrderByColumn(FeedCommentPeer::ID)
+                            ->filterByFeedItem($feedItem)
+                            ->filterById($lastCommentId, \Criteria::LESS_THAN);
 
+        /** @var $commentsPaginator \PropelModelPager */
+        $commentsPaginator = $commentsQuery->paginate($page, 10);
 
-
-        if (count($comments) > 0) {
-            $feedType = $this->getRequest()->get('feedType', 'course');
-            $content = $this->render('ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig', array('feedType' => $feedType, 'comment' => $comments))->getContent();
-            $lastPage = false;
-        } else {
-            $content = '';
-            $lastPage = true;
-        }
-       // $content = $commentsQuery->toString();
-
-        return new JsonResponse(array('success' => true, 'lastPage' => $lastPage, 'content' => $content));
+        $comments = $commentsPaginator->getResults();
+        $feedType = $this->getRequest()->get('feedType', 'course');
+        $content = $this->render('ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig', array('feedType' => $feedType, 'comment' => $comments))->getContent();
+        return new JsonResponse(array('success' => true, 'lastCommentId' => $comments->getLast()->getId(), 'loadedCount' => count($comments), 'content' => $content));
 
     }
 }

@@ -74,12 +74,15 @@ class Course extends BaseCourse
      */
     public function getFeedForUser(User $user)
     {
-        $orderCriteria = new \Criteria();
+        $criteria = new \Criteria();
+
         if ($user->isStudent()) {
-            $orderCriteria->addJoin(StudentAssignmentPeer::ASSIGNMENT_ID, FeedItemPeer::ASSIGNMENT_ID, \Criteria::LEFT_JOIN);
-            $orderCriteria->addAnd(StudentAssignmentPeer::STUDENT_ID, $user->getStudent()->getId(), '=');
+            $criteria->addJoin(StudentAssignmentPeer::ASSIGNMENT_ID, FeedItemPeer::ASSIGNMENT_ID, \Criteria::RIGHT_JOIN);
+            $criteria->addAnd(StudentAssignmentPeer::STUDENT_ID, $user->getStudent()->getId(), \Criteria::EQUAL);
+            $criteria->addOr(FeedItemPeer::ASSIGNMENT_ID, null, \Criteria::ISNULL);
         }
-        $orderCriteria->addDescendingOrderByColumn('created_at');
-        return parent::getFeedItems($orderCriteria);
+        $criteria->addDescendingOrderByColumn('created_at');
+
+        return parent::getFeedItems($criteria);
     }
 }
