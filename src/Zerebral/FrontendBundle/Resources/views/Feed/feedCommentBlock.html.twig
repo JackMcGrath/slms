@@ -26,15 +26,11 @@
 
 {% import _self as self %}
 {% if feedType == 'course' %}
-    {% for com in comment %}
+    {% for com in comment|reverse %}
         {{ self.course_details_comment_block(com) }}
     {% else %}
         {{ self.course_details_comment_block(comment) }}
     {% endfor %}
 {% else %}
-    {% for com in comment %}
-        {{ self.assignment_details_comment_block(com) }}
-    {% else %}
-        {{ self.assignment_details_comment_block(comment) }}
-    {% endfor %}
+    {{ self.assignment_details_comment_block(comment) }}
 {% endif %}

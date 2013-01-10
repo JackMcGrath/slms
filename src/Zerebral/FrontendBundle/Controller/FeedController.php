@@ -20,6 +20,7 @@ use Zerebral\BusinessBundle\Model\Feed\FeedComment;
 use Zerebral\BusinessBundle\Model\Course\Course;
 
 use Zerebral\BusinessBundle\Model\Feed\FeedCommentQuery;
+use Zerebral\BusinessBundle\Model\Feed\FeedCommentPeer;
 
 /**
  * @Route("/feed")
@@ -127,21 +128,23 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function loadComments(\Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem)
     {
-        $page = $this->getRequest()->get('page', 1);
+        $page = 1;
         $lastCommentId = $this->getRequest()->get('lastCommentId', 0);
 
         /** @var $commentsQuery \Zerebral\BusinessBundle\Model\Feed\FeedCommentQuery */
-        $commentsQuery = FeedCommentQuery::create()->filterByFeedItem($feedItem);
-        $commentsQuery->filterById($lastCommentId, \Criteria::LESS_THAN);
-        $commentsPaginatorDummy = $commentsQuery->paginate();
+        $commentsQuery = FeedCommentQuery::create()
+                            ->clearOrderByColumns()
+                            ->addDescendingOrderByColumn(FeedCommentPeer::ID)
+                            ->filterByFeedItem($feedItem)
+                            ->filterById($lastCommentId, \Criteria::LESS_THAN);
 
         /** @var $commentsPaginator \PropelModelPager */
-        $commentsPaginator = $commentsQuery->paginate($commentsPaginatorDummy->getLastPage() - $page + 1);
+        $commentsPaginator = $commentsQuery->paginate($page, 10);
 
         $comments = $commentsPaginator->getResults();
         $feedType = $this->getRequest()->get('feedType', 'course');
         $content = $this->render('ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig', array('feedType' => $feedType, 'comment' => $comments))->getContent();
-        return new JsonResponse(array('success' => true, 'lastPage' => $commentsPaginator->isFirstPage(), 'content' => $content));
+        return new JsonResponse(array('success' => true, 'lastCommentId' => $comments->getLast()->getId(), 'loadedCount' => count($comments), 'content' => $content));
 
     }
 }
