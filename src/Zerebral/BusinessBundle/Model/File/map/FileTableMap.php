@@ -48,6 +48,11 @@ class FileTableMap extends TableMap
         $this->addColumn('size', 'Size', 'INTEGER', true, null, null);
         $this->addColumn('mime_type', 'MimeType', 'VARCHAR', true, 30, null);
         $this->addColumn('storage', 'Storage', 'CHAR', true, null, 'local');
+        $this->getColumn('storage', false)->setValueSet(array (
+  0 => 'local',
+  1 => 'dropbox',
+  2 => 's3',
+));
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', true, null, null);
         // validators
     } // initialize()

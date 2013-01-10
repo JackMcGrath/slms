@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<database name="default" defaultIdMethod="native" package="attendance" namespace="Zerebral\BusinessBundle\Model\Attendance" defaultPhpNamingMethod="phpname">
+    <table name="attendance" phpName="Attendance" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="course_id" phpName="CourseId" type="INTEGER" sqlType="int(11) unsigned" required="true"/>
+        <column name="date" phpName="Date" type="DATE" required="true"/>
+        <column name="teacher_id" phpName="TeacherId" type="INTEGER" sqlType="int(11) unsigned" required="true"/>
+        <foreign-key foreignTable="courses" name="attendance_courses" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="course_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="teachers" name="attendance_teachers" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="teacher_id" foreign="id"/>
+        </foreign-key>
+        <unique name="attendance_date_course">
+            <unique-column name="course_id"/>
+            <unique-column name="date"/>
+        </unique>
+        <index name="attendance_teachers">
+            <index-column name="teacher_id"/>
+        </index>
+    </table>
+
+    <table name="student_attendance" phpName="StudentAttendance" idMethod="native">
+        <column name="attendance_id" phpName="AttendanceId" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" required="true"/>
+        <column name="student_id" phpName="StudentId" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" required="true"/>
+        <column name="status" phpName="Status" type="CHAR" valueSet="present,tardy,excused" sqlType="enum('present','tardy','excused')" required="true"/>
+        <column name="comment" phpName="Comment" type="VARCHAR" size="200" required="false"/>
+        <foreign-key foreignTable="attendance" name="student_attendance_attendance" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="attendance_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="students" name="student_attendance_students" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="student_id" foreign="id"/>
+        </foreign-key>
+        <index name="student_attendance_students">
+            <index-column name="student_id"/>
+        </index>
+    </table>
+</database>

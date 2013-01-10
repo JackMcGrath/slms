@@ -85,6 +85,12 @@ abstract class BaseDocument extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * Get the [reference_id] column value.
      *
      * @return int
@@ -172,7 +178,7 @@ abstract class BaseDocument extends BaseObject implements Persistent
      */
     public function setReferenceId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -193,7 +199,7 @@ abstract class BaseDocument extends BaseObject implements Persistent
      */
     public function setType($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -214,7 +220,7 @@ abstract class BaseDocument extends BaseObject implements Persistent
      */
     public function setStorage($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -235,7 +241,7 @@ abstract class BaseDocument extends BaseObject implements Persistent
      */
     public function setPath($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -982,6 +988,7 @@ abstract class BaseDocument extends BaseObject implements Persistent
         $this->created_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -999,7 +1006,10 @@ abstract class BaseDocument extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
     }

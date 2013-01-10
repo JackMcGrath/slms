@@ -138,6 +138,12 @@ abstract class BaseFile extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
@@ -297,7 +303,7 @@ abstract class BaseFile extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -318,7 +324,7 @@ abstract class BaseFile extends BaseObject implements Persistent
      */
     public function setName($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -339,7 +345,7 @@ abstract class BaseFile extends BaseObject implements Persistent
      */
     public function setDescription($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -360,7 +366,7 @@ abstract class BaseFile extends BaseObject implements Persistent
      */
     public function setSize($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -381,7 +387,7 @@ abstract class BaseFile extends BaseObject implements Persistent
      */
     public function setMimeType($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -402,7 +408,7 @@ abstract class BaseFile extends BaseObject implements Persistent
      */
     public function setStorage($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -717,6 +723,12 @@ abstract class BaseFile extends BaseObject implements Persistent
                         $assignmentReferenceId->save($con);
                     }
                 }
+            } elseif ($this->collassignmentReferenceIds) {
+                foreach ($this->collassignmentReferenceIds as $assignmentReferenceId) {
+                    if ($assignmentReferenceId->isModified()) {
+                        $assignmentReferenceId->save($con);
+                    }
+                }
             }
 
             if ($this->studentAssignmentReferenceIdsScheduledForDeletion !== null) {
@@ -733,6 +745,12 @@ abstract class BaseFile extends BaseObject implements Persistent
                 }
 
                 foreach ($this->getstudentAssignmentReferenceIds() as $studentAssignmentReferenceId) {
+                    if ($studentAssignmentReferenceId->isModified()) {
+                        $studentAssignmentReferenceId->save($con);
+                    }
+                }
+            } elseif ($this->collstudentAssignmentReferenceIds) {
+                foreach ($this->collstudentAssignmentReferenceIds as $studentAssignmentReferenceId) {
                     if ($studentAssignmentReferenceId->isModified()) {
                         $studentAssignmentReferenceId->save($con);
                     }
@@ -1453,6 +1471,7 @@ abstract class BaseFile extends BaseObject implements Persistent
                       $this->collFileReferencessPartial = true;
                     }
 
+                    $collFileReferencess->getInternalIterator()->rewind();
                     return $collFileReferencess;
                 }
 
@@ -1720,6 +1739,7 @@ abstract class BaseFile extends BaseObject implements Persistent
                       $this->collCourseMaterialsPartial = true;
                     }
 
+                    $collCourseMaterials->getInternalIterator()->rewind();
                     return $collCourseMaterials;
                 }
 
@@ -2012,6 +2032,7 @@ abstract class BaseFile extends BaseObject implements Persistent
                       $this->collUsersPartial = true;
                     }
 
+                    $collUsers->getInternalIterator()->rewind();
                     return $collUsers;
                 }
 
@@ -2511,6 +2532,7 @@ abstract class BaseFile extends BaseObject implements Persistent
         $this->created_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->applyDefaultValues();
         $this->resetModified();
@@ -2529,7 +2551,8 @@ abstract class BaseFile extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collFileReferencess) {
                 foreach ($this->collFileReferencess as $o) {
                     $o->clearAllReferences($deep);
@@ -2555,6 +2578,8 @@ abstract class BaseFile extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         if ($this->collFileReferencess instanceof PropelCollection) {

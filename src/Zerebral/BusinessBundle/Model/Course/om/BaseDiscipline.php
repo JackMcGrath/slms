@@ -88,6 +88,12 @@ abstract class BaseDiscipline extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
@@ -131,7 +137,7 @@ abstract class BaseDiscipline extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -152,7 +158,7 @@ abstract class BaseDiscipline extends BaseObject implements Persistent
      */
     public function setTeacherId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -177,7 +183,7 @@ abstract class BaseDiscipline extends BaseObject implements Persistent
      */
     public function setName($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -1095,6 +1101,7 @@ abstract class BaseDiscipline extends BaseObject implements Persistent
                       $this->collCoursesPartial = true;
                     }
 
+                    $collCourses->getInternalIterator()->rewind();
                     return $collCourses;
                 }
 
@@ -1286,6 +1293,7 @@ abstract class BaseDiscipline extends BaseObject implements Persistent
         $this->name = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1303,12 +1311,18 @@ abstract class BaseDiscipline extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collCourses) {
                 foreach ($this->collCourses as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->aTeacher instanceof Persistent) {
+              $this->aTeacher->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         if ($this->collCourses instanceof PropelCollection) {

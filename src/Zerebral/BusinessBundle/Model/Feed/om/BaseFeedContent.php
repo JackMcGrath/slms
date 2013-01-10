@@ -113,6 +113,12 @@ abstract class BaseFeedContent extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
@@ -202,7 +208,7 @@ abstract class BaseFeedContent extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -223,7 +229,7 @@ abstract class BaseFeedContent extends BaseObject implements Persistent
      */
     public function setType($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -244,7 +250,7 @@ abstract class BaseFeedContent extends BaseObject implements Persistent
      */
     public function setText($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -265,7 +271,7 @@ abstract class BaseFeedContent extends BaseObject implements Persistent
      */
     public function setLinkUrl($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -286,7 +292,7 @@ abstract class BaseFeedContent extends BaseObject implements Persistent
      */
     public function setLinkTitle($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -307,7 +313,7 @@ abstract class BaseFeedContent extends BaseObject implements Persistent
      */
     public function setLinkDescription($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -328,7 +334,7 @@ abstract class BaseFeedContent extends BaseObject implements Persistent
      */
     public function setLinkThumbnailUrl($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -1270,6 +1276,7 @@ abstract class BaseFeedContent extends BaseObject implements Persistent
                       $this->collFeedItemsPartial = true;
                     }
 
+                    $collFeedItems->getInternalIterator()->rewind();
                     return $collFeedItems;
                 }
 
@@ -1562,6 +1569,7 @@ abstract class BaseFeedContent extends BaseObject implements Persistent
                       $this->collFeedCommentsPartial = true;
                     }
 
+                    $collFeedComments->getInternalIterator()->rewind();
                     return $collFeedComments;
                 }
 
@@ -1757,6 +1765,7 @@ abstract class BaseFeedContent extends BaseObject implements Persistent
         $this->link_thumbnail_url = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1774,7 +1783,8 @@ abstract class BaseFeedContent extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collFeedItems) {
                 foreach ($this->collFeedItems as $o) {
                     $o->clearAllReferences($deep);
@@ -1785,6 +1795,8 @@ abstract class BaseFeedContent extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         if ($this->collFeedItems instanceof PropelCollection) {
