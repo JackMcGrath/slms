@@ -19,6 +19,8 @@ use Zerebral\BusinessBundle\Model\Assignment\Assignment;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentCategory;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentCategoryQuery;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery;
+use Zerebral\BusinessBundle\Model\Attendance\Attendance;
+use Zerebral\BusinessBundle\Model\Attendance\AttendanceQuery;
 use Zerebral\BusinessBundle\Model\Course\Course;
 use Zerebral\BusinessBundle\Model\Course\CourseQuery;
 use Zerebral\BusinessBundle\Model\Course\CourseTeacher;
@@ -102,6 +104,12 @@ abstract class BaseTeacher extends BaseObject implements Persistent
     protected $collAssignmentsPartial;
 
     /**
+     * @var        PropelObjectCollection|Attendance[] Collection to store aggregation of Attendance objects.
+     */
+    protected $collAttendances;
+    protected $collAttendancesPartial;
+
+    /**
      * @var        PropelObjectCollection|Course[] Collection to store aggregation of Course objects.
      */
     protected $collCreatedByTeachers;
@@ -145,6 +153,12 @@ abstract class BaseTeacher extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
@@ -161,6 +175,12 @@ abstract class BaseTeacher extends BaseObject implements Persistent
      * @var		PropelObjectCollection
      */
     protected $assignmentsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $attendancesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -244,7 +264,7 @@ abstract class BaseTeacher extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -265,7 +285,7 @@ abstract class BaseTeacher extends BaseObject implements Persistent
      */
     public function setUserId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -290,7 +310,7 @@ abstract class BaseTeacher extends BaseObject implements Persistent
      */
     public function setBio($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -311,7 +331,7 @@ abstract class BaseTeacher extends BaseObject implements Persistent
      */
     public function setSubjects($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -332,7 +352,7 @@ abstract class BaseTeacher extends BaseObject implements Persistent
      */
     public function setGrades($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -459,6 +479,8 @@ abstract class BaseTeacher extends BaseObject implements Persistent
             $this->collAssignmentCategories = null;
 
             $this->collAssignments = null;
+
+            $this->collAttendances = null;
 
             $this->collCreatedByTeachers = null;
 
@@ -639,6 +661,12 @@ abstract class BaseTeacher extends BaseObject implements Persistent
                         $course->save($con);
                     }
                 }
+            } elseif ($this->collCourses) {
+                foreach ($this->collCourses as $course) {
+                    if ($course->isModified()) {
+                        $course->save($con);
+                    }
+                }
             }
 
             if ($this->assignmentCategoriesScheduledForDeletion !== null) {
@@ -670,6 +698,23 @@ abstract class BaseTeacher extends BaseObject implements Persistent
 
             if ($this->collAssignments !== null) {
                 foreach ($this->collAssignments as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->attendancesScheduledForDeletion !== null) {
+                if (!$this->attendancesScheduledForDeletion->isEmpty()) {
+                    AttendanceQuery::create()
+                        ->filterByPrimaryKeys($this->attendancesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->attendancesScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collAttendances !== null) {
+                foreach ($this->collAttendances as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -939,6 +984,14 @@ abstract class BaseTeacher extends BaseObject implements Persistent
                     }
                 }
 
+                if ($this->collAttendances !== null) {
+                    foreach ($this->collAttendances as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
                 if ($this->collCreatedByTeachers !== null) {
                     foreach ($this->collCreatedByTeachers as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
@@ -1065,6 +1118,9 @@ abstract class BaseTeacher extends BaseObject implements Persistent
             }
             if (null !== $this->collAssignments) {
                 $result['Assignments'] = $this->collAssignments->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collAttendances) {
+                $result['Attendances'] = $this->collAttendances->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collCreatedByTeachers) {
                 $result['CreatedByTeachers'] = $this->collCreatedByTeachers->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1259,6 +1315,12 @@ abstract class BaseTeacher extends BaseObject implements Persistent
                 }
             }
 
+            foreach ($this->getAttendances() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addAttendance($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getCreatedByTeachers() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addCreatedByTeacher($relObj->copy($deepCopy));
@@ -1402,6 +1464,9 @@ abstract class BaseTeacher extends BaseObject implements Persistent
         if ('Assignment' == $relationName) {
             $this->initAssignments();
         }
+        if ('Attendance' == $relationName) {
+            $this->initAttendances();
+        }
         if ('CreatedByTeacher' == $relationName) {
             $this->initCreatedByTeachers();
         }
@@ -1502,6 +1567,7 @@ abstract class BaseTeacher extends BaseObject implements Persistent
                       $this->collAssignmentCategoriesPartial = true;
                     }
 
+                    $collAssignmentCategories->getInternalIterator()->rewind();
                     return $collAssignmentCategories;
                 }
 
@@ -1744,6 +1810,7 @@ abstract class BaseTeacher extends BaseObject implements Persistent
                       $this->collAssignmentsPartial = true;
                     }
 
+                    $collAssignments->getInternalIterator()->rewind();
                     return $collAssignments;
                 }
 
@@ -1926,6 +1993,249 @@ abstract class BaseTeacher extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collAttendances collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Teacher The current object (for fluent API support)
+     * @see        addAttendances()
+     */
+    public function clearAttendances()
+    {
+        $this->collAttendances = null; // important to set this to null since that means it is uninitialized
+        $this->collAttendancesPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collAttendances collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialAttendances($v = true)
+    {
+        $this->collAttendancesPartial = $v;
+    }
+
+    /**
+     * Initializes the collAttendances collection.
+     *
+     * By default this just sets the collAttendances collection to an empty array (like clearcollAttendances());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initAttendances($overrideExisting = true)
+    {
+        if (null !== $this->collAttendances && !$overrideExisting) {
+            return;
+        }
+        $this->collAttendances = new PropelObjectCollection();
+        $this->collAttendances->setModel('Attendance');
+    }
+
+    /**
+     * Gets an array of Attendance objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Teacher is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Attendance[] List of Attendance objects
+     * @throws PropelException
+     */
+    public function getAttendances($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collAttendancesPartial && !$this->isNew();
+        if (null === $this->collAttendances || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collAttendances) {
+                // return empty collection
+                $this->initAttendances();
+            } else {
+                $collAttendances = AttendanceQuery::create(null, $criteria)
+                    ->filterByTeacher($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collAttendancesPartial && count($collAttendances)) {
+                      $this->initAttendances(false);
+
+                      foreach($collAttendances as $obj) {
+                        if (false == $this->collAttendances->contains($obj)) {
+                          $this->collAttendances->append($obj);
+                        }
+                      }
+
+                      $this->collAttendancesPartial = true;
+                    }
+
+                    $collAttendances->getInternalIterator()->rewind();
+                    return $collAttendances;
+                }
+
+                if($partial && $this->collAttendances) {
+                    foreach($this->collAttendances as $obj) {
+                        if($obj->isNew()) {
+                            $collAttendances[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collAttendances = $collAttendances;
+                $this->collAttendancesPartial = false;
+            }
+        }
+
+        return $this->collAttendances;
+    }
+
+    /**
+     * Sets a collection of Attendance objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $attendances A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Teacher The current object (for fluent API support)
+     */
+    public function setAttendances(PropelCollection $attendances, PropelPDO $con = null)
+    {
+        $attendancesToDelete = $this->getAttendances(new Criteria(), $con)->diff($attendances);
+
+        $this->attendancesScheduledForDeletion = unserialize(serialize($attendancesToDelete));
+
+        foreach ($attendancesToDelete as $attendanceRemoved) {
+            $attendanceRemoved->setTeacher(null);
+        }
+
+        $this->collAttendances = null;
+        foreach ($attendances as $attendance) {
+            $this->addAttendance($attendance);
+        }
+
+        $this->collAttendances = $attendances;
+        $this->collAttendancesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Attendance objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Attendance objects.
+     * @throws PropelException
+     */
+    public function countAttendances(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collAttendancesPartial && !$this->isNew();
+        if (null === $this->collAttendances || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collAttendances) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getAttendances());
+            }
+            $query = AttendanceQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByTeacher($this)
+                ->count($con);
+        }
+
+        return count($this->collAttendances);
+    }
+
+    /**
+     * Method called to associate a Attendance object to this object
+     * through the Attendance foreign key attribute.
+     *
+     * @param    Attendance $l Attendance
+     * @return Teacher The current object (for fluent API support)
+     */
+    public function addAttendance(Attendance $l)
+    {
+        if ($this->collAttendances === null) {
+            $this->initAttendances();
+            $this->collAttendancesPartial = true;
+        }
+        if (!in_array($l, $this->collAttendances->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddAttendance($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Attendance $attendance The attendance object to add.
+     */
+    protected function doAddAttendance($attendance)
+    {
+        $this->collAttendances[]= $attendance;
+        $attendance->setTeacher($this);
+    }
+
+    /**
+     * @param	Attendance $attendance The attendance object to remove.
+     * @return Teacher The current object (for fluent API support)
+     */
+    public function removeAttendance($attendance)
+    {
+        if ($this->getAttendances()->contains($attendance)) {
+            $this->collAttendances->remove($this->collAttendances->search($attendance));
+            if (null === $this->attendancesScheduledForDeletion) {
+                $this->attendancesScheduledForDeletion = clone $this->collAttendances;
+                $this->attendancesScheduledForDeletion->clear();
+            }
+            $this->attendancesScheduledForDeletion[]= clone $attendance;
+            $attendance->setTeacher(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Teacher is new, it will return
+     * an empty collection; or if this Teacher has previously
+     * been saved, it will retrieve related Attendances from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Teacher.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Attendance[] List of Attendance objects
+     */
+    public function getAttendancesJoinCourse($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = AttendanceQuery::create(null, $criteria);
+        $query->joinWith('Course', $join_behavior);
+
+        return $this->getAttendances($query, $con);
+    }
+
+    /**
      * Clears out the collCreatedByTeachers collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -2011,6 +2321,7 @@ abstract class BaseTeacher extends BaseObject implements Persistent
                       $this->collCreatedByTeachersPartial = true;
                     }
 
+                    $collCreatedByTeachers->getInternalIterator()->rewind();
                     return $collCreatedByTeachers;
                 }
 
@@ -2278,6 +2589,7 @@ abstract class BaseTeacher extends BaseObject implements Persistent
                       $this->collDisciplinesPartial = true;
                     }
 
+                    $collDisciplines->getInternalIterator()->rewind();
                     return $collDisciplines;
                 }
 
@@ -2495,6 +2807,7 @@ abstract class BaseTeacher extends BaseObject implements Persistent
                       $this->collCourseTeachersPartial = true;
                     }
 
+                    $collCourseTeachers->getInternalIterator()->rewind();
                     return $collCourseTeachers;
                 }
 
@@ -2737,6 +3050,7 @@ abstract class BaseTeacher extends BaseObject implements Persistent
                       $this->collCourseMaterialsPartial = true;
                     }
 
+                    $collCourseMaterials->getInternalIterator()->rewind();
                     return $collCourseMaterials;
                 }
 
@@ -3132,6 +3446,7 @@ abstract class BaseTeacher extends BaseObject implements Persistent
         $this->grades = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -3149,7 +3464,8 @@ abstract class BaseTeacher extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collAssignmentCategories) {
                 foreach ($this->collAssignmentCategories as $o) {
                     $o->clearAllReferences($deep);
@@ -3157,6 +3473,11 @@ abstract class BaseTeacher extends BaseObject implements Persistent
             }
             if ($this->collAssignments) {
                 foreach ($this->collAssignments as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collAttendances) {
+                foreach ($this->collAttendances as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -3185,6 +3506,11 @@ abstract class BaseTeacher extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->aUser instanceof Persistent) {
+              $this->aUser->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         if ($this->collAssignmentCategories instanceof PropelCollection) {
@@ -3195,6 +3521,10 @@ abstract class BaseTeacher extends BaseObject implements Persistent
             $this->collAssignments->clearIterator();
         }
         $this->collAssignments = null;
+        if ($this->collAttendances instanceof PropelCollection) {
+            $this->collAttendances->clearIterator();
+        }
+        $this->collAttendances = null;
         if ($this->collCreatedByTeachers instanceof PropelCollection) {
             $this->collCreatedByTeachers->clearIterator();
         }

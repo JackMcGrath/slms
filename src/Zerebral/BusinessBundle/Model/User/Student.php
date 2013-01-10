@@ -20,6 +20,11 @@ class Student extends BaseStudent
         return $this->getUser()->getFullName();
     }
 
+    public function getFormattedName()
+    {
+        return $this->getUser()->getFormattedName();
+    }
+
     public function getCourseAssignments(\Zerebral\BusinessBundle\Model\Course\Course $course)
     {
         $assignments = new \PropelObjectCollection();

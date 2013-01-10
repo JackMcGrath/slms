@@ -389,7 +389,7 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
     public function filterByIsSubmitted($isSubmitted = null, $comparison = null)
     {
         if (is_string($isSubmitted)) {
-            $is_submitted = in_array(strtolower($isSubmitted), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            $isSubmitted = in_array(strtolower($isSubmitted), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
         }
 
         return $this->addUsingAlias(StudentAssignmentPeer::IS_SUBMITTED, $isSubmitted, $comparison);

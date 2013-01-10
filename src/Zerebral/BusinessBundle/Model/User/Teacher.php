@@ -19,6 +19,11 @@ class Teacher extends BaseTeacher
         return $this->getUser()->getFullName();
     }
 
+    public function getFormattedName()
+    {
+        return $this->getUser()->getFormattedName();
+    }
+
     public function getCourseAssignments(\Zerebral\BusinessBundle\Model\Course\Course $course)
     {
         return $course->getAssignments();

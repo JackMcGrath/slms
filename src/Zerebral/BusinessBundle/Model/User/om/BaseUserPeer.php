@@ -84,6 +84,16 @@ abstract class BaseUserPeer
     /** the column name for the updated_at field */
     const UPDATED_AT = 'users.updated_at';
 
+    /** The enumerated values for the role field */
+    const ROLE_DIRECTOR = 'director';
+    const ROLE_PARENT = 'parent';
+    const ROLE_TEACHER = 'teacher';
+    const ROLE_STUDENT = 'student';
+
+    /** The enumerated values for the gender field */
+    const GENDER_MALE = 'male';
+    const GENDER_FEMALE = 'female';
+
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
 
@@ -126,6 +136,20 @@ abstract class BaseUserPeer
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, )
     );
 
+    /** The enumerated values for this table */
+    protected static $enumValueSets = array(
+        UserPeer::ROLE => array(
+            UserPeer::ROLE_DIRECTOR,
+            UserPeer::ROLE_PARENT,
+            UserPeer::ROLE_TEACHER,
+            UserPeer::ROLE_STUDENT,
+        ),
+        UserPeer::GENDER => array(
+            UserPeer::GENDER_MALE,
+            UserPeer::GENDER_FEMALE,
+        ),
+    );
+
     /**
      * Translates a fieldname to another type
      *
@@ -163,6 +187,50 @@ abstract class BaseUserPeer
         }
 
         return UserPeer::$fieldNames[$type];
+    }
+
+    /**
+     * Gets the list of values for all ENUM columns
+     * @return array
+     */
+    public static function getValueSets()
+    {
+      return UserPeer::$enumValueSets;
+    }
+
+    /**
+     * Gets the list of values for an ENUM column
+     *
+     * @param string $colname The ENUM column name.
+     *
+     * @return array list of possible values for the column
+     */
+    public static function getValueSet($colname)
+    {
+        $valueSets = UserPeer::getValueSets();
+
+        if (!isset($valueSets[$colname])) {
+            throw new PropelException(sprintf('Column "%s" has no ValueSet.', $colname));
+        }
+
+        return $valueSets[$colname];
+    }
+
+    /**
+     * Gets the SQL value for the ENUM column value
+     *
+     * @param string $colname ENUM column name.
+     * @param string $enumVal ENUM value.
+     *
+     * @return int            SQL value
+     */
+    public static function getSqlValueForEnum($colname, $enumVal)
+    {
+        $values = UserPeer::getValueSet($colname);
+        if (!in_array($enumVal, $values)) {
+            throw new PropelException(sprintf('Value "%s" is not accepted in this enumerated column', $colname));
+        }
+        return array_search($enumVal, $values);
     }
 
     /**
@@ -309,7 +377,7 @@ abstract class BaseUserPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -414,8 +482,15 @@ abstract class BaseUserPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (UserPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         UserPeer::$instances = array();
     }
 

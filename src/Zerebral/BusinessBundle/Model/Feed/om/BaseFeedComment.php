@@ -106,6 +106,12 @@ abstract class BaseFeedComment extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * Get the [id] column value.
      *
      * @return int
@@ -193,7 +199,7 @@ abstract class BaseFeedComment extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -214,7 +220,7 @@ abstract class BaseFeedComment extends BaseObject implements Persistent
      */
     public function setFeedItemId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -239,7 +245,7 @@ abstract class BaseFeedComment extends BaseObject implements Persistent
      */
     public function setFeedContentId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -264,7 +270,7 @@ abstract class BaseFeedComment extends BaseObject implements Persistent
      */
     public function setCreatedBy($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -1261,6 +1267,7 @@ abstract class BaseFeedComment extends BaseObject implements Persistent
         $this->created_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1278,7 +1285,19 @@ abstract class BaseFeedComment extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->aFeedItem instanceof Persistent) {
+              $this->aFeedItem->clearAllReferences($deep);
+            }
+            if ($this->aFeedContent instanceof Persistent) {
+              $this->aFeedContent->clearAllReferences($deep);
+            }
+            if ($this->aUser instanceof Persistent) {
+              $this->aUser->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         $this->aFeedItem = null;

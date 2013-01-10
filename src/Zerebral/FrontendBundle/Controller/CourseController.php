@@ -16,6 +16,7 @@ use Zerebral\BusinessBundle\Calendar\EventProviders\AssignmentEventsProvider;
 use Zerebral\BusinessBundle\Calendar\EventProviders\CourseAssignmentEventsProvider;
 
 use Zerebral\CommonBundle\Component\Calendar\Calendar;
+use Zerebral\BusinessBundle\Model\User\StudentQuery;
 
 /**
  * @Route("/courses")
@@ -263,6 +264,43 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function attendanceAction(Model\Course\Course $course)
     {
+        $dateRaw = $this->getRequest()->get('date', time());
+        $date = date('Y-m-d', $dateRaw);
+        $dateTime = new \DateTime($date);
+
+        $c = new \Criteria();
+        $c->add('date', $date);
+        $attendance = $course->getAttendances($c)->getFirst();
+
+        if ($attendance) {
+            $students = StudentQuery::create()->getCourseAttendanceByDate($course, $date)->find();
+        } else {
+            $students = StudentQuery::create()->getByCourse($course)->find();
+        }
+
+        $form = $this->createForm(new FormType\AttendanceType(), $attendance);
+        if ($this->getRequest()->isMethod('POST')) {
+            $form->bind($this->getRequest());
+            if ($form->isValid()) {
+                /** @var $attendance Model\Attendance\Attendance */
+                $attendance = $form->getData();
+                $attendance->setCourseId($course->getId());
+                $attendance->setTeacherId($this->getRoleUser()->getId());
+                $attendance->setDate($date);
+                $attendance->save();
+                $this->setFlash('attendance_save_success', 'Attendance for ' . date('m/d/Y', $dateRaw) . ' was successfully saved.');
+                return $this->redirect($this->generateUrl('course_attendance', array('id' => $course->getId(), 'date' => $dateRaw)));
+            }
+        }
+
+        return array(
+            'course' => $course,
+            'attendance' => $attendance,
+            'students' => $students,
+            'form' => $form->createView(),
+            'date' => $dateTime,
+            'target' => 'course'
+        );
 
     }
 }

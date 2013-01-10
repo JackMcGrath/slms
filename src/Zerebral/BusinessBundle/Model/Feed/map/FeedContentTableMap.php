@@ -44,6 +44,13 @@ class FeedContentTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('type', 'Type', 'CHAR', true, null, null);
+        $this->getColumn('type', false)->setValueSet(array (
+  0 => 'video',
+  1 => 'image',
+  2 => 'website',
+  3 => 'text',
+  4 => 'assignment',
+));
         $this->addColumn('text', 'Text', 'LONGVARCHAR', false, null, null);
         $this->addColumn('link_url', 'LinkUrl', 'VARCHAR', false, 150, null);
         $this->addColumn('link_title', 'LinkTitle', 'VARCHAR', false, 100, null);

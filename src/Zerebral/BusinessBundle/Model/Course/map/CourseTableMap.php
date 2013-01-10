@@ -78,6 +78,7 @@ class CourseTableMap extends TableMap
         $this->addRelation('GradeLevel', 'Zerebral\\BusinessBundle\\Model\\Course\\GradeLevel', RelationMap::MANY_TO_ONE, array('grade_level_id' => 'id', ), 'CASCADE', 'CASCADE');
         $this->addRelation('AssignmentCategory', 'Zerebral\\BusinessBundle\\Model\\Assignment\\AssignmentCategory', RelationMap::ONE_TO_MANY, array('id' => 'course_id', ), 'CASCADE', 'CASCADE', 'AssignmentCategories');
         $this->addRelation('Assignment', 'Zerebral\\BusinessBundle\\Model\\Assignment\\Assignment', RelationMap::ONE_TO_MANY, array('id' => 'course_id', ), 'CASCADE', 'CASCADE', 'Assignments');
+        $this->addRelation('Attendance', 'Zerebral\\BusinessBundle\\Model\\Attendance\\Attendance', RelationMap::ONE_TO_MANY, array('id' => 'course_id', ), 'CASCADE', 'CASCADE', 'Attendances');
         $this->addRelation('CourseStudent', 'Zerebral\\BusinessBundle\\Model\\Course\\CourseStudent', RelationMap::ONE_TO_MANY, array('id' => 'course_id', ), 'CASCADE', 'CASCADE', 'CourseStudents');
         $this->addRelation('CourseTeacher', 'Zerebral\\BusinessBundle\\Model\\Course\\CourseTeacher', RelationMap::ONE_TO_MANY, array('id' => 'course_id', ), 'CASCADE', 'CASCADE', 'CourseTeachers');
         $this->addRelation('CourseScheduleDay', 'Zerebral\\BusinessBundle\\Model\\Course\\CourseScheduleDay', RelationMap::ONE_TO_MANY, array('id' => 'course_id', ), 'CASCADE', 'CASCADE', 'CourseScheduleDays');

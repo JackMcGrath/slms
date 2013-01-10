@@ -13,6 +13,7 @@ use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\PeerEvent;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentCategoryPeer;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer;
+use Zerebral\BusinessBundle\Model\Attendance\AttendancePeer;
 use Zerebral\BusinessBundle\Model\Course\CoursePeer;
 use Zerebral\BusinessBundle\Model\Course\CourseTeacherPeer;
 use Zerebral\BusinessBundle\Model\Course\DisciplinePeer;
@@ -268,7 +269,7 @@ abstract class BaseTeacherPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -373,8 +374,15 @@ abstract class BaseTeacherPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (TeacherPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         TeacherPeer::$instances = array();
     }
 
@@ -390,6 +398,9 @@ abstract class BaseTeacherPeer
         // Invalidate objects in AssignmentPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         AssignmentPeer::clearInstancePool();
+        // Invalidate objects in AttendancePeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        AttendancePeer::clearInstancePool();
         // Invalidate objects in CoursePeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         CoursePeer::clearInstancePool();

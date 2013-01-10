@@ -16,6 +16,7 @@ use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\QueryEvent;
 use Zerebral\BusinessBundle\Model\Assignment\Assignment;
 use Zerebral\BusinessBundle\Model\Assignment\StudentAssignment;
+use Zerebral\BusinessBundle\Model\Attendance\StudentAttendance;
 use Zerebral\BusinessBundle\Model\Course\Course;
 use Zerebral\BusinessBundle\Model\Course\CourseStudent;
 use Zerebral\BusinessBundle\Model\User\Student;
@@ -47,6 +48,10 @@ use Zerebral\BusinessBundle\Model\User\User;
  * @method StudentQuery leftJoinStudentAssignment($relationAlias = null) Adds a LEFT JOIN clause to the query using the StudentAssignment relation
  * @method StudentQuery rightJoinStudentAssignment($relationAlias = null) Adds a RIGHT JOIN clause to the query using the StudentAssignment relation
  * @method StudentQuery innerJoinStudentAssignment($relationAlias = null) Adds a INNER JOIN clause to the query using the StudentAssignment relation
+ *
+ * @method StudentQuery leftJoinStudentAttendance($relationAlias = null) Adds a LEFT JOIN clause to the query using the StudentAttendance relation
+ * @method StudentQuery rightJoinStudentAttendance($relationAlias = null) Adds a RIGHT JOIN clause to the query using the StudentAttendance relation
+ * @method StudentQuery innerJoinStudentAttendance($relationAlias = null) Adds a INNER JOIN clause to the query using the StudentAttendance relation
  *
  * @method StudentQuery leftJoinCourseStudent($relationAlias = null) Adds a LEFT JOIN clause to the query using the CourseStudent relation
  * @method StudentQuery rightJoinCourseStudent($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CourseStudent relation
@@ -561,6 +566,80 @@ abstract class BaseStudentQuery extends ModelCriteria
         return $this
             ->joinStudentAssignment($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'StudentAssignment', '\Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentQuery');
+    }
+
+    /**
+     * Filter the query by a related StudentAttendance object
+     *
+     * @param   StudentAttendance|PropelObjectCollection $studentAttendance  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   StudentQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByStudentAttendance($studentAttendance, $comparison = null)
+    {
+        if ($studentAttendance instanceof StudentAttendance) {
+            return $this
+                ->addUsingAlias(StudentPeer::ID, $studentAttendance->getStudentId(), $comparison);
+        } elseif ($studentAttendance instanceof PropelObjectCollection) {
+            return $this
+                ->useStudentAttendanceQuery()
+                ->filterByPrimaryKeys($studentAttendance->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByStudentAttendance() only accepts arguments of type StudentAttendance or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the StudentAttendance relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return StudentQuery The current query, for fluid interface
+     */
+    public function joinStudentAttendance($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('StudentAttendance');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'StudentAttendance');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the StudentAttendance relation StudentAttendance object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Zerebral\BusinessBundle\Model\Attendance\StudentAttendanceQuery A secondary query class using the current class as primary query
+     */
+    public function useStudentAttendanceQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinStudentAttendance($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'StudentAttendance', '\Zerebral\BusinessBundle\Model\Attendance\StudentAttendanceQuery');
     }
 
     /**

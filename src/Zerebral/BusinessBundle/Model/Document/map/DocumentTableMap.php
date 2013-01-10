@@ -44,7 +44,14 @@ class DocumentTableMap extends TableMap
         // columns
         $this->addPrimaryKey('reference_id', 'ReferenceId', 'INTEGER', true, null, null);
         $this->addPrimaryKey('type', 'Type', 'VARCHAR', true, null, null);
+        $this->getColumn('type', false)->setValueSet(array (
+  0 => 'assignment',
+  1 => 'student_assignment',
+));
         $this->addColumn('storage', 'Storage', 'VARCHAR', true, null, null);
+        $this->getColumn('storage', false)->setValueSet(array (
+  0 => 'local',
+));
         $this->addColumn('path', 'Path', 'VARCHAR', true, 200, null);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', true, null, null);
         // validators

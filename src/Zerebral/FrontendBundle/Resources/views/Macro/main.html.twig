@@ -31,6 +31,7 @@
 {% macro topMenu(selected, course) %}
     <ul>
         <li{{ selected == 'feed' ? ' class="active"' : '' }}><a href="{{ path('course_feed', {id: course.id}) }}">Feed</a></li>
+        <li{{ selected == 'attendance' ? ' class="active"' : '' }}><a href="{{ path('course_attendance', {id: course.id}) }}">Attendance</a></li>
         <li{{ selected == 'assignments' ? ' class="active"' : '' }}><a href="{{ path('course_assignments', {id: course.id}) }}">Assignments</a></li>
         <li{{ selected == 'details' ? ' class="active"' : '' }}><a href="{{ path('course_view', {id: course.id}) }}">Details</a></li>
         <li{{ selected == 'materials' ? ' class="active"' : '' }}><a href="{{ path('course_materials', {courseId: course.id}) }}">Syllabus</a></li>

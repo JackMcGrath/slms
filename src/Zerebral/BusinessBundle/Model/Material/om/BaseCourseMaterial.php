@@ -125,6 +125,12 @@ abstract class BaseCourseMaterial extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * Get the [id] column value.
      *
      * @return int
@@ -232,7 +238,7 @@ abstract class BaseCourseMaterial extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -253,7 +259,7 @@ abstract class BaseCourseMaterial extends BaseObject implements Persistent
      */
     public function setCourseId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -278,7 +284,7 @@ abstract class BaseCourseMaterial extends BaseObject implements Persistent
      */
     public function setFolderId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -303,7 +309,7 @@ abstract class BaseCourseMaterial extends BaseObject implements Persistent
      */
     public function setDescription($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -324,7 +330,7 @@ abstract class BaseCourseMaterial extends BaseObject implements Persistent
      */
     public function setFileId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -349,7 +355,7 @@ abstract class BaseCourseMaterial extends BaseObject implements Persistent
      */
     public function setCreatedBy($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -1454,6 +1460,7 @@ abstract class BaseCourseMaterial extends BaseObject implements Persistent
         $this->created_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1471,7 +1478,22 @@ abstract class BaseCourseMaterial extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->aTeacher instanceof Persistent) {
+              $this->aTeacher->clearAllReferences($deep);
+            }
+            if ($this->aCourse instanceof Persistent) {
+              $this->aCourse->clearAllReferences($deep);
+            }
+            if ($this->aCourseFolder instanceof Persistent) {
+              $this->aCourseFolder->clearAllReferences($deep);
+            }
+            if ($this->aFile instanceof Persistent) {
+              $this->aFile->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         $this->aTeacher = null;

@@ -46,6 +46,15 @@ class CourseScheduleDayTableMap extends TableMap
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignPrimaryKey('course_id', 'CourseId', 'INTEGER' , 'courses', 'id', true, null, null);
         $this->addColumn('week_day', 'WeekDay', 'CHAR', true, null, null);
+        $this->getColumn('week_day', false)->setValueSet(array (
+  0 => 'Sunday',
+  1 => 'Monday',
+  2 => 'Tuesday',
+  3 => 'Wednesday',
+  4 => 'Thursday',
+  5 => 'Friday',
+  6 => 'Saturday',
+));
         $this->addColumn('time_from', 'TimeFrom', 'TIME', true, null, null);
         $this->addColumn('time_to', 'TimeTo', 'TIME', true, null, null);
         // validators
