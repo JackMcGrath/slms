@@ -5,6 +5,8 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Form\Util\PropertyPath;
 
+use Zerebral\BusinessBundle\ContentFetcher\Fetcher;
+
 class FeedContentValidator extends ConstraintValidator
 {
 
@@ -28,7 +30,7 @@ class FeedContentValidator extends ConstraintValidator
     }
 
     /**
-     * @param mixed $object
+     * @param mixed|\Zerebral\BusinessBundle\Model\Feed\FeedContent $object
      * @param \Symfony\Component\Validator\Constraint|FeedContent $constraint
      */
     public function validate($object, Constraint $constraint)
@@ -42,7 +44,20 @@ class FeedContentValidator extends ConstraintValidator
         if (!in_array($typeValue, array('assignment', 'text'))) {
             if (!$this->validateUrl($linkUrlValue)) {
                 $this->context->addViolationAtSubPath($constraint->linkUrlField, $constraint->urlRegexpMessage, array('%url%' => $linkUrlValue));
+                return;
             }
+
+            $fetcher = new Fetcher($linkUrlValue);
+            if (!$fetcher->isLoaded()) {
+                $this->context->addViolationAtSubPath($constraint->linkUrlField, $constraint->brokenUrlMessage, array('%url%' => $linkUrlValue));
+                return;
+            }
+
+            $fetcher->parse();
+
+            $object->setLinkTitle($fetcher->getTitle());
+            $object->setLinkDescription($fetcher->getDescription());
+            $object->setLinkThumbnailUrl($fetcher->getThumbmnailUrl());
         }
     }
 }

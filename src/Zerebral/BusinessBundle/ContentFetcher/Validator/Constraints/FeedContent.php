@@ -7,7 +7,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 class FeedContent extends Constraint
 {
     public $urlRegexpMessage = '%url% is not a valid URL';
-    public $otherMessage = 'Other error';
+    public $brokenUrlMessage = '%url% is broken';
 
     public $typeField;
     public $linkUrlField;
