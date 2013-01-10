@@ -38,14 +38,17 @@
 
                 <form method="POST" {{ form_enctype(form) }}>
                 <table class="table table-bordered table-striped">
-                    <tr>
-                        <th class="name">Student name</th>
-                        <th class="status" statusName="present"><label><input type="radio" name="status" value="present"/> Present</label></th>
-                        <th class="status" statusName="tardy"><label><input type="radio" name="status" value="tardy"/> Tardy</label></th>
-                        <th class="status" statusName="excused"><label><input type="radio" name="status" value="excused"/> Excused</label></th>
-                        <th>Comments</th>
-                    </tr>
 
+                        <tr>
+                            <th class="name">Student name</th>
+                            <th class="status" statusName="present"><label><input type="radio" name="status" value="present"/> Present</label></th>
+                            <th class="status" statusName="tardy"><label><input type="radio" name="status" value="tardy"/> Tardy</label></th>
+                            <th class="status" statusName="excused"><label><input type="radio" name="status" value="excused"/> Excused</label></th>
+                            <th>Comments</th>
+                        </tr>
+
+
+                    <tbody>
                     {% for student in students %}
                     <tr class="student">
                         <td>{{ student.formattedName }}</td>
@@ -61,9 +64,11 @@
                         <td class="comment">
                             <input type="text" name="attendance[studentAttendances][{{ loop.index - 1 }}][comment]" value="{{ student.hasVirtualColumn('comment') ? student.getVirtualColumn('comment') : '' }}" maxlength="200" class="input-medium"/>
                         </td>
+                        <input type="hidden" name="attendance[studentAttendances][{{ loop.index - 1 }}][studentId]" value="{{ student.id }}"/>
                     </tr>
-                    <input type="hidden" name="attendance[studentAttendances][{{ loop.index - 1 }}][studentId]" value="{{ student.id }}"/>
+
                     {% endfor %}
+                    </tbody>
                 </table>
                 {{ form_widget(form._token) }}
                 <div class="form-actions">
