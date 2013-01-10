@@ -13,7 +13,7 @@
         {{ mainPartials.topMenu('attendance', course) }}
     </div>
     <div class="row-fluid attendance-block">
-        <div class="span6">
+        <div class="content">
             <div class="row-fluid">
                 <h2 class="pull-left form-title">
                     {{ course.name }} <small>attendance</small>
@@ -36,30 +36,30 @@
                 </div>
                 <div class="clearfix"></div>
 
-                <form method="POST">
-                <table class="table table-bordered" {{ form_enctype(form) }}>
+                <form method="POST" {{ form_enctype(form) }}>
+                <table class="table table-bordered table-striped">
                     <tr>
                         <th class="name">Student name</th>
-                        <th>Present</th>
-                        <th>Tardy</th>
-                        <th>Excused</th>
+                        <th class="status" statusName="present"><label><input type="radio" name="status" value="present"/> Present</label></th>
+                        <th class="status" statusName="tardy"><label><input type="radio" name="status" value="tardy"/> Tardy</label></th>
+                        <th class="status" statusName="excused"><label><input type="radio" name="status" value="excused"/> Excused</label></th>
                         <th>Comments</th>
                     </tr>
 
                     {% for student in students %}
-                    <tr>
+                    <tr class="student">
                         <td>{{ student.formattedName }}</td>
-                        <td>
+                        <td class="status" statusName="present">
                             <input type="radio" name="attendance[studentAttendances][{{ loop.index - 1 }}][status]" value="present" {{ student.hasVirtualColumn('status') ? (student.getVirtualColumn('status') == 'present' ? 'checked' : '') : 'checked' }}/>
                         </td>
-                        <td>
+                        <td class="status" statusName="tardy">
                             <input type="radio" name="attendance[studentAttendances][{{ loop.index - 1 }}][status]" value="tardy" {{ student.hasVirtualColumn('status') ? (student.getVirtualColumn('status') == 'tardy' ? 'checked' : '') : '' }}/>
                         </td>
-                        <td>
+                        <td class="status" statusName="excused">
                             <input type="radio" name="attendance[studentAttendances][{{ loop.index - 1 }}][status]" value="excused" {{ student.hasVirtualColumn('status') ? (student.getVirtualColumn('status') == 'excused' ? 'checked' : '') : '' }}/>
                         </td>
                         <td class="comment">
-                            <input type="text" name="attendance[studentAttendances][{{ loop.index - 1 }}][comment]" value="{{ student.hasVirtualColumn('comment') ? student.getVirtualColumn('comment') : '' }}"/>
+                            <input type="text" name="attendance[studentAttendances][{{ loop.index - 1 }}][comment]" value="{{ student.hasVirtualColumn('comment') ? student.getVirtualColumn('comment') : '' }}" maxlength="200" class="input-medium"/>
                         </td>
                     </tr>
                     <input type="hidden" name="attendance[studentAttendances][{{ loop.index - 1 }}][studentId]" value="{{ student.id }}"/>
