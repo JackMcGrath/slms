@@ -65,20 +65,20 @@ ZerebralCourseDetailFeedBlock.prototype = {
             type: 'get',
             url: link.attr('href'),
             data: {
-                page: link.data('page'),
                 lastCommentId: link.data('lastCommentId')
             },
             success: function(response) {
                 if (response.success) {
-                    if (response.lastPage) {
+                    link.data('lastCommentId', response['lastCommentId']);
+                    link.parents('.comment').after(response.content);
+                    link.data('loadedCount', (link.data('loadedCount') + response['loadedCount']));
+
+                    if (link.data('loadedCount') >= link.data('totalCount')) {
                         link.html('No more comments');
-                        link.parents('.comment').slideUp('fast', function() {
+                        link.parents('.comment').delay(500).slideUp('fast', function() {
                             link.parents('.comment').remove();
                         });
-                    } else {
-                        link.data('page', link.data('page') + 1);
                     }
-                    link.parents('.comment').after(response.content);
                 } else {
                     this.error(response);
                 }
