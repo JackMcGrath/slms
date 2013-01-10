@@ -1,4 +1,7 @@
 .attendance-block {
+    .content {
+        width: 675px;
+    }
     .attendance-table {
         width: 100%;
         margin-left: 0px;
@@ -28,13 +31,27 @@
         }
 
         table.table {
+            margin-top: 15px;
             th.name {
-                width: 220px;
+                width: 200px;
             }
-            td.comment input {
-                height: 12px;
-                font-size: 10px;
-                margin-bottom: 0px;
+            th.status {
+                label {
+                    font-weight: bold;
+                }
+                input {
+                    margin: 0 3px 2px 0;
+                    padding: 0;
+                    vertical-align: middle;
+                }
+            }
+            td.comment {
+                max-width: 155px;
+                input {
+                    height: 13px;
+                    font-size: 11px;
+                    margin-bottom: 0px;
+                }
             }
         }
     }
