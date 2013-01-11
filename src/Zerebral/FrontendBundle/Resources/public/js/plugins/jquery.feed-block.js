@@ -5,6 +5,8 @@ var ZerebralCourseDetailFeedBlock = function(element, options) {
     self.feedItemForm = element.find('#ajaxFeedItemForm');
     self.feedItemFormDiv = element.find('.feed-item-form');
 
+    self.feedItemAlertBlock = element.find('.feed-item-alert-block');
+
     self.feedItemsDiv = element.find('.feed-items');
     self.itemsDiv = element.find('.feed-item');
     self.commentsDiv = element.find('.feed-item .comments');
@@ -48,12 +50,18 @@ ZerebralCourseDetailFeedBlock.prototype = {
                 self.feedItemForm.find('input[type="submit"]').attr('disabled', true).val('   Posting...    ');
                 self.feedItemForm.find('a.cancel-link').hide();
                 self.feedItemForm.find('.attached-link-delete').hide();
+                self.feedItemAlertBlock.slideUp('fast', function() {
+                    self.feedItemAlertBlock.find('ul > li').remove();
+                });
             },
             success: function(response) {
                 if (response['has_errors']) {
+                    self.feedItemAlertBlock.slideDown();
+                    var ul = self.feedItemAlertBlock.find('ul');
                     for (var fieldName in response['errors']) {
                         var field = self.feedItemForm.find('[name^="' + fieldName.replace(/\[/g,'\\[').replace(/\]/g,'\\]') + '"]').last();
                         field.parents('.control-group').addClass('error');
+                        ul.append($('<li>' + response['errors'][fieldName][0] + '</li>'));
                     }
                 } else {
                     self.addItemBlock(response['content']);
@@ -146,6 +154,10 @@ ZerebralCourseDetailFeedBlock.prototype = {
             height: 18
         }, 500, function() {
             self.feedItemFormTextarea.css('background-image', self.feedItemFormTextarea.data('background-image'));
+        });
+
+        self.feedItemAlertBlock.slideUp('fast', function() {
+            self.feedItemAlertBlock.find('ul > li').remove();
         });
 
     },

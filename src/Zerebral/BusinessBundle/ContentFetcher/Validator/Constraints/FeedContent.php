@@ -7,9 +7,10 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 class FeedContent extends Constraint
 {
     public $urlRegexpMessage = '%url% is not a valid URL';
-    public $brokenUrlMessage = '%url% is broken';
+    public $brokenUrlMessage = 'URL %url% is broken';
     public $longUrlMessage = '%url% is too long. Please use URL shortener';
-    public $wrongUrlTypeMessage = '%url% is not valid for %type%';
+    public $wrongUrlTypeMessage = 'URL %url% is not valid for %type%';
+    public $missingUrlMessage = 'Please insert URL for post';
 
     public $typeField;
     public $linkUrlField;

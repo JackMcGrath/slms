@@ -39,6 +39,13 @@
 {% macro course_details_feed(feedItemForm, feedItemFormPath, feedItems) %}
     {% import _self as self %}
     <div class="course-details-feed">
+    <div class="feed-item-alert-block alert alert-block alert-error" style="display: none;">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        <strong>Oops, it seems we have errors here:</strong>
+        <ul class="alert-errors">
+
+        </ul>
+    </div>
     <div class="feed-item-form">
         <form id="ajaxFeedItemForm" method="post" {{ form_enctype(feedItemForm) }} action="{{ feedItemFormPath }}">
             <div class="control-group">

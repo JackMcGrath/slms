@@ -39,6 +39,12 @@ class FeedContentValidator extends ConstraintValidator
         $linkUrlValue = $this->getPropertyValue($object, $constraint->linkUrlField);
 
         if (!in_array($typeValue, array('assignment', 'text'))) {
+
+            if (trim(strlen($linkUrlValue)) == 0) {
+                $this->context->addViolationAtSubPath($constraint->linkUrlField, $constraint->missingUrlMessage);
+                return;
+            }
+
             if (!$this->validateUrl($linkUrlValue)) {
                 $this->context->addViolationAtSubPath($constraint->linkUrlField, $constraint->urlRegexpMessage, array('%url%' => $linkUrlValue));
                 return;
