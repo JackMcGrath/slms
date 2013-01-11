@@ -1,11 +1,22 @@
 {% macro assignment_details_feed(feedCommentForm, feedCommentFormPath, comments) %}
     <div class="assignment-details-feed">
+    <div class="feed-comment-alert-block alert alert-block alert-error" style="display: none;">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        <strong>Oops, it seems we have errors here:</strong>
+        <ul class="alert-errors">
+
+        </ul>
+    </div>
     <div class="feed-comment-form">
         <form id="ajaxFeedCommentForm" method="post" {{ form_enctype(feedCommentForm) }} action="{{ feedCommentFormPath }}">
-            <textarea class="feed-comment-textarea" name="feed_comment[feedContent][text]" placeholder="Leave a new comment" ></textarea>
+            <div class="control-group">
+                <textarea class="feed-comment-textarea" name="feed_comment[feedContent][text]" placeholder="Leave a new comment" ></textarea>
+            </div>
             <div class="feed-comment-form-controls">
                 <div class="attached-link">
-                    <input class="attached-link-field" type="text" name="feed_comment[feedContent][link_url]" placeholder="Enter link..." />
+                    <div class="control-group">
+                        <input class="attached-link-field" type="text" name="feed_comment[feedContent][linkUrl]" placeholder="Enter link..." />
+                    </div>
                     <input class="comment-type" type="hidden" name="feed_comment[feedContent][type]" value="text" />
                     <div class="attached-link-delete" style="">
                         <i class="icon-small-trash-bin"></i> <a class="gray" href="#">Delete</a>
@@ -39,6 +50,13 @@
 {% macro course_details_feed(feedItemForm, feedItemFormPath, feedItems) %}
     {% import _self as self %}
     <div class="course-details-feed">
+    <div class="feed-item-alert-block alert alert-block alert-error" style="display: none;">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        <strong>Oops, it seems we have errors here:</strong>
+        <ul class="alert-errors">
+
+        </ul>
+    </div>
     <div class="feed-item-form">
         <form id="ajaxFeedItemForm" method="post" {{ form_enctype(feedItemForm) }} action="{{ feedItemFormPath }}">
             <div class="control-group">

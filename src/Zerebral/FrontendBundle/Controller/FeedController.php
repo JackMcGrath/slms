@@ -50,10 +50,11 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
             $feedItem->save();
 
             $feedType = $this->getRequest()->get('feedType', 'assignment');
-            return $this->render('ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig', array('feedType' => $feedType, 'comment' => $feedComment));
+            $content = $this->render('ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig', array('feedType' => $feedType, 'comment' => $feedComment))->getContent();
+            return new JsonResponse(array('has_errors' => false, 'content' => $content));
         }
 
-        return new FormJsonResponse($feedCommentForm, 500);
+        return new FormJsonResponse($feedCommentForm);
     }
 
     /**

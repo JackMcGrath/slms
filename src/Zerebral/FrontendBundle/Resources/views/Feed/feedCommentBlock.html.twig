@@ -1,7 +1,62 @@
+{% macro course_feed_comment_text_block(comment) %}
+    <b>{{ comment.user.fullName }}</b>&nbsp;{{ comment.feedContent.text }}
+{% endmacro %}
+
+{% macro course_feed_comment_website_block(comment) %}
+    <b>{{ comment.user.fullName }}</b>&nbsp;posted a <a target="_blank" href="{{ comment.feedContent.linkUrl }}">website link</a>
+    <div class="link-content">
+        {% if comment.feedContent.linkThumbnailUrl is not null %}
+            <div class="thumbnail">
+                <a href="{{ comment.feedContent.linkUrl }}" target="_blank"><img width="95" height="60" src="{{ comment.feedContent.linkThumbnailUrl }}" alt="{{ comment.feedContent.linkTitle }}" /></a>
+            </div>
+        {% endif %}
+        <div class="info">
+            <div class="title"><a target="_blank" href="{{ comment.feedContent.linkUrl }}">{{ comment.feedContent.linkTitle }}</a></div>
+            <div class="description">{{ comment.feedContent.linkDescription }}</div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+{% endmacro %}
+
+{% macro course_feed_comment_video_block(comment) %}
+    <b>{{ comment.user.fullName }}</b>&nbsp;posted a <a target="_blank" href="{{ comment.feedContent.linkUrl }}">video</a>
+    <div class="link-content">
+        {% if comment.feedContent.linkThumbnailUrl is not null %}
+            <div class="thumbnail">
+                <a href="{{ comment.feedContent.linkUrl }}" target="_blank"><img width="95" height="60" src="{{ comment.feedContent.linkThumbnailUrl }}" alt="{{ comment.feedContent.linkTitle }}" /></a>
+            </div>
+        {% endif %}
+        <div class="info">
+            <div class="title"><a target="_blank" href="{{ comment.feedContent.linkUrl }}">{{ comment.feedContent.linkTitle }}</a></div>
+            <div class="description">{{ comment.feedContent.linkDescription }}</div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+{% endmacro %}
+
+{% macro course_feed_comment_image_block(comment) %}
+    <b>{{ comment.user.fullName }}</b>&nbsp;posted an <a target="_blank" href="{{ comment.feedContent.linkUrl }}">image</a>
+    <div class="link-content">
+        <a href="{{ comment.feedContent.linkUrl }}" target="_blank"><img src="{{ comment.feedContent.linkUrl }}" alt="{{ comment.feedContent.linkTitle }}" /></a>
+    </div>
+{% endmacro %}
+
+
 {% macro course_details_comment_block(comment) %}
+    {% import _self as self %}
     <div class="comment {% if app.user.id == comment.user.id %} is_author {% endif %}">
         <div class="avatar"><img class="rounded" src="{{ get_file_storage_link(comment.user.getAvatarFile()) | imagine_filter('small_thumbnail') }}" /></div>
-        <div class="content"><b>{{ comment.user.fullName }}</b>&nbsp;{{ comment.feedContent.text }}</div>
+        <div class="content">
+            {% if comment.feedContent.type == 'website' %}
+                {{ self.course_feed_comment_website_block(comment) }}
+            {% elseif comment.feedContent.type == 'video' %}
+                {{ self.course_feed_comment_video_block(comment) }}
+            {% elseif comment.feedContent.type == 'image' %}
+                {{ self.course_feed_comment_image_block(comment) }}
+            {% else %}
+                {{ self.course_feed_comment_text_block(comment) }}
+            {% endif %}
+        </div>
         <div class="timestamp">
             <span class="gray" data-date="{{ comment.createdAt.format('Y-m-d H:i:s') }}">{{ time_diff(comment.createdAt) }}</span>
         </div>
@@ -10,16 +65,87 @@
     </div>
 {% endmacro %}
 
+
+
+
+
+{% macro assignment_feed_comment_text_block(comment) %}
+    <div class="author {% if app.user.id == comment.user.id %} is_author {% endif %}">
+    {{ comment.user.fullName }} <span class="gray timestamp" data-date="{{ comment.createdAt.format('Y-m-d H:i:s') }}">{{ time_diff(comment.createdAt) }}</span>
+    {% if app.user.id == comment.user.id %}<a href="{{ path('ajax_feed_remove_comment', {feedCommentId: comment.id}) }}" class="gray delete-link delete-comment"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
+    </div>
+    <div class="text">{{ comment.feedContent.text }}</div>
+{% endmacro %}
+
+{% macro assignment_feed_comment_website_block(comment) %}
+    <div class="author {% if app.user.id == comment.user.id %} is_author {% endif %}">
+        {{ comment.user.fullName }} <span class="gray">posted a </span><a href="{{ comment.feedContent.linkUrl }}" target="_blank">website link</a><span class="gray timestamp" data-date="{{ comment.createdAt.format('Y-m-d H:i:s') }}">{{ time_diff(comment.createdAt) }}</span>
+        {% if app.user.id == comment.user.id %}<a href="{{ path('ajax_feed_remove_comment', {feedCommentId: comment.id}) }}" class="gray delete-link delete-comment"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
+    </div>
+    <div class="text">
+        {{ comment.feedContent.text }}
+        <div class="link-content">
+            {% if comment.feedContent.linkThumbnailUrl is not null %}
+                <div class="thumbnail">
+                    <a href="{{ comment.feedContent.linkUrl }}" target="_blank"><img width="95" height="60" src="{{ comment.feedContent.linkThumbnailUrl }}" alt="{{ comment.feedContent.linkTitle }}" /></a>
+                </div>
+            {% endif %}
+            <div class="info">
+                <div class="title"><a target="_blank" href="{{ comment.feedContent.linkUrl }}">{{ comment.feedContent.linkTitle }}</a></div>
+                <div class="description">{{ comment.feedContent.linkDescription }}</div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro assignment_feed_comment_video_block(comment) %}
+    <div class="author {% if app.user.id == comment.user.id %} is_author {% endif %}">
+        {{ comment.user.fullName }} <span class="gray">posted a </span><a href="{{ comment.feedContent.linkUrl }}" target="_blank">video</a><span class="gray timestamp" data-date="{{ comment.createdAt.format('Y-m-d H:i:s') }}">{{ time_diff(comment.createdAt) }}</span>
+        {% if app.user.id == comment.user.id %}<a href="{{ path('ajax_feed_remove_comment', {feedCommentId: comment.id}) }}" class="gray delete-link delete-comment"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
+    </div>
+    <div class="text">
+        {{ comment.feedContent.text }}
+        <div class="link-content">
+            {% if comment.feedContent.linkThumbnailUrl is not null %}
+                <div class="thumbnail">
+                    <a href="{{ comment.feedContent.linkUrl }}" target="_blank"><img width="95" height="60" src="{{ comment.feedContent.linkThumbnailUrl }}" alt="{{ comment.feedContent.linkTitle }}" /></a>
+                </div>
+            {% endif %}
+            <div class="info">
+                <div class="title"><a target="_blank" href="{{ comment.feedContent.linkUrl }}">{{ comment.feedContent.linkTitle }}</a></div>
+                <div class="description">{{ comment.feedContent.linkDescription }}</div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro assignment_feed_comment_image_block(comment) %}
+    <div class="author">{{ comment.user.fullName }}<span class="gray"> posted an </span><a target="_blank" href="{{ comment.feedContent.linkUrl }}">image</a> <span class="gray timestamp" data-date="{{ comment.createdAt.format('Y-m-d H:i:s') }}">{{ time_diff(comment.createdAt) }}</span></div>
+    <div class="text">
+        {{ comment.feedContent.text }}
+        <div class="link-content">
+            <a href="{{ comment.feedContent.linkUrl }}" target="_blank"><img src="{{ comment.feedContent.linkUrl }}" alt="{{ comment.feedContent.linkTitle }}" /></a>
+        </div>
+    </div>
+{% endmacro %}
+
+
 {% macro assignment_details_comment_block(comment) %}
+    {% import _self as self %}
     <div class="comment">
         <div class="avatar"><img class="rounded" src="{{ get_file_storage_link(comment.user.getAvatarFile()) | imagine_filter('thumbnail') }}" /> </div>
         <div class="content">
-            <div class="author {% if app.user.id == comment.user.id %} is_author {% endif %}">
-                {{ comment.user.fullName }} <span class="gray timestamp" data-date="{{ comment.createdAt.format('Y-m-d H:i:s') }}">{{ time_diff(comment.createdAt) }}</span>
-                {% if app.user.id == comment.user.id %}<a href="{{ path('ajax_feed_remove_comment', {feedCommentId: comment.id}) }}" class="gray delete-link delete-comment"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
-            </div>
-            <div class="text">{{ comment.feedContent.text }}</div>
-            <div class="link"><a href="{{ comment.feedContent.linkUrl }}">{{ comment.feedContent.linkUrl }}</a></div>
+            {% if comment.feedContent.type == 'website' %}
+                {{ self.assignment_feed_comment_website_block(comment) }}
+            {% elseif comment.feedContent.type == 'video' %}
+                {{ self.assignment_feed_comment_video_block(comment) }}
+            {% elseif comment.feedContent.type == 'image' %}
+                {{ self.assignment_feed_comment_image_block(comment) }}
+            {% else %}
+                {{ self.assignment_feed_comment_text_block(comment) }}
+            {% endif %}
         </div>
     </div>
 {% endmacro %}
