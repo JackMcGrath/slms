@@ -170,6 +170,10 @@ Zerebral\BusinessBundle\Model\Feed\FeedItem:
     getters:
         feedContent:
           - Valid: ~
+Zerebral\BusinessBundle\Model\Feed\FeedComment:
+    getters:
+        feedContent:
+          - Valid: ~
 
 Zerebral\BusinessBundle\Model\Feed\FeedContent:
     constraints:

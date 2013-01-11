@@ -91,7 +91,9 @@
             <div class="avatar"><img class="rounded" src="{{ get_file_storage_link(app.user.getAvatarFile()) | imagine_filter('small_thumbnail') }}" /></div>
             <div class="content">
                 <form class="feed-item-comment-form" action="{{ path('ajax_feed_add_comment', {feedItemId: feedItem.id}) }}" method="post">
-                    <textarea class="comment-input" name="feed_comment[feedContent][text]" placeholder="Leave a new comment"></textarea>
+                    <div class="control-group">
+                        <textarea class="comment-input" name="feed_comment[feedContent][text]" placeholder="Leave a new comment"></textarea>
+                    </div>
                     <div class="buttons" style="display: none;">
                         <input type="submit" class="btn btn-danger" value="Post" />&nbsp;&nbsp;&nbsp;<a href="#" class="cancel-link">Cancel</a>
                         <input class="comment-type" type="hidden" name="feed_comment[feedContent][type]" value="text" />
