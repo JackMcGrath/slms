@@ -336,6 +336,7 @@ var ZerebralAssignmentDetailFeedBlock = function(element, options) {
     self.feedCommentFormDiv = element.find('.feed-comment-form');
     self.feedCommentForm = element.find('#ajaxFeedCommentForm');
     self.feedCommentsDiv = element.find('.comments');
+    self.feedCommentAlertBlock = element.find('.feed-comment-alert-block');
     self.options = options;
 };
 
@@ -358,9 +359,38 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
 
         this.feedCommentForm.zerebralAjaxForm({
             data: { feedType: 'assignment' },
-            success: $.proxy(self.addCommentBlock, this),
+            beforeSend: function() {
+                self.feedCommentForm.find('.control-group').removeClass('error');
+                self.feedCommentForm.find('textarea').attr('disabled', true);
+                self.feedCommentForm.find('.attached-link-field').attr('disabled', true);
+                self.feedCommentForm.find('input[type="submit"]').attr('disabled', true).val('   Posting...    ');
+                self.feedCommentForm.find('.attached-link-delete').hide();
+                self.feedCommentAlertBlock.slideUp('fast', function() {
+                    self.feedCommentAlertBlock.find('ul > li').remove();
+                });
+            },
+            success: function(response) {
+                //$.proxy(self.addCommentBlock, this),
+                if (response['has_errors']) {
+                    self.feedCommentAlertBlock.slideDown();
+                    var ul = self.feedCommentAlertBlock.find('ul');
+                    for (var fieldName in response['errors']) {
+                        var field = self.feedCommentForm.find('[name^="' + fieldName.replace(/\[/g,'\\[').replace(/\]/g,'\\]') + '"]').last();
+                        field.parents('.control-group').addClass('error');
+                        ul.append($('<li>' + response['errors'][fieldName][0] + '</li>'));
+                    }
+                } else {
+                    self.addCommentBlock(response['content']);
+                }
+            },
             error: function() { alert('Oops, seems like unknown error has appeared!'); },
-            dataType: 'html'
+            complete: function() {
+                self.feedCommentForm.find('textarea').attr('disabled', false);
+                self.feedCommentForm.find('.attached-link-field').attr('disabled', false);
+                self.feedCommentForm.find('input[type="submit"]').attr('disabled', false).val('Post message');
+                self.feedCommentForm.find('.attached-link-delete').show();
+            },
+            dataType: 'json'
         });
 
     },
@@ -371,6 +401,24 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
         this.feedCommentForm.find('.attach-links').hide();
         this.feedCommentForm.find('input.comment-type').val(link.parent().data('linkType'));
         this.feedCommentForm.find('.attached-link').slideDown();
+        switch (link.parent().data('linkType')) {
+            case 'video': {
+                this.feedCommentForm.find('.attached-link-field').attr('placeholder', 'Insert link to YouTube or Vimeo video page...');
+                break;
+            }
+            case 'website': {
+                this.feedCommentForm.find('.attached-link-field').attr('placeholder', 'Insert link to website...');
+                break;
+            }
+            case 'image': {
+                this.feedCommentForm.find('.attached-link-field').attr('placeholder', 'Insert link to image...');
+                break;
+            }
+            default: {
+                this.feedCommentForm.find('.attached-link-field').attr('placeholder', '');
+                break;
+            }
+        }
     },
     resetMainFormType: function(event) {
         event.preventDefault();
