@@ -1,6 +1,6 @@
 $(document).ready(function(){
-    $('.pick-date .date').datepicker().on('changeDate', function(e) {
-        location.href = '?date=' + (e.date.getTime() - (e.date.getTimezoneOffset() * 60000))/ 1000;
+    $('.pick-date').datepicker().on('changeDate', function(e) {
+        location.href = '?date=' + (e.date.getTime() + (e.date.getTimezoneOffset() * 60000))/ 1000;
     });
 
     $('th.status input[type="radio"]').change(function(e) {
@@ -16,5 +16,15 @@ $(document).ready(function(){
         } else {
             $('th input[type="radio"]').removeAttr('checked');
         }
+    });
+
+    $('.create-record').click(function() {
+        $('.no-attendance').hide();
+        $('.attendance-record').show();
+    });
+
+    $('.cancel-record').click(function() {
+        $('.no-attendance').show();
+        $('.attendance-record').hide();
     });
 });
