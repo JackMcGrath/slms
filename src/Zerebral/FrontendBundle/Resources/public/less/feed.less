@@ -75,16 +75,21 @@
                 .author {
                     font-weight: bold;
                     .gray {
-                        margin-left: 6px;
+//                        margin-left: 6px;
                         font-weight: normal;
-                        color: #bbbbbb;
+                        color: #8C8C8C;
+                    }
+                    a {
+                        color: #333333;
                     }
                     .timestamp {
                         float: right;
                         font-size: 11px;
                         margin-right: 10px;
+                        color: #bbbbbb;
                     }
                     .delete-link {
+                        color: #bbbbbb;
                         display: none;
                         float: right;
                         font-size: 11px;
@@ -92,6 +97,31 @@
                     }
                 }
                 .text {
+                    .link-content {
+                        margin-top: 10px;
+                        .thumbnail {
+                            width: 95px;
+                            height: 60px;
+                            padding: 0;
+                            float: left;
+                            margin-right: 10px;
+                        // margin-top: 4px;
+                            img {
+                                width: 95px;
+                                height: 60px;
+                            }
+                        }
+                        .info {
+                            color: #333333;
+                            min-height: 70px;
+                            border-bottom: none;
+                            font-weight: normal;
+                            a {
+                                font-weight: bold;
+                                color: #333333;
+                            }
+                        }
+                    }
                 }
                 .by_author {
                     color: #c77371;
