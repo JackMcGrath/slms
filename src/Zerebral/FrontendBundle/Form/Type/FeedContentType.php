@@ -12,11 +12,7 @@ class FeedContentType extends AbstractType {
     public function buildForm(FormBuilderInterface $builder, array $options) {
         $builder->add('type', 'hidden', array('required' => true));
         $builder->add('text', 'text', array('required' => false));
-        $builder->add('link_url', 'text', array('required' => false));
-        $builder->add('link_title', 'text', array('required' => false));
-        $builder->add('link_description', 'text', array('required' => false));
-        $builder->add('link_thumbnail_url', 'text', array('required' => false));
-
+        $builder->add('linkUrl', 'text', array('required' => false));
     }
 
     public function getName() {
