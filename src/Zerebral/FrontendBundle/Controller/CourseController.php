@@ -288,6 +288,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
                 $attendance->setTeacherId($this->getRoleUser()->getId());
                 $attendance->setDate($date);
                 $attendance->save();
+
                 $this->setFlash('attendance_save_success', 'Attendance for ' . date('m/d/Y', $dateRaw) . ' was successfully saved.');
                 return $this->redirect($this->generateUrl('course_attendance', array('id' => $course->getId(), 'date' => $dateRaw)));
             }
@@ -299,8 +300,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
             'students' => $students,
             'form' => $form->createView(),
             'date' => $dateTime,
-            'prevDay' => $dateTime->sub(new \DateInterval('P1D'))->format('U'),
-            'nextDay' => $dateTime->add(new \DateInterval('P2D'))->format('U'),
+            'dateRaw' => $dateRaw,
             'target' => 'course'
         );
 
