@@ -22,12 +22,12 @@ $(document).ready(function(){
     });
 
     $('.create-record').click(function() {
-        $('.no-attendance').hide();
+        $('.no-record').hide();
         $('.attendance-record').show();
     });
 
     $('.cancel-record').click(function() {
-        $('.no-attendance').show();
+        $('.no-record').show();
         $('.attendance-record').hide();
     });
 });
