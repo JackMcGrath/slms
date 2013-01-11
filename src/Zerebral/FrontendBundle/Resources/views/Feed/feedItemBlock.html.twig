@@ -36,6 +36,16 @@
     </div>
 {% endmacro %}
 
+{% macro feed_item_image_block(feedItem) %}
+    <div class="author">{{ feedItem.user.fullName }}<span class="gray"> posted an </span><a target="_blank" href="{{ feedItem.feedContent.linkUrl }}">image</a> <span class="gray timestamp" data-date="{{ feedItem.createdAt.format('Y-m-d H:i:s') }}">{{ time_diff(feedItem.createdAt) }}</span></div>
+    <div class="text">
+        {{ feedItem.feedContent.text }}
+        <div class="link-content">
+            <a href="{{ feedItem.feedContent.linkUrl }}" target="_blank"><img src="{{ feedItem.feedContent.linkUrl }}" alt="{{ feedItem.feedContent.linkTitle }}" /></a>
+        </div>
+    </div>
+{% endmacro %}
+
 {% macro feed_item_assignment_block(feedItem) %}
     <div class="author">{{ feedItem.user.fullName }}<span class="gray"> created new assignment </span><a href="{{ path('assignment_view', {id: feedItem.assignment.id}) }}">{{ feedItem.assignment.name }}</a> <span class="gray timestamp" data-date="{{ feedItem.createdAt.format('Y-m-d H:i:s') }}">{{ time_diff(feedItem.createdAt) }}</span></div>
     <div class="text">
@@ -64,6 +74,8 @@
             {{ self.feed_item_website_block(feedItem) }}
         {% elseif feedItem.feedContent.type == 'video' %}
             {{ self.feed_item_video_block(feedItem) }}
+        {% elseif feedItem.feedContent.type == 'image' %}
+            {{ self.feed_item_image_block(feedItem) }}
         {% else %}
             {{ self.feed_item_text_block(feedItem) }}
         {% endif %}
@@ -73,6 +85,8 @@
             <div class="attached-link"><i class="icon-globe"></i> <a href="{{ feedItem.feedContent.linkUrl }}">{{ feedItem.feedContent.linkUrl }}</a></div>
         {% elseif feedItem.feedContent.type == 'video' %}
             <div class="attached-link"><i class="icon-play"></i> <a href="{{ feedItem.feedContent.linkUrl }}">{{ feedItem.feedContent.linkUrl }}</a></div>
+        {% elseif feedItem.feedContent.type == 'image' %}
+            <div class="attached-link"><i class="icon-picture"></i> <a href="{{ feedItem.feedContent.linkUrl }}">{{ feedItem.feedContent.linkUrl }}</a></div>
         {% endif %}
         <i class="icon-comment"></i> <a class="show-comment-form-link" data-comments-count="{{ feedItem.feedComments|length }}" href="#">Comment (<span>{{ feedItem.feedComments|length }}</span>)</a>
     </div>
