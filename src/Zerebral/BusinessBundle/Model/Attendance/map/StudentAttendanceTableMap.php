@@ -44,7 +44,7 @@ class StudentAttendanceTableMap extends TableMap
         // columns
         $this->addForeignPrimaryKey('attendance_id', 'AttendanceId', 'INTEGER' , 'attendance', 'id', true, null, null);
         $this->addForeignPrimaryKey('student_id', 'StudentId', 'INTEGER' , 'students', 'id', true, null, null);
-        $this->addColumn('status', 'Status', 'CHAR', true, null, null);
+        $this->addColumn('status', 'Status', 'CHAR', true, null, 'present');
         $this->getColumn('status', false)->setValueSet(array (
   0 => 'present',
   1 => 'tardy',
