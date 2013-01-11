@@ -277,25 +277,12 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
             $attendance->initStudents(StudentQuery::create()->findByCourse($course)->find());
         }
 
-//        if ($attendance) {
-//            $students = StudentQuery::create()->findCourseAttendanceByDate($course, $date)->find();
-//        } else {
-//            $students = StudentQuery::create()->findByCourse($course)->find();
-//        }
-
-//        $attendance->setStudentAttendances()
-
-
         $form = $this->createForm(new FormType\AttendanceType(), $attendance);
         if ($this->getRequest()->isMethod('POST')) {
-//            var_dump('bind');
             $form->bind($this->getRequest());
             if ($form->isValid()) {
                 /** @var $attendance Model\Attendance\Attendance */
                 $attendance = $form->getData();
-                foreach ($attendance->getStudentAttendances() as $a) {
-                    var_dump($a->getStudentId(), $a->getModifiedColumns());
-                }
                 $attendance->setCourseId($course->getId());
                 $attendance->setTeacherId($this->getRoleUser()->getId());
                 $attendance->setDate($date);
