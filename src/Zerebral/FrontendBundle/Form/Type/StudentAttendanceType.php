@@ -18,6 +18,7 @@ class StudentAttendanceType extends AbstractType
         ));
         $builder->add('comment', 'text', array('max_length' => 200));
         $builder->add('studentId', 'hidden');
+        $builder->add('attendanceId', 'hidden');
     }
 
 

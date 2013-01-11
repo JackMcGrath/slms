@@ -6,7 +6,7 @@ use Zerebral\BusinessBundle\Model\User\om\BaseStudentQuery;
 
 class StudentQuery extends BaseStudentQuery
 {
-    public function getCourseAttendanceByDate($course, $date)
+    public function findCourseAttendanceByDate($course, $date)
     {
         $this->leftJoinUser();
         $this->innerJoin('CourseStudent course_students');
@@ -31,7 +31,7 @@ class StudentQuery extends BaseStudentQuery
      * @param \Zerebral\BusinessBundle\Model\Course\Course $course
      * @return mixed
      */
-    public function getByCourse($course)
+    public function findByCourse($course)
     {
         $this->leftJoinUser();
         $this->filterByCourse($course);

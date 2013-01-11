@@ -270,20 +270,32 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
 
         $c = new \Criteria();
         $c->add('date', $date);
+        /** @var $attendance \Zerebral\BusinessBundle\Model\Attendance\Attendance */
         $attendance = $course->getAttendances($c)->getFirst();
-
-        if ($attendance) {
-            $students = StudentQuery::create()->getCourseAttendanceByDate($course, $date)->find();
-        } else {
-            $students = StudentQuery::create()->getByCourse($course)->find();
+        if (empty($attendance)) {
+            $attendance = new \Zerebral\BusinessBundle\Model\Attendance\Attendance();
+            $attendance->initStudents(StudentQuery::create()->findByCourse($course)->find());
         }
+
+//        if ($attendance) {
+//            $students = StudentQuery::create()->findCourseAttendanceByDate($course, $date)->find();
+//        } else {
+//            $students = StudentQuery::create()->findByCourse($course)->find();
+//        }
+
+//        $attendance->setStudentAttendances()
+
 
         $form = $this->createForm(new FormType\AttendanceType(), $attendance);
         if ($this->getRequest()->isMethod('POST')) {
+//            var_dump('bind');
             $form->bind($this->getRequest());
             if ($form->isValid()) {
                 /** @var $attendance Model\Attendance\Attendance */
                 $attendance = $form->getData();
+                foreach ($attendance->getStudentAttendances() as $a) {
+                    var_dump($a->getStudentId(), $a->getModifiedColumns());
+                }
                 $attendance->setCourseId($course->getId());
                 $attendance->setTeacherId($this->getRoleUser()->getId());
                 $attendance->setDate($date);
@@ -297,7 +309,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
         return array(
             'course' => $course,
             'attendance' => $attendance,
-            'students' => $students,
+//            'students' => $students,
             'form' => $form->createView(),
             'date' => $dateTime,
             'dateRaw' => $dateRaw,

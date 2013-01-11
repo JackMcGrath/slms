@@ -33,7 +33,7 @@
                 </div>
                 <div class="clearfix"></div>
 
-                <form method="POST" {{ form_enctype(form) }} class="attendance-record {{ attendance ? '' : 'hide' }}">
+                <form method="POST" {{ form_enctype(form) }} class="attendance-record {{ attendance.isNew ? 'hide' : '' }}">
                 <table class="table table-bordered table-striped">
                     <tr>
                         <th class="name">Student name</th>
@@ -44,24 +44,29 @@
                     </tr>
 
                     <tbody>
-                    {% for student in students %}
-                    <tr class="student">
-                        <td>{{ student.formattedName }}</td>
-                        <td class="status" statusName="present">
-                            <input type="radio" name="attendance[studentAttendances][{{ loop.index - 1 }}][status]" value="present" {{ student.hasVirtualColumn('status') ? (student.getVirtualColumn('status') == 'present' ? 'checked' : '') : 'checked' }}/>
-                        </td>
-                        <td class="status" statusName="tardy">
-                            <input type="radio" name="attendance[studentAttendances][{{ loop.index - 1 }}][status]" value="tardy" {{ student.hasVirtualColumn('status') ? (student.getVirtualColumn('status') == 'tardy' ? 'checked' : '') : '' }}/>
-                        </td>
-                        <td class="status" statusName="excused">
-                            <input type="radio" name="attendance[studentAttendances][{{ loop.index - 1 }}][status]" value="excused" {{ student.hasVirtualColumn('status') ? (student.getVirtualColumn('status') == 'excused' ? 'checked' : '') : '' }}/>
-                        </td>
-                        <td class="comment">
-                            <input type="text" name="attendance[studentAttendances][{{ loop.index - 1 }}][comment]" value="{{ student.hasVirtualColumn('comment') ? student.getVirtualColumn('comment') : '' }}" maxlength="200" class="input-medium"/>
-                        </td>
-                        <input type="hidden" name="attendance[studentAttendances][{{ loop.index - 1 }}][studentId]" value="{{ student.id }}"/>
 
-                    </tr>
+                    {% set attendancies = form.studentAttendances.children|sort_by('vars[data].student.formattedName') %}
+                    {% for index, studentAttendance in attendancies %}
+                        {% set student = studentAttendance.vars.data.student %}
+                        <tr class="student">
+                            <td>{{ student.formattedName }}</td>
+                            <td class="status" statusName="present">
+                                <input type="radio" name="attendance[studentAttendances][{{ index }}][status]" value="present" {{ studentAttendance.vars.data.status == 'present' or studentAttendance.vars.data.status is empty ? 'checked' : '' }}/>
+                            </td>
+                            <td class="status" statusName="tardy">
+                                <input type="radio" name="attendance[studentAttendances][{{ index }}][status]" value="tardy" {{ studentAttendance.vars.data.status == 'tardy' ? 'checked' : '' }}/>
+                            </td>
+                            <td class="status" statusName="excused">
+                                <input type="radio" name="attendance[studentAttendances][{{index  }}][status]" value="excused" {{ studentAttendance.vars.data.status == 'excused' ? 'checked' : '' }}/>
+                            </td>
+                            <td class="comment">
+                                <input type="text" name="attendance[studentAttendances][{{ index }}][comment]" value="{{ studentAttendance.vars.data.comment }}" maxlength="200" class="input-medium"/>
+                            </td>
+                            <input type="hidden" name="attendance[studentAttendances][{{ index }}][studentId]" value="{{ student.id }}"/>
+                            {% if attendance %}
+                                <input type="hidden" name="attendance[studentAttendances][{{ index }}][attendanceId]" value="{{ attendance.id }}"/>
+                            {% endif %}
+                        </tr>
 
                     {% endfor %}
                     </tbody>
@@ -74,7 +79,7 @@
                     {% endif %}
                 </div>
                 </form>
-                <div class="no-record{{ attendance ? ' hide' : '' }}">
+                <div class="no-record{{ attendance.isNew ? '' : ' hide' }}">
                     <p>No attendance has been recorded on this day</p>
                     <div class="form-actions">
                         <input type="button" class="create-record btn btn-danger" value="Record" />

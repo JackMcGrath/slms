@@ -107,8 +107,8 @@ class SolutionController extends \Zerebral\CommonBundle\Component\Controller
 
         if ($assignments) {
             $localFileStorage = $this->container->get('zerebral.file_storage')->getFileStorage('local');
-            foreach ($assignments as $assignments) {
-                foreach ($assignments->getFiles() as $file) {
+            foreach ($assignments as $solutions) {
+                foreach ($solutions->getFiles() as $file) {
                     $file->setFileStorage($localFileStorage);
                     if (is_file($file->getAbsolutePath()))
                         $zip->addFile($file->getAbsolutePath(), $file->getName());
