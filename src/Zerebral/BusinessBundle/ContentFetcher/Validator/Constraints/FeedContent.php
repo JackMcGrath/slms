@@ -8,12 +8,11 @@ class FeedContent extends Constraint
 {
     public $urlRegexpMessage = '%url% is not a valid URL';
     public $brokenUrlMessage = '%url% is broken';
+    public $longUrlMessage = '%url% is too long. Please use URL shortener';
+    public $wrongUrlTypeMessage = '%url% is not valid for %type%';
 
     public $typeField;
     public $linkUrlField;
-    public $linkDescriptionField;
-    public $linkThumbnailUrlField;
-
 
 
     /** {@inheritDoc} */
@@ -28,21 +27,12 @@ class FeedContent extends Constraint
         if (empty($this->linkUrlField)) {
             throw new ConstraintDefinitionException("You should specify linkUrl field");
         }
-
-        if (empty($this->linkDescriptionField)) {
-            throw new ConstraintDefinitionException("You should specify linkDescription field");
-        }
-
-        if (empty($this->linkThumbnailUrlField)) {
-            throw new ConstraintDefinitionException("You should specify linkThumbnailUrl field");
-        }
-
     }
 
     /** {@inheritDoc} */
     public function getRequiredOptions()
     {
-        return array('typeField', 'linkUrlField', 'linkDescriptionField', 'linkThumbnailUrlField');
+        return array('typeField', 'linkUrlField');
     }
 
     /** {@inheritDoc} */

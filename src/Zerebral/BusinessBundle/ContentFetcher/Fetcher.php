@@ -8,6 +8,7 @@ class Fetcher
 
     protected $url;
     protected $urlContent;
+    protected $urlType;
     protected $urlResponseCode;
 
     protected $title;
@@ -43,12 +44,12 @@ class Fetcher
         $metaTags = array();
         for ($i = 0; $i < $nodeList->length; $i++) {
             $node = $nodeList->item($i);
-            $tagName = $node->getAttribute('name');
+            $tagName = strtolower($node->getAttribute('name'));
             if (in_array($tagName, self::$metaTagsList)) {
                 $metaTags[$tagName] = $node->getAttribute('content');
             }
 
-            $tagProperty = $node->getAttribute('property');
+            $tagProperty = strtolower($node->getAttribute('property'));
             if (in_array($tagProperty, self::$metaTagsList)) {
                 $metaTags[$tagProperty] = $node->getAttribute('content');
             }
@@ -64,19 +65,59 @@ class Fetcher
         @$dom->loadHTML($this->urlContent);
         $metaTags = $this->nodeListToArray($dom->getElementsByTagName('meta'));
 
-        $this->title = isset($metaTags['og:title']) ? $metaTags['og:title'] : (isset($metaTags['title']) ? $metaTags['title'] : $dom->getElementsByTagName('title')->item(0)->nodeValue);
-        $this->description = mb_strimwidth((isset($metaTags['og:description']) ? $metaTags['og:description'] : (isset($metaTags['description']) ? $metaTags['description'] : '')), 0, 253, '...');
-
-        $thumbnailUrl = isset($metaTags['og:image']) ? $metaTags['og:image'] : (isset($metaTags['image_src']) ? $metaTags['image_src'] : $dom->getElementsByTagName('img')->item(0)->getAttribute('src'));
-        if (strtolower(substr($thumbnailUrl, 0, 4)) !== 'http') {
-            $urlInfo = parse_url($this->url);
-            if (strtolower(substr($thumbnailUrl, 0, 2)) == '//') {
-                $this->thumbmnailUrl = $urlInfo['scheme'] . ':' . $thumbnailUrl;
+        //$this->title = isset($metaTags['og:title']) ? $metaTags['og:title'] : (isset($metaTags['title']) ? $metaTags['title'] : $dom->getElementsByTagName('title')->item(0)->nodeValue);
+        if (isset($metaTags['og:title'])) {
+            $this->title = $metaTags['og:title'];
+        } else if (isset($metaTags['title'])) {
+            $this->title = $metaTags['title'];
+        } else {
+            $titleTag = $dom->getElementsByTagName('title')->item(0);//
+            if (is_null($titleTag)) {
+                $this->title = $this->url;
             } else {
-                $thumbnailUrl  = ltrim($thumbnailUrl, '/');
-                $this->thumbmnailUrl = $urlInfo['scheme'] . '://' . $urlInfo['host'] . '/' . $thumbnailUrl;
+                $this->title = $titleTag->nodeValue;
             }
         }
+        $this->title = mb_strimwidth($this->title, 0, 97, '...');
+
+        //$this->description = mb_strimwidth((isset($metaTags['og:description']) ? $metaTags['og:description'] : (isset($metaTags['description']) ? $metaTags['description'] : '')), 0, 253, '...');
+        if (isset($metaTags['og:description'])) {
+            $this->description = $metaTags['og:description'];
+        } else if (isset($metaTags['description'])) {
+            $this->description = $metaTags['description'];
+        } else {
+            $this->description = '';
+        }
+        $this->description = mb_strimwidth($this->description, 0, 253, '...');
+
+
+        //$thumbnailUrl = isset($metaTags['og:image']) ? $metaTags['og:image'] : (isset($metaTags['image_src']) ? $metaTags['image_src'] : $dom->getElementsByTagName('img')->item(0)->getAttribute('src'));
+        if (isset($metaTags['og:image'])) {
+            $this->thumbmnailUrl = $metaTags['og:image'];
+        } else if (isset($metaTags['image_src'])) {
+            $this->thumbmnailUrl = $metaTags['image_src'];
+        } else {
+            $imageTag = $dom->getElementsByTagName('img')->item(0);
+            if (is_null($imageTag)) {
+                $this->thumbmnailUrl = null;
+            } else {
+                $this->thumbmnailUrl = $imageTag->getAttribute('src');
+            }
+        }
+
+        if (!is_null($this->thumbmnailUrl)) {
+            $thumbnailUrl = $this->thumbmnailUrl;
+            if (strtolower(substr($thumbnailUrl, 0, 4)) !== 'http') {
+                $urlInfo = parse_url($this->url);
+                if (strtolower(substr($thumbnailUrl, 0, 2)) == '//') {
+                    $this->thumbmnailUrl = $urlInfo['scheme'] . ':' . $thumbnailUrl;
+                } else {
+                    $thumbnailUrl  = ltrim($thumbnailUrl, '/');
+                    $this->thumbmnailUrl = $urlInfo['scheme'] . '://' . $urlInfo['host'] . '/' . $thumbnailUrl;
+                }
+            }
+        }
+
     }
 
     /** @todo: Handle all possible response codes */
@@ -97,6 +138,7 @@ class Fetcher
         );
         curl_setopt_array($curlHandler, $options);
         $this->urlContent = curl_exec($curlHandler);
+        $this->urlType = curl_getinfo($curlHandler, CURLINFO_CONTENT_TYPE);
         $this->urlResponseCode = curl_getinfo($curlHandler, CURLINFO_HTTP_CODE);
         curl_close($curlHandler);
     }
@@ -104,5 +146,20 @@ class Fetcher
     public function isLoaded()
     {
         return $this->urlResponseCode == 200;
+    }
+
+    public function isMatchType($type)
+    {
+        switch ($type) {
+            case 'website': return (strtolower(substr($this->urlType, 0, 9)) === 'text/html');
+            case 'image': return (strtolower(substr($this->urlType, 0, 5)) === 'image');
+            case 'video': {
+                $urlInfo = parse_url($this->url);
+                $host = strtolower(ltrim($urlInfo['host'], 'www.'));
+                return in_array($host, array('vimeo.com', 'youtube.com'));
+                break;
+            }
+            default: return true;
+        }
     }
 }

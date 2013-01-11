@@ -176,8 +176,6 @@ Zerebral\BusinessBundle\Model\Feed\FeedContent:
         - Zerebral\BusinessBundle\ContentFetcher\Validator\Constraints\FeedContent:
             typeField: type
             linkUrlField: linkUrl
-            linkDescriptionField: linkDescription
-            linkThumbnailUrlField: linkThumbnailUrl
     getters:
         text:
           - NotBlank:

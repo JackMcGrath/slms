@@ -43,6 +43,11 @@ ZerebralCourseDetailFeedBlock.prototype = {
             dataType: 'json',
             beforeSend: function() {
                 self.feedItemForm.find('.control-group').removeClass('error');
+                self.feedItemFormTextarea.attr('disabled', true);
+                self.feedItemForm.find('.attached-link-field').attr('disabled', true);
+                self.feedItemForm.find('input[type="submit"]').attr('disabled', true).val('   Posting...    ');
+                self.feedItemForm.find('a.cancel-link').hide();
+                self.feedItemForm.find('.attached-link-delete').hide();
             },
             success: function(response) {
                 if (response['has_errors']) {
@@ -54,7 +59,14 @@ ZerebralCourseDetailFeedBlock.prototype = {
                     self.addItemBlock(response['content']);
                 }
             },
-            error: function() { alert('Oops, seems like unknown error has appeared!'); }
+            error: function() { alert('Oops, seems like unknown error has appeared!'); },
+            complete: function() {
+                self.feedItemFormTextarea.attr('disabled', false);
+                self.feedItemForm.find('.attached-link-field').attr('disabled', false);
+                self.feedItemForm.find('input[type="submit"]').attr('disabled', false).val('Post message');
+                self.feedItemForm.find('a.cancel-link').show();
+                self.feedItemForm.find('.attached-link-delete').show();
+            }
         });
 
         $.each(this.commentsDiv.find('form'), function(index, value) {
@@ -125,6 +137,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
 
         var self = this;
         self.resetMainFormType();
+        self.feedItemForm.find('.control-group').removeClass('error');
         this.feedItemFormTextarea.val('').parents('form').animate({'background-color': 'transparent'}).find('.feed-item-form-controls').hide();
         this.feedItemFormTextarea.animate({
             width: 571,
@@ -143,6 +156,24 @@ ZerebralCourseDetailFeedBlock.prototype = {
         this.feedItemForm.find('input.comment-type').val(link.parent().data('linkType'));
         this.feedItemForm.find('.attached-link').slideDown();
         this.feedItemForm.find('.attached-link-field').val('');
+        switch (link.parent().data('linkType')) {
+            case 'video': {
+                this.feedItemForm.find('.attached-link-field').attr('placeholder', 'Insert link to YouTube or Vimeo video page...');
+                break;
+            }
+            case 'website': {
+                this.feedItemForm.find('.attached-link-field').attr('placeholder', 'Insert link to website...');
+                break;
+            }
+            case 'image': {
+                this.feedItemForm.find('.attached-link-field').attr('placeholder', 'Insert link to image...');
+                break;
+            }
+            default: {
+                this.feedItemForm.find('.attached-link-field').attr('placeholder', '');
+                break;
+            }
+        }
     },
     resetMainFormType: function(event) {
         if (event) {
@@ -151,6 +182,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
         this.feedItemForm.find('.attached-link').slideUp();
         this.feedItemForm.find('input.comment-type').val('text');
         this.feedItemForm.find('.attach-links').show();
+        this.feedItemForm.find('.attached-link .control-group').removeClass('error');
     },
 
     expandCommentForm: function(event) {

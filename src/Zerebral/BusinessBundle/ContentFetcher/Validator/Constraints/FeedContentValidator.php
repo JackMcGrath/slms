@@ -37,9 +37,6 @@ class FeedContentValidator extends ConstraintValidator
     {
         $typeValue = $this->getPropertyValue($object, $constraint->typeField);
         $linkUrlValue = $this->getPropertyValue($object, $constraint->linkUrlField);
-        $linkDescriptionValue = $this->getPropertyValue($object, $constraint->linkDescriptionField);
-        $linkThumnailUrlValue = $this->getPropertyValue($object, $constraint->linkThumbnailUrlField);
-
 
         if (!in_array($typeValue, array('assignment', 'text'))) {
             if (!$this->validateUrl($linkUrlValue)) {
@@ -47,9 +44,19 @@ class FeedContentValidator extends ConstraintValidator
                 return;
             }
 
+            if (mb_strlen($linkUrlValue) > 150) {
+                $this->context->addViolationAtSubPath($constraint->linkUrlField, $constraint->longUrlMessage, array('%url%' => $linkUrlValue));
+                return;
+            }
+
             $fetcher = new Fetcher($linkUrlValue);
             if (!$fetcher->isLoaded()) {
                 $this->context->addViolationAtSubPath($constraint->linkUrlField, $constraint->brokenUrlMessage, array('%url%' => $linkUrlValue));
+                return;
+            }
+
+            if (!$fetcher->isMatchType($typeValue)) {
+                $this->context->addViolationAtSubPath($constraint->linkUrlField, $constraint->wrongUrlTypeMessage, array('%url%' => $linkUrlValue, '%type%' => $typeValue));
                 return;
             }
 
