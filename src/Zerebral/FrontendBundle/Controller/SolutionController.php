@@ -92,7 +92,7 @@ class SolutionController extends \Zerebral\CommonBundle\Component\Controller
     {
         $zip = new \ZipArchive();
 
-        $filename = preg_replace(array("[\s]", "/[^a-z0-9_]/i"), array("_", ""), $assignment ? $assignment->getName() : $student->getFullName());
+        $filename = preg_replace(array("[\s]", "/[^a-z0-9_]/i"), array("_", ""), ($assignment ? $assignment->getName() : '') . ($student ? '_' . $student->getFullName() : ''));
         $filePath = "/data/zip_files/" . $filename . '_solutions_' . time() . '.zip';
 
         if ($zip->open('.' . $filePath, \ZIPARCHIVE::CREATE)!==TRUE) {
