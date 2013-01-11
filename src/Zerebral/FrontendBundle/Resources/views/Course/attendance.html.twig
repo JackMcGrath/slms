@@ -23,30 +23,25 @@
 
             <div class="attendance-table">
                 {{ flashMessages.show('attendance_save_success', 'success') }}
-                <div class="today">
-                    <a href="{{ path('course_attendance', {id: course.id}) }}"><span class="label label-inverse">Today</span></a>
-                    {{ "now" | date('F, d') }}
+                <div class="date-selector">
+                    <a href="{{ path('course_attendance', {id: course.id, date: prevDay}) }}">&#706;</a>
+                    {{ date | date('F, d') }}
+                    <a href="{{ path('course_attendance', {id: course.id, date: nextDay}) }}">&#707;</a>
                 </div>
-                <div class="pick-date">
-                    Pick date
-                    <div class="input-append date" data-date="{{ date | date('m/d/Y') }}" data-date-format="mm/dd/yyyy">
-                        <input readonly="readonly" type="text" class="attendance-date input-small" value="{{ date | date('m/d/Y') }}"/>
-                        <span class="add-on"><i class="icon-calendar"></i></span>
-                    </div>
+                <div class="pick-date"  data-date="{{ date | date('m/d/Y') }}" data-date-format="mm/dd/yyyy">
+                    Pick date <i class="icon-new-calendar"></i>
                 </div>
                 <div class="clearfix"></div>
 
-                <form method="POST" {{ form_enctype(form) }}>
+                <form method="POST" {{ form_enctype(form) }} class="attendance-record {{ attendance ? '' : 'hide' }}">
                 <table class="table table-bordered table-striped">
-
-                        <tr>
-                            <th class="name">Student name</th>
-                            <th class="status" statusName="present"><label><input type="radio" name="status" value="present"/> Present</label></th>
-                            <th class="status" statusName="tardy"><label><input type="radio" name="status" value="tardy"/> Tardy</label></th>
-                            <th class="status" statusName="excused"><label><input type="radio" name="status" value="excused"/> Excused</label></th>
-                            <th>Comments</th>
-                        </tr>
-
+                    <tr>
+                        <th class="name">Student name</th>
+                        <th class="status" statusName="present"><label><input type="radio" name="status" value="present"/> Present</label></th>
+                        <th class="status" statusName="tardy"><label><input type="radio" name="status" value="tardy"/> Tardy</label></th>
+                        <th class="status" statusName="excused"><label><input type="radio" name="status" value="excused"/> Excused</label></th>
+                        <th>Comments</th>
+                    </tr>
 
                     <tbody>
                     {% for student in students %}
@@ -73,9 +68,17 @@
                 {{ form_widget(form._token) }}
                 <div class="form-actions">
                     <input type="submit" class="btn btn-danger" value="Save" />
-
+                    {% if attendance == null %}
+                        <input type="button" class="btn cancel-record" value="Cancel" />
+                    {% endif %}
                 </div>
                 </form>
+                <div class="no-record{{ attendance ? ' hide' : '' }}">
+                    <p>No attendance has been recorded on this day</p>
+                    <div class="form-actions">
+                        <input type="button" class="create-record btn btn-danger" value="Record" />
+                    </div>
+                </div>
             </div>
         </div>
 

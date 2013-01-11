@@ -299,6 +299,8 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
             'students' => $students,
             'form' => $form->createView(),
             'date' => $dateTime,
+            'prevDay' => $dateTime->sub(new \DateInterval('P1D'))->format('U'),
+            'nextDay' => $dateTime->add(new \DateInterval('P2D'))->format('U'),
             'target' => 'course'
         );
 

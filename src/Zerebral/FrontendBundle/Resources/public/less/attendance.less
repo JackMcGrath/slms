@@ -6,27 +6,24 @@
         width: 100%;
         margin-left: 0px;
 
-        .today {
-            float:left;
-            margin-top: 9px;
+        .date-selector {
+            margin-left: 270px;
+            text-align: center;
+            display: inline-block;
+            font-size: 15px;
             a {
-                margin-right: 8px;
+                color: #333333;
+                font-weight: bold;
+                margin: 0 15px;
+                font-size: 15px;
+                vertical-align: top;
             }
         }
         .pick-date {
             float: right;
-            .date {
+            cursor: pointer;
+            i {
                 margin-left: 10px;
-                display: inline-block;
-                vertical-align: middle;
-                .add-on {
-                    height: 22px;
-                    i {
-                        margin-left: 2px;
-                        margin-top: 4px;
-                        width: 14px;
-                    }
-                }
             }
         }
 
@@ -57,6 +54,12 @@
                     margin-bottom: 0px;
                 }
             }
+        }
+    }
+    .no-record {
+        p {
+            text-align: center;
+            margin: 13% 0;
         }
     }
 }
