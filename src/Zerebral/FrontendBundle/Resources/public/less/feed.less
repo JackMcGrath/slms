@@ -2,6 +2,9 @@
     .feed-comment-form {
         background-color: #f3f3f3;
         padding-bottom: 10px;
+        .control-group {
+            margin-bottom: 0;
+        }
         form {
             margin: 0;
         }
@@ -31,6 +34,9 @@
             }
             .attached-link {
                 display: none;
+                .control-group {
+                    float: left;
+                }
                 .attached-link-delete {
                     float: right;
                     padding-top: 10px;
@@ -69,16 +75,21 @@
                 .author {
                     font-weight: bold;
                     .gray {
-                        margin-left: 6px;
+//                        margin-left: 6px;
                         font-weight: normal;
-                        color: #bbbbbb;
+                        color: #8C8C8C;
+                    }
+                    a {
+                        color: #333333;
                     }
                     .timestamp {
                         float: right;
                         font-size: 11px;
                         margin-right: 10px;
+                        color: #bbbbbb;
                     }
                     .delete-link {
+                        color: #bbbbbb;
                         display: none;
                         float: right;
                         font-size: 11px;
@@ -86,6 +97,31 @@
                     }
                 }
                 .text {
+                    .link-content {
+                        margin-top: 10px;
+                        .thumbnail {
+                            width: 95px;
+                            height: 60px;
+                            padding: 0;
+                            float: left;
+                            margin-right: 10px;
+                        // margin-top: 4px;
+                            img {
+                                width: 95px;
+                                height: 60px;
+                            }
+                        }
+                        .info {
+                            color: #333333;
+                            min-height: 70px;
+                            border-bottom: none;
+                            font-weight: normal;
+                            a {
+                                font-weight: bold;
+                                color: #333333;
+                            }
+                        }
+                    }
                 }
                 .by_author {
                     color: #c77371;
@@ -107,9 +143,15 @@
     }
 }
 
+
+
+
 .course-details-feed {
     .feed-item-form {
         padding-bottom: 0;
+        .control-group {
+            margin-bottom: 0;
+        }
         .feed-item-textarea {
             resize: none;
             position: relative;
@@ -137,6 +179,9 @@
             }
             .attached-link {
                 display: none;
+                .control-group {
+                    float: left;
+                }
                 .attached-link-delete {
                     float: right;
                     padding-top: 10px;
@@ -193,12 +238,39 @@
                         color: #8c8c8c;
                         font-weight: normal;
                     }
+                    a {
+                        color: #333333;
+                    }
                 }
                 .text {
                     color: #b74a47;
                     font-weight: bold;
                     font-size: 13px;
                     line-height: 1.5;
+                    margin-left: 70px;
+                    .link-content {
+                        margin-top: 10px;
+                        .thumbnail {
+                            width: 95px;
+                            height: 60px;
+                            padding: 0;
+                            float: left;
+                            margin-right: 10px;
+                            // margin-top: 4px;
+                            img {
+                                width: 95px;
+                                height: 60px;
+                            }
+                        }
+                        .info {
+                            color: #333333;
+                            font-weight: normal;
+                            a {
+                                font-weight: bold;
+                                color: #333333;
+                            }
+                        }
+                    }
                 }
                 .timestamp {
                     float: right;
@@ -210,6 +282,13 @@
             .comments-button {
                 margin-left: 70px;
                 margin-bottom: 10px;
+                .attached-link {
+                    display: inline;
+                    margin-right: 10px;
+                    a {
+                        color: #656565;
+                    }
+                }
                 a.show-comment-form-link {
                     color: #656565;
                 }
@@ -259,8 +338,38 @@
                         margin-left: 0px;
                         max-width: 440px;
                         margin-bottom: 0;
+                        .link-content {
+                            margin-top: 10px;
+                            .thumbnail {
+                                width: 95px;
+                                height: 60px;
+                                padding: 0;
+                                float: left;
+                                margin-right: 10px;
+                            // margin-top: 4px;
+                                img {
+                                    width: 95px;
+                                    height: 60px;
+                                }
+                            }
+                            .info {
+                                color: #333333;
+                                font-weight: normal;
+                                a {
+                                    font-weight: bold;
+                                    color: #333333;
+                                }
+                            }
+                        }
+                        a {
+                            color: #333333;
+                            font-weight: bold;
+                        }
                         .feed-item-comment-form {
                             margin: 0;
+                            .control-group {
+                                margin-bottom: 0;
+                            }
                         }
                         .comment-input {
                             margin-bottom: 0;

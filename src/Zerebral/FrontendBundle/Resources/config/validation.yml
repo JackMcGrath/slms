@@ -165,9 +165,7 @@ Zerebral\BusinessBundle\Model\Material\CourseMaterial:
         courseId:
             - NotBlank:
                 message: Course id can not be blank
-
-
-
+                
 Zerebral\BusinessBundle\Model\Attendance\StudentAttendance:
     getters:
         status:
@@ -176,3 +174,23 @@ Zerebral\BusinessBundle\Model\Attendance\StudentAttendance:
                 message:  Incorrect value.
         comment:
             - MaxLength: 200
+                            
+Zerebral\BusinessBundle\Model\Feed\FeedItem:
+    getters:
+        feedContent:
+          - Valid: ~
+Zerebral\BusinessBundle\Model\Feed\FeedComment:
+    getters:
+        feedContent:
+          - Valid: ~
+
+Zerebral\BusinessBundle\Model\Feed\FeedContent:
+    constraints:
+        - Zerebral\BusinessBundle\ContentFetcher\Validator\Constraints\FeedContent:
+            typeField: type
+            linkUrlField: linkUrl
+    getters:
+        text:
+          - NotBlank:
+              message: Please write comment text
+                                          

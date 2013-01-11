@@ -21,7 +21,8 @@ class FeedItemType extends AbstractType {
 
         $resolver->setDefaults(
             array(
-                'data_class' => 'Zerebral\BusinessBundle\Model\Feed\FeedItem'
+                'data_class' => 'Zerebral\BusinessBundle\Model\Feed\FeedItem',
+                'cascade_validation' => true
             )
         );
     }

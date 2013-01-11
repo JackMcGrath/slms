@@ -1,5 +1,53 @@
+{% macro feed_item_website_block(feedItem) %}
+    <div class="author">{{ feedItem.user.fullName }}<span class="gray"> posted a </span><a target="_blank" href="{{ feedItem.feedContent.linkUrl }}">website link</a> <span class="gray timestamp" data-date="{{ feedItem.createdAt.format('Y-m-d H:i:s') }}">{{ time_diff(feedItem.createdAt) }}</span></div>
+    <div class="text">
+        {{ feedItem.feedContent.text }}
+        <div class="link-content">
+            {% if feedItem.feedContent.linkThumbnailUrl is not null %}
+                <div class="thumbnail">
+                    <a href="{{ feedItem.feedContent.linkUrl }}" target="_blank"><img width="95" height="60" src="{{ feedItem.feedContent.linkThumbnailUrl }}" alt="{{ feedItem.feedContent.linkTitle }}" /></a>
+                </div>
+            {% endif %}
+            <div class="info">
+                <div class="title"><a target="_blank" href="{{ feedItem.feedContent.linkUrl }}">{{ feedItem.feedContent.linkTitle }}</a></div>
+                <div class="description">{{ feedItem.feedContent.linkDescription }}</div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro feed_item_video_block(feedItem) %}
+    <div class="author">{{ feedItem.user.fullName }}<span class="gray"> posted a </span><a target="_blank" href="{{ feedItem.feedContent.linkUrl }}">video</a> <span class="gray timestamp" data-date="{{ feedItem.createdAt.format('Y-m-d H:i:s') }}">{{ time_diff(feedItem.createdAt) }}</span></div>
+    <div class="text">
+        {{ feedItem.feedContent.text }}
+        <div class="link-content">
+            {% if feedItem.feedContent.linkThumbnailUrl is not null %}
+                <div class="thumbnail">
+                    <a href="{{ feedItem.feedContent.linkUrl }}" target="_blank"><img width="95" height="60" src="{{ feedItem.feedContent.linkThumbnailUrl }}" alt="{{ feedItem.feedContent.linkTitle }}" /></a>
+                </div>
+            {% endif %}
+            <div class="info">
+                <div class="title"><a target="_blank" href="{{ feedItem.feedContent.linkUrl }}">{{ feedItem.feedContent.linkTitle }}</a></div>
+                <div class="description">{{ feedItem.feedContent.linkDescription }}</div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro feed_item_image_block(feedItem) %}
+    <div class="author">{{ feedItem.user.fullName }}<span class="gray"> posted an </span><a target="_blank" href="{{ feedItem.feedContent.linkUrl }}">image</a> <span class="gray timestamp" data-date="{{ feedItem.createdAt.format('Y-m-d H:i:s') }}">{{ time_diff(feedItem.createdAt) }}</span></div>
+    <div class="text">
+        {{ feedItem.feedContent.text }}
+        <div class="link-content">
+            <a href="{{ feedItem.feedContent.linkUrl }}" target="_blank"><img src="{{ feedItem.feedContent.linkUrl }}" alt="{{ feedItem.feedContent.linkTitle }}" /></a>
+        </div>
+    </div>
+{% endmacro %}
+
 {% macro feed_item_assignment_block(feedItem) %}
-    <div class="author">{{ feedItem.user.fullName }}<span class="gray"> created new assignment </span><a style="color: #333333;" href="{{ path('assignment_view', {id: feedItem.assignment.id}) }}">{{ feedItem.assignment.name }}</a> <span class="gray timestamp" data-date="{{ feedItem.createdAt.format('Y-m-d H:i:s') }}">{{ time_diff(feedItem.createdAt) }}</span></div>
+    <div class="author">{{ feedItem.user.fullName }}<span class="gray"> created new assignment </span><a href="{{ path('assignment_view', {id: feedItem.assignment.id}) }}">{{ feedItem.assignment.name }}</a> <span class="gray timestamp" data-date="{{ feedItem.createdAt.format('Y-m-d H:i:s') }}">{{ time_diff(feedItem.createdAt) }}</span></div>
     <div class="text">
         {% autoescape 'html' %}
         {{ feedItem.assignment.description|striptags|slice(0, 100) }}
@@ -12,7 +60,6 @@
     <div class="text">
         {{ feedItem.feedContent.text }}
     </div>
-    <div class="link"><a href=""></a></div>
 {% endmacro %}
 
 
@@ -23,11 +70,26 @@
         {% if app.user.id == feedItem.user.id %}<a href="{{ path('ajax_feed_remove_feed_item', {feedItemId: feedItem.id}) }}" class="gray delete-link delete-feed-item"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
         {% if feedItem.feedContent.type == 'assignment' %}
             {{ self.feed_item_assignment_block(feedItem) }}
+        {% elseif feedItem.feedContent.type == 'website' %}
+            {{ self.feed_item_website_block(feedItem) }}
+        {% elseif feedItem.feedContent.type == 'video' %}
+            {{ self.feed_item_video_block(feedItem) }}
+        {% elseif feedItem.feedContent.type == 'image' %}
+            {{ self.feed_item_image_block(feedItem) }}
         {% else %}
             {{ self.feed_item_text_block(feedItem) }}
         {% endif %}
     </div>
-    <div class="comments-button"><i class="icon-comment"></i> <a class="show-comment-form-link" data-comments-count="{{ feedItem.feedComments|length }}" href="#">Comment (<span>{{ feedItem.feedComments|length }}</span>)</a></div>
+    <div class="comments-button">
+        {% if feedItem.feedContent.type == 'website' %}
+            <div class="attached-link"><i class="icon-globe"></i> <a href="{{ feedItem.feedContent.linkUrl }}">{{ feedItem.feedContent.linkUrl }}</a></div>
+        {% elseif feedItem.feedContent.type == 'video' %}
+            <div class="attached-link"><i class="icon-play"></i> <a href="{{ feedItem.feedContent.linkUrl }}">{{ feedItem.feedContent.linkUrl }}</a></div>
+        {% elseif feedItem.feedContent.type == 'image' %}
+            <div class="attached-link"><i class="icon-picture"></i> <a href="{{ feedItem.feedContent.linkUrl }}">{{ feedItem.feedContent.linkUrl }}</a></div>
+        {% endif %}
+        <i class="icon-comment"></i> <a class="show-comment-form-link" data-comments-count="{{ feedItem.feedComments|length }}" href="#">Comment (<span>{{ feedItem.feedComments|length }}</span>)</a>
+    </div>
     <div class="comments">
         {% set lastFeedComments = feedItem.lastFeedComments %}
         {% if lastFeedComments|length < feedItem.feedComments|length %}
@@ -43,7 +105,9 @@
             <div class="avatar"><img class="rounded" src="{{ get_file_storage_link(app.user.getAvatarFile()) | imagine_filter('small_thumbnail') }}" /></div>
             <div class="content">
                 <form class="feed-item-comment-form" action="{{ path('ajax_feed_add_comment', {feedItemId: feedItem.id}) }}" method="post">
-                    <textarea class="comment-input" name="feed_comment[feedContent][text]" placeholder="Leave a new comment"></textarea>
+                    <div class="control-group">
+                        <textarea class="comment-input" name="feed_comment[feedContent][text]" placeholder="Leave a new comment"></textarea>
+                    </div>
                     <div class="buttons" style="display: none;">
                         <input type="submit" class="btn btn-danger" value="Post" />&nbsp;&nbsp;&nbsp;<a href="#" class="cancel-link">Cancel</a>
                         <input class="comment-type" type="hidden" name="feed_comment[feedContent][type]" value="text" />

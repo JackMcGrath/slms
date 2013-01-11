@@ -50,10 +50,11 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
             $feedItem->save();
 
             $feedType = $this->getRequest()->get('feedType', 'assignment');
-            return $this->render('ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig', array('feedType' => $feedType, 'comment' => $feedComment));
+            $content = $this->render('ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig', array('feedType' => $feedType, 'comment' => $feedComment))->getContent();
+            return new JsonResponse(array('has_errors' => false, 'content' => $content));
         }
 
-        return new FormJsonResponse($feedCommentForm, 500);
+        return new FormJsonResponse($feedCommentForm);
     }
 
     /**
@@ -74,9 +75,8 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
     }
 
     /**
-     * @Route         ("/add-feed-item/{courseId}", name="ajax_course_add_feed_item")
-     *
-     * @param         \Zerebral\BusinessBundle\Model\Course\Course
+     * @Route("/add-feed-item/{courseId}", name="ajax_course_add_feed_item")
+     * @param \Zerebral\BusinessBundle\Model\Course\Course
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Zerebral\CommonBundle\HttpFoundation\FormJsonResponse
      * @ParamConverter("course", options={"mapping": {"courseId": "id"}})
@@ -96,10 +96,11 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
             $course->addFeedItem($feedItem);
             $course->save();
 
-            return $this->render('ZerebralFrontendBundle:Feed:feedItemBlock.html.twig', array('feedItem' => $feedItem));
+            $content = $this->render('ZerebralFrontendBundle:Feed:feedItemBlock.html.twig', array('feedItem' => $feedItem))->getContent();
+            return new JsonResponse(array('has_errors' => false, 'content' => $content));
         }
 
-        return new FormJsonResponse($feedItemForm, 500);
+        return new FormJsonResponse($feedItemForm);
     }
 
     /**

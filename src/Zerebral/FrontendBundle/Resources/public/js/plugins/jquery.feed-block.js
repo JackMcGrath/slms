@@ -5,6 +5,8 @@ var ZerebralCourseDetailFeedBlock = function(element, options) {
     self.feedItemForm = element.find('#ajaxFeedItemForm');
     self.feedItemFormDiv = element.find('.feed-item-form');
 
+    self.feedItemAlertBlock = element.find('.feed-item-alert-block');
+
     self.feedItemsDiv = element.find('.feed-items');
     self.itemsDiv = element.find('.feed-item');
     self.commentsDiv = element.find('.feed-item .comments');
@@ -40,17 +42,67 @@ ZerebralCourseDetailFeedBlock.prototype = {
         this.commentsDiv.on('click', 'a.load-more-link', $.proxy(self.loadComments, self));
 
         this.feedItemForm.zerebralAjaxForm({
-            success: $.proxy(self.addItemBlock, this),
+            dataType: 'json',
+            beforeSend: function() {
+                self.feedItemForm.find('.control-group').removeClass('error');
+                self.feedItemFormTextarea.attr('disabled', true);
+                self.feedItemForm.find('.attached-link-field').attr('disabled', true);
+                self.feedItemForm.find('input[type="submit"]').attr('disabled', true).val('   Posting...    ');
+                self.feedItemForm.find('a.cancel-link').hide();
+                self.feedItemForm.find('.attached-link-delete').hide();
+                self.feedItemAlertBlock.slideUp('fast', function() {
+                    self.feedItemAlertBlock.find('ul > li').remove();
+                });
+            },
+            success: function(response) {
+                if (response['has_errors']) {
+                    self.feedItemAlertBlock.slideDown();
+                    var ul = self.feedItemAlertBlock.find('ul');
+                    for (var fieldName in response['errors']) {
+                        var field = self.feedItemForm.find('[name^="' + fieldName.replace(/\[/g,'\\[').replace(/\]/g,'\\]') + '"]').last();
+                        field.parents('.control-group').addClass('error');
+                        ul.append($('<li>' + response['errors'][fieldName][0] + '</li>'));
+                    }
+                } else {
+                    self.addItemBlock(response['content']);
+                }
+            },
             error: function() { alert('Oops, seems like unknown error has appeared!'); },
-            dataType: 'html'
+            complete: function() {
+                self.feedItemFormTextarea.attr('disabled', false);
+                self.feedItemForm.find('.attached-link-field').attr('disabled', false);
+                self.feedItemForm.find('input[type="submit"]').attr('disabled', false).val('Post message');
+                self.feedItemForm.find('a.cancel-link').show();
+                self.feedItemForm.find('.attached-link-delete').show();
+            }
         });
 
         $.each(this.commentsDiv.find('form'), function(index, value) {
+            var form = $(this);
             $(this).zerebralAjaxForm({
+                beforeSend: function() {
+                    form.find('textarea').attr('disabled', true);
+                    form.find('input[type="submit"]').attr('disabled', true);
+                    form.find('a.cancel-link').hide();
+                },
                 data: { feedType: 'course' },
-                success: $.proxy(self.addCommentBlock, this),
+                success: function(response) {
+                    if (response['has_errors']) {
+                        for (var fieldName in response['errors']) {
+                            var field = form.find('[name^="' + fieldName.replace(/\[/g,'\\[').replace(/\]/g,'\\]') + '"]').last();
+                            field.parents('.control-group').addClass('error');
+                        }
+                    } else {
+                        $.proxy(self.addCommentBlock, form, response['content'])();
+                    }
+                },
                 error: function() { alert('Oops, seems like unknown error has appeared!'); },
-                dataType: 'html'
+                complete: function() {
+                    form.find('textarea').attr('disabled', false);
+                    form.find('input[type="submit"]').attr('disabled', false);
+                    form.find('a.cancel-link').show();
+                },
+                dataType: 'json'
             });
         })
     },
@@ -113,7 +165,8 @@ ZerebralCourseDetailFeedBlock.prototype = {
 
         var self = this;
         self.resetMainFormType();
-        this.feedItemFormTextarea.val('').parent().animate({'background-color': 'transparent'}).find('.feed-item-form-controls').hide();
+        self.feedItemForm.find('.control-group').removeClass('error');
+        this.feedItemFormTextarea.val('').parents('form').animate({'background-color': 'transparent'}).find('.feed-item-form-controls').hide();
         this.feedItemFormTextarea.animate({
             width: 571,
             margin: 0,
@@ -121,6 +174,10 @@ ZerebralCourseDetailFeedBlock.prototype = {
             height: 18
         }, 500, function() {
             self.feedItemFormTextarea.css('background-image', self.feedItemFormTextarea.data('background-image'));
+        });
+
+        self.feedItemAlertBlock.slideUp('fast', function() {
+            self.feedItemAlertBlock.find('ul > li').remove();
         });
 
     },
@@ -131,6 +188,24 @@ ZerebralCourseDetailFeedBlock.prototype = {
         this.feedItemForm.find('input.comment-type').val(link.parent().data('linkType'));
         this.feedItemForm.find('.attached-link').slideDown();
         this.feedItemForm.find('.attached-link-field').val('');
+        switch (link.parent().data('linkType')) {
+            case 'video': {
+                this.feedItemForm.find('.attached-link-field').attr('placeholder', 'Insert link to YouTube or Vimeo video page...');
+                break;
+            }
+            case 'website': {
+                this.feedItemForm.find('.attached-link-field').attr('placeholder', 'Insert link to website...');
+                break;
+            }
+            case 'image': {
+                this.feedItemForm.find('.attached-link-field').attr('placeholder', 'Insert link to image...');
+                break;
+            }
+            default: {
+                this.feedItemForm.find('.attached-link-field').attr('placeholder', '');
+                break;
+            }
+        }
     },
     resetMainFormType: function(event) {
         if (event) {
@@ -139,6 +214,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
         this.feedItemForm.find('.attached-link').slideUp();
         this.feedItemForm.find('input.comment-type').val('text');
         this.feedItemForm.find('.attach-links').show();
+        this.feedItemForm.find('.attached-link .control-group').removeClass('error');
     },
 
     expandCommentForm: function(event) {
@@ -146,13 +222,13 @@ ZerebralCourseDetailFeedBlock.prototype = {
         input.animate({
             height: '+60'
         }, 300);
-        input.parent().find('.buttons').show();
+        input.parents('form').find('.buttons').show();
     },
     collapseCommentForm: function(event) {
         event.preventDefault();
         var link = $(event.target);
         link.parent().hide();
-        link.parents('form').find('.comment-input').animate({
+        link.parents('form').find('.comment-input').parents('.control-group').removeClass('error').end().animate({
             height: '18'
         }, 300).val('');
 
@@ -166,12 +242,32 @@ ZerebralCourseDetailFeedBlock.prototype = {
     addItemBlock: function(response) {
         var self = this;
         var itemBlock = $(response);
-
+        var form = itemBlock.find('form');
         itemBlock.find('form').zerebralAjaxForm({
+            beforeSend: function() {
+                form.find('textarea').attr('disabled', true);
+                form.find('input[type="submit"]').attr('disabled', true);
+                form.find('a.cancel-link').hide();
+            },
             data: { feedType: 'course' },
-            success: $.proxy(self.addCommentBlock, itemBlock.find('form')),
-            error: function() { alert('Oops, seems like unknown error has appeared!');},
-            dataType: 'html'
+            success: function(response) {
+                if (response['has_errors']) {
+                    for (var fieldName in response['errors']) {
+                        var field = form.find('[name^="' + fieldName.replace(/\[/g,'\\[').replace(/\]/g,'\\]') + '"]').last();
+                        field.parents('.control-group').addClass('error');
+                    }
+                } else {
+                    $.proxy(self.addCommentBlock, form, response['content'])();
+                }
+            },
+            error: function() { alert('Oops, seems like unknown error has appeared!'); },
+            complete: function() {
+                form.find('textarea').attr('disabled', false);
+                form.find('input[type="submit"]').attr('disabled', false);
+                form.find('a.cancel-link').show();
+            },
+            dataType: 'json'
+
         });
         this.feedItemsDiv.find('.empty').remove().end().prepend(itemBlock);
         this.collapseFeedItemForm();
@@ -240,6 +336,7 @@ var ZerebralAssignmentDetailFeedBlock = function(element, options) {
     self.feedCommentFormDiv = element.find('.feed-comment-form');
     self.feedCommentForm = element.find('#ajaxFeedCommentForm');
     self.feedCommentsDiv = element.find('.comments');
+    self.feedCommentAlertBlock = element.find('.feed-comment-alert-block');
     self.options = options;
 };
 
@@ -262,9 +359,38 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
 
         this.feedCommentForm.zerebralAjaxForm({
             data: { feedType: 'assignment' },
-            success: $.proxy(self.addCommentBlock, this),
+            beforeSend: function() {
+                self.feedCommentForm.find('.control-group').removeClass('error');
+                self.feedCommentForm.find('textarea').attr('disabled', true);
+                self.feedCommentForm.find('.attached-link-field').attr('disabled', true);
+                self.feedCommentForm.find('input[type="submit"]').attr('disabled', true).val('   Posting...    ');
+                self.feedCommentForm.find('.attached-link-delete').hide();
+                self.feedCommentAlertBlock.slideUp('fast', function() {
+                    self.feedCommentAlertBlock.find('ul > li').remove();
+                });
+            },
+            success: function(response) {
+                //$.proxy(self.addCommentBlock, this),
+                if (response['has_errors']) {
+                    self.feedCommentAlertBlock.slideDown();
+                    var ul = self.feedCommentAlertBlock.find('ul');
+                    for (var fieldName in response['errors']) {
+                        var field = self.feedCommentForm.find('[name^="' + fieldName.replace(/\[/g,'\\[').replace(/\]/g,'\\]') + '"]').last();
+                        field.parents('.control-group').addClass('error');
+                        ul.append($('<li>' + response['errors'][fieldName][0] + '</li>'));
+                    }
+                } else {
+                    self.addCommentBlock(response['content']);
+                }
+            },
             error: function() { alert('Oops, seems like unknown error has appeared!'); },
-            dataType: 'html'
+            complete: function() {
+                self.feedCommentForm.find('textarea').attr('disabled', false);
+                self.feedCommentForm.find('.attached-link-field').attr('disabled', false);
+                self.feedCommentForm.find('input[type="submit"]').attr('disabled', false).val('Post message');
+                self.feedCommentForm.find('.attached-link-delete').show();
+            },
+            dataType: 'json'
         });
 
     },
@@ -275,6 +401,24 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
         this.feedCommentForm.find('.attach-links').hide();
         this.feedCommentForm.find('input.comment-type').val(link.parent().data('linkType'));
         this.feedCommentForm.find('.attached-link').slideDown();
+        switch (link.parent().data('linkType')) {
+            case 'video': {
+                this.feedCommentForm.find('.attached-link-field').attr('placeholder', 'Insert link to YouTube or Vimeo video page...');
+                break;
+            }
+            case 'website': {
+                this.feedCommentForm.find('.attached-link-field').attr('placeholder', 'Insert link to website...');
+                break;
+            }
+            case 'image': {
+                this.feedCommentForm.find('.attached-link-field').attr('placeholder', 'Insert link to image...');
+                break;
+            }
+            default: {
+                this.feedCommentForm.find('.attached-link-field').attr('placeholder', '');
+                break;
+            }
+        }
     },
     resetMainFormType: function(event) {
         event.preventDefault();
