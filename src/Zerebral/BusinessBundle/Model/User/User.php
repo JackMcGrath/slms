@@ -274,6 +274,11 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
         return $this->getFirstName() . ' ' . $this->getLastName();
     }
 
+    public function getFormattedName()
+    {
+        return $this->getLastName() . ', ' . $this->getFirstName();
+    }
+
 
     /**
      * @param \Zerebral\BusinessBundle\Model\Course\Course $course

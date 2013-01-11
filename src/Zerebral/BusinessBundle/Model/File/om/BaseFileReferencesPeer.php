@@ -51,6 +51,10 @@ abstract class BaseFileReferencesPeer
     /** the column name for the reference_type field */
     const REFERENCE_TYPE = 'file_references.reference_type';
 
+    /** The enumerated values for the reference_type field */
+    const REFERENCE_TYPE_ASSIGNMENT = 'assignment';
+    const REFERENCE_TYPE_STUDENTASSIGNMENT = 'studentassignment';
+
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
 
@@ -93,6 +97,14 @@ abstract class BaseFileReferencesPeer
         BasePeer::TYPE_NUM => array (0, 1, 2, )
     );
 
+    /** The enumerated values for this table */
+    protected static $enumValueSets = array(
+        FileReferencesPeer::REFERENCE_TYPE => array(
+            FileReferencesPeer::REFERENCE_TYPE_ASSIGNMENT,
+            FileReferencesPeer::REFERENCE_TYPE_STUDENTASSIGNMENT,
+        ),
+    );
+
     /**
      * Translates a fieldname to another type
      *
@@ -130,6 +142,50 @@ abstract class BaseFileReferencesPeer
         }
 
         return FileReferencesPeer::$fieldNames[$type];
+    }
+
+    /**
+     * Gets the list of values for all ENUM columns
+     * @return array
+     */
+    public static function getValueSets()
+    {
+      return FileReferencesPeer::$enumValueSets;
+    }
+
+    /**
+     * Gets the list of values for an ENUM column
+     *
+     * @param string $colname The ENUM column name.
+     *
+     * @return array list of possible values for the column
+     */
+    public static function getValueSet($colname)
+    {
+        $valueSets = FileReferencesPeer::getValueSets();
+
+        if (!isset($valueSets[$colname])) {
+            throw new PropelException(sprintf('Column "%s" has no ValueSet.', $colname));
+        }
+
+        return $valueSets[$colname];
+    }
+
+    /**
+     * Gets the SQL value for the ENUM column value
+     *
+     * @param string $colname ENUM column name.
+     * @param string $enumVal ENUM value.
+     *
+     * @return int            SQL value
+     */
+    public static function getSqlValueForEnum($colname, $enumVal)
+    {
+        $values = FileReferencesPeer::getValueSet($colname);
+        if (!in_array($enumVal, $values)) {
+            throw new PropelException(sprintf('Value "%s" is not accepted in this enumerated column', $colname));
+        }
+        return array_search($enumVal, $values);
     }
 
     /**
@@ -254,7 +310,7 @@ abstract class BaseFileReferencesPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -359,8 +415,15 @@ abstract class BaseFileReferencesPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (FileReferencesPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         FileReferencesPeer::$instances = array();
     }
 

@@ -19,6 +19,8 @@ use Zerebral\BusinessBundle\Model\Assignment\Assignment;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery;
 use Zerebral\BusinessBundle\Model\Assignment\StudentAssignment;
 use Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentQuery;
+use Zerebral\BusinessBundle\Model\Attendance\StudentAttendance;
+use Zerebral\BusinessBundle\Model\Attendance\StudentAttendanceQuery;
 use Zerebral\BusinessBundle\Model\Course\Course;
 use Zerebral\BusinessBundle\Model\Course\CourseQuery;
 use Zerebral\BusinessBundle\Model\Course\CourseStudent;
@@ -92,6 +94,12 @@ abstract class BaseStudent extends BaseObject implements Persistent
     protected $collStudentAssignmentsPartial;
 
     /**
+     * @var        PropelObjectCollection|StudentAttendance[] Collection to store aggregation of StudentAttendance objects.
+     */
+    protected $collStudentAttendances;
+    protected $collStudentAttendancesPartial;
+
+    /**
      * @var        PropelObjectCollection|CourseStudent[] Collection to store aggregation of CourseStudent objects.
      */
     protected $collCourseStudents;
@@ -122,6 +130,12 @@ abstract class BaseStudent extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
@@ -138,6 +152,12 @@ abstract class BaseStudent extends BaseObject implements Persistent
      * @var		PropelObjectCollection
      */
     protected $studentAssignmentsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $studentAttendancesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -203,7 +223,7 @@ abstract class BaseStudent extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -224,7 +244,7 @@ abstract class BaseStudent extends BaseObject implements Persistent
      */
     public function setUserId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -249,7 +269,7 @@ abstract class BaseStudent extends BaseObject implements Persistent
      */
     public function setBio($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -270,7 +290,7 @@ abstract class BaseStudent extends BaseObject implements Persistent
      */
     public function setActivities($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -291,7 +311,7 @@ abstract class BaseStudent extends BaseObject implements Persistent
      */
     public function setInterests($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -416,6 +436,8 @@ abstract class BaseStudent extends BaseObject implements Persistent
 
             $this->aUser = null;
             $this->collStudentAssignments = null;
+
+            $this->collStudentAttendances = null;
 
             $this->collCourseStudents = null;
 
@@ -591,6 +613,12 @@ abstract class BaseStudent extends BaseObject implements Persistent
                         $assignment->save($con);
                     }
                 }
+            } elseif ($this->collAssignments) {
+                foreach ($this->collAssignments as $assignment) {
+                    if ($assignment->isModified()) {
+                        $assignment->save($con);
+                    }
+                }
             }
 
             if ($this->coursesScheduledForDeletion !== null) {
@@ -611,6 +639,12 @@ abstract class BaseStudent extends BaseObject implements Persistent
                         $course->save($con);
                     }
                 }
+            } elseif ($this->collCourses) {
+                foreach ($this->collCourses as $course) {
+                    if ($course->isModified()) {
+                        $course->save($con);
+                    }
+                }
             }
 
             if ($this->studentAssignmentsScheduledForDeletion !== null) {
@@ -624,6 +658,23 @@ abstract class BaseStudent extends BaseObject implements Persistent
 
             if ($this->collStudentAssignments !== null) {
                 foreach ($this->collStudentAssignments as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->studentAttendancesScheduledForDeletion !== null) {
+                if (!$this->studentAttendancesScheduledForDeletion->isEmpty()) {
+                    StudentAttendanceQuery::create()
+                        ->filterByPrimaryKeys($this->studentAttendancesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->studentAttendancesScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collStudentAttendances !== null) {
+                foreach ($this->collStudentAttendances as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -833,6 +884,14 @@ abstract class BaseStudent extends BaseObject implements Persistent
                     }
                 }
 
+                if ($this->collStudentAttendances !== null) {
+                    foreach ($this->collStudentAttendances as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
                 if ($this->collCourseStudents !== null) {
                     foreach ($this->collCourseStudents as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
@@ -932,6 +991,9 @@ abstract class BaseStudent extends BaseObject implements Persistent
             }
             if (null !== $this->collStudentAssignments) {
                 $result['StudentAssignments'] = $this->collStudentAssignments->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collStudentAttendances) {
+                $result['StudentAttendances'] = $this->collStudentAttendances->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collCourseStudents) {
                 $result['CourseStudents'] = $this->collCourseStudents->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1111,6 +1173,12 @@ abstract class BaseStudent extends BaseObject implements Persistent
                 }
             }
 
+            foreach ($this->getStudentAttendances() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addStudentAttendance($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getCourseStudents() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addCourseStudent($relObj->copy($deepCopy));
@@ -1233,6 +1301,9 @@ abstract class BaseStudent extends BaseObject implements Persistent
         if ('StudentAssignment' == $relationName) {
             $this->initStudentAssignments();
         }
+        if ('StudentAttendance' == $relationName) {
+            $this->initStudentAttendances();
+        }
         if ('CourseStudent' == $relationName) {
             $this->initCourseStudents();
         }
@@ -1324,6 +1395,7 @@ abstract class BaseStudent extends BaseObject implements Persistent
                       $this->collStudentAssignmentsPartial = true;
                     }
 
+                    $collStudentAssignments->getInternalIterator()->rewind();
                     return $collStudentAssignments;
                 }
 
@@ -1481,6 +1553,249 @@ abstract class BaseStudent extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collStudentAttendances collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Student The current object (for fluent API support)
+     * @see        addStudentAttendances()
+     */
+    public function clearStudentAttendances()
+    {
+        $this->collStudentAttendances = null; // important to set this to null since that means it is uninitialized
+        $this->collStudentAttendancesPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collStudentAttendances collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialStudentAttendances($v = true)
+    {
+        $this->collStudentAttendancesPartial = $v;
+    }
+
+    /**
+     * Initializes the collStudentAttendances collection.
+     *
+     * By default this just sets the collStudentAttendances collection to an empty array (like clearcollStudentAttendances());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initStudentAttendances($overrideExisting = true)
+    {
+        if (null !== $this->collStudentAttendances && !$overrideExisting) {
+            return;
+        }
+        $this->collStudentAttendances = new PropelObjectCollection();
+        $this->collStudentAttendances->setModel('StudentAttendance');
+    }
+
+    /**
+     * Gets an array of StudentAttendance objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Student is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|StudentAttendance[] List of StudentAttendance objects
+     * @throws PropelException
+     */
+    public function getStudentAttendances($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collStudentAttendancesPartial && !$this->isNew();
+        if (null === $this->collStudentAttendances || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collStudentAttendances) {
+                // return empty collection
+                $this->initStudentAttendances();
+            } else {
+                $collStudentAttendances = StudentAttendanceQuery::create(null, $criteria)
+                    ->filterByStudent($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collStudentAttendancesPartial && count($collStudentAttendances)) {
+                      $this->initStudentAttendances(false);
+
+                      foreach($collStudentAttendances as $obj) {
+                        if (false == $this->collStudentAttendances->contains($obj)) {
+                          $this->collStudentAttendances->append($obj);
+                        }
+                      }
+
+                      $this->collStudentAttendancesPartial = true;
+                    }
+
+                    $collStudentAttendances->getInternalIterator()->rewind();
+                    return $collStudentAttendances;
+                }
+
+                if($partial && $this->collStudentAttendances) {
+                    foreach($this->collStudentAttendances as $obj) {
+                        if($obj->isNew()) {
+                            $collStudentAttendances[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collStudentAttendances = $collStudentAttendances;
+                $this->collStudentAttendancesPartial = false;
+            }
+        }
+
+        return $this->collStudentAttendances;
+    }
+
+    /**
+     * Sets a collection of StudentAttendance objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $studentAttendances A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Student The current object (for fluent API support)
+     */
+    public function setStudentAttendances(PropelCollection $studentAttendances, PropelPDO $con = null)
+    {
+        $studentAttendancesToDelete = $this->getStudentAttendances(new Criteria(), $con)->diff($studentAttendances);
+
+        $this->studentAttendancesScheduledForDeletion = unserialize(serialize($studentAttendancesToDelete));
+
+        foreach ($studentAttendancesToDelete as $studentAttendanceRemoved) {
+            $studentAttendanceRemoved->setStudent(null);
+        }
+
+        $this->collStudentAttendances = null;
+        foreach ($studentAttendances as $studentAttendance) {
+            $this->addStudentAttendance($studentAttendance);
+        }
+
+        $this->collStudentAttendances = $studentAttendances;
+        $this->collStudentAttendancesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related StudentAttendance objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related StudentAttendance objects.
+     * @throws PropelException
+     */
+    public function countStudentAttendances(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collStudentAttendancesPartial && !$this->isNew();
+        if (null === $this->collStudentAttendances || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collStudentAttendances) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getStudentAttendances());
+            }
+            $query = StudentAttendanceQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByStudent($this)
+                ->count($con);
+        }
+
+        return count($this->collStudentAttendances);
+    }
+
+    /**
+     * Method called to associate a StudentAttendance object to this object
+     * through the StudentAttendance foreign key attribute.
+     *
+     * @param    StudentAttendance $l StudentAttendance
+     * @return Student The current object (for fluent API support)
+     */
+    public function addStudentAttendance(StudentAttendance $l)
+    {
+        if ($this->collStudentAttendances === null) {
+            $this->initStudentAttendances();
+            $this->collStudentAttendancesPartial = true;
+        }
+        if (!in_array($l, $this->collStudentAttendances->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddStudentAttendance($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	StudentAttendance $studentAttendance The studentAttendance object to add.
+     */
+    protected function doAddStudentAttendance($studentAttendance)
+    {
+        $this->collStudentAttendances[]= $studentAttendance;
+        $studentAttendance->setStudent($this);
+    }
+
+    /**
+     * @param	StudentAttendance $studentAttendance The studentAttendance object to remove.
+     * @return Student The current object (for fluent API support)
+     */
+    public function removeStudentAttendance($studentAttendance)
+    {
+        if ($this->getStudentAttendances()->contains($studentAttendance)) {
+            $this->collStudentAttendances->remove($this->collStudentAttendances->search($studentAttendance));
+            if (null === $this->studentAttendancesScheduledForDeletion) {
+                $this->studentAttendancesScheduledForDeletion = clone $this->collStudentAttendances;
+                $this->studentAttendancesScheduledForDeletion->clear();
+            }
+            $this->studentAttendancesScheduledForDeletion[]= clone $studentAttendance;
+            $studentAttendance->setStudent(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Student is new, it will return
+     * an empty collection; or if this Student has previously
+     * been saved, it will retrieve related StudentAttendances from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Student.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|StudentAttendance[] List of StudentAttendance objects
+     */
+    public function getStudentAttendancesJoinAttendance($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = StudentAttendanceQuery::create(null, $criteria);
+        $query->joinWith('Attendance', $join_behavior);
+
+        return $this->getStudentAttendances($query, $con);
+    }
+
+    /**
      * Clears out the collCourseStudents collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -1566,6 +1881,7 @@ abstract class BaseStudent extends BaseObject implements Persistent
                       $this->collCourseStudentsPartial = true;
                     }
 
+                    $collCourseStudents->getInternalIterator()->rewind();
                     return $collCourseStudents;
                 }
 
@@ -2088,6 +2404,7 @@ abstract class BaseStudent extends BaseObject implements Persistent
         $this->interests = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -2105,9 +2422,15 @@ abstract class BaseStudent extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collStudentAssignments) {
                 foreach ($this->collStudentAssignments as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collStudentAttendances) {
+                foreach ($this->collStudentAttendances as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -2126,12 +2449,21 @@ abstract class BaseStudent extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->aUser instanceof Persistent) {
+              $this->aUser->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         if ($this->collStudentAssignments instanceof PropelCollection) {
             $this->collStudentAssignments->clearIterator();
         }
         $this->collStudentAssignments = null;
+        if ($this->collStudentAttendances instanceof PropelCollection) {
+            $this->collStudentAttendances->clearIterator();
+        }
+        $this->collStudentAttendances = null;
         if ($this->collCourseStudents instanceof PropelCollection) {
             $this->collCourseStudents->clearIterator();
         }

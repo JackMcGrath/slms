@@ -55,6 +55,15 @@ abstract class BaseCourseScheduleDayPeer
     /** the column name for the time_to field */
     const TIME_TO = 'course_schedule_days.time_to';
 
+    /** The enumerated values for the week_day field */
+    const WEEK_DAY_SUNDAY = 'Sunday';
+    const WEEK_DAY_MONDAY = 'Monday';
+    const WEEK_DAY_TUESDAY = 'Tuesday';
+    const WEEK_DAY_WEDNESDAY = 'Wednesday';
+    const WEEK_DAY_THURSDAY = 'Thursday';
+    const WEEK_DAY_FRIDAY = 'Friday';
+    const WEEK_DAY_SATURDAY = 'Saturday';
+
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
 
@@ -97,6 +106,19 @@ abstract class BaseCourseScheduleDayPeer
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
+    /** The enumerated values for this table */
+    protected static $enumValueSets = array(
+        CourseScheduleDayPeer::WEEK_DAY => array(
+            CourseScheduleDayPeer::WEEK_DAY_SUNDAY,
+            CourseScheduleDayPeer::WEEK_DAY_MONDAY,
+            CourseScheduleDayPeer::WEEK_DAY_TUESDAY,
+            CourseScheduleDayPeer::WEEK_DAY_WEDNESDAY,
+            CourseScheduleDayPeer::WEEK_DAY_THURSDAY,
+            CourseScheduleDayPeer::WEEK_DAY_FRIDAY,
+            CourseScheduleDayPeer::WEEK_DAY_SATURDAY,
+        ),
+    );
+
     /**
      * Translates a fieldname to another type
      *
@@ -134,6 +156,50 @@ abstract class BaseCourseScheduleDayPeer
         }
 
         return CourseScheduleDayPeer::$fieldNames[$type];
+    }
+
+    /**
+     * Gets the list of values for all ENUM columns
+     * @return array
+     */
+    public static function getValueSets()
+    {
+      return CourseScheduleDayPeer::$enumValueSets;
+    }
+
+    /**
+     * Gets the list of values for an ENUM column
+     *
+     * @param string $colname The ENUM column name.
+     *
+     * @return array list of possible values for the column
+     */
+    public static function getValueSet($colname)
+    {
+        $valueSets = CourseScheduleDayPeer::getValueSets();
+
+        if (!isset($valueSets[$colname])) {
+            throw new PropelException(sprintf('Column "%s" has no ValueSet.', $colname));
+        }
+
+        return $valueSets[$colname];
+    }
+
+    /**
+     * Gets the SQL value for the ENUM column value
+     *
+     * @param string $colname ENUM column name.
+     * @param string $enumVal ENUM value.
+     *
+     * @return int            SQL value
+     */
+    public static function getSqlValueForEnum($colname, $enumVal)
+    {
+        $values = CourseScheduleDayPeer::getValueSet($colname);
+        if (!in_array($enumVal, $values)) {
+            throw new PropelException(sprintf('Value "%s" is not accepted in this enumerated column', $colname));
+        }
+        return array_search($enumVal, $values);
     }
 
     /**
@@ -262,7 +328,7 @@ abstract class BaseCourseScheduleDayPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -367,8 +433,15 @@ abstract class BaseCourseScheduleDayPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (CourseScheduleDayPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         CourseScheduleDayPeer::$instances = array();
     }
 

@@ -181,6 +181,12 @@ abstract class BaseUser extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
@@ -464,7 +470,7 @@ abstract class BaseUser extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -485,7 +491,7 @@ abstract class BaseUser extends BaseObject implements Persistent
      */
     public function setRole($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -506,7 +512,7 @@ abstract class BaseUser extends BaseObject implements Persistent
      */
     public function setFirstName($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -527,7 +533,7 @@ abstract class BaseUser extends BaseObject implements Persistent
      */
     public function setLastName($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -548,7 +554,7 @@ abstract class BaseUser extends BaseObject implements Persistent
      */
     public function setSalutation($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -592,7 +598,7 @@ abstract class BaseUser extends BaseObject implements Persistent
      */
     public function setGender($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -613,7 +619,7 @@ abstract class BaseUser extends BaseObject implements Persistent
      */
     public function setEmail($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -634,7 +640,7 @@ abstract class BaseUser extends BaseObject implements Persistent
      */
     public function setPassword($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -655,7 +661,7 @@ abstract class BaseUser extends BaseObject implements Persistent
      */
     public function setSalt($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -676,7 +682,7 @@ abstract class BaseUser extends BaseObject implements Persistent
      */
     public function setAvatarId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -1981,6 +1987,7 @@ abstract class BaseUser extends BaseObject implements Persistent
                       $this->collFeedItemsPartial = true;
                     }
 
+                    $collFeedItems->getInternalIterator()->rewind();
                     return $collFeedItems;
                 }
 
@@ -2273,6 +2280,7 @@ abstract class BaseUser extends BaseObject implements Persistent
                       $this->collFeedCommentsPartial = true;
                     }
 
+                    $collFeedComments->getInternalIterator()->rewind();
                     return $collFeedComments;
                 }
 
@@ -2540,6 +2548,7 @@ abstract class BaseUser extends BaseObject implements Persistent
                       $this->collStudentsPartial = true;
                     }
 
+                    $collStudents->getInternalIterator()->rewind();
                     return $collStudents;
                 }
 
@@ -2757,6 +2766,7 @@ abstract class BaseUser extends BaseObject implements Persistent
                       $this->collTeachersPartial = true;
                     }
 
+                    $collTeachers->getInternalIterator()->rewind();
                     return $collTeachers;
                 }
 
@@ -2909,6 +2919,7 @@ abstract class BaseUser extends BaseObject implements Persistent
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->applyDefaultValues();
         $this->resetModified();
@@ -2927,7 +2938,8 @@ abstract class BaseUser extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collFeedItems) {
                 foreach ($this->collFeedItems as $o) {
                     $o->clearAllReferences($deep);
@@ -2948,6 +2960,11 @@ abstract class BaseUser extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->aAvatar instanceof Persistent) {
+              $this->aAvatar->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         if ($this->collFeedItems instanceof PropelCollection) {

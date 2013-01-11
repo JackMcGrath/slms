@@ -47,6 +47,10 @@ class FileReferencesTableMap extends TableMap
         $this->addForeignPrimaryKey('reference_id', 'referenceId', 'INTEGER' , 'assignments', 'id', true, null, null);
         $this->addForeignPrimaryKey('reference_id', 'referenceId', 'INTEGER' , 'student_assignments', 'id', true, null, null);
         $this->addPrimaryKey('reference_type', 'referenceType', 'CHAR', true, null, null);
+        $this->getColumn('reference_type', false)->setValueSet(array (
+  0 => 'assignment',
+  1 => 'studentassignment',
+));
         // validators
     } // initialize()
 

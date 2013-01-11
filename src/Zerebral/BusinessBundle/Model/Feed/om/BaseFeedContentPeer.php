@@ -62,6 +62,13 @@ abstract class BaseFeedContentPeer
     /** the column name for the link_thumbnail_url field */
     const LINK_THUMBNAIL_URL = 'feed_contents.link_thumbnail_url';
 
+    /** The enumerated values for the type field */
+    const TYPE_VIDEO = 'video';
+    const TYPE_IMAGE = 'image';
+    const TYPE_WEBSITE = 'website';
+    const TYPE_TEXT = 'text';
+    const TYPE_ASSIGNMENT = 'assignment';
+
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
 
@@ -104,6 +111,17 @@ abstract class BaseFeedContentPeer
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
     );
 
+    /** The enumerated values for this table */
+    protected static $enumValueSets = array(
+        FeedContentPeer::TYPE => array(
+            FeedContentPeer::TYPE_VIDEO,
+            FeedContentPeer::TYPE_IMAGE,
+            FeedContentPeer::TYPE_WEBSITE,
+            FeedContentPeer::TYPE_TEXT,
+            FeedContentPeer::TYPE_ASSIGNMENT,
+        ),
+    );
+
     /**
      * Translates a fieldname to another type
      *
@@ -141,6 +159,50 @@ abstract class BaseFeedContentPeer
         }
 
         return FeedContentPeer::$fieldNames[$type];
+    }
+
+    /**
+     * Gets the list of values for all ENUM columns
+     * @return array
+     */
+    public static function getValueSets()
+    {
+      return FeedContentPeer::$enumValueSets;
+    }
+
+    /**
+     * Gets the list of values for an ENUM column
+     *
+     * @param string $colname The ENUM column name.
+     *
+     * @return array list of possible values for the column
+     */
+    public static function getValueSet($colname)
+    {
+        $valueSets = FeedContentPeer::getValueSets();
+
+        if (!isset($valueSets[$colname])) {
+            throw new PropelException(sprintf('Column "%s" has no ValueSet.', $colname));
+        }
+
+        return $valueSets[$colname];
+    }
+
+    /**
+     * Gets the SQL value for the ENUM column value
+     *
+     * @param string $colname ENUM column name.
+     * @param string $enumVal ENUM value.
+     *
+     * @return int            SQL value
+     */
+    public static function getSqlValueForEnum($colname, $enumVal)
+    {
+        $values = FeedContentPeer::getValueSet($colname);
+        if (!in_array($enumVal, $values)) {
+            throw new PropelException(sprintf('Value "%s" is not accepted in this enumerated column', $colname));
+        }
+        return array_search($enumVal, $values);
     }
 
     /**
@@ -273,7 +335,7 @@ abstract class BaseFeedContentPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -378,8 +440,15 @@ abstract class BaseFeedContentPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (FeedContentPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         FeedContentPeer::$instances = array();
     }
 

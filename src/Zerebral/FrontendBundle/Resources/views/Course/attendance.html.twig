@@ -1,0 +1,91 @@
+{% extends 'ZerebralFrontendBundle::layout.html.twig' %}
+{% import "ZerebralFrontendBundle:Macro:main.html.twig" as mainPartials %}
+{% import "ZerebralFrontendBundle:Macro:flashMessages.html.twig" as flashMessages %}
+
+{% block content %}
+    {% javascripts
+    '@ZerebralFrontendBundle/Resources/public/js/controllers/attendance/index.js'
+    output='js/compiled/attendance.js' %}
+    <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+
+    <div class="top-second-navbar">
+        {{ mainPartials.topMenu('attendance', course) }}
+    </div>
+    <div class="row-fluid attendance-block">
+        <div class="content">
+            <div class="row-fluid">
+                <h2 class="pull-left form-title">
+                    {{ course.name }} <small>attendance</small>
+                </h2>
+            </div>
+            <hr/>
+
+            <div class="attendance-table">
+                {{ flashMessages.show('attendance_save_success', 'success') }}
+                <div class="date-selector">
+                    <a href="{{ path('course_attendance', {id: course.id, date: dateRaw|date_modify("-1 day")|date('U')}) }}">&#706;</a>
+                    {{ dateRaw | date('F, d') }}
+                    <a href="{{ path('course_attendance', {id: course.id, date: dateRaw|date_modify("+1 day")|date('U')}) }}">&#707;</a>
+                </div>
+                <div class="pick-date"  data-date="{{ dateRaw | date('m/d/Y') }}" data-date-format="mm/dd/yyyy">
+                    Pick date <i class="icon-new-calendar"></i>
+                </div>
+                <div class="clearfix"></div>
+
+                <form method="POST" {{ form_enctype(form) }} class="attendance-record {{ attendance ? '' : 'hide' }}">
+                <table class="table table-bordered table-striped">
+                    <tr>
+                        <th class="name">Student name</th>
+                        <th class="status" statusName="present"><label><input type="radio" value="present"/> Present</label></th>
+                        <th class="status" statusName="tardy"><label><input type="radio" value="tardy"/> Tardy</label></th>
+                        <th class="status" statusName="excused"><label><input type="radio" value="excused"/> Excused</label></th>
+                        <th>Comments</th>
+                    </tr>
+
+                    <tbody>
+                    {% for student in students %}
+                    <tr class="student">
+                        <td>{{ student.formattedName }}</td>
+                        <td class="status" statusName="present">
+                            <input type="radio" name="attendance[studentAttendances][{{ loop.index - 1 }}][status]" value="present" {{ student.hasVirtualColumn('status') ? (student.getVirtualColumn('status') == 'present' ? 'checked' : '') : 'checked' }}/>
+                        </td>
+                        <td class="status" statusName="tardy">
+                            <input type="radio" name="attendance[studentAttendances][{{ loop.index - 1 }}][status]" value="tardy" {{ student.hasVirtualColumn('status') ? (student.getVirtualColumn('status') == 'tardy' ? 'checked' : '') : '' }}/>
+                        </td>
+                        <td class="status" statusName="excused">
+                            <input type="radio" name="attendance[studentAttendances][{{ loop.index - 1 }}][status]" value="excused" {{ student.hasVirtualColumn('status') ? (student.getVirtualColumn('status') == 'excused' ? 'checked' : '') : '' }}/>
+                        </td>
+                        <td class="comment">
+                            <input type="text" name="attendance[studentAttendances][{{ loop.index - 1 }}][comment]" value="{{ student.hasVirtualColumn('comment') ? student.getVirtualColumn('comment') : '' }}" maxlength="200" class="input-medium"/>
+                        </td>
+                        <input type="hidden" name="attendance[studentAttendances][{{ loop.index - 1 }}][studentId]" value="{{ student.id }}"/>
+
+                    </tr>
+
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {{ form_widget(form._token) }}
+                <div class="form-actions">
+                    <input type="submit" class="btn btn-danger" value="Save" />
+                    {% if attendance == null %}
+                        <input type="button" class="btn cancel-record" value="Cancel" />
+                    {% endif %}
+                </div>
+                </form>
+                <div class="no-record{{ attendance ? ' hide' : '' }}">
+                    <p>No attendance has been recorded on this day</p>
+                    <div class="form-actions">
+                        <input type="button" class="create-record btn btn-danger" value="Record" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-navbar pull-left">
+
+
+        </div>
+    </div>
+{% endblock %}

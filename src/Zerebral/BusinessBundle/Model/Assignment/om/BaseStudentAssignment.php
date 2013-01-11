@@ -122,6 +122,12 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
@@ -249,7 +255,7 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -270,7 +276,7 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
      */
     public function setStudentId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -295,7 +301,7 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
      */
     public function setAssignmentId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -664,6 +670,12 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
                         $file->save($con);
                     }
                 }
+            } elseif ($this->collFiles) {
+                foreach ($this->collFiles as $file) {
+                    if ($file->isModified()) {
+                        $file->save($con);
+                    }
+                }
             }
 
             if ($this->assignmentReferenceIdsScheduledForDeletion !== null) {
@@ -680,6 +692,12 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
                 }
 
                 foreach ($this->getassignmentReferenceIds() as $assignmentReferenceId) {
+                    if ($assignmentReferenceId->isModified()) {
+                        $assignmentReferenceId->save($con);
+                    }
+                }
+            } elseif ($this->collassignmentReferenceIds) {
+                foreach ($this->collassignmentReferenceIds as $assignmentReferenceId) {
                     if ($assignmentReferenceId->isModified()) {
                         $assignmentReferenceId->save($con);
                     }
@@ -1421,6 +1439,7 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
                       $this->collFileReferencessPartial = true;
                     }
 
+                    $collFileReferencess->getInternalIterator()->rewind();
                     return $collFileReferencess;
                 }
 
@@ -1968,6 +1987,7 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
         $this->created_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->applyDefaultValues();
         $this->resetModified();
@@ -1986,7 +2006,8 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collFileReferencess) {
                 foreach ($this->collFileReferencess as $o) {
                     $o->clearAllReferences($deep);
@@ -2002,6 +2023,14 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->aStudent instanceof Persistent) {
+              $this->aStudent->clearAllReferences($deep);
+            }
+            if ($this->aAssignment instanceof Persistent) {
+              $this->aAssignment->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         if ($this->collFileReferencess instanceof PropelCollection) {

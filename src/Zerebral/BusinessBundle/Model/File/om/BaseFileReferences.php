@@ -92,6 +92,12 @@ abstract class BaseFileReferences extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * Get the [file_id] column value.
      *
      * @return int
@@ -129,7 +135,7 @@ abstract class BaseFileReferences extends BaseObject implements Persistent
      */
     public function setfileId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -154,7 +160,7 @@ abstract class BaseFileReferences extends BaseObject implements Persistent
      */
     public function setreferenceId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -183,7 +189,7 @@ abstract class BaseFileReferences extends BaseObject implements Persistent
      */
     public function setreferenceType($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -1116,6 +1122,7 @@ abstract class BaseFileReferences extends BaseObject implements Persistent
         $this->reference_type = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1133,7 +1140,19 @@ abstract class BaseFileReferences extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->aFile instanceof Persistent) {
+              $this->aFile->clearAllReferences($deep);
+            }
+            if ($this->aassignmentReferenceId instanceof Persistent) {
+              $this->aassignmentReferenceId->clearAllReferences($deep);
+            }
+            if ($this->astudentAssignmentReferenceId instanceof Persistent) {
+              $this->astudentAssignmentReferenceId->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         $this->aFile = null;

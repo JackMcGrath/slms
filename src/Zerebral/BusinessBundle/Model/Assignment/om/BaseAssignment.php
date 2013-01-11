@@ -169,6 +169,12 @@ abstract class BaseAssignment extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
@@ -322,7 +328,7 @@ abstract class BaseAssignment extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -343,7 +349,7 @@ abstract class BaseAssignment extends BaseObject implements Persistent
      */
     public function setTeacherId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -368,7 +374,7 @@ abstract class BaseAssignment extends BaseObject implements Persistent
      */
     public function setCourseId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -393,7 +399,7 @@ abstract class BaseAssignment extends BaseObject implements Persistent
      */
     public function setAssignmentCategoryId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -418,7 +424,7 @@ abstract class BaseAssignment extends BaseObject implements Persistent
      */
     public function setName($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -439,7 +445,7 @@ abstract class BaseAssignment extends BaseObject implements Persistent
      */
     public function setDescription($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -460,7 +466,7 @@ abstract class BaseAssignment extends BaseObject implements Persistent
      */
     public function setMaxPoints($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -811,6 +817,12 @@ abstract class BaseAssignment extends BaseObject implements Persistent
                         $student->save($con);
                     }
                 }
+            } elseif ($this->collStudents) {
+                foreach ($this->collStudents as $student) {
+                    if ($student->isModified()) {
+                        $student->save($con);
+                    }
+                }
             }
 
             if ($this->filesScheduledForDeletion !== null) {
@@ -831,6 +843,12 @@ abstract class BaseAssignment extends BaseObject implements Persistent
                         $file->save($con);
                     }
                 }
+            } elseif ($this->collFiles) {
+                foreach ($this->collFiles as $file) {
+                    if ($file->isModified()) {
+                        $file->save($con);
+                    }
+                }
             }
 
             if ($this->studentAssignmentReferenceIdsScheduledForDeletion !== null) {
@@ -847,6 +865,12 @@ abstract class BaseAssignment extends BaseObject implements Persistent
                 }
 
                 foreach ($this->getstudentAssignmentReferenceIds() as $studentAssignmentReferenceId) {
+                    if ($studentAssignmentReferenceId->isModified()) {
+                        $studentAssignmentReferenceId->save($con);
+                    }
+                }
+            } elseif ($this->collstudentAssignmentReferenceIds) {
+                foreach ($this->collstudentAssignmentReferenceIds as $studentAssignmentReferenceId) {
                     if ($studentAssignmentReferenceId->isModified()) {
                         $studentAssignmentReferenceId->save($con);
                     }
@@ -1772,6 +1796,7 @@ abstract class BaseAssignment extends BaseObject implements Persistent
                       $this->collStudentAssignmentsPartial = true;
                     }
 
+                    $collStudentAssignments->getInternalIterator()->rewind();
                     return $collStudentAssignments;
                 }
 
@@ -2014,6 +2039,7 @@ abstract class BaseAssignment extends BaseObject implements Persistent
                       $this->collFeedItemsPartial = true;
                     }
 
+                    $collFeedItems->getInternalIterator()->rewind();
                     return $collFeedItems;
                 }
 
@@ -2306,6 +2332,7 @@ abstract class BaseAssignment extends BaseObject implements Persistent
                       $this->collFileReferencessPartial = true;
                     }
 
+                    $collFileReferencess->getInternalIterator()->rewind();
                     return $collFileReferencess;
                 }
 
@@ -3033,6 +3060,7 @@ abstract class BaseAssignment extends BaseObject implements Persistent
         $this->due_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -3050,7 +3078,8 @@ abstract class BaseAssignment extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collStudentAssignments) {
                 foreach ($this->collStudentAssignments as $o) {
                     $o->clearAllReferences($deep);
@@ -3081,6 +3110,17 @@ abstract class BaseAssignment extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->aTeacher instanceof Persistent) {
+              $this->aTeacher->clearAllReferences($deep);
+            }
+            if ($this->aCourse instanceof Persistent) {
+              $this->aCourse->clearAllReferences($deep);
+            }
+            if ($this->aAssignmentCategory instanceof Persistent) {
+              $this->aAssignmentCategory->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         if ($this->collStudentAssignments instanceof PropelCollection) {

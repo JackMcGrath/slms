@@ -165,7 +165,16 @@ Zerebral\BusinessBundle\Model\Material\CourseMaterial:
         courseId:
             - NotBlank:
                 message: Course id can not be blank
-
+                
+Zerebral\BusinessBundle\Model\Attendance\StudentAttendance:
+    getters:
+        status:
+            - Choice:
+                choices: [present, tardy, excused]
+                message:  Incorrect value.
+        comment:
+            - MaxLength: 200
+                            
 Zerebral\BusinessBundle\Model\Feed\FeedItem:
     getters:
         feedContent:
@@ -182,3 +191,4 @@ Zerebral\BusinessBundle\Model\Feed\FeedContent:
         text:
           - NotBlank:
               message: Please write comment text
+                                          

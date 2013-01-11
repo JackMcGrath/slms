@@ -1,0 +1,65 @@
+.attendance-block {
+    .content {
+        width: 675px;
+    }
+    .attendance-table {
+        width: 100%;
+        margin-left: 0px;
+
+        .date-selector {
+            margin-left: 270px;
+            text-align: center;
+            display: inline-block;
+            font-size: 15px;
+            a {
+                color: #333333;
+                font-weight: bold;
+                margin: 0 15px;
+                font-size: 15px;
+                vertical-align: top;
+            }
+        }
+        .pick-date {
+            float: right;
+            cursor: pointer;
+            i {
+                margin-left: 10px;
+            }
+        }
+
+        table.table {
+            margin-top: 15px;
+            th {
+                background-color: @white;
+            }
+            th.name {
+                width: 200px;
+            }
+            th.status {
+                label {
+                    font-weight: bold;
+                }
+                input {
+                    margin: 0 3px 2px 0;
+                    padding: 0;
+                    vertical-align: middle;
+                }
+            }
+            td.comment {
+                max-width: 155px;
+                text-align: center;
+                input {
+                    height: 13px;
+                    font-size: 11px;
+                    margin-bottom: 0px;
+                }
+            }
+        }
+    }
+    .no-record {
+        p {
+            text-align: center;
+            margin: 13% 0;
+        }
+    }
+}
