@@ -78,6 +78,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function feedAction(Model\Course\Course $course)
     {
+         // TODO: move to partial similar to CourseMaterialFolder::form
         $feedItemFormType = new FormType\FeedItemType();
         $feedItemForm = $this->createForm($feedItemFormType, null);
 
@@ -183,9 +184,11 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     {
         $session = $this->getRequest()->getSession();
 
+         // TODO: remove
         $folderType = new FormType\CourseFolderType();
         $folderForm = $this->createForm($folderType);
 
+         // TODO: move to partial similar to CourseMaterialFolder::form
         $courseMaterialType = new FormType\CourseMaterialsType();
         $courseMaterialType->setCourse($course);
         $courseMaterialForm = $this->createForm($courseMaterialType);
@@ -264,10 +267,12 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function attendanceAction(Model\Course\Course $course)
     {
+        // TODO: raw date should be pre-formatted in Y-m-d
         $dateRaw = $this->getRequest()->get('date', time());
         $date = date('Y-m-d', $dateRaw);
         $dateTime = new \DateTime($date);
 
+        // TODO: create proper method in course to find attendance by date
         $c = new \Criteria();
         $c->add('date', $date);
         /** @var $attendance \Zerebral\BusinessBundle\Model\Attendance\Attendance */

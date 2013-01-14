@@ -8,22 +8,31 @@ use Symfony\Component\Form\FormEvents;
 
 use Zerebral\CommonBundle\Component\FileStorage\FileStorageInterface;
 
-class FileSubscriber implements EventSubscriberInterface {
+/**
+ * TODO: move postBind logic directly to FileType, it's just few lines of code
+ *
+ * @deprecated
+ */
+class FileSubscriber implements EventSubscriberInterface
+{
     /** @var \Symfony\Component\Form\FormBuilder */
     private $builder;
 
-    public function __construct(FormBuilderInterface $builder) {
+    public function __construct(FormBuilderInterface $builder)
+    {
         $this->builder = $builder;
     }
 
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents()
+    {
         return array(FormEvents::POST_BIND => 'postBind');
     }
 
-    public function postBind(DataEvent $event) {
+    public function postBind(DataEvent $event)
+    {
         $options = $this->builder->getOptions();
 
-        /** @var null|\Zerebral\BusinessBundle\Model\File\File $file  */
+        /** @var null|\Zerebral\BusinessBundle\Model\File\File $file */
         $file = $event->getData();
 
         if (is_null($file)) {

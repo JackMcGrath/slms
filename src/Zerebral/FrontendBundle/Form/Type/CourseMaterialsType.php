@@ -8,6 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints as Constraint;
 
+// TODO: comments + type hints
 class CourseMaterialsType extends AbstractType
 {
     protected $fileStorage;
