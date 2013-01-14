@@ -23,6 +23,8 @@ class LoginSuccessHandler implements AuthenticationSuccessHandlerInterface
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token)
     {
+        // TODO: add proper comments
+
         $session = $request->getSession();
         if($session->get('access_code', false)){
             $code = $session->get('access_code');

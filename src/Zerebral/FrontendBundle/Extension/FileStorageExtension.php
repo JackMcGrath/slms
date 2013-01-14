@@ -6,7 +6,9 @@ use Twig_Extension;
 use Zerebral\CommonBundle\Component\FileStorage\FileStorageFactory;
 use Zerebral\BusinessBundle\Model\File\File;
 
-class FileStorageExtension extends \Twig_Extension {
+// TODO: tbd about this class, I guess his involved not only in file storage operations
+class FileStorageExtension extends \Twig_Extension
+{
     /** @var FileStorageFactory */
     protected $fileStorageFactory;
 
@@ -30,18 +32,21 @@ class FileStorageExtension extends \Twig_Extension {
     /**
      * @param \Zerebral\CommonBundle\Component\FileStorage\FileStorageFactory $fileStorageFactory
      */
-    public function __construct(FileStorageFactory $fileStorageFactory) {
+    public function __construct(FileStorageFactory $fileStorageFactory)
+    {
         $this->fileStorageFactory = $fileStorageFactory;
     }
 
 
-    public function getFilters() {
+    public function getFilters()
+    {
         return array(
             'bytes_to_human' => new \Twig_Filter_Method($this, 'bytesToHuman')
         );
     }
 
-    public function getFunctions() {
+    public function getFunctions()
+    {
         return array(
             'get_file_storage_link' => new \Twig_Function_Method($this, 'getFileStorageLink'),
             'get_file_icon' => new \Twig_Function_Method($this, 'getFileIcon')
@@ -52,7 +57,8 @@ class FileStorageExtension extends \Twig_Extension {
      * @param File $file
      * @return string
      */
-    public function getFileStorageLink(File $file) {
+    public function getFileStorageLink(File $file)
+    {
         if (!is_null($file)) {
             $file->setFileStorage($this->fileStorageFactory->getFileStorage($file->getStorage()));
             return $file->getLink();
@@ -65,7 +71,8 @@ class FileStorageExtension extends \Twig_Extension {
      *
      * @return \Zerebral\BusinessBundle\Model\File\File
      */
-    public function getFileIcon(File $file, $size = null) {
+    public function getFileIcon(File $file, $size = null)
+    {
         $mimeTypeArray = explode('/', $file->getMimeType());
         $icons = self::$mimeTypeIcons;
 
@@ -83,7 +90,8 @@ class FileStorageExtension extends \Twig_Extension {
         return $iconFile;
     }
 
-    public function bytesToHuman($bytes, $precision = 2) {
+    public function bytesToHuman($bytes, $precision = 2)
+    {
         $kilobyte = 1024;
         $megabyte = $kilobyte * 1024;
         $gigabyte = $megabyte * 1024;
@@ -108,7 +116,8 @@ class FileStorageExtension extends \Twig_Extension {
         }
     }
 
-    public function getName() {
+    public function getName()
+    {
         return 'file_storage_extension';
     }
 }

@@ -26,6 +26,9 @@ class MaterialController extends \Zerebral\CommonBundle\Component\Controller
      *
      * @PreAuthorize("hasRole('ROLE_TEACHER')")
      * @Template()
+     *
+     * TODO: rename to uploadAction
+     * TODO: make sure user has access to course
      */
     public function uploadMaterialAction(Model\Course\Course $course)
     {
@@ -56,6 +59,8 @@ class MaterialController extends \Zerebral\CommonBundle\Component\Controller
     /**
      * @Route("/materials/delete/{id}", name="delete_course_material")
      * @PreAuthorize("hasRole('ROLE_TEACHER')")
+     *
+     * TODO: make sure user can delete material!!!
      */
     public function deleteAction(Model\Material\CourseMaterial $material)
     {

@@ -6,6 +6,7 @@ use \Symfony\Component\DependencyInjection\ContainerInterface;
 use \Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use \Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
+// TODO: comments
 abstract class ModelAccessVoter implements VoterInterface
 {
 

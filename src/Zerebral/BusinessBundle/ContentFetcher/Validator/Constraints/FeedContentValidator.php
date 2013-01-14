@@ -40,6 +40,7 @@ class FeedContentValidator extends ConstraintValidator
 
         if (!in_array($typeValue, array('assignment', 'text'))) {
 
+            // TODO: remove, empty url should be validate by EmptyValidator or similar
             if (trim(strlen($linkUrlValue)) == 0) {
                 $this->context->addViolationAtSubPath($constraint->linkUrlField, $constraint->missingUrlMessage);
                 return;
@@ -50,6 +51,7 @@ class FeedContentValidator extends ConstraintValidator
                 return;
             }
 
+            // TODO: remove, url length should be validate by LengthValidator or similar
             if (mb_strlen($linkUrlValue) > 150) {
                 $this->context->addViolationAtSubPath($constraint->linkUrlField, $constraint->longUrlMessage, array('%url%' => $linkUrlValue));
                 return;

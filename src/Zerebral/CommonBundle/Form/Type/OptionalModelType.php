@@ -87,7 +87,6 @@ class OptionalModelType extends AbstractType
         );
     }
 
-//    public function finishView()
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['create_new_label'] = $options['create_new_label'];

@@ -2,6 +2,7 @@
 
 namespace Zerebral\FrontendBundle\Extension;
 
+// TODO: sortBy is definitely not native twig function, rename to SortByTwigExtension
 class NativeTwigFunction extends \Twig_Extension
 {
     public function getFunctions()
@@ -39,10 +40,6 @@ class NativeTwigFunction extends \Twig_Extension
             'sort_by' => new \Twig_Filter_Method($this, 'sortBy'),
         );
     }
-
-
-
-
 
     public function getName()
     {

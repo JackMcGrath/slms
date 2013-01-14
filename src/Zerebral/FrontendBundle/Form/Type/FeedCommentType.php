@@ -9,16 +9,20 @@ use Symfony\Component\Validator\Constraints\Collection;
 
 use Zerebral\FrontendBundle\Form\Type\FeedContentType;
 
-class FeedCommentType extends AbstractType {
-    public function buildForm(FormBuilderInterface $builder, array $options) {
+class FeedCommentType extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
         $builder->add('feedContent', new FeedContentType(), array('required' => true));
     }
 
-    public function getName() {
+    public function getName()
+    {
         return 'feed_comment';
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver) {
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
 
         $resolver->setDefaults(
             array(
