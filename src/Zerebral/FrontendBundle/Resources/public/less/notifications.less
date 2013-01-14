@@ -1,0 +1,61 @@
+.notifications-popup {
+    position: fixed;
+    width: 500px;
+    padding: 20px 0 5px;
+    border:1px solid #eee;
+    background: @white;
+    top: 40px;
+    left: 80px;
+    .box-shadow(0 5px 10px rgba(0,0,0,.2));
+
+    .title {
+        padding: 0 20px;
+        border-bottom: 1px solid #dddfe7;
+        padding-bottom: 15px;
+        h4 {
+            display: inline-block;
+            font-size: 14px;
+            font-weight: normal;
+        }
+        a.view-all {
+            float: right;
+        }
+    }
+    .notifications-list {
+        padding: 0 20px;
+        max-height: 400px;
+        overflow: auto;
+
+        .loading {
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        .no-notifications {
+            margin-top: 20px;
+            b {
+                font-size: 13px;
+                margin-bottom: 10px;
+                display: block;
+                font-style: none;
+            }
+            p {
+                color: #ababab;
+            }
+        }
+
+        .item {
+            img.avatar {
+                margin-right: 10px;
+                width: 43px;
+                height: 43px;
+            }
+            margin: 15px 0;
+        }
+    }
+}
+i.notifications {
+    cursor: pointer;
+    small {
+        font-style: normal;
+    }
+}
