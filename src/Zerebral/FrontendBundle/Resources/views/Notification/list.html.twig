@@ -1,0 +1,15 @@
+{% import "ZerebralFrontendBundle:Notification:notificationItemBlock.html.twig" as notificationPartial %}
+
+{% for notification in notifications %}
+    <div class="item">
+        {{ notificationPartial.simpleBlock(notification) }}
+    </div>
+{% else %}
+    <div class="no-notifications">
+        <b>No notifications available</b>
+        <p>
+            You will receive notifications regarding any activity in courses or
+            assignments assigned to you.
+        </p>
+    </div>
+{% endfor %}

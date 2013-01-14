@@ -13,6 +13,7 @@ use Symfony\Component\Validator\Constraints\Collection;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentCategoryQuery;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentCategory;
 
+// TODO: comments + type hints
 class AssignmentType extends AbstractType
 {
 

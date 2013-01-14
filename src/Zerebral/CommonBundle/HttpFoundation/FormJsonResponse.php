@@ -5,6 +5,7 @@ namespace Zerebral\CommonBundle\HttpFoundation;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Form\Form;
 
+// TODO: comments + type hints + unit tests
 class FormJsonResponse extends JsonResponse
 {
 
@@ -30,8 +31,9 @@ class FormJsonResponse extends JsonResponse
 //        return new static($form, $status, $headers);
 //    }
 
-    private function getErrors($form, &$data, $name = '') {
-        foreach($form->all() as $child) {
+    private function getErrors($form, &$data, $name = '')
+    {
+        foreach ($form->all() as $child) {
             $propertyPath = str_replace(array('[', ']'), '', $child->getPropertyPath());
             if (count($child->all()) > 0) {
                 $this->getErrors($child, $data, ($name . '[' . $propertyPath . ']'));
@@ -40,7 +42,7 @@ class FormJsonResponse extends JsonResponse
             if (count($child->getErrors()) > 0) {
                 $propertyPath = $name . '[' . $propertyPath . ']';
                 $data['errors'][$propertyPath] = array();
-                foreach($child->getErrors()as $error) {
+                foreach ($child->getErrors() as $error) {
                     $data['errors'][$propertyPath][] = $error->getMessage();
                 }
             }

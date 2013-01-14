@@ -33,6 +33,9 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
      * @return \Symfony\Component\HttpFoundation\Response|\Zerebral\CommonBundle\HttpFoundation\FormJsonResponse
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @ParamConverter("feedItem", options={"mapping": {"feedItemId": "id"}})
+     *
+     * TODO: move to FeedCommentController::saveAction
+     * TODO: add is ajax validation
      */
     public function addFeedCommentAction(\Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem)
     {
@@ -63,6 +66,9 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @ParamConverter("feedComment", options={"mapping": {"feedCommentId": "id"}})
+     *
+     * TODO: move to FeedCommentController::removeAction
+     * TODO: add is ajax validation
      */
     public function removeFeedCommentAction(\Zerebral\BusinessBundle\Model\Feed\FeedComment $feedComment)
     {
@@ -80,6 +86,9 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Zerebral\CommonBundle\HttpFoundation\FormJsonResponse
      * @ParamConverter("course", options={"mapping": {"courseId": "id"}})
+     *
+     * TODO: rename to saveItemAction
+     * TODO: add is ajax validation
      */
     public function addFeedItemAction(\Zerebral\BusinessBundle\Model\Course\Course $course)
     {
@@ -109,6 +118,9 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @ParamConverter("feedItem", options={"mapping": {"feedItemId": "id"}})
+     *
+     * TODO: rename to removeItemAction
+     * TODO: add is ajax validation
      */
     public function removeFeedItemAction(\Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem)
     {
@@ -126,18 +138,22 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @ParamConverter("feedItem", options={"mapping": {"feedItemId": "id"}})
+     *
+     * TODO: move to FeedCommentController::indexAction
+     * TODO: add is ajax validation
      */
     public function loadComments(\Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem)
     {
         $page = 1;
         $lastCommentId = $this->getRequest()->get('lastCommentId', 0);
 
+        // TODO: move to FeedCommentQuery::filterOlder($feedItem, $lastCommentId)
         /** @var $commentsQuery \Zerebral\BusinessBundle\Model\Feed\FeedCommentQuery */
         $commentsQuery = FeedCommentQuery::create()
-                            ->clearOrderByColumns()
-                            ->addDescendingOrderByColumn(FeedCommentPeer::ID)
-                            ->filterByFeedItem($feedItem)
-                            ->filterById($lastCommentId, \Criteria::LESS_THAN);
+                ->clearOrderByColumns()
+                ->addDescendingOrderByColumn(FeedCommentPeer::ID)
+                ->filterByFeedItem($feedItem)
+                ->filterById($lastCommentId, \Criteria::LESS_THAN);
 
         /** @var $commentsPaginator \PropelModelPager */
         $commentsPaginator = $commentsQuery->paginate($page, 10);

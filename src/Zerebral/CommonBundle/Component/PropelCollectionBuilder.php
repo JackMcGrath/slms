@@ -4,6 +4,11 @@ namespace Zerebral\CommonBundle\Component;
 
 use \PropelCollection;
 
+/**
+ * Don't use this class any more
+ * All object buildings should be done by FormType
+ * @deprecated
+ */
 class PropelCollectionBuilder
 {
 

@@ -10,8 +10,11 @@ use Symfony\Component\Validator\Constraints\Collection;
 
 use Zerebral\FrontendBundle\Form\EventListener\FileSubscriber;
 
-class FileType extends AbstractType {
-    public function buildForm(FormBuilderInterface $builder, array $options) {
+// TODO: move common bundle
+class FileType extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
         $fileSubscriber = new FileSubscriber($builder);
         $builder->addEventSubscriber($fileSubscriber);
         $builder->add('uploadedFile', 'file', array('required' => false));
@@ -19,11 +22,13 @@ class FileType extends AbstractType {
 
     }
 
-    public function getName() {
+    public function getName()
+    {
         return 'file';
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver) {
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
 
         $resolver->setOptional(array('storage'));
         $resolver->setDefaults(

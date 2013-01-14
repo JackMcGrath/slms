@@ -30,7 +30,7 @@ class CourseMaterialFolderController extends \Zerebral\CommonBundle\Component\Co
     public function deleteAction(Model\Material\CourseFolder $folder)
     {
         $folder->delete();
-        #TODO do not redirect to does not exist folder!!
+        // TODO: do not redirect to does not exist folder!!
         return $this->redirect($this->getRequest()->headers->get('referer'));
     }
 

@@ -8,16 +8,19 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Zerebral\BusinessBundle\Model\User\Teacher;
 
+// TODO: comments + type hints
 class TeacherProfileType extends AbstractType
 {
     protected $fileStorage;
 
 
-    public function setFileStorage($fileStorage) {
+    public function setFileStorage($fileStorage)
+    {
         $this->fileStorage = $fileStorage;
     }
 
-    public function getFileStorage() {
+    public function getFileStorage()
+    {
         return $this->fileStorage;
     }
 
@@ -38,10 +41,12 @@ class TeacherProfileType extends AbstractType
 
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array(
-            'data_class' => 'Zerebral\BusinessBundle\Model\User\Teacher',
-            'cascade_validation' => true,
-            'validation_groups' => array('profile')
-        ));
+        $resolver->setDefaults(
+            array(
+                'data_class' => 'Zerebral\BusinessBundle\Model\User\Teacher',
+                'cascade_validation' => true,
+                'validation_groups' => array('profile')
+            )
+        );
     }
 }

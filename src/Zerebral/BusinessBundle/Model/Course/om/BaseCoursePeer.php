@@ -25,6 +25,7 @@ use Zerebral\BusinessBundle\Model\Course\map\CourseTableMap;
 use Zerebral\BusinessBundle\Model\Feed\FeedItemPeer;
 use Zerebral\BusinessBundle\Model\Material\CourseFolderPeer;
 use Zerebral\BusinessBundle\Model\Material\CourseMaterialPeer;
+use Zerebral\BusinessBundle\Model\Notification\NotificationPeer;
 use Zerebral\BusinessBundle\Model\User\TeacherPeer;
 
 abstract class BaseCoursePeer
@@ -453,6 +454,9 @@ abstract class BaseCoursePeer
         // Invalidate objects in CourseMaterialPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         CourseMaterialPeer::clearInstancePool();
+        // Invalidate objects in NotificationPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        NotificationPeer::clearInstancePool();
     }
 
     /**
