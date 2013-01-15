@@ -54,6 +54,7 @@ class NotificationTableMap extends TableMap
   3 => 'material_create',
   4 => 'assignment_file_create',
   5 => 'attendance_status',
+  6 => 'course_feed_comment_create',
 ));
         $this->addColumn('params', 'Params', 'VARCHAR', false, 100, null);
         $this->addColumn('is_read', 'IsRead', 'BOOLEAN', true, 1, false);

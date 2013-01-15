@@ -47,7 +47,6 @@ class NotificationEventSubscriber implements \Symfony\Component\EventDispatcher\
         /** @var $assignment \Zerebral\BusinessBundle\Model\Assignment\Assignment */
         $assignment = $event->getModel();
 
-
         foreach ($assignment->getStudentAssignments() as $student) {
             $notification = new Notification();
             $notification->setUserId($student->getStudent()->getUserId());
@@ -57,7 +56,6 @@ class NotificationEventSubscriber implements \Symfony\Component\EventDispatcher\
             $notification->setCreatedBy($assignment->getTeacher()->getUserId());
             $notification->save();
         }
-
     }
 
     public function updateCourse(ModelEvent $event)
@@ -132,6 +130,18 @@ class NotificationEventSubscriber implements \Symfony\Component\EventDispatcher\
 
     public function createFeed(ModelEvent $event)
     {
+        /** @var $feedItem \Zerebral\BusinessBundle\Model\Feed\FeedItem */
+        $feedItem = $event->getModel();
 
+        if (!$feedItem->getAssignmentId() && $feedItem->getCourseId() && $feedItem->isNew()) {
+            foreach ($feedItem->getCourse()->getCourseTeachers() as $teacher) {
+                $notification = new Notification();
+                $notification->setUserId($teacher->getTeacher()->getUserId());
+                $notification->setType(NotificationPeer::TYPE_COURSE_FEED_COMMENT_CREATE);
+                $notification->setCourse($feedItem->getCourse());
+                $notification->setCreatedBy($feedItem->getCreatedBy());
+                $notification->save();
+            }
+        }
     }
 }
