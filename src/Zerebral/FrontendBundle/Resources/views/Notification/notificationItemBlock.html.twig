@@ -2,36 +2,16 @@
     {% set type = notification.type %}
     {% if type == 'course_update' %}
         {{ _self.title('Course Details') }}
-        {{ _self.date(notification) }}
-        {{ _self.courseUpdate(notification) }}
     {% elseif type == 'assignment_create' %}
         {{ _self.title('New Assignment') }}
-        {{ _self.date(notification) }}
-        {{ _self.assignmentCreate(notification) }}
     {% endif %}
+    {{ _self.date(notification) }}
+    {{ _self.text(notification) }}
 {% endmacro %}
 
 {% macro simpleBlock(notification) %}
-    {% set type = notification.type %}
-    {% if type == 'course_update' %}
-        <img class="avatar" src="{{ get_file_storage_link(notification.userRelatedByCreatedBy.getAvatarFile()) | imagine_filter('thumbnail') }}"/>
-        {{ _self.courseUpdate(notification) }}
-    {% elseif type == 'assignment_create' %}
-        <img class="avatar" src="{{ get_file_storage_link(notification.userRelatedByCreatedBy.getAvatarFile()) | imagine_filter('thumbnail') }}"/>
-        {{ _self.assignmentCreate(notification) }}
-    {% elseif type == 'assignment_update' %}
-        <img class="avatar" src="{{ get_file_storage_link(notification.userRelatedByCreatedBy.getAvatarFile()) | imagine_filter('thumbnail') }}"/>
-        {{ _self.assignmentUpdate(notification) }}
-    {% elseif type == 'material_create' %}
-        <img class="avatar" src="{{ get_file_storage_link(notification.userRelatedByCreatedBy.getAvatarFile()) | imagine_filter('thumbnail') }}"/>
-        {{ _self.materialCreate(notification) }}
-    {% elseif type == 'assignment_file_create' %}
-        <img class="avatar" src="{{ get_file_storage_link(notification.userRelatedByCreatedBy.getAvatarFile()) | imagine_filter('thumbnail') }}"/>
-        {{ _self.assignmentFileCreate(notification) }}
-    {% elseif type == 'attendance_status' %}
-        <img class="avatar" src="{{ get_file_storage_link(notification.userRelatedByCreatedBy.getAvatarFile()) | imagine_filter('thumbnail') }}"/>
-        {{ _self.attendanceStatus(notification) }}
-    {% endif %}
+    {{ _self.avatar(notification) }}
+    {{ _self.text(notification) }}
 {% endmacro %}
 
 {% macro courseUpdate(notification) %}
@@ -55,17 +35,40 @@
 {% endmacro %}
 
 {% macro attendanceStatus(notification) %}
-    <b>{{ notification.userRelatedByCreatedBy ? notification.userRelatedByCreatedBy.fullName : '' }}</b> has marked you as (absent/tardy) for <b>{{ notification.course.name }}</b>
+    <b>{{ notification.userRelatedByCreatedBy ? notification.userRelatedByCreatedBy.fullName : '' }}</b> has marked you as {{ notification.getParam('status') }} for <b>{{ notification.course.name }}</b> at {{ notification.getParam('date') | date('m/d/Y') }}
 {% endmacro %}
 
 {% macro title(text) %}
     <h3>{{ text }}</h3>
 {% endmacro %}
 
+{% macro text(notification) %}
+    {% set type = notification.type %}
+    <p>
+    {% if type == 'course_update' %}
+        {{ _self.courseUpdate(notification) }}
+    {% elseif type == 'assignment_create' %}
+        {{ _self.assignmentCreate(notification) }}
+    {% elseif type == 'assignment_update' %}
+         {{ _self.assignmentUpdate(notification) }}
+    {% elseif type == 'material_create' %}
+        {{ _self.materialCreate(notification) }}
+    {% elseif type == 'assignment_file_create' %}
+        {{ _self.assignmentFileCreate(notification) }}
+    {% elseif type == 'attendance_status' %}
+        {{ _self.attendanceStatus(notification) }}
+    {% endif %}
+    </p>
+{% endmacro %}
+
 {% macro date(notification) %}
     <div class="date">
         {{ time_diff(notification.createdAt) }}
     </div>
+{% endmacro %}
+
+{% macro avatar(notification) %}
+    <img class="avatar rounded" src="{{ get_file_storage_link(notification.userRelatedByCreatedBy.getAvatarFile()) | imagine_filter('thumbnail') }}"/>
 {% endmacro %}
 
 

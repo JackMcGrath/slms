@@ -1,7 +1,7 @@
 {% import "ZerebralFrontendBundle:Notification:notificationItemBlock.html.twig" as notificationPartial %}
 
 {% for notification in notifications %}
-    <div class="item">
+    <div class="item{{ loop.last ? ' last' : '' }}">
         {{ notificationPartial.simpleBlock(notification) }}
     </div>
 {% else %}

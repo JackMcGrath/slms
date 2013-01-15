@@ -6,6 +6,7 @@
     background: @white;
     top: 40px;
     left: 80px;
+    z-index: 100;
     .box-shadow(0 5px 10px rgba(0,0,0,.2));
 
     .title {
@@ -22,15 +23,16 @@
         }
     }
     .notifications-list {
-        padding: 0 20px;
         max-height: 400px;
         overflow: auto;
 
         .loading {
+            padding: 0px 20px;
             margin-top: 20px;
             margin-bottom: 10px;
         }
         .no-notifications {
+            padding: 0px 20px;
             margin-top: 20px;
             b {
                 font-size: 13px;
@@ -44,10 +46,23 @@
         }
 
         .item {
+            padding: 10px 20px;
+            border-bottom: 1px dashed #eee;
+            &.last {
+                border-bottom: none;
+                padding-bottom: 0px;
+            }
             img.avatar {
                 margin-right: 10px;
                 width: 43px;
                 height: 43px;
+                vertical-align: top;
+            }
+            p {
+                display: inline-block;
+                width: 390px;
+                margin: 0;
+                padding: 0;
             }
             margin: 15px 0;
         }
