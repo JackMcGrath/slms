@@ -76,6 +76,7 @@ abstract class BaseNotificationPeer
     const TYPE_MATERIAL_CREATE = 'material_create';
     const TYPE_ASSIGNMENT_FILE_CREATE = 'assignment_file_create';
     const TYPE_ATTENDANCE_STATUS = 'attendance_status';
+    const TYPE_COURSE_FEED_COMMENT_CREATE = 'course_feed_comment_create';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -128,6 +129,7 @@ abstract class BaseNotificationPeer
             NotificationPeer::TYPE_MATERIAL_CREATE,
             NotificationPeer::TYPE_ASSIGNMENT_FILE_CREATE,
             NotificationPeer::TYPE_ATTENDANCE_STATUS,
+            NotificationPeer::TYPE_COURSE_FEED_COMMENT_CREATE,
         ),
     );
 

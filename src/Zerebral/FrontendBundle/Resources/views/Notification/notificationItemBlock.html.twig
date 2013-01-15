@@ -38,6 +38,10 @@
     <b>{{ notification.userRelatedByCreatedBy ? notification.userRelatedByCreatedBy.fullName : '' }}</b> has marked you as {{ notification.getParam('status') }} for <b>{{ notification.course.name }}</b> at {{ notification.getParam('date') | date('m/d/Y') }}
 {% endmacro %}
 
+{% macro courseFeedComment(notification) %}
+    <b>{{ notification.userRelatedByCreatedBy ? notification.userRelatedByCreatedBy.fullName : '' }}</b> has posted a new comment in {{ notification.course.name }}
+{% endmacro %}
+
 {% macro title(text) %}
     <h3>{{ text }}</h3>
 {% endmacro %}
@@ -57,6 +61,8 @@
         {{ _self.assignmentFileCreate(notification) }}
     {% elseif type == 'attendance_status' %}
         {{ _self.attendanceStatus(notification) }}
+    {% elseif type == 'course_feed_comment_create' %}
+        {{ _self.courseFeedComment(notification) }}
     {% endif %}
     </p>
 {% endmacro %}

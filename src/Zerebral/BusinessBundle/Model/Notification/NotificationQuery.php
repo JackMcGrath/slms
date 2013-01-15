@@ -10,7 +10,7 @@ class NotificationQuery extends BaseNotificationQuery
     {
         $this->filterByUserId($userId);
         $this->filterByIsRead(false);
-        $this->orderBy('created_at');
+        $this->orderBy('created_at', \Criteria::DESC);
         return $this;
     }
 }
