@@ -15,31 +15,31 @@
 {% endmacro %}
 
 {% macro courseUpdate(notification) %}
-    <b>{{ notification.userRelatedByCreatedBy ? notification.userRelatedByCreatedBy.fullName : '' }}</b> has updated the course details for <b>{{ notification.course.name }}</b>
+    <a href="#">{{ notification.userRelatedByCreatedBy ? notification.userRelatedByCreatedBy.fullName : '' }}</a> has updated the course details for <a href="{{ path('course_view', {id: notification.course.id}) }}">{{ notification.course.name }}</a>
 {% endmacro %}
 
 {% macro assignmentCreate(notification) %}
-    <b>{{ notification.userRelatedByCreatedBy ? notification.userRelatedByCreatedBy.fullName : '' }}</b> has posted a new assignment <b>{{ notification.assignment.name }}</b> in <b>{{ notification.course.name }}</b>
+    <a href="#">{{ notification.userRelatedByCreatedBy ? notification.userRelatedByCreatedBy.fullName : '' }}</a> has posted a new assignment <a href="{{ path('assignment_view', {id: notification.assignment.id}) }}">{{ notification.assignment.name }}</a> in <a href="{{ path('course_view', {id: notification.course.id}) }}">{{ notification.course.name }}</a>
 {% endmacro %}
 
 {% macro assignmentUpdate(notification) %}
-    <b>{{ notification.userRelatedByCreatedBy ? notification.userRelatedByCreatedBy.fullName : '' }}</b> has updated the assignment details for <b>{{ notification.assignment.name }}</b>
+    <a href="#">{{ notification.userRelatedByCreatedBy ? notification.userRelatedByCreatedBy.fullName : '' }}</a> has updated the assignment details for <a href="{{ path('assignment_view', {id: notification.assignment.id}) }}">{{ notification.assignment.name }}</a>
 {% endmacro %}
 
 {% macro materialCreate(notification) %}
-    <b>{{ notification.userRelatedByCreatedBy ? notification.userRelatedByCreatedBy.fullName : '' }}</b> has uploaded a new file to <b>{{ notification.course.name }}</b>
+    <a href="#">{{ notification.userRelatedByCreatedBy ? notification.userRelatedByCreatedBy.fullName : '' }}</a> has uploaded a new file to <a href="{{ path('course_view', {id: notification.course.id}) }}">{{ notification.course.name }}</a>
 {% endmacro %}
 
 {% macro assignmentFileCreate(notification) %}
-    <b>{{ notification.userRelatedByCreatedBy ? notification.userRelatedByCreatedBy.fullName : '' }}</b> has added a new file to <b>{{ notification.assignment.name }}</b>
+    <a href="#">{{ notification.userRelatedByCreatedBy ? notification.userRelatedByCreatedBy.fullName : '' }}</a> has added a new file to <a href="{{ path('assignment_view', {id: notification.assignment.id}) }}">{{ notification.assignment.name }}</a>
 {% endmacro %}
 
 {% macro attendanceStatus(notification) %}
-    <b>{{ notification.userRelatedByCreatedBy ? notification.userRelatedByCreatedBy.fullName : '' }}</b> has marked you as {{ notification.getParam('status') }} for <b>{{ notification.course.name }}</b> at {{ notification.getParam('date') | date('m/d/Y') }}
+    <a href="#">{{ notification.userRelatedByCreatedBy ? notification.userRelatedByCreatedBy.fullName : '' }}</a> has marked you as <b>{{ notification.getParam('status') }}</b> for <a href="{{ path('course_view', {id: notification.course.id}) }}">{{ notification.course.name }}</a> at {{ notification.getParam('date') | date('m/d/Y') }}
 {% endmacro %}
 
 {% macro courseFeedComment(notification) %}
-    <b>{{ notification.userRelatedByCreatedBy ? notification.userRelatedByCreatedBy.fullName : '' }}</b> has posted a new comment in {{ notification.course.name }}
+    <a href="#">{{ notification.userRelatedByCreatedBy ? notification.userRelatedByCreatedBy.fullName : '' }}</a> has posted a new comment in <a href="{{ path('course_view', {id: notification.course.id}) }}">{{ notification.course.name }}</a>
 {% endmacro %}
 
 {% macro title(text) %}
