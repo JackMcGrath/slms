@@ -103,14 +103,14 @@
                             <a href="{{ path('dashboard') }}"><i class="icon-big-home"></i>Home</a>
                         </div>
                     </li>
-                    <li class="{{ target is defined and target == 'notifications' ? 'active' : ''}}">
-                        {% set notificationsCount = app.user.unreadNotifications.count %}
-                        <div class="menu-item notice">
-                            <a href="{{ path('notifications') }}">
-                                <i class="icon-big-bell">{% if notificationsCount %}<small>{{ notificationsCount }}</small>{% endif %}</i>Notifications
-                            </a>
-                        </div>
-                    </li>
+                    {#<li class="{{ target is defined and target == 'notifications' ? 'active' : ''}}">#}
+                        {#{% set notificationsCount = app.user.unreadNotifications.count %}#}
+                        {#<div class="menu-item notice">#}
+                            {#<a href="{{ path('notifications') }}">#}
+                                {#<i class="icon-big-bell">{% if notificationsCount %}<small>{{ notificationsCount }}</small>{% endif %}</i>Notifications#}
+                            {#</a>#}
+                        {#</div>#}
+                    {#</li>#}
                     <li class="{{ target is defined and target == 'courses' ? 'active' : ''}}">
                         <div class="menu-item">
                             <a href="{{ path("courses") }}"><i class="icon-big-notepad"></i>Courses</a>
@@ -122,16 +122,16 @@
                         </div>
                     </li>
                     <li class="{{ target is defined and target == 'messages' ? 'active' : ''}}"><div class="menu-item"><i class="icon-big-mail"></i>Messages</div></li>
-                    <li class="{{ target is defined and target == 'calendar' ? 'active' : ''}}"><div class="menu-item"><i class="icon-big-calendar"></i>Calendar</div></li>
-                    <li class="{{ target is defined and target == 'members' ? 'active' : ''}}">
-                        <div class="menu-item">
-                            {% if course is defined and course %}
-                                <a href="{{ path('course_members', {id: course.id}) }}"><i class="icon-big-members"></i>Members</a>
-                            {% else %}
-                                <i class="icon-big-members"></i>Members
-                            {% endif %}
-                        </div>
-                    </li>
+                    {#<li class="{{ target is defined and target == 'calendar' ? 'active' : ''}}"><div class="menu-item"><i class="icon-big-calendar"></i>Calendar</div></li>#}
+                    {#<li class="{{ target is defined and target == 'members' ? 'active' : ''}}">#}
+                        {#<div class="menu-item">#}
+                            {#{% if course is defined and course %}#}
+                                {#<a href="{{ path('course_members', {id: course.id}) }}"><i class="icon-big-members"></i>Members</a>#}
+                            {#{% else %}#}
+                                {#<i class="icon-big-members"></i>Members#}
+                            {#{% endif %}#}
+                        {#</div>#}
+                    {#</li>#}
                     {% if app.user.isTeacher %}
                     <li class="{{ target is defined and target == 'files' ? 'active' : ''}}">
                         <div class="menu-item">
