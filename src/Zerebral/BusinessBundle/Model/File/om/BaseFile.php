@@ -636,34 +636,25 @@ abstract class BaseFile extends BaseObject implements Persistent
         }
 
         $con->beginTransaction();
-        $isInsert = $this->isNew();
+        // $isInsert = $this->isNew();
         try {
-            $ret = $this->preSave($con);
+            $ret = true;
+            if ($this->isNew() || $this->isModified()) {
+                $ret = $this->preSave($con);
             // event behavior
             EventDispatcherProxy::trigger('model.save.pre', new ModelEvent($this));
-            if ($isInsert) {
+            }
+            if ($this->isNew()) {
                 $ret = $ret && $this->preInsert($con);
                 // event behavior
                 EventDispatcherProxy::trigger('model.insert.pre', new ModelEvent($this));
-            } else {
+            } elseif ($this->isModified()) {
                 $ret = $ret && $this->preUpdate($con);
                 // event behavior
                 EventDispatcherProxy::trigger(array('update.pre', 'model.update.pre'), new ModelEvent($this));
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
-                if ($isInsert) {
-                    $this->postInsert($con);
-                    // event behavior
-                    EventDispatcherProxy::trigger('model.insert.post', new ModelEvent($this));
-                } else {
-                    $this->postUpdate($con);
-                    // event behavior
-                    EventDispatcherProxy::trigger(array('update.post', 'model.update.post'), new ModelEvent($this));
-                }
-                $this->postSave($con);
-                // event behavior
-                EventDispatcherProxy::trigger('model.save.post', new ModelEvent($this));
                 FilePeer::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
@@ -693,6 +684,8 @@ abstract class BaseFile extends BaseObject implements Persistent
         $affectedRows = 0; // initialize var to track total num of affected rows
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
+            $isInsert = $this->isNew();
+            $isUpdate = $this->isModified();
 
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
@@ -811,6 +804,21 @@ abstract class BaseFile extends BaseObject implements Persistent
 
             $this->alreadyInSave = false;
 
+            if ($isInsert) {
+                $this->postInsert($con);
+                    // event behavior
+                    EventDispatcherProxy::trigger('model.insert.post', new ModelEvent($this));
+            }
+            if ($isUpdate) {
+                $this->postUpdate($con);
+                    // event behavior
+                    EventDispatcherProxy::trigger(array('update.post', 'model.update.post'), new ModelEvent($this));
+            }
+            if ($isUpdate || $isInsert) {
+                $this->postSave($con);
+                    // event behavior
+                    EventDispatcherProxy::trigger('model.save.post', new ModelEvent($this));
+            }
         }
 
         return $affectedRows;

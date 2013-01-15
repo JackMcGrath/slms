@@ -65,6 +65,7 @@ propel:
         propel.schema.dir: "%kernel.root_dir%/schemas/"
         propel.php.dir: %kernel.root_dir%/../src
         propel.samePhpName: true
+        propel.builder.object.class: src.Zerebral.BusinessBundle.Propel.PHP5ObjectBuilderWithValidEvents
 
 
 # Swiftmailer Configuration
