@@ -14,7 +14,7 @@
 
             <div class="span9 items-list{% if is_granted('ROLE_TEACHER') %} teacher-role{% endif %}">
                 {% for notification in notifications %}
-                    <div class="list-item span12{{ loop.last ? ' last' : '' }}">
+                    <div class="list-item span12{{ loop.last ? ' last' : '' }} {{ notification.type }}">
                         {{ notificationPartial.mainBlock(notification) }}
                     </div>
                 {% endfor %}
