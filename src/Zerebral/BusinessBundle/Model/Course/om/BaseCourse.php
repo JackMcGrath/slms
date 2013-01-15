@@ -42,6 +42,8 @@ use Zerebral\BusinessBundle\Model\Material\CourseFolder;
 use Zerebral\BusinessBundle\Model\Material\CourseFolderQuery;
 use Zerebral\BusinessBundle\Model\Material\CourseMaterial;
 use Zerebral\BusinessBundle\Model\Material\CourseMaterialQuery;
+use Zerebral\BusinessBundle\Model\Notification\Notification;
+use Zerebral\BusinessBundle\Model\Notification\NotificationQuery;
 use Zerebral\BusinessBundle\Model\User\Student;
 use Zerebral\BusinessBundle\Model\User\StudentQuery;
 use Zerebral\BusinessBundle\Model\User\Teacher;
@@ -204,6 +206,12 @@ abstract class BaseCourse extends BaseObject implements Persistent
     protected $collCourseMaterialsPartial;
 
     /**
+     * @var        PropelObjectCollection|Notification[] Collection to store aggregation of Notification objects.
+     */
+    protected $collNotifications;
+    protected $collNotificationsPartial;
+
+    /**
      * @var        PropelObjectCollection|Student[] Collection to store aggregation of Student objects.
      */
     protected $collStudents;
@@ -298,6 +306,12 @@ abstract class BaseCourse extends BaseObject implements Persistent
      * @var		PropelObjectCollection
      */
     protected $courseMaterialsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $notificationsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -923,6 +937,8 @@ abstract class BaseCourse extends BaseObject implements Persistent
 
             $this->collCourseMaterials = null;
 
+            $this->collNotifications = null;
+
             $this->collStudents = null;
             $this->collTeachers = null;
         } // if (deep)
@@ -1291,6 +1307,24 @@ abstract class BaseCourse extends BaseObject implements Persistent
                 }
             }
 
+            if ($this->notificationsScheduledForDeletion !== null) {
+                if (!$this->notificationsScheduledForDeletion->isEmpty()) {
+                    foreach ($this->notificationsScheduledForDeletion as $notification) {
+                        // need to save related object because we set the relation to null
+                        $notification->save($con);
+                    }
+                    $this->notificationsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collNotifications !== null) {
+                foreach ($this->collNotifications as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             $this->alreadyInSave = false;
 
             if ($isInsert) {
@@ -1604,6 +1638,14 @@ abstract class BaseCourse extends BaseObject implements Persistent
                     }
                 }
 
+                if ($this->collNotifications !== null) {
+                    foreach ($this->collNotifications as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
 
             $this->alreadyInValidation = false;
         }
@@ -1749,6 +1791,9 @@ abstract class BaseCourse extends BaseObject implements Persistent
             }
             if (null !== $this->collCourseMaterials) {
                 $result['CourseMaterials'] = $this->collCourseMaterials->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collNotifications) {
+                $result['Notifications'] = $this->collNotifications->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -2009,6 +2054,12 @@ abstract class BaseCourse extends BaseObject implements Persistent
                 }
             }
 
+            foreach ($this->getNotifications() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addNotification($relObj->copy($deepCopy));
+                }
+            }
+
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -2252,6 +2303,9 @@ abstract class BaseCourse extends BaseObject implements Persistent
         }
         if ('CourseMaterial' == $relationName) {
             $this->initCourseMaterials();
+        }
+        if ('Notification' == $relationName) {
+            $this->initNotifications();
         }
     }
 
@@ -4518,6 +4572,299 @@ abstract class BaseCourse extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collNotifications collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Course The current object (for fluent API support)
+     * @see        addNotifications()
+     */
+    public function clearNotifications()
+    {
+        $this->collNotifications = null; // important to set this to null since that means it is uninitialized
+        $this->collNotificationsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collNotifications collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialNotifications($v = true)
+    {
+        $this->collNotificationsPartial = $v;
+    }
+
+    /**
+     * Initializes the collNotifications collection.
+     *
+     * By default this just sets the collNotifications collection to an empty array (like clearcollNotifications());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initNotifications($overrideExisting = true)
+    {
+        if (null !== $this->collNotifications && !$overrideExisting) {
+            return;
+        }
+        $this->collNotifications = new PropelObjectCollection();
+        $this->collNotifications->setModel('Notification');
+    }
+
+    /**
+     * Gets an array of Notification objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Course is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Notification[] List of Notification objects
+     * @throws PropelException
+     */
+    public function getNotifications($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collNotificationsPartial && !$this->isNew();
+        if (null === $this->collNotifications || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collNotifications) {
+                // return empty collection
+                $this->initNotifications();
+            } else {
+                $collNotifications = NotificationQuery::create(null, $criteria)
+                    ->filterByCourse($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collNotificationsPartial && count($collNotifications)) {
+                      $this->initNotifications(false);
+
+                      foreach($collNotifications as $obj) {
+                        if (false == $this->collNotifications->contains($obj)) {
+                          $this->collNotifications->append($obj);
+                        }
+                      }
+
+                      $this->collNotificationsPartial = true;
+                    }
+
+                    $collNotifications->getInternalIterator()->rewind();
+                    return $collNotifications;
+                }
+
+                if($partial && $this->collNotifications) {
+                    foreach($this->collNotifications as $obj) {
+                        if($obj->isNew()) {
+                            $collNotifications[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collNotifications = $collNotifications;
+                $this->collNotificationsPartial = false;
+            }
+        }
+
+        return $this->collNotifications;
+    }
+
+    /**
+     * Sets a collection of Notification objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $notifications A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Course The current object (for fluent API support)
+     */
+    public function setNotifications(PropelCollection $notifications, PropelPDO $con = null)
+    {
+        $notificationsToDelete = $this->getNotifications(new Criteria(), $con)->diff($notifications);
+
+        $this->notificationsScheduledForDeletion = unserialize(serialize($notificationsToDelete));
+
+        foreach ($notificationsToDelete as $notificationRemoved) {
+            $notificationRemoved->setCourse(null);
+        }
+
+        $this->collNotifications = null;
+        foreach ($notifications as $notification) {
+            $this->addNotification($notification);
+        }
+
+        $this->collNotifications = $notifications;
+        $this->collNotificationsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Notification objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Notification objects.
+     * @throws PropelException
+     */
+    public function countNotifications(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collNotificationsPartial && !$this->isNew();
+        if (null === $this->collNotifications || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collNotifications) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getNotifications());
+            }
+            $query = NotificationQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByCourse($this)
+                ->count($con);
+        }
+
+        return count($this->collNotifications);
+    }
+
+    /**
+     * Method called to associate a Notification object to this object
+     * through the Notification foreign key attribute.
+     *
+     * @param    Notification $l Notification
+     * @return Course The current object (for fluent API support)
+     */
+    public function addNotification(Notification $l)
+    {
+        if ($this->collNotifications === null) {
+            $this->initNotifications();
+            $this->collNotificationsPartial = true;
+        }
+        if (!in_array($l, $this->collNotifications->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddNotification($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Notification $notification The notification object to add.
+     */
+    protected function doAddNotification($notification)
+    {
+        $this->collNotifications[]= $notification;
+        $notification->setCourse($this);
+    }
+
+    /**
+     * @param	Notification $notification The notification object to remove.
+     * @return Course The current object (for fluent API support)
+     */
+    public function removeNotification($notification)
+    {
+        if ($this->getNotifications()->contains($notification)) {
+            $this->collNotifications->remove($this->collNotifications->search($notification));
+            if (null === $this->notificationsScheduledForDeletion) {
+                $this->notificationsScheduledForDeletion = clone $this->collNotifications;
+                $this->notificationsScheduledForDeletion->clear();
+            }
+            $this->notificationsScheduledForDeletion[]= $notification;
+            $notification->setCourse(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Course is new, it will return
+     * an empty collection; or if this Course has previously
+     * been saved, it will retrieve related Notifications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Course.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Notification[] List of Notification objects
+     */
+    public function getNotificationsJoinAssignment($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = NotificationQuery::create(null, $criteria);
+        $query->joinWith('Assignment', $join_behavior);
+
+        return $this->getNotifications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Course is new, it will return
+     * an empty collection; or if this Course has previously
+     * been saved, it will retrieve related Notifications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Course.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Notification[] List of Notification objects
+     */
+    public function getNotificationsJoinUserRelatedByCreatedBy($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = NotificationQuery::create(null, $criteria);
+        $query->joinWith('UserRelatedByCreatedBy', $join_behavior);
+
+        return $this->getNotifications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Course is new, it will return
+     * an empty collection; or if this Course has previously
+     * been saved, it will retrieve related Notifications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Course.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Notification[] List of Notification objects
+     */
+    public function getNotificationsJoinUserRelatedByUserId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = NotificationQuery::create(null, $criteria);
+        $query->joinWith('UserRelatedByUserId', $join_behavior);
+
+        return $this->getNotifications($query, $con);
+    }
+
+    /**
      * Clears out the collStudents collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -4954,6 +5301,11 @@ abstract class BaseCourse extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collNotifications) {
+                foreach ($this->collNotifications as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collStudents) {
                 foreach ($this->collStudents as $o) {
                     $o->clearAllReferences($deep);
@@ -5013,6 +5365,10 @@ abstract class BaseCourse extends BaseObject implements Persistent
             $this->collCourseMaterials->clearIterator();
         }
         $this->collCourseMaterials = null;
+        if ($this->collNotifications instanceof PropelCollection) {
+            $this->collNotifications->clearIterator();
+        }
+        $this->collNotifications = null;
         if ($this->collStudents instanceof PropelCollection) {
             $this->collStudents->clearIterator();
         }

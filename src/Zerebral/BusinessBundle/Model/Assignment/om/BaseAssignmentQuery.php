@@ -23,6 +23,7 @@ use Zerebral\BusinessBundle\Model\Course\Course;
 use Zerebral\BusinessBundle\Model\Feed\FeedItem;
 use Zerebral\BusinessBundle\Model\File\File;
 use Zerebral\BusinessBundle\Model\File\FileReferences;
+use Zerebral\BusinessBundle\Model\Notification\Notification;
 use Zerebral\BusinessBundle\Model\User\Student;
 use Zerebral\BusinessBundle\Model\User\Teacher;
 
@@ -72,6 +73,10 @@ use Zerebral\BusinessBundle\Model\User\Teacher;
  * @method AssignmentQuery leftJoinFileReferences($relationAlias = null) Adds a LEFT JOIN clause to the query using the FileReferences relation
  * @method AssignmentQuery rightJoinFileReferences($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FileReferences relation
  * @method AssignmentQuery innerJoinFileReferences($relationAlias = null) Adds a INNER JOIN clause to the query using the FileReferences relation
+ *
+ * @method AssignmentQuery leftJoinNotification($relationAlias = null) Adds a LEFT JOIN clause to the query using the Notification relation
+ * @method AssignmentQuery rightJoinNotification($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Notification relation
+ * @method AssignmentQuery innerJoinNotification($relationAlias = null) Adds a INNER JOIN clause to the query using the Notification relation
  *
  * @method Assignment findOne(PropelPDO $con = null) Return the first Assignment matching the query
  * @method Assignment findOneOrCreate(PropelPDO $con = null) Return the first Assignment matching the query, or a new Assignment object populated from the query conditions when no match is found
@@ -1029,6 +1034,80 @@ abstract class BaseAssignmentQuery extends ModelCriteria
         return $this
             ->joinFileReferences($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'FileReferences', '\Zerebral\BusinessBundle\Model\File\FileReferencesQuery');
+    }
+
+    /**
+     * Filter the query by a related Notification object
+     *
+     * @param   Notification|PropelObjectCollection $notification  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   AssignmentQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByNotification($notification, $comparison = null)
+    {
+        if ($notification instanceof Notification) {
+            return $this
+                ->addUsingAlias(AssignmentPeer::ID, $notification->getAssignmentId(), $comparison);
+        } elseif ($notification instanceof PropelObjectCollection) {
+            return $this
+                ->useNotificationQuery()
+                ->filterByPrimaryKeys($notification->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByNotification() only accepts arguments of type Notification or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Notification relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return AssignmentQuery The current query, for fluid interface
+     */
+    public function joinNotification($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Notification');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Notification');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Notification relation Notification object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Zerebral\BusinessBundle\Model\Notification\NotificationQuery A secondary query class using the current class as primary query
+     */
+    public function useNotificationQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinNotification($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Notification', '\Zerebral\BusinessBundle\Model\Notification\NotificationQuery');
     }
 
     /**

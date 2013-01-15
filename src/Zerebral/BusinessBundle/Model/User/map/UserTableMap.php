@@ -93,6 +93,8 @@ class UserTableMap extends TableMap
         $this->addRelation('Avatar', 'Zerebral\\BusinessBundle\\Model\\File\\File', RelationMap::MANY_TO_ONE, array('avatar_id' => 'id', ), 'SET NULL', 'CASCADE');
         $this->addRelation('FeedItem', 'Zerebral\\BusinessBundle\\Model\\Feed\\FeedItem', RelationMap::ONE_TO_MANY, array('id' => 'created_by', ), 'CASCADE', 'CASCADE', 'FeedItems');
         $this->addRelation('FeedComment', 'Zerebral\\BusinessBundle\\Model\\Feed\\FeedComment', RelationMap::ONE_TO_MANY, array('id' => 'created_by', ), 'CASCADE', 'CASCADE', 'FeedComments');
+        $this->addRelation('NotificationRelatedByCreatedBy', 'Zerebral\\BusinessBundle\\Model\\Notification\\Notification', RelationMap::ONE_TO_MANY, array('id' => 'created_by', ), 'CASCADE', 'CASCADE', 'NotificationsRelatedByCreatedBy');
+        $this->addRelation('NotificationRelatedByUserId', 'Zerebral\\BusinessBundle\\Model\\Notification\\Notification', RelationMap::ONE_TO_MANY, array('id' => 'user_id', ), 'CASCADE', 'CASCADE', 'NotificationsRelatedByUserId');
         $this->addRelation('Student', 'Zerebral\\BusinessBundle\\Model\\User\\Student', RelationMap::ONE_TO_MANY, array('id' => 'user_id', ), null, null, 'Students');
         $this->addRelation('Teacher', 'Zerebral\\BusinessBundle\\Model\\User\\Teacher', RelationMap::ONE_TO_MANY, array('id' => 'user_id', ), null, null, 'Teachers');
     } // buildRelations()

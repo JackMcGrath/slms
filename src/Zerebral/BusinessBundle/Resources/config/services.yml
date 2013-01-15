@@ -28,3 +28,8 @@ services:
         class:      Zerebral\BusinessBundle\EventHandler\FeedEventSubscriber
         tags:
             -       { name: propel.event }
+
+    zerebral.notification_event_subscriber:
+            class:      Zerebral\BusinessBundle\EventHandler\NotificationEventSubscriber
+            tags:
+                -       { name: propel.event }

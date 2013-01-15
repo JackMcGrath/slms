@@ -1,0 +1,76 @@
+.notifications-popup {
+    position: fixed;
+    width: 500px;
+    padding: 20px 0 5px;
+    border:1px solid #eee;
+    background: @white;
+    top: 40px;
+    left: 80px;
+    z-index: 100;
+    .box-shadow(0 5px 10px rgba(0,0,0,.2));
+
+    .title {
+        padding: 0 20px;
+        border-bottom: 1px solid #dddfe7;
+        padding-bottom: 15px;
+        h4 {
+            display: inline-block;
+            font-size: 14px;
+            font-weight: normal;
+        }
+        a.view-all {
+            float: right;
+        }
+    }
+    .notifications-list {
+        max-height: 400px;
+        overflow: auto;
+
+        .loading {
+            padding: 0px 20px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        .no-notifications {
+            padding: 0px 20px;
+            margin-top: 20px;
+            b {
+                font-size: 13px;
+                margin-bottom: 10px;
+                display: block;
+                font-style: none;
+            }
+            p {
+                color: #ababab;
+            }
+        }
+
+        .item {
+            padding: 10px 20px;
+            margin: 5px 0;
+            border-bottom: 1px dashed #eee;
+            &.last {
+                border-bottom: none;
+                padding-bottom: 0px;
+            }
+            img.avatar {
+                margin-right: 10px;
+                width: 43px;
+                height: 43px;
+                vertical-align: top;
+            }
+            p {
+                display: inline-block;
+                width: 380px;
+                margin: 0;
+                padding: 0;
+            }
+        }
+    }
+}
+i.notifications {
+    cursor: pointer;
+    small {
+        font-style: normal;
+    }
+}

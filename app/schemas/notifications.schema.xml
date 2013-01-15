@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<database name="default" defaultIdMethod="native" package="notification" namespace="Zerebral\BusinessBundle\Model\Notification" defaultPhpNamingMethod="phpname">
+    <table name="notifications" phpName="Notification" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="user_id" phpName="UserId" type="INTEGER" sqlType="int(11) unsigned" required="true"/>
+        <column name="course_id" phpName="CourseId" type="INTEGER" sqlType="int(11) unsigned" required="false"/>
+        <column name="assignment_id" phpName="AssignmentId" type="INTEGER" sqlType="int(11) unsigned" required="false"/>
+        <column name="type" phpName="Type" type="CHAR" valueSet="assignment_create,course_update,assignment_update,material_create,assignment_file_create,attendance_status,course_feed_comment_create" sqlType="enum('assignment_create','course_update','assignment_update','material_create','assignment_file_create','attendance_status','course_feed_comment_create')" required="false">
+
+        </column>
+        <column name="params" phpName="Params" type="VARCHAR" size="100" required="false"/>
+        <column name="is_read" phpName="IsRead" type="BOOLEAN" size="1" sqlType="tinyint(1) unsigned" required="true" defaultValue="false"/>
+        <column name="created_by" phpName="CreatedBy" type="INTEGER" sqlType="int(11) unsigned" required="false"/>
+        <column name="created_at" phpName="CreatedAt" type="TIMESTAMP" required="true"/>
+        <foreign-key foreignTable="assignments" name="notifications_assignment" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="assignment_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="courses" name="notifications_course" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="course_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="users" name="notifications_creator" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="created_by" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="users" name="notifications_user" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="user_id" foreign="id"/>
+        </foreign-key>
+        <index name="notifications_user">
+            <index-column name="user_id"/>
+        </index>
+        <index name="notifications_creator">
+            <index-column name="created_by"/>
+        </index>
+        <index name="notifications_course">
+            <index-column name="course_id"/>
+        </index>
+        <index name="notifications_assignment">
+            <index-column name="assignment_id"/>
+        </index>
+    </table>
+</database>

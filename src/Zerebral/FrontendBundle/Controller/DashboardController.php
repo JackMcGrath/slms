@@ -15,6 +15,11 @@ class DashboardController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function indexAction()
     {
+//        foreach(\Zerebral\BusinessBundle\Model\Notification\NotificationQuery::create()->find() as $not) {
+//            echo $not->getId() . ' ' . get_class($not) . PHP_EOL;
+//        }
+//        die();
+
         return array(
             'name' => 'dev',
             'target' => 'home'
