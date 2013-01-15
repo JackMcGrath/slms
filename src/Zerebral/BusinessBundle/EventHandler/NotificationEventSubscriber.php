@@ -105,7 +105,7 @@ class NotificationEventSubscriber implements \Symfony\Component\EventDispatcher\
                 $notification->setCourse($fileReference->getassignmentReferenceId()->getCourse());
                 $notification->setAssignment($fileReference->getassignmentReferenceId());
                 $notification->setCreatedBy($fileReference->getassignmentReferenceId()->getCourse()->getTeachers()->getFirst()->getUserId());
-                $notification->setParams(json_encode(array('file_id' => $fileReference->getfileId())));
+                $notification->setParam('file_id',$fileReference->getfileId());
                 $notification->save();
             }
         }
@@ -123,7 +123,8 @@ class NotificationEventSubscriber implements \Symfony\Component\EventDispatcher\
                 $notification->setType(NotificationPeer::TYPE_ATTENDANCE_STATUS);
                 $notification->setCourse($attendance->getCourse());
                 $notification->setCreatedBy($attendance->getTeacher()->getUserId());
-                $notification->setParams(json_encode(array('status' => $studentAttendance->getStatus())));
+                $notification->setParam('status', $studentAttendance->getStatus());
+                $notification->setParam('date', $attendance->getDate('Y-m-d'));
                 $notification->save();
             }
         }
