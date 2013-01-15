@@ -65,6 +65,10 @@
                 width: 380px;
                 margin: 0;
                 padding: 0;
+                a {
+                    color: #458dba;
+                    font-weight: bold;
+                }
             }
         }
     }
@@ -83,6 +87,7 @@
             float: right;
             display: inline-block;
             margin-top: 15px;
+            font-size: 11px;
         }
         &.course_update p, &.assignment_update p {
             .icon-color-cutter;
@@ -106,14 +111,18 @@
             background-repeat: no-repeat;
             padding-left: 20px;
             a {
-                color: #0b4c75;
+                color: #458dba;
+                font-weight: bold;
             }
         }
     }
 }
 
 .notifications-list .main-list-block .items-list {
-    margin-top: -10px;
+    .list-item {
+        padding-top: 15px;
+        padding-bottom: 15px;
+    }
 }
 
 i.notifications {

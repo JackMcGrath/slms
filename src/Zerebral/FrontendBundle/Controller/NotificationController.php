@@ -27,7 +27,6 @@ class NotificationController extends \Zerebral\CommonBundle\Component\Controller
         $user = $this->getUser();
 
         $notifications = \Zerebral\BusinessBundle\Model\Notification\NotificationQuery::create()->findUnreadByUserId($user->getId());
-        //$notifications->update(array('IsRead' => true));
 
         return array(
             'notifications' => $notifications->find(),
