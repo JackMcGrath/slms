@@ -1,10 +1,6 @@
 {% macro mainBlock(notification) %}
     {% set type = notification.type %}
-    {% if type == 'course_update' %}
-        {{ _self.title('Course Details') }}
-    {% elseif type == 'assignment_create' %}
-        {{ _self.title('New Assignment') }}
-    {% endif %}
+    {{ _self.title(notification) }}
     {{ _self.date(notification) }}
     {{ _self.text(notification) }}
 {% endmacro %}
@@ -42,8 +38,25 @@
     <a href="#">{{ notification.userRelatedByCreatedBy ? notification.userRelatedByCreatedBy.fullName : '' }}</a> has posted a new comment in <a href="{{ path('course_view', {id: notification.course.id}) }}">{{ notification.course.name }}</a>
 {% endmacro %}
 
-{% macro title(text) %}
-    <h3>{{ text }}</h3>
+{% macro title(notification) %}
+    {% set type = notification.type %}
+    <h3>
+    {% if type == 'course_update' %}
+        Course Details
+    {% elseif type == 'assignment_create' %}
+        New Assignment
+    {% elseif type == 'assignment_update' %}
+        Assignment Details
+    {% elseif type == 'material_create' %}
+        New Syllabus Materials
+    {% elseif type == 'assignment_file_create' %}
+        New Assignment File
+    {% elseif type == 'attendance_status' %}
+        Attendance Updated
+    {% elseif type == 'course_feed_comment_create' %}
+        Response to Comment
+    {% endif %}
+    </h3>
 {% endmacro %}
 
 {% macro text(notification) %}
