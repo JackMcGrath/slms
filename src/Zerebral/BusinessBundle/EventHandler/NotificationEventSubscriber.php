@@ -62,7 +62,9 @@ class NotificationEventSubscriber implements \Symfony\Component\EventDispatcher\
     {
         /** @var $course \Zerebral\BusinessBundle\Model\Course\Course */
         $course = $event->getModel();
-
+//
+//        var_dump($course->isModified(), $course->getModifiedColumns());
+//        die;
         foreach ($course->getCourseStudents() as $student) {
             $notification = new Notification();
             $notification->setUserId($student->getStudent()->getUserId());
@@ -78,15 +80,13 @@ class NotificationEventSubscriber implements \Symfony\Component\EventDispatcher\
         /** @var $material \Zerebral\BusinessBundle\Model\Material\CourseMaterial */
         $material = $event->getModel();
 
-        if ($material->isNew()) {
-            foreach ($material->getCourse()->getStudents() as $student) {
-                $notification = new Notification();
-                $notification->setUserId($student->getStudent()->getUserId());
-                $notification->setType(NotificationPeer::TYPE_MATERIAL_CREATE);
-                $notification->setCourse($material->getCourse());
-                $notification->setCreatedBy($material->getCourse()->getTeachers()->getFirst()->getUserId());
-                $notification->save();
-            }
+        foreach ($material->getCourse()->getStudents() as $student) {
+            $notification = new Notification();
+            $notification->setUserId($student->getStudent()->getUserId());
+            $notification->setType(NotificationPeer::TYPE_MATERIAL_CREATE);
+            $notification->setCourse($material->getCourse());
+            $notification->setCreatedBy($material->getCourse()->getTeachers()->getFirst()->getUserId());
+            $notification->save();
         }
     }
 
@@ -133,7 +133,7 @@ class NotificationEventSubscriber implements \Symfony\Component\EventDispatcher\
         /** @var $feedItem \Zerebral\BusinessBundle\Model\Feed\FeedItem */
         $feedItem = $event->getModel();
 
-        if (!$feedItem->getAssignmentId() && $feedItem->getCourseId() && $feedItem->isNew()) {
+        if (!$feedItem->getAssignmentId() && $feedItem->getCourseId()) {
             foreach ($feedItem->getCourse()->getCourseTeachers() as $teacher) {
                 $notification = new Notification();
                 $notification->setUserId($teacher->getTeacher()->getUserId());

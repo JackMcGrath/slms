@@ -3,7 +3,6 @@ $(document).ready(function() {
         $('.notifications-popup').slideToggle('', popupOpenCallback);
     });
     $('body').click(function(e) {
-        console.log($(e.target).closest('.notifications-popup').hasClass('notifications-popup'));
         if (!$(e.target).closest('.notifications-popup').hasClass('notifications-popup') && !$(e.target).closest('i.notifications').hasClass('notifications')) {
             $('.notifications-popup').slideUp(popupOpenCallback);
         }
@@ -17,8 +16,11 @@ $(document).ready(function() {
                 success: function(response) {
                     if (!response.has_errors) {
                         $('.notifications-popup .notifications-list').html(response.content);
+                    } else {
+                        $('.notifications-popup .notifications-list').html('<div class="loading">Oops, seems like unknown error has appeared!</div>');
                     }
                 },
+                error: function() { $('.notifications-popup .notifications-list').html('<div class="loading">Oops, seems like unknown error has appeared!</div>'); },
                 beforeSend: function() {
                     $('.notifications-popup .notifications-list').html('<div class="loading">Loading...</div>');
                 }
