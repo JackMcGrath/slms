@@ -105,7 +105,36 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
             $course->addFeedItem($feedItem);
             $course->save();
 
-            $content = $this->render('ZerebralFrontendBundle:Feed:feedItemBlock.html.twig', array('feedItem' => $feedItem))->getContent();
+            $content = $this->render('ZerebralFrontendBundle:Feed:feedItemBlock.html.twig', array('feedItem' => $feedItem, 'isGlobal' => false))->getContent();
+            return new JsonResponse(array('has_errors' => false, 'content' => $content));
+        }
+
+        return new FormJsonResponse($feedItemForm);
+    }
+
+    /**
+     * @Route("/add-global-feed-item", name="ajax_global_add_feed_item")
+     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Zerebral\CommonBundle\HttpFoundation\FormJsonResponse
+     *
+     * TODO: rename to saveItemAction
+     * TODO: add is ajax validation
+     */
+    public function addGlobalFeedItemAction()
+    {
+        $feedItemFormType = new FormType\FeedItemType();
+        $feedItemForm = $this->createForm($feedItemFormType, null);
+
+
+        $feedItemForm->bind($this->getRequest());
+
+        if ($feedItemForm->isValid()) {
+
+            $feedItem = $feedItemForm->getData();
+            $feedItem->setCreatedBy($this->getUser()->getId());
+            $feedItem->save();
+
+            $content = $this->render('ZerebralFrontendBundle:Feed:feedItemBlock.html.twig', array('feedItem' => $feedItem, 'isGlobal' => true))->getContent();
             return new JsonResponse(array('has_errors' => false, 'content' => $content));
         }
 
