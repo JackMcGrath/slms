@@ -27,4 +27,13 @@ class StudentAssignmentQuery extends BaseStudentAssignmentQuery
         $this->filterByIsSubmitted(true);
         return $this;
     }
+
+    public function findTodayCount()
+    {
+        $this->leftJoinAssignment();
+        $this->groupBy('student_assignments.student_id');
+        $this->withColumn('COUNT(assignments.id)', 'assignmentsCount');
+        $this->where("DATE(assignments.due_at)='" . date('Y-m-d') . "'");
+        return $this;
+    }
 }
