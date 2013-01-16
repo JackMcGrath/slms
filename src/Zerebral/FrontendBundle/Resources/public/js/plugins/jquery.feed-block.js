@@ -25,6 +25,9 @@ ZerebralCourseDetailFeedBlock.prototype = {
     feedItemsDiv: undefined,
 
 
+    timeOffset: null,
+
+
     init: function() {
         var self = this;
         this.feedItemFormTextarea.click($.proxy(self.expandFeedItemForm, self));
@@ -41,6 +44,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
 
         this.commentsDiv.on('click', 'a.load-more-link', $.proxy(self.loadComments, self));
 
+        self.timeOffset = moment(this.feedItemsDiv.data('serverTime'), 'YYYY-MM-DD HH:mm:ss').diff(moment());
         self.updateFeed();
         setInterval($.proxy(self.updateFeed, self), 5000);
 
@@ -111,11 +115,11 @@ ZerebralCourseDetailFeedBlock.prototype = {
     },
 
     updateFeed: function() {
+        var currentTime = moment().add('seconds', self.timeOffset);
         var timestamps = this.feedItemsDiv.find('span.timestamp, div.timestamp>span.gray');
         $.each(timestamps, function(index, value) {
-            var date = $(value).data('date');
-            var humanDate = moment(date, 'YYYY-MM-DD HH:mm:ss').fromNow();
-            //console.log('Found timestamp "' + date + '" and it was "' + humanDate + '" but it shows "' + $(value).html() + '"');
+            var itemDate = moment($(value).data('date'), 'YYYY-MM-DD HH:mm:ss');
+            var humanDate = itemDate.from(currentTime);
             $(value).html(humanDate);
         });
     },
@@ -360,6 +364,7 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
     feedCommentFormDiv: undefined,
     feedCommentForm: undefined,
     feedCommentsDiv: undefined,
+    timeOffset: null,
 
 
         init: function() {
@@ -369,6 +374,7 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
 
         this.feedCommentsDiv.on('click', 'a.delete-link', $.proxy(self.deleteCommentBlock, self));
 
+        self.timeOffset = moment(this.feedCommentsDiv.data('serverTime'), 'YYYY-MM-DD HH:mm:ss').diff(moment());
         self.updateFeed();
         setInterval($.proxy(self.updateFeed, self), 5000);
 
@@ -438,11 +444,11 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
     },
 
     updateFeed: function() {
+        var currentTime = moment().add('seconds', self.timeOffset);
         var timestamps = this.feedCommentsDiv.find('span.timestamp');
         $.each(timestamps, function(index, value) {
-            var date = $(value).data('date');
-            var humanDate = moment(date, 'YYYY-MM-DD HH:mm:ss').fromNow();
-            //console.log('Found timestamp "' + date + '" and it was "' + humanDate + '" but it shows "' + $(value).html() + '"');
+            var date = moment($(value).data('date'), 'YYYY-MM-DD HH:mm:ss');
+            var humanDate = date.from(currentTime);
             $(value).html(humanDate);
         });
     },

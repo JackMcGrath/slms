@@ -34,7 +34,7 @@
             </div>
         </form>
     </div>
-    <div class="comments">
+    <div class="comments" data-server-time="{{ "now"|date("Y-m-d H:i:s") }}">
         {% for comment in comments %}
             {% include "ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig" with {'feedType': 'assignment'} %}
         {% else %}
@@ -86,7 +86,7 @@
         </form>
     </div>
     <hr />
-    <div class="feed-items">
+    <div class="feed-items" data-server-time="{{ "now"|date("Y-m-d H:i:s") }}">
         {% for feedItem in feedItems %}
         {% include "ZerebralFrontendBundle:Feed:feedItemBlock.html.twig" %}
         {% else %}
