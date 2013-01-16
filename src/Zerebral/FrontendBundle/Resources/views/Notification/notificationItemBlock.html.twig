@@ -87,7 +87,9 @@
 {% endmacro %}
 
 {% macro avatar(notification) %}
-    <img class="avatar rounded" src="{{ get_file_storage_link(notification.userRelatedByCreatedBy.getAvatarFile()) | imagine_filter('thumbnail') }}"/>
+    {% if notification.userRelatedByCreatedBy %}
+        <img class="avatar rounded" src="{{ get_file_storage_link(notification.userRelatedByCreatedBy.getAvatarFile()) | imagine_filter('thumbnail') }}"/>
+    {% endif %}
 {% endmacro %}
 
 
