@@ -13,4 +13,12 @@ class NotificationQuery extends BaseNotificationQuery
         $this->orderBy('created_at', \Criteria::DESC);
         return $this;
     }
+
+    public function findAllByUserId($userId)
+    {
+        $this->filterByUserId($userId);
+        $this->orderBy('created_at', \Criteria::DESC);
+        return $this;
+    }
+
 }
