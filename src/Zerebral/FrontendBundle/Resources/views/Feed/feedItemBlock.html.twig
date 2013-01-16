@@ -13,7 +13,7 @@
         {% if feedItem.feedContent.type == 'text' %}
             <span class="gray"> posted </span>
         {% endif %}
-        <span class="gray"> in </span><a href="#">{{ feedItem.course.name }}</a>
+        <span class="gray"> in </span><a href="{{ path('course_view', {id: feedItem.course.id}) }}">{{ feedItem.course.name }}</a>
     {% endif %}
     <span class="gray timestamp" data-date="{{ feedItem.createdAt.format('Y-m-d H:i:s') }}">{{ time_diff(feedItem.createdAt) }}</span></div>
 {% endmacro %}

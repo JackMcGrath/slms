@@ -34,4 +34,30 @@ class AssignmentQuery extends BaseAssignmentQuery
 
         return $this;
     }
+
+    public function findToday()
+    {
+        $this->add('DATE(due_at)', date('Y-m-d'));
+        return $this;
+    }
+
+    public function findTodayCountForTeacher()
+    {
+        $this->findToday();
+        $this->withColumn('COUNT(assignments.id)', 'assignmentsCount');
+        $this->groupBy('teacher_id');
+        return $this;
+    }
+
+    public function findInCompletedNow()
+    {
+        $this->leftJoinStudentAssignment();
+        $this->where("DATE_FORMAT(due_at, '%Y-%m-%d %H:%i')>'" . date('Y-m-d H:i', strtotime('-1 hour')) . "'");
+        $this->where("DATE_FORMAT(due_at, '%Y-%m-%d %H:%i')<='" . date('Y-m-d H:i') . "'");
+        $this->where("StudentAssignment.is_submitted=0");
+        $this->withColumn('COUNT(student_assignments.id)', 'missedSubmissionsCount');
+        $this->groupBy('assignments.id');
+        return $this;
+
+    }
 }

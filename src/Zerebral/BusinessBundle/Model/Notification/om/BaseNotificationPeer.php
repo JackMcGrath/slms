@@ -77,6 +77,12 @@ abstract class BaseNotificationPeer
     const TYPE_ASSIGNMENT_FILE_CREATE = 'assignment_file_create';
     const TYPE_ATTENDANCE_STATUS = 'attendance_status';
     const TYPE_COURSE_FEED_COMMENT_CREATE = 'course_feed_comment_create';
+    const TYPE_ASSIGNMENT_DUE_SINGLE_STUDENT = 'assignment_due_single_student';
+    const TYPE_ASSIGNMENT_DUE_SINGLE_TEACHER = 'assignment_due_single_teacher';
+    const TYPE_ASSIGNMENT_DUE_MULTIPLE_STUDENT = 'assignment_due_multiple_student';
+    const TYPE_ASSIGNMENT_DUE_MULTIPLE_TEACHER = 'assignment_due_multiple_teacher';
+    const TYPE_ASSIGNMENT_COMPLETE = 'assignment_complete';
+    const TYPE_ASSIGNMENT_INCOMPLETE = 'assignment_incomplete';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -130,6 +136,12 @@ abstract class BaseNotificationPeer
             NotificationPeer::TYPE_ASSIGNMENT_FILE_CREATE,
             NotificationPeer::TYPE_ATTENDANCE_STATUS,
             NotificationPeer::TYPE_COURSE_FEED_COMMENT_CREATE,
+            NotificationPeer::TYPE_ASSIGNMENT_DUE_SINGLE_STUDENT,
+            NotificationPeer::TYPE_ASSIGNMENT_DUE_SINGLE_TEACHER,
+            NotificationPeer::TYPE_ASSIGNMENT_DUE_MULTIPLE_STUDENT,
+            NotificationPeer::TYPE_ASSIGNMENT_DUE_MULTIPLE_TEACHER,
+            NotificationPeer::TYPE_ASSIGNMENT_COMPLETE,
+            NotificationPeer::TYPE_ASSIGNMENT_INCOMPLETE,
         ),
     );
 

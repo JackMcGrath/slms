@@ -41,6 +41,9 @@ ZerebralCourseDetailFeedBlock.prototype = {
 
         this.commentsDiv.on('click', 'a.load-more-link', $.proxy(self.loadComments, self));
 
+        self.updateFeed();
+        setInterval($.proxy(self.updateFeed, self), 5000);
+
         this.feedItemForm.zerebralAjaxForm({
             dataType: 'json',
             beforeSend: function() {
@@ -105,6 +108,16 @@ ZerebralCourseDetailFeedBlock.prototype = {
                 dataType: 'json'
             });
         })
+    },
+
+    updateFeed: function() {
+        var timestamps = this.feedItemsDiv.find('span.timestamp, div.timestamp>span.gray');
+        $.each(timestamps, function(index, value) {
+            var date = $(value).data('date');
+            var humanDate = moment(date, 'YYYY-MM-DD HH:mm:ss').fromNow();
+            //console.log('Found timestamp "' + date + '" and it was "' + humanDate + '" but it shows "' + $(value).html() + '"');
+            $(value).html(humanDate);
+        });
     },
 
     loadComments: function(event) {
@@ -356,6 +369,9 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
 
         this.feedCommentsDiv.on('click', 'a.delete-link', $.proxy(self.deleteCommentBlock, self));
 
+        self.updateFeed();
+        setInterval($.proxy(self.updateFeed, self), 5000);
+
 
         this.feedCommentForm.zerebralAjaxForm({
             data: { feedType: 'assignment' },
@@ -420,6 +436,17 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
             }
         }
     },
+
+    updateFeed: function() {
+        var timestamps = this.feedCommentsDiv.find('span.timestamp');
+        $.each(timestamps, function(index, value) {
+            var date = $(value).data('date');
+            var humanDate = moment(date, 'YYYY-MM-DD HH:mm:ss').fromNow();
+            //console.log('Found timestamp "' + date + '" and it was "' + humanDate + '" but it shows "' + $(value).html() + '"');
+            $(value).html(humanDate);
+        });
+    },
+
     resetMainFormType: function(event) {
         event.preventDefault();
         var link = $(event.target);
