@@ -55,6 +55,12 @@ class NotificationTableMap extends TableMap
   4 => 'assignment_file_create',
   5 => 'attendance_status',
   6 => 'course_feed_comment_create',
+  7 => 'assignment_due_single_student',
+  8 => 'assignment_due_single_teacher',
+  9 => 'assignment_due_multiple_student',
+  10 => 'assignment_due_multiple_teacher',
+  11 => 'assignment_complete',
+  12 => 'assignment_incomplete',
 ));
         $this->addColumn('params', 'Params', 'VARCHAR', false, 100, null);
         $this->addColumn('is_read', 'IsRead', 'BOOLEAN', true, 1, false);

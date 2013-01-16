@@ -5,7 +5,7 @@
         <column name="user_id" phpName="UserId" type="INTEGER" sqlType="int(11) unsigned" required="true"/>
         <column name="course_id" phpName="CourseId" type="INTEGER" sqlType="int(11) unsigned" required="false"/>
         <column name="assignment_id" phpName="AssignmentId" type="INTEGER" sqlType="int(11) unsigned" required="false"/>
-        <column name="type" phpName="Type" type="CHAR" valueSet="assignment_create,course_update,assignment_update,material_create,assignment_file_create,attendance_status,course_feed_comment_create" sqlType="enum('assignment_create','course_update','assignment_update','material_create','assignment_file_create','attendance_status','course_feed_comment_create')" required="false">
+        <column name="type" phpName="Type" type="CHAR" valueSet="assignment_create,course_update,assignment_update,material_create,assignment_file_create,attendance_status,course_feed_comment_create,assignment_due_single_student,assignment_due_single_teacher,assignment_due_multiple_student,assignment_due_multiple_teacher,assignment_complete,assignment_incomplete" sqlType="enum('assignment_create','course_update','assignment_update','material_create','assignment_file_create','attendance_status','course_feed_comment_create','assignment_due_single_student','assignment_due_single_teacher','assignment_due_multiple_student','assignment_due_multiple_teacher','assignment_complete','assignment_incomplete')" required="false">
 
         </column>
         <column name="params" phpName="Params" type="VARCHAR" size="100" required="false"/>

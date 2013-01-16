@@ -38,6 +38,23 @@
     <a href="#">{{ notification.userRelatedByCreatedBy ? notification.userRelatedByCreatedBy.fullName : '' }}</a> has posted a new comment in <a href="{{ path('course_view', {id: notification.course.id}) }}">{{ notification.course.name }}</a>
 {% endmacro %}
 
+{% macro assignmentDueSingle(notification) %}
+    <a href="{{ path('assignment_view', {id: notification.assignment.id}) }}">{{ notification.assignment.name }}</a> is due today for <a href="{{ path('course_view', {id: notification.course.id}) }}">{{ notification.course.name }}</a>
+{% endmacro %}
+
+{% macro assignmentDueMultiple(notification) %}
+    You have {{ notification.getParam('assignmentsCount') }} due today
+{% endmacro %}
+
+{% macro assignmentComplete(notification) %}
+
+{% endmacro %}
+
+{% macro assignmentInComplete(notification) %}
+    <a href="{{ path('assignment_view', {id: notification.assignment.id}) }}">{{ notification.assignment.name }}</a> is incomplete. Assignment is missing {{ notification.getParam('missedSubmissionsCount') }} submissions
+{% endmacro %}
+
+
 {% macro title(notification) %}
     {% set type = notification.type %}
     <h3>
@@ -76,6 +93,18 @@
         {{ _self.attendanceStatus(notification) }}
     {% elseif type == 'course_feed_comment_create' %}
         {{ _self.courseFeedComment(notification) }}
+    {% elseif type == 'assignment_due_single_student' %}
+        {{ _self.assignmentDueSingle(notification) }}
+    {% elseif type == 'assignment_due_single_teacher' %}
+        {{ _self.assignmentDueSingle(notification) }}
+    {% elseif type == 'assignment_due_multiple_student' %}
+        {{ _self.assignmentDueMultiple(notification) }}
+    {% elseif type == 'assignment_due_multiple_teacher' %}
+        {{ _self.assignmentDueMultiple(notification) }}
+    {% elseif type == 'assignment_complete' %}
+        {{ _self.assignmentComplete(notification) }}
+    {% elseif type == 'assignment_incomplete' %}
+        {{ _self.assignmentInComplete(notification) }}
     {% endif %}
     </p>
 {% endmacro %}
