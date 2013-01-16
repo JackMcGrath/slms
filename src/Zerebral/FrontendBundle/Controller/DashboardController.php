@@ -6,6 +6,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 
+use Zerebral\FrontendBundle\Form\Type as FormType;
+
 class DashboardController extends \Zerebral\CommonBundle\Component\Controller
 {
     /**
@@ -20,9 +22,17 @@ class DashboardController extends \Zerebral\CommonBundle\Component\Controller
 //        }
 //        die();
 
+        $feedItemFormType = new FormType\FeedItemType();
+        $feedItemForm = $this->createForm($feedItemFormType, null);
+
+        $feedItemQuery = new \Zerebral\BusinessBundle\Model\Feed\FeedItemQuery();
+        $feeds = $feedItemQuery->getItemsForUser($this->getUser());
+
         return array(
-            'name' => 'dev',
-            'target' => 'home'
+            'target' => 'home',
+            'feedItemForm' => $feedItemForm->createView(),
+            'feedItems' => $feeds,
+            'target' => 'feed',
         );
     }
 }

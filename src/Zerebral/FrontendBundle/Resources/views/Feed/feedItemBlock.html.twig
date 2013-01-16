@@ -1,5 +1,26 @@
-{% macro feed_item_website_block(feedItem) %}
-    <div class="author">{{ feedItem.user.fullName }}<span class="gray"> posted a </span><a target="_blank" href="{{ feedItem.feedContent.linkUrl }}">website link</a> <span class="gray timestamp" data-date="{{ feedItem.createdAt.format('Y-m-d H:i:s') }}">{{ time_diff(feedItem.createdAt) }}</span></div>
+{% macro feed_item_author_block(feedItem, isGlobal) %}
+    <div class="author">{{ feedItem.user.fullName }}
+    {% if feedItem.feedContent.type == 'assignment' %}
+        <span class="gray"> created new assignment </span><a href="{{ path('assignment_view', {id: feedItem.assignment.id}) }}">{{ feedItem.assignment.name }}</a>
+    {% elseif feedItem.feedContent.type == 'video' %}
+        <span class="gray"> posted a </span><a target="_blank" href="{{ feedItem.feedContent.linkUrl }}">video</a>
+    {% elseif feedItem.feedContent.type == 'image' %}
+        <span class="gray"> posted an </span><a target="_blank" href="{{ feedItem.feedContent.linkUrl }}">image</a>
+    {% elseif feedItem.feedContent.type == 'website' %}
+        <span class="gray"> posted an </span><a target="_blank" href="{{ feedItem.feedContent.linkUrl }}">website link</a>
+    {% endif %}
+    {% if isGlobal and feedItem.course is not sameas(null) %}
+        {% if feedItem.feedContent.type == 'text' %}
+            <span class="gray"> posted </span>
+        {% endif %}
+        <span class="gray"> in </span><a href="#">{{ feedItem.course.name }}</a>
+    {% endif %}
+    <span class="gray timestamp" data-date="{{ feedItem.createdAt.format('Y-m-d H:i:s') }}">{{ time_diff(feedItem.createdAt) }}</span></div>
+{% endmacro %}
+
+{% macro feed_item_website_block(feedItem, isGlobal) %}
+    {% import _self as self %}
+    {{ self.feed_item_author_block(feedItem, isGlobal) }}
     <div class="text">
         {{ feedItem.feedContent.text }}
         <div class="link-content">
@@ -17,8 +38,9 @@
     </div>
 {% endmacro %}
 
-{% macro feed_item_video_block(feedItem) %}
-    <div class="author">{{ feedItem.user.fullName }}<span class="gray"> posted a </span><a target="_blank" href="{{ feedItem.feedContent.linkUrl }}">video</a> <span class="gray timestamp" data-date="{{ feedItem.createdAt.format('Y-m-d H:i:s') }}">{{ time_diff(feedItem.createdAt) }}</span></div>
+{% macro feed_item_video_block(feedItem, isGlobal) %}
+    {% import _self as self %}
+    {{ self.feed_item_author_block(feedItem, isGlobal) }}
     <div class="text">
         {{ feedItem.feedContent.text }}
         <div class="link-content">
@@ -36,8 +58,9 @@
     </div>
 {% endmacro %}
 
-{% macro feed_item_image_block(feedItem) %}
-    <div class="author">{{ feedItem.user.fullName }}<span class="gray"> posted an </span><a target="_blank" href="{{ feedItem.feedContent.linkUrl }}">image</a> <span class="gray timestamp" data-date="{{ feedItem.createdAt.format('Y-m-d H:i:s') }}">{{ time_diff(feedItem.createdAt) }}</span></div>
+{% macro feed_item_image_block(feedItem, isGlobal) %}
+    {% import _self as self %}
+    {{ self.feed_item_author_block(feedItem, isGlobal) }}
     <div class="text">
         {{ feedItem.feedContent.text }}
         <div class="link-content">
@@ -46,8 +69,9 @@
     </div>
 {% endmacro %}
 
-{% macro feed_item_assignment_block(feedItem) %}
-    <div class="author">{{ feedItem.user.fullName }}<span class="gray"> created new assignment </span><a href="{{ path('assignment_view', {id: feedItem.assignment.id}) }}">{{ feedItem.assignment.name }}</a> <span class="gray timestamp" data-date="{{ feedItem.createdAt.format('Y-m-d H:i:s') }}">{{ time_diff(feedItem.createdAt) }}</span></div>
+{% macro feed_item_assignment_block(feedItem, isGlobal) %}
+    {% import _self as self %}
+    {{ self.feed_item_author_block(feedItem, isGlobal) }}
     <div class="text">
         {% autoescape 'html' %}
         {{ feedItem.assignment.description|striptags|slice(0, 100) }}
@@ -55,8 +79,9 @@
     </div>
 {% endmacro %}
 
-{% macro feed_item_text_block(feedItem) %}
-    <div class="author">{{ feedItem.user.fullName }}<span class="gray timestamp" data-date="{{ feedItem.createdAt.format('Y-m-d H:i:s') }}">{{ time_diff(feedItem.createdAt) }}</span></div>
+{% macro feed_item_text_block(feedItem, isGlobal) %}
+    {% import _self as self %}
+    {{ self.feed_item_author_block(feedItem, isGlobal) }}
     <div class="text">
         {{ feedItem.feedContent.text }}
     </div>
@@ -69,15 +94,15 @@
     <div class="content {% if app.user.id == feedItem.user.id and feedItem.feedContent.type != 'assignment' %} is_author {% endif %}">
         {% if app.user.id == feedItem.user.id %}<a href="{{ path('ajax_feed_remove_feed_item', {feedItemId: feedItem.id}) }}" class="gray delete-link delete-feed-item"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
         {% if feedItem.feedContent.type == 'assignment' %}
-            {{ self.feed_item_assignment_block(feedItem) }}
+            {{ self.feed_item_assignment_block(feedItem, isGlobal) }}
         {% elseif feedItem.feedContent.type == 'website' %}
-            {{ self.feed_item_website_block(feedItem) }}
+            {{ self.feed_item_website_block(feedItem, isGlobal) }}
         {% elseif feedItem.feedContent.type == 'video' %}
-            {{ self.feed_item_video_block(feedItem) }}
+            {{ self.feed_item_video_block(feedItem, isGlobal) }}
         {% elseif feedItem.feedContent.type == 'image' %}
-            {{ self.feed_item_image_block(feedItem) }}
+            {{ self.feed_item_image_block(feedItem, isGlobal) }}
         {% else %}
-            {{ self.feed_item_text_block(feedItem) }}
+            {{ self.feed_item_text_block(feedItem, isGlobal) }}
         {% endif %}
     </div>
     <div class="comments-button">
