@@ -131,7 +131,7 @@
                                     </td>
                                     <td class="name-container">
                                         {{ student.getUser.getFirstName }} {{ student.getUser.getLastName }}
-                                        <img class="rounded pull-right" src="http://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?s=24"/>
+                                        <img class="rounded pull-right" src="{{ get_file_storage_link(student.user.getAvatarFile()) | imagine_filter('small_thumbnail') }}"/>
                                     </td>
                                 </tr>
                             {%  endfor %}

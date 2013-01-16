@@ -22,7 +22,7 @@
             float: right;
         }
     }
-    .notifications-list {
+    .notifications-popup-list {
         max-height: 400px;
         overflow: auto;
 
@@ -58,16 +58,73 @@
                 width: 43px;
                 height: 43px;
                 vertical-align: top;
+                display: inline-block;
             }
             p {
                 display: inline-block;
                 width: 380px;
                 margin: 0;
                 padding: 0;
+                a {
+                    color: #458dba;
+                    font-weight: bold;
+                }
             }
         }
     }
 }
+
+.notifications-list {
+    .list-item {
+        h3 {
+            font-size: 18px;
+            font-style: normal;
+            display: inline-block;
+            float: left;
+        }
+        .date {
+            color: #9a9a9a;
+            float: right;
+            display: inline-block;
+            margin-top: 15px;
+            font-size: 11px;
+        }
+        &.course_update p, &.assignment_update p {
+            .icon-color-cutter;
+        }
+        &.assignment_create p {
+            .icon-color-bookmark;
+        }
+        &.assignment_file_create p, &.material_create p {
+            .icon-color-attachment;
+        }
+        &.course_feed_comment_create p {
+            .icon-color-exclamation;
+        }
+        &.attendance_status p {
+            .icon-color-abacus;
+        }
+        p {
+            display: block;
+            clear: both;
+            color: #626262;
+            background-repeat: no-repeat;
+            padding-left: 20px;
+            a {
+                color: #458dba;
+                font-weight: bold;
+            }
+        }
+    }
+}
+
+.notifications-list .main-list-block .items-list {
+    .list-item {
+        padding-top: 15px;
+        padding-bottom: 15px;
+    }
+}
+
 i.notifications {
     cursor: pointer;
     small {
