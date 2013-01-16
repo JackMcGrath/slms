@@ -22,7 +22,7 @@ class FeedItemQuery extends BaseFeedItemQuery
 
             $criteria->addJoin(FeedItemPeer::ASSIGNMENT_ID, StudentAssignmentPeer::ASSIGNMENT_ID, \Criteria::LEFT_JOIN);
             $criteria->addAnd(StudentAssignmentPeer::STUDENT_ID, $user->getStudent()->getId(), \Criteria::EQUAL);
-            $criteria->addOr(StudentAssignmentPeer::ASSIGNMENT_ID, null, \Criteria::ISNULL);
+            $criteria->addOr(FeedItemPeer::ASSIGNMENT_ID, null, \Criteria::ISNULL);
         } else {
             $criteria->addJoin(FeedItemPeer::COURSE_ID, CourseTeacherPeer::COURSE_ID, \Criteria::LEFT_JOIN);
             $criteria->addAnd(CourseTeacherPeer::TEACHER_ID, $user->getTeacher()->getId(), \Criteria::EQUAL);
