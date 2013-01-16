@@ -6,9 +6,18 @@ use Zerebral\BusinessBundle\Model\Notification\om\BaseNotificationPeer;
 
 class NotificationPeer extends BaseNotificationPeer
 {
-    public static function createAssignmentComplete()
+    public static function createAssignmentComplete($assignments)
     {
-
+        /** @var $assignment \Zerebral\BusinessBundle\Model\Assignment\Assignment */
+        foreach ($assignments as $assignment) {
+            if (!$assignment->hasNotificationByType(self::TYPE_ASSIGNMENT_COMPLETE)) {
+                $notification = new Notification();
+                $notification->setUserId($assignment->getTeacher()->getUserId());
+                $notification->setType(self::TYPE_ASSIGNMENT_COMPLETE);
+                $notification->setAssignment($assignment);
+                $notification->save();
+            }
+        }
     }
 
     public static function createAssignmentInCompleted($assignments)

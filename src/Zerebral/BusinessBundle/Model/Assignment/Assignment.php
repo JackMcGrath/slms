@@ -34,5 +34,10 @@ class Assignment extends BaseAssignment
         return $this->getFeedItems()->getFirst();
     }
 
-
+    public function hasNotificationByType($type)
+    {
+        $c = new \Criteria();
+        $c->add('type', $type);
+        return (bool)$this->getNotifications($c)->count();
+    }
 }
