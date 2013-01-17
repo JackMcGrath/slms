@@ -11,42 +11,46 @@ use Zerebral\BusinessBundle\Model\Course\CoursePeer;
 
 class FeedItemQuery extends BaseFeedItemQuery
 {
-    public static function getGlobalFeed(\Zerebral\BusinessBundle\Model\User\User $user)
+    public function getGlobalFeed(\Zerebral\BusinessBundle\Model\User\User $user)
     {
-        $criteria = new \Criteria();
-
         if ($user->isStudent()) {
+            $this->addJoin(FeedItemPeer::COURSE_ID, CourseStudentPeer::COURSE_ID, \Criteria::LEFT_JOIN);
+            $this->addAnd(CourseStudentPeer::STUDENT_ID, $user->getStudent()->getId(), \Criteria::EQUAL);
+            $this->addOr(FeedItemPeer::COURSE_ID, null, \Criteria::ISNULL);
 
-            $criteria->addJoin(FeedItemPeer::COURSE_ID, CourseStudentPeer::COURSE_ID, \Criteria::LEFT_JOIN);
-            $criteria->addAnd(CourseStudentPeer::STUDENT_ID, $user->getStudent()->getId(), \Criteria::EQUAL);
-            $criteria->addOr(FeedItemPeer::COURSE_ID, null, \Criteria::ISNULL);
-
-            $criteria->addJoin(FeedItemPeer::ASSIGNMENT_ID, StudentAssignmentPeer::ASSIGNMENT_ID, \Criteria::LEFT_JOIN);
-            $criteria->addAnd(StudentAssignmentPeer::STUDENT_ID, $user->getStudent()->getId(), \Criteria::EQUAL);
-            $criteria->addOr(FeedItemPeer::ASSIGNMENT_ID, null, \Criteria::ISNULL);
+            $this->addJoin(FeedItemPeer::ASSIGNMENT_ID, StudentAssignmentPeer::ASSIGNMENT_ID, \Criteria::LEFT_JOIN);
+            $this->addAnd(StudentAssignmentPeer::STUDENT_ID, $user->getStudent()->getId(), \Criteria::EQUAL);
+            $this->addOr(FeedItemPeer::ASSIGNMENT_ID, null, \Criteria::ISNULL);
         } else {
-            $criteria->addJoin(FeedItemPeer::COURSE_ID, CourseTeacherPeer::COURSE_ID, \Criteria::LEFT_JOIN);
-            $criteria->addAnd(CourseTeacherPeer::TEACHER_ID, $user->getTeacher()->getId(), \Criteria::EQUAL);
-            $criteria->addOr(FeedItemPeer::COURSE_ID, null, \Criteria::ISNULL);
+            $this->addJoin(FeedItemPeer::COURSE_ID, CourseTeacherPeer::COURSE_ID, \Criteria::LEFT_JOIN);
+            $this->addAnd(CourseTeacherPeer::TEACHER_ID, $user->getTeacher()->getId(), \Criteria::EQUAL);
+            $this->addOr(FeedItemPeer::COURSE_ID, null, \Criteria::ISNULL);
         }
-        $criteria->addDescendingOrderByColumn('created_at');
 
-        return parent::create(null, $criteria);
+        $relatedUsers = $user->getRelatedUsers();
+        $ids = array();
+        foreach($relatedUsers as $relatedUser) {
+            $ids[] = $relatedUser->getId();
+        }
+
+        $this->addAnd(FeedItemPeer::CREATED_BY, $ids, \Criteria::IN);
+        $this->addDescendingOrderByColumn('created_at');
+
+        return $this;
     }
 
-    public static function getCourseFeed(\Zerebral\BusinessBundle\Model\Course\Course $course, \Zerebral\BusinessBundle\Model\User\User $user)
+    public function getCourseFeed(\Zerebral\BusinessBundle\Model\Course\Course $course, \Zerebral\BusinessBundle\Model\User\User $user)
     {
-        $criteria = new \Criteria();
-
         if ($user->isStudent()) {
-            $criteria->addJoin(FeedItemPeer::ASSIGNMENT_ID, StudentAssignmentPeer::ASSIGNMENT_ID, \Criteria::LEFT_JOIN);
-            $criteria->addAnd(StudentAssignmentPeer::STUDENT_ID, $user->getStudent()->getId(), \Criteria::EQUAL);
-            $criteria->addOr(FeedItemPeer::ASSIGNMENT_ID, null, \Criteria::ISNULL);
+            $this->addJoin(FeedItemPeer::ASSIGNMENT_ID, StudentAssignmentPeer::ASSIGNMENT_ID, \Criteria::LEFT_JOIN);
+            $this->addAnd(StudentAssignmentPeer::STUDENT_ID, $user->getStudent()->getId(), \Criteria::EQUAL);
+            $this->addOr(FeedItemPeer::ASSIGNMENT_ID, null, \Criteria::ISNULL);
         }
-        $criteria->addJoin(FeedItemPeer::COURSE_ID, CoursePeer::ID, \Criteria::LEFT_JOIN);
-        $criteria->addAnd(CoursePeer::ID, $course->getId(), \Criteria::EQUAL);
-        $criteria->addDescendingOrderByColumn('created_at');
-        return parent::create(null, $criteria);
+        $this->addJoin(FeedItemPeer::COURSE_ID, CoursePeer::ID, \Criteria::LEFT_JOIN);
+        $this->addAnd(CoursePeer::ID, $course->getId(), \Criteria::EQUAL);
+        $this->addDescendingOrderByColumn('created_at');
+
+        return $this;
     }
 
     public function filterNewer($lastItemId)

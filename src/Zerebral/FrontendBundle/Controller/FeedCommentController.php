@@ -94,7 +94,7 @@ class FeedCommentController extends \Zerebral\CommonBundle\Component\Controller
         $lastCommentId = $this->getRequest()->get('lastCommentId', 0);
 
         /** @var $commentsQuery \Zerebral\BusinessBundle\Model\Feed\FeedCommentQuery */
-        $commentsQuery = FeedCommentQuery::filterOlder($feedItem, $lastCommentId);
+        $commentsQuery = FeedCommentQuery::create()->filterOlder($feedItem, $lastCommentId);
 
         /** @var $commentsPaginator \PropelModelPager */
         $commentsPaginator = $commentsQuery->paginate($page, 10);
@@ -117,7 +117,7 @@ class FeedCommentController extends \Zerebral\CommonBundle\Component\Controller
     public function checkoutAction(\Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem)
     {
         $lastCommentId = $this->getRequest()->get('lastCommentId', 0);
-        $comments = FeedCommentQuery::filterNewer($feedItem, $lastCommentId)->find();
+        $comments = FeedCommentQuery::create()->filterNewer($feedItem, $lastCommentId)->find();
         $content = '';
         if (count($comments) > 0) {
             foreach ($comments as $comment) {

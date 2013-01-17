@@ -14,17 +14,17 @@ class FeedCommentQuery extends BaseFeedCommentQuery
         return $filter->orderByCreatedAt();
     }
 
-    public static function filterOlder($feedItem, $lastCommentId)
+    public function filterOlder($feedItem, $lastCommentId)
     {
-        return self::create()->clearOrderByColumns()
+        return $this->clearOrderByColumns()
             ->addDescendingOrderByColumn(FeedCommentPeer::ID)
             ->filterByFeedItem($feedItem)
             ->filterById($lastCommentId, \Criteria::LESS_THAN);
     }
 
-    public static function filterNewer($feedItem, $lastCommentId)
+    public function filterNewer($feedItem, $lastCommentId)
     {
-        return self::create()->clearOrderByColumns()
+        return $this->clearOrderByColumns()
             ->addAscendingOrderByColumn(FeedCommentPeer::ID)
             ->filterByFeedItem($feedItem)
             ->filterById($lastCommentId, \Criteria::GREATER_THAN);

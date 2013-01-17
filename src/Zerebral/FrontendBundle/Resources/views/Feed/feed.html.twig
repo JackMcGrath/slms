@@ -55,10 +55,10 @@
 
 {% macro course_details_feed(feedItemForm, feedItems, course = null) %}
     {% import _self as self %}
-    {% if course is defined %}
-        {% set isGlobal = false %}
-    {% else %}
+    {% if course is null %}
         {% set isGlobal = true %}
+    {% else %}
+        {% set isGlobal = false %}
     {% endif %}
     <div class="course-details-feed">
     <div class="feed-item-alert-block alert alert-block alert-error" style="display: none;">

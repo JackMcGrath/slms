@@ -20,6 +20,7 @@ use Zerebral\BusinessBundle\Model\Feed\FeedComment;
 use Zerebral\BusinessBundle\Model\Course\Course;
 
 use Zerebral\BusinessBundle\Model\Feed\FeedCommentQuery;
+use Zerebral\BusinessBundle\Model\Feed\FeedItemQuery;
 
 /**
  * @Route("/feed")
@@ -88,9 +89,9 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
     {
         $lastItemId = $this->getRequest()->get('lastItemId', 0);
         if (is_null($course)) {
-            $query = \Zerebral\BusinessBundle\Model\Feed\FeedItemQuery::getGlobalFeed($this->getUser());
+            $query = FeedItemQuery::create()->getGlobalFeed($this->getUser());
         } else {
-            $query = \Zerebral\BusinessBundle\Model\Feed\FeedItemQuery::getCourseFeed($course, $this->getUser());
+            $query = FeedItemQuery::create()->getCourseFeed($course, $this->getUser());
         }
 
         $items = $query->filterNewer($lastItemId)->find();

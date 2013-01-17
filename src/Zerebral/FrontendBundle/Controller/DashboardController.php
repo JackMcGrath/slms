@@ -27,7 +27,8 @@ class DashboardController extends \Zerebral\CommonBundle\Component\Controller
         $feedItemFormType = new FormType\FeedItemType();
         $feedItemForm = $this->createForm($feedItemFormType, null);
 
-        $feeds = FeedItemQuery::getGlobalFeed($this->getUser())->find();
+        $feeds = FeedItemQuery::create()->getGlobalFeed($this->getUser())->find();
+
 
         return array(
             'target' => 'home',
