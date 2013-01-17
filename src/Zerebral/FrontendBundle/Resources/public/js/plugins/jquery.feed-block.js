@@ -76,7 +76,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
                     }
                 } else {
                     self.feedItemsDiv.data('lastItemId', response['lastItemId']);
-                    self.addItemBlock(response['content']);
+                    self.addItemBlock(response['content'], true);
                 }
             },
             error: function() { alert('Oops, seems like unknown error has appeared!'); },
@@ -133,7 +133,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
                 success: function(response) {
                     if (response.success) {
                         self.feedItemsDiv.data('lastItemId', response['lastItemId']);
-                        $.proxy(self.addItemBlock(response['content']), self);
+                        $.proxy(self.addItemBlock(response['content'], false), self);
                     }
                 },
                 error: function() { self.errorHasAppeared++; }
@@ -281,7 +281,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
         var link = $(event.target);
         link.parents('.feed-item').find('.comment.hidden').removeClass('hidden');
     },
-    addItemBlock: function(response) {
+    addItemBlock: function(response, collapseForm) {
         var self = this;
         var itemBlock = $(response);
         var form = itemBlock.find('form');
@@ -312,7 +312,9 @@ ZerebralCourseDetailFeedBlock.prototype = {
 
         });
         this.feedItemsDiv.find('.empty').remove().end().prepend(itemBlock);
-        this.collapseFeedItemForm();
+        if (collapseForm) {
+            this.collapseFeedItemForm();
+        }
     },
     deleteItemBlock: function(event) {
         event.preventDefault();
