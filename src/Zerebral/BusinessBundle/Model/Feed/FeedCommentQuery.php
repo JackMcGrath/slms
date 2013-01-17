@@ -19,8 +19,7 @@ class FeedCommentQuery extends BaseFeedCommentQuery
         return self::create()->clearOrderByColumns()
             ->addDescendingOrderByColumn(FeedCommentPeer::ID)
             ->filterByFeedItem($feedItem)
-            ->filterById($lastCommentId, \Criteria::LESS_THAN)
-            ->find();
+            ->filterById($lastCommentId, \Criteria::LESS_THAN);
     }
 
     public static function filterNewer($feedItem, $lastCommentId)
@@ -28,7 +27,6 @@ class FeedCommentQuery extends BaseFeedCommentQuery
         return self::create()->clearOrderByColumns()
             ->addAscendingOrderByColumn(FeedCommentPeer::ID)
             ->filterByFeedItem($feedItem)
-            ->filterById($lastCommentId, \Criteria::GREATER_THAN)
-            ->find();
+            ->filterById($lastCommentId, \Criteria::GREATER_THAN);
     }
 }

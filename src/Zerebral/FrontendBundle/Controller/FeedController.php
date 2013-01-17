@@ -27,44 +27,14 @@ use Zerebral\BusinessBundle\Model\Feed\FeedCommentQuery;
 class FeedController extends \Zerebral\CommonBundle\Component\Controller
 {
     /**
-     * @Route("/save/{courseId}", name="ajax_course_add_feed_item")
+     * @Route("/save", name="ajax_add_feed_item")
      * @param \Zerebral\BusinessBundle\Model\Course\Course
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Zerebral\CommonBundle\HttpFoundation\FormJsonResponse
-     * @ParamConverter("course", options={"mapping": {"courseId": "id"}})
      *
      * TODO: add is ajax validation
      */
-    public function saveItemAction(\Zerebral\BusinessBundle\Model\Course\Course $course)
-    {
-        $feedItemFormType = new FormType\FeedItemType();
-        $feedItemForm = $this->createForm($feedItemFormType, null);
-
-
-        $feedItemForm->bind($this->getRequest());
-
-        if ($feedItemForm->isValid()) {
-
-            $feedItem = $feedItemForm->getData();
-            $feedItem->setCreatedBy($this->getUser()->getId());
-            $course->addFeedItem($feedItem);
-            $course->save();
-
-            $content = $this->render('ZerebralFrontendBundle:Feed:feedItemBlock.html.twig', array('feedItem' => $feedItem, 'isGlobal' => false))->getContent();
-            return new JsonResponse(array('has_errors' => false, 'content' => $content));
-        }
-
-        return new FormJsonResponse($feedItemForm);
-    }
-
-    /**
-     * @Route("/save-global", name="ajax_global_add_feed_item")
-     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Zerebral\CommonBundle\HttpFoundation\FormJsonResponse
-     *
-     * TODO: add is ajax validation
-     */
-    public function saveGlobalItemAction()
+    public function saveAction()
     {
         $feedItemFormType = new FormType\FeedItemType();
         $feedItemForm = $this->createForm($feedItemFormType, null);
@@ -78,15 +48,16 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
             $feedItem->setCreatedBy($this->getUser()->getId());
             $feedItem->save();
 
-            $content = $this->render('ZerebralFrontendBundle:Feed:feedItemBlock.html.twig', array('feedItem' => $feedItem, 'isGlobal' => true))->getContent();
-            return new JsonResponse(array('has_errors' => false, 'content' => $content));
+            $content = $this->render('ZerebralFrontendBundle:Feed:feedItemBlock.html.twig', array('feedItem' => $feedItem, 'isGlobal' => false))->getContent();
+            return new JsonResponse(array('has_errors' => false, 'content' => $content, 'lastItemId' => $feedItem->getId()));
         }
 
         return new FormJsonResponse($feedItemForm);
     }
 
+
     /**
-     * @Route("/remove/{feedItemId}", name="ajax_feed_remove_feed_item")
+     * @Route("/remove/{feedItemId}", name="ajax_remove_feed_item")
      * @param \Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
@@ -94,7 +65,7 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
      *
      * TODO: add is ajax validation
      */
-    public function removeItemAction(\Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem)
+    public function removeAction(\Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem)
     {
         if (($this->getUser()->getId() == $feedItem->getCreatedBy()) && ($feedItem->getFeedContent()->getType() != 'assignment')) {
             $feedItem->delete();
@@ -102,5 +73,36 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
         } else {
             return new JsonResponse(array('message' => 'You can\'t delete other feed items or assignments items'), 403);
         }
+    }
+
+    /**
+     * @Route("/checkout/{courseId}", name="ajax_checkout_items", defaults={"courseId" = null})
+     * @param \Zerebral\BusinessBundle\Model\Course\Course $course
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @ParamConverter("course", options={"mapping": {"courseId": "id"}})
+     *
+     * TODO: add is ajax validation
+     */
+    public function checkoutAction(Course $course = null)
+    {
+        $lastItemId = $this->getRequest()->get('lastItemId', 0);
+        if (is_null($course)) {
+            $query = \Zerebral\BusinessBundle\Model\Feed\FeedItemQuery::getGlobalFeed($this->getUser());
+        } else {
+            $query = \Zerebral\BusinessBundle\Model\Feed\FeedItemQuery::getCourseFeed($course, $this->getUser());
+        }
+
+        $items = $query->filterNewer($lastItemId)->find();
+
+        $content = '';
+        if (count($items) > 0) {
+            foreach ($items as $item) {
+                $content .= $this->render('ZerebralFrontendBundle:Feed:feedItemBlock.html.twig', array('feedItem' => $item, 'isGlobal' => is_null($course)))->getContent();
+            }
+            $lastItemId = $items->getFirst()->getId();
+        }
+
+        return new JsonResponse(array('success' => true, 'lastItemId' => $lastItemId, 'content' => $content));
     }
 }

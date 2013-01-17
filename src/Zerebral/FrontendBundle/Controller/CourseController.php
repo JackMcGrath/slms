@@ -87,6 +87,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
 
         return array(
             'course' => $course,
+            'feedItems' => \Zerebral\BusinessBundle\Model\Feed\FeedItemQuery::getCourseFeed($course, $this->getUser())->find(),
             'upcomingAssignments' => $upcomingAssignments,
             'recentMaterials' => $recentMaterials,
             'feedItemForm' => $feedItemForm->createView(),

@@ -53,7 +53,7 @@ class FeedCommentController extends \Zerebral\CommonBundle\Component\Controller
 
             $feedType = $this->getRequest()->get('feedType', 'assignment');
             $content = $this->render('ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig', array('feedType' => $feedType, 'comment' => $feedComment))->getContent();
-            return new JsonResponse(array('has_errors' => false, 'content' => $content));
+            return new JsonResponse(array('has_errors' => false, 'content' => $content, 'lastCommentId' => $feedComment->getId()));
         }
 
         return new FormJsonResponse($feedCommentForm);
@@ -117,7 +117,7 @@ class FeedCommentController extends \Zerebral\CommonBundle\Component\Controller
     public function checkoutAction(\Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem)
     {
         $lastCommentId = $this->getRequest()->get('lastCommentId', 0);
-        $comments = FeedCommentQuery::filterNewer($feedItem, $lastCommentId);
+        $comments = FeedCommentQuery::filterNewer($feedItem, $lastCommentId)->find();
         $content = '';
         if (count($comments) > 0) {
             foreach ($comments as $comment) {

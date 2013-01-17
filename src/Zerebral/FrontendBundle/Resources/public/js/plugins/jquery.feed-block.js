@@ -27,6 +27,9 @@ ZerebralCourseDetailFeedBlock.prototype = {
 
     timeOffset: null,
 
+    ajaxInProgress: false,
+    errorHasAppeared: 0,
+
 
     init: function() {
         var self = this;
@@ -44,13 +47,14 @@ ZerebralCourseDetailFeedBlock.prototype = {
 
         this.commentsDiv.on('click', 'a.load-more-link', $.proxy(self.loadComments, self));
 
-        self.timeOffset = moment(this.feedItemsDiv.data('serverTime'), 'YYYY-MM-DD HH:mm:ss').diff(moment());
+        self.timeOffset = moment(this.feedItemsDiv.data('serverTime'), 'YYYY-MM-DD HH:mm:ss').diff(moment(), 'seconds');
         self.updateFeed();
         setInterval($.proxy(self.updateFeed, self), 5000);
 
         this.feedItemForm.zerebralAjaxForm({
             dataType: 'json',
             beforeSend: function() {
+                self.ajaxInProgress = true;
                 self.feedItemForm.find('.control-group').removeClass('error');
                 self.feedItemFormTextarea.attr('disabled', true);
                 self.feedItemForm.find('.attached-link-field').attr('disabled', true);
@@ -71,6 +75,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
                         ul.append($('<li>' + response['errors'][fieldName][0] + '</li>'));
                     }
                 } else {
+                    self.feedItemsDiv.data('lastItemId', response['lastItemId']);
                     self.addItemBlock(response['content']);
                 }
             },
@@ -81,6 +86,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
                 self.feedItemForm.find('input[type="submit"]').attr('disabled', false).val('Post message');
                 self.feedItemForm.find('a.cancel-link').show();
                 self.feedItemForm.find('.attached-link-delete').show();
+                self.ajaxInProgress = false;
             }
         });
 
@@ -115,6 +121,25 @@ ZerebralCourseDetailFeedBlock.prototype = {
     },
 
     updateFeed: function() {
+        var self = this;
+
+        if (!self.ajaxInProgress && self.errorHasAppeared < 2) {
+            $.ajax({
+                dataType: 'json',
+                url: self.feedItemsDiv.data('checkoutUrl'),
+                data: {
+                    lastItemId: self.feedItemsDiv.data('lastItemId')
+                },
+                success: function(response) {
+                    if (response.success) {
+                        self.feedItemsDiv.data('lastItemId', response['lastItemId']);
+                        $.proxy(self.addItemBlock(response['content']), self);
+                    }
+                },
+                error: function() { self.errorHasAppeared++; }
+            });
+        }
+
         var currentTime = moment().add('seconds', self.timeOffset);
         var timestamps = this.feedItemsDiv.find('span.timestamp, div.timestamp>span.gray');
         $.each(timestamps, function(index, value) {
@@ -407,6 +432,7 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
                     }
                 } else {
                     self.addCommentBlock(response['content']);
+                    self.feedCommentsDiv.data('lastCommentId', response['lastCommentId']);
                 }
             },
             error: function() { alert('Oops, seems like unknown error has appeared!'); },
@@ -415,7 +441,7 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
                 self.feedCommentForm.find('.attached-link-field').attr('disabled', false);
                 self.feedCommentForm.find('input[type="submit"]').attr('disabled', false).val('Post message');
                 self.feedCommentForm.find('.attached-link-delete').show();
-                self.ajaxInProgress = true;
+                self.ajaxInProgress = false;
             },
             dataType: 'json'
         });

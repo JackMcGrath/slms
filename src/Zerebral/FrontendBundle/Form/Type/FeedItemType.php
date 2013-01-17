@@ -13,6 +13,7 @@ class FeedItemType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('feedContent', new FeedContentType(), array('required' => true));
+        $builder->add('courseId', 'integer', array('required' => false));
     }
 
     public function getName()
