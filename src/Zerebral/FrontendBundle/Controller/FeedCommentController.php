@@ -103,6 +103,29 @@ class FeedCommentController extends \Zerebral\CommonBundle\Component\Controller
         $feedType = $this->getRequest()->get('feedType', 'course');
         $content = $this->render('ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig', array('feedType' => $feedType, 'comment' => $comments))->getContent();
         return new JsonResponse(array('success' => true, 'lastCommentId' => $comments->getLast()->getId(), 'loadedCount' => count($comments), 'content' => $content));
+    }
 
+    /**
+     * @Route("/checkout/{feedItemId}", name="ajax_checkout_comments")
+     * @param \Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @ParamConverter("feedItem", options={"mapping": {"feedItemId": "id"}})
+     *
+     * TODO: add is ajax validation
+     */
+    public function checkoutAction(\Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem)
+    {
+        $lastCommentId = $this->getRequest()->get('lastCommentId', 0);
+        $comments = FeedCommentQuery::filterNewer($feedItem, $lastCommentId);
+        $content = '';
+        if (count($comments) > 0) {
+            foreach ($comments as $comment) {
+                $content .= $this->render('ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig', array('feedType' => 'assignment', 'comment' => $comment))->getContent();
+            }
+            $lastCommentId = $comments->getLast()->getId();
+        }
+
+        return new JsonResponse(array('success' => true, 'lastCommentId' => $lastCommentId, 'content' => $content));
     }
 }

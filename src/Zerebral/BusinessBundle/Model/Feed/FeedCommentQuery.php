@@ -22,4 +22,13 @@ class FeedCommentQuery extends BaseFeedCommentQuery
             ->filterById($lastCommentId, \Criteria::LESS_THAN)
             ->find();
     }
+
+    public static function filterNewer($feedItem, $lastCommentId)
+    {
+        return self::create()->clearOrderByColumns()
+            ->addAscendingOrderByColumn(FeedCommentPeer::ID)
+            ->filterByFeedItem($feedItem)
+            ->filterById($lastCommentId, \Criteria::GREATER_THAN)
+            ->find();
+    }
 }

@@ -122,7 +122,10 @@
 {% endmacro %}
 
 {% macro assignment_feed_comment_image_block(comment) %}
-    <div class="author">{{ comment.user.fullName }}<span class="gray"> posted an </span><a target="_blank" href="{{ comment.feedContent.linkUrl }}">image</a> <span class="gray timestamp" data-date="{{ comment.createdAt.format('Y-m-d H:i:s') }}">{{ time_diff(comment.createdAt) }}</span></div>
+    <div class="author {% if app.user.id == comment.user.id %} is_author {% endif %}">
+        {{ comment.user.fullName }}<span class="gray"> posted an </span><a target="_blank" href="{{ comment.feedContent.linkUrl }}">image</a> <span class="gray timestamp" data-date="{{ comment.createdAt.format('Y-m-d H:i:s') }}">{{ time_diff(comment.createdAt) }}</span>
+        {% if app.user.id == comment.user.id %}<a href="{{ path('ajax_feed_remove_comment', {feedCommentId: comment.id}) }}" class="gray delete-link delete-comment"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
+    </div>
     <div class="text">
         {{ comment.feedContent.text }}
         <div class="link-content">

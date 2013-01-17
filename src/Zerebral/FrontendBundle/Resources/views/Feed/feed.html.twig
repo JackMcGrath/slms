@@ -1,4 +1,4 @@
-{% macro assignment_details_feed(feedCommentForm, feedCommentFormPath, comments) %}
+{% macro assignment_details_feed(feedCommentForm, feedItem) %}
     <div class="assignment-details-feed">
     <div class="feed-comment-alert-block alert alert-block alert-error" style="display: none;">
         <button type="button" class="close" data-dismiss="alert">×</button>
@@ -8,7 +8,7 @@
         </ul>
     </div>
     <div class="feed-comment-form">
-        <form id="ajaxFeedCommentForm" method="post" {{ form_enctype(feedCommentForm) }} action="{{ feedCommentFormPath }}">
+        <form id="ajaxFeedCommentForm" method="post" {{ form_enctype(feedCommentForm) }} action="{{ path('ajax_feed_add_comment', {feedItemId: feedItem.id }) }}">
             <div class="control-group">
                 <textarea class="feed-comment-textarea" name="feed_comment[feedContent][text]" placeholder="Leave a new comment" ></textarea>
             </div>
@@ -34,7 +34,13 @@
             </div>
         </form>
     </div>
-    <div class="comments" data-server-time="{{ "now"|date("Y-m-d H:i:s") }}">
+    {% set comments = feedItem.feedComments %}
+    {% if comments|length > 0 %}
+        {% set lastCommentId = comments.last.id %}
+    {% else %}
+        {% set lastCommentId = 0 %}
+    {% endif %}
+    <div class="comments" data-last-comment-id="{{ lastCommentId }}" data-server-time="{{ "now"|date("Y-m-d H:i:s") }}" data-checkout-url="{{ path('ajax_checkout_comments', {feedItemId: feedItem.id}) }}">
         {% for comment in comments %}
             {% include "ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig" with {'feedType': 'assignment'} %}
         {% else %}

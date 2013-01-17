@@ -366,6 +366,9 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
     feedCommentsDiv: undefined,
     timeOffset: null,
 
+    ajaxInProgress: false,
+    errorHasAppeared: 0,
+
 
         init: function() {
         var self = this;
@@ -374,7 +377,7 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
 
         this.feedCommentsDiv.on('click', 'a.delete-link', $.proxy(self.deleteCommentBlock, self));
 
-        self.timeOffset = moment(this.feedCommentsDiv.data('serverTime'), 'YYYY-MM-DD HH:mm:ss').diff(moment());
+        self.timeOffset = moment(this.feedCommentsDiv.data('serverTime'), 'YYYY-MM-DD HH:mm:ss').diff(moment(), 'seconds');
         self.updateFeed();
         setInterval($.proxy(self.updateFeed, self), 5000);
 
@@ -382,6 +385,7 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
         this.feedCommentForm.zerebralAjaxForm({
             data: { feedType: 'assignment' },
             beforeSend: function() {
+                self.ajaxInProgress = true;
                 self.feedCommentForm.find('.control-group').removeClass('error');
                 self.feedCommentForm.find('textarea').attr('disabled', true);
                 self.feedCommentForm.find('.attached-link-field').attr('disabled', true);
@@ -411,6 +415,7 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
                 self.feedCommentForm.find('.attached-link-field').attr('disabled', false);
                 self.feedCommentForm.find('input[type="submit"]').attr('disabled', false).val('Post message');
                 self.feedCommentForm.find('.attached-link-delete').show();
+                self.ajaxInProgress = true;
             },
             dataType: 'json'
         });
@@ -444,8 +449,33 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
     },
 
     updateFeed: function() {
+        var self = this;
+        if (!self.ajaxInProgress && self.errorHasAppeared < 2) {
+            $.ajax({
+                dataType: 'json',
+                url: self.feedCommentsDiv.data('checkoutUrl'),
+                data: {
+                    lastCommentId: self.feedCommentsDiv.data('lastCommentId')
+                },
+                success: function(response) {
+                    if (response.success) {
+                        self.feedCommentsDiv.data('lastCommentId', response['lastCommentId']);
+                        var commentBlock = $(response['content']);
+                        commentBlock.css('display', 'none');
+                        if (self.feedCommentsDiv.find('.comment:last').length > 0) {
+                            self.feedCommentsDiv.find('.comment:last').after(commentBlock);
+                        } else {
+                            self.feedCommentsDiv.find('.empty').remove().end().append(commentBlock);
+                        }
+                        commentBlock.slideDown();
+                    }
+                },
+                error: function() { self.errorHasAppeared++; }
+            });
+        }
+
         var currentTime = moment().add('seconds', self.timeOffset);
-        var timestamps = this.feedCommentsDiv.find('span.timestamp');
+        var timestamps = self.feedCommentsDiv.find('span.timestamp');
         $.each(timestamps, function(index, value) {
             var date = moment($(value).data('date'), 'YYYY-MM-DD HH:mm:ss');
             var humanDate = date.from(currentTime);
