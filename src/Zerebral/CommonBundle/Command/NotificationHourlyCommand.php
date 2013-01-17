@@ -23,7 +23,8 @@ class NotificationHourlyCommand extends ContainerAwareCommand
         $inCompletedAssignments = \Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery::create()->findInCompletedNow()->find();
         \Zerebral\BusinessBundle\Model\Notification\NotificationPeer::createAssignmentInCompleted($inCompletedAssignments);
 
-        //\Zerebral\BusinessBundle\Model\Notification\NotificationPeer::createAssignmentComplete($todayAssignments);
+        $completedAssignments = \Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery::create()->findCompleteNow()->find();
+        \Zerebral\BusinessBundle\Model\Notification\NotificationPeer::createAssignmentComplete($completedAssignments);
 
 //        $studentAssignmentsCount = \Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery::create()->findIncompletedNow()->find();
 //        \Zerebral\BusinessBundle\Model\Notification\NotificationPeer::createAssignmentIncomplete($studentAssignmentsCount);

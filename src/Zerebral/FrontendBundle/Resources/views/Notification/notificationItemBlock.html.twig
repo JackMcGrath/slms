@@ -47,7 +47,7 @@
 {% endmacro %}
 
 {% macro assignmentComplete(notification) %}
-
+    <a href="{{ path('assignment_view', {id: notification.assignment.id}) }}">{{ notification.assignment.name }}</a> is complete and ready for grading
 {% endmacro %}
 
 {% macro assignmentInComplete(notification) %}
@@ -72,6 +72,18 @@
         Attendance Updated
     {% elseif type == 'course_feed_comment_create' %}
         Response to Comment
+    {% elseif type == 'assignment_due_single_student' %}
+        Assignment due date
+    {% elseif type == 'assignment_due_single_teacher' %}
+        Assignment due date
+    {% elseif type == 'assignment_due_multiple_student' %}
+        Assignments due date
+    {% elseif type == 'assignment_due_multiple_teacher' %}
+        Assignments due date
+    {% elseif type == 'assignment_complete' %}
+        Assignment complete
+    {% elseif type == 'assignment_incomplete' %}
+        Assignment incomplete
     {% endif %}
     </h3>
 {% endmacro %}
@@ -118,6 +130,8 @@
 {% macro avatar(notification) %}
     {% if notification.userRelatedByCreatedBy %}
         <img class="avatar rounded" src="{{ get_file_storage_link(notification.userRelatedByCreatedBy.getAvatarFile()) | imagine_filter('thumbnail') }}"/>
+    {% else %}
+        <img class="avatar"/>
     {% endif %}
 {% endmacro %}
 
