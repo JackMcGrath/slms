@@ -152,38 +152,40 @@ ZerebralCourseDetailFeedBlock.prototype = {
     loadComments: function(event) {
         event.preventDefault();
         var link = $(event.target);
-        var loadingSpan = link.prev('span.load-more-link');
-        link.hide();
-        loadingSpan.removeClass('hidden');
-        $.ajax({
-            type: 'get',
-            url: link.attr('href'),
-            data: {
-                lastCommentId: link.data('lastCommentId')
-            },
-            success: function(response) {
-                if (response.success) {
-                    link.data('lastCommentId', response['lastCommentId']);
-                    link.parents('.comment').after(response.content);
-                    link.data('loadedCount', (link.data('loadedCount') + response['loadedCount']));
+        if (!link.data('disabled')) {
+            var loadingSpan = link.prev('span.load-more-link');
+            link.hide();
+            loadingSpan.removeClass('hidden');
+            $.ajax({
+                type: 'get',
+                url: link.attr('href'),
+                data: {
+                    lastCommentId: link.data('lastCommentId')
+                },
+                success: function(response) {
+                    if (response.success) {
+                        link.data('lastCommentId', response['lastCommentId']);
+                        link.parents('.comment').after(response.content);
+                        link.data('loadedCount', (link.data('loadedCount') + response['loadedCount']));
 
-                    if (link.data('loadedCount') >= link.data('totalCount')) {
-                        link.html('No more comments');
-                        link.parents('.comment').delay(500).slideUp('fast', function() {
-                            link.parents('.comment').remove();
-                        });
+                        if (link.data('loadedCount') >= link.data('totalCount')) {
+                            link.html('No more comments').data('disabled', true);
+                            link.parents('.comment').delay(500).slideUp('fast', function() {
+                                link.parents('.comment').remove();
+                            });
+                        }
+                    } else {
+                        this.error(response);
                     }
-                } else {
-                    this.error(response);
-                }
-            },
-            error: function() { alert('Oops, seems like unknown error has appeared!'); },
-            complete: function() {
-                loadingSpan.addClass('hidden');
-                link.show();
-            },
-            dataType: 'json'
-        })
+                },
+                error: function() { alert('Oops, seems like unknown error has appeared!'); },
+                complete: function() {
+                    loadingSpan.addClass('hidden');
+                    link.show();
+                },
+                dataType: 'json'
+            });
+        }
     },
 
     expandFeedItemForm: function() {
