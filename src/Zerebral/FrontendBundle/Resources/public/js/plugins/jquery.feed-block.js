@@ -106,7 +106,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
                             field.parents('.control-group').addClass('error');
                         }
                     } else {
-                        $.proxy(self.addCommentBlock, form, response['content'])();
+                        $.proxy(self.addCommentBlock, form, response['content'], response['lastCommentId'])();
                     }
                 },
                 error: function() { alert('Oops, seems like unknown error has appeared!'); },
@@ -124,16 +124,31 @@ ZerebralCourseDetailFeedBlock.prototype = {
         var self = this;
 
         if (!self.ajaxInProgress && self.errorHasAppeared < 2) {
+
+            var lastIds = {};
+            var items = self.feedItemsDiv.find('.comments');
+            $.each(items, function(index, value) {
+                lastIds[$(value).data('itemId')] = $(value).data('lastItemCommentId');
+            });
+
             $.ajax({
                 dataType: 'json',
                 url: self.feedItemsDiv.data('checkoutUrl'),
                 data: {
-                    lastItemId: self.feedItemsDiv.data('lastItemId')
+                    lastItemId: self.feedItemsDiv.data('lastItemId'),
+                    lastIds: lastIds
                 },
                 success: function(response) {
                     if (response.success) {
                         self.feedItemsDiv.data('lastItemId', response['lastItemId']);
                         $.proxy(self.addItemBlock(response['content'], false), self);
+
+
+                        $.each(response['comments'], function(index, value) {
+                            var form = self.feedItemsDiv.find('#feedItem' + index).find('form');
+                            $.proxy(self.addCommentBlock, form, value['content'], value['lastCommentId'])();
+                        });
+
                     }
                 },
                 error: function() { self.errorHasAppeared++; }
@@ -301,7 +316,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
                         field.parents('.control-group').addClass('error');
                     }
                 } else {
-                    $.proxy(self.addCommentBlock, form, response['content'])();
+                    $.proxy(self.addCommentBlock, form, response['content'], response['lastCommentId'])();
                 }
             },
             error: function() { alert('Oops, seems like unknown error has appeared!'); },
@@ -336,7 +351,8 @@ ZerebralCourseDetailFeedBlock.prototype = {
             })
         }
     },
-    addCommentBlock: function(response) {
+    addCommentBlock: function(response, lastCommentId) {
+        $(this).parents('.comments').data('lastItemCommentId', lastCommentId);
         $(this).parents('.comment').before(response);
         var commentsCount = $(this).parents('.feed-item').find('.show-comment-form-link').data('commentsCount');
         $(this).parents('.feed-item').find('.show-comment-form-link span').html((commentsCount + 1));

@@ -104,6 +104,25 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
             $lastItemId = $items->getFirst()->getId();
         }
 
-        return new JsonResponse(array('success' => true, 'lastItemId' => $lastItemId, 'content' => $content));
+
+        $lastIds = $this->getRequest()->get('lastIds', array());
+        $comments = FeedCommentQuery::create()->getNewComments($lastIds)->find();
+        $sortedByItemComments = array();
+        foreach($comments as $comment) {
+            if (!isset($sortedByItemComments[$comment->getFeedItemId()])) {
+                $sortedByItemComments[$comment->getFeedItemId()] = array('lastCommentId' => 0, 'comments' => array());
+            }
+            $sortedByItemComments[$comment->getFeedItemId()]['comments'] = $comment;
+            if ($sortedByItemComments[$comment->getFeedItemId()]['lastCommentId'] < $comment->getId()) {
+                $sortedByItemComments[$comment->getFeedItemId()]['lastCommentId'] = $comment->getId();
+            }
+        }
+
+        foreach ($sortedByItemComments as $feedItemId => $item) {
+            $sortedByItemComments[$feedItemId]['content'] = $this->render('ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig', array('feedType' => 'course', 'comment' => $item['comments']))->getContent();
+            unset($sortedByItemComments[$feedItemId]['comments']);
+        }
+
+        return new JsonResponse(array('success' => true, 'lastItemId' => $lastItemId, 'content' => $content, 'comments' => $sortedByItemComments));
     }
 }
