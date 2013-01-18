@@ -17,11 +17,8 @@ use Glorpen\PropelEvent\PropelEventBundle\Events\QueryEvent;
 use Zerebral\BusinessBundle\Model\Feed\FeedComment;
 use Zerebral\BusinessBundle\Model\Feed\FeedItem;
 use Zerebral\BusinessBundle\Model\File\File;
-<<<<<<< HEAD
 use Zerebral\BusinessBundle\Model\Message\Message;
-=======
 use Zerebral\BusinessBundle\Model\Notification\Notification;
->>>>>>> 7089aaae578297e1e28a26f884daf6f034050977
 use Zerebral\BusinessBundle\Model\User\Student;
 use Zerebral\BusinessBundle\Model\User\Teacher;
 use Zerebral\BusinessBundle\Model\User\User;
@@ -75,7 +72,6 @@ use Zerebral\BusinessBundle\Model\User\UserQuery;
  * @method UserQuery rightJoinFeedComment($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FeedComment relation
  * @method UserQuery innerJoinFeedComment($relationAlias = null) Adds a INNER JOIN clause to the query using the FeedComment relation
  *
-<<<<<<< HEAD
  * @method UserQuery leftJoinMessageRelatedByUserId($relationAlias = null) Adds a LEFT JOIN clause to the query using the MessageRelatedByUserId relation
  * @method UserQuery rightJoinMessageRelatedByUserId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the MessageRelatedByUserId relation
  * @method UserQuery innerJoinMessageRelatedByUserId($relationAlias = null) Adds a INNER JOIN clause to the query using the MessageRelatedByUserId relation
@@ -87,7 +83,7 @@ use Zerebral\BusinessBundle\Model\User\UserQuery;
  * @method UserQuery leftJoinMessageRelatedByToId($relationAlias = null) Adds a LEFT JOIN clause to the query using the MessageRelatedByToId relation
  * @method UserQuery rightJoinMessageRelatedByToId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the MessageRelatedByToId relation
  * @method UserQuery innerJoinMessageRelatedByToId($relationAlias = null) Adds a INNER JOIN clause to the query using the MessageRelatedByToId relation
-=======
+ *
  * @method UserQuery leftJoinNotificationRelatedByCreatedBy($relationAlias = null) Adds a LEFT JOIN clause to the query using the NotificationRelatedByCreatedBy relation
  * @method UserQuery rightJoinNotificationRelatedByCreatedBy($relationAlias = null) Adds a RIGHT JOIN clause to the query using the NotificationRelatedByCreatedBy relation
  * @method UserQuery innerJoinNotificationRelatedByCreatedBy($relationAlias = null) Adds a INNER JOIN clause to the query using the NotificationRelatedByCreatedBy relation
@@ -95,7 +91,6 @@ use Zerebral\BusinessBundle\Model\User\UserQuery;
  * @method UserQuery leftJoinNotificationRelatedByUserId($relationAlias = null) Adds a LEFT JOIN clause to the query using the NotificationRelatedByUserId relation
  * @method UserQuery rightJoinNotificationRelatedByUserId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the NotificationRelatedByUserId relation
  * @method UserQuery innerJoinNotificationRelatedByUserId($relationAlias = null) Adds a INNER JOIN clause to the query using the NotificationRelatedByUserId relation
->>>>>>> 7089aaae578297e1e28a26f884daf6f034050977
  *
  * @method UserQuery leftJoinStudent($relationAlias = null) Adds a LEFT JOIN clause to the query using the Student relation
  * @method UserQuery rightJoinStudent($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Student relation
@@ -1010,21 +1005,14 @@ abstract class BaseUserQuery extends ModelCriteria
     }
 
     /**
-<<<<<<< HEAD
      * Filter the query by a related Message object
      *
      * @param   Message|PropelObjectCollection $message  the related object to use as filter
-=======
-     * Filter the query by a related Notification object
-     *
-     * @param   Notification|PropelObjectCollection $notification  the related object to use as filter
->>>>>>> 7089aaae578297e1e28a26f884daf6f034050977
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   UserQuery The current query, for fluid interface
      * @throws   PropelException - if the provided filter is invalid.
      */
-<<<<<<< HEAD
     public function filterByMessageRelatedByUserId($message, $comparison = null)
     {
         if ($message instanceof Message) {
@@ -1037,46 +1025,21 @@ abstract class BaseUserQuery extends ModelCriteria
                 ->endUse();
         } else {
             throw new PropelException('filterByMessageRelatedByUserId() only accepts arguments of type Message or PropelCollection');
-=======
-    public function filterByNotificationRelatedByCreatedBy($notification, $comparison = null)
-    {
-        if ($notification instanceof Notification) {
-            return $this
-                ->addUsingAlias(UserPeer::ID, $notification->getCreatedBy(), $comparison);
-        } elseif ($notification instanceof PropelObjectCollection) {
-            return $this
-                ->useNotificationRelatedByCreatedByQuery()
-                ->filterByPrimaryKeys($notification->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByNotificationRelatedByCreatedBy() only accepts arguments of type Notification or PropelCollection');
->>>>>>> 7089aaae578297e1e28a26f884daf6f034050977
         }
     }
 
     /**
-<<<<<<< HEAD
      * Adds a JOIN clause to the query using the MessageRelatedByUserId relation
-=======
-     * Adds a JOIN clause to the query using the NotificationRelatedByCreatedBy relation
->>>>>>> 7089aaae578297e1e28a26f884daf6f034050977
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return UserQuery The current query, for fluid interface
      */
-<<<<<<< HEAD
     public function joinMessageRelatedByUserId($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('MessageRelatedByUserId');
-=======
-    public function joinNotificationRelatedByCreatedBy($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('NotificationRelatedByCreatedBy');
->>>>>>> 7089aaae578297e1e28a26f884daf6f034050977
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -1091,22 +1054,14 @@ abstract class BaseUserQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-<<<<<<< HEAD
             $this->addJoinObject($join, 'MessageRelatedByUserId');
-=======
-            $this->addJoinObject($join, 'NotificationRelatedByCreatedBy');
->>>>>>> 7089aaae578297e1e28a26f884daf6f034050977
         }
 
         return $this;
     }
 
     /**
-<<<<<<< HEAD
      * Use the MessageRelatedByUserId relation Message object
-=======
-     * Use the NotificationRelatedByCreatedBy relation Notification object
->>>>>>> 7089aaae578297e1e28a26f884daf6f034050977
      *
      * @see       useQuery()
      *
@@ -1114,7 +1069,6 @@ abstract class BaseUserQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-<<<<<<< HEAD
      * @return   \Zerebral\BusinessBundle\Model\Message\MessageQuery A secondary query class using the current class as primary query
      */
     public function useMessageRelatedByUserIdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
@@ -1128,27 +1082,11 @@ abstract class BaseUserQuery extends ModelCriteria
      * Filter the query by a related Message object
      *
      * @param   Message|PropelObjectCollection $message  the related object to use as filter
-=======
-     * @return   \Zerebral\BusinessBundle\Model\Notification\NotificationQuery A secondary query class using the current class as primary query
-     */
-    public function useNotificationRelatedByCreatedByQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinNotificationRelatedByCreatedBy($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'NotificationRelatedByCreatedBy', '\Zerebral\BusinessBundle\Model\Notification\NotificationQuery');
-    }
-
-    /**
-     * Filter the query by a related Notification object
-     *
-     * @param   Notification|PropelObjectCollection $notification  the related object to use as filter
->>>>>>> 7089aaae578297e1e28a26f884daf6f034050977
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   UserQuery The current query, for fluid interface
      * @throws   PropelException - if the provided filter is invalid.
      */
-<<<<<<< HEAD
     public function filterByMessageRelatedByFromId($message, $comparison = null)
     {
         if ($message instanceof Message) {
@@ -1161,46 +1099,21 @@ abstract class BaseUserQuery extends ModelCriteria
                 ->endUse();
         } else {
             throw new PropelException('filterByMessageRelatedByFromId() only accepts arguments of type Message or PropelCollection');
-=======
-    public function filterByNotificationRelatedByUserId($notification, $comparison = null)
-    {
-        if ($notification instanceof Notification) {
-            return $this
-                ->addUsingAlias(UserPeer::ID, $notification->getUserId(), $comparison);
-        } elseif ($notification instanceof PropelObjectCollection) {
-            return $this
-                ->useNotificationRelatedByUserIdQuery()
-                ->filterByPrimaryKeys($notification->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByNotificationRelatedByUserId() only accepts arguments of type Notification or PropelCollection');
->>>>>>> 7089aaae578297e1e28a26f884daf6f034050977
         }
     }
 
     /**
-<<<<<<< HEAD
      * Adds a JOIN clause to the query using the MessageRelatedByFromId relation
-=======
-     * Adds a JOIN clause to the query using the NotificationRelatedByUserId relation
->>>>>>> 7089aaae578297e1e28a26f884daf6f034050977
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return UserQuery The current query, for fluid interface
      */
-<<<<<<< HEAD
     public function joinMessageRelatedByFromId($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('MessageRelatedByFromId');
-=======
-    public function joinNotificationRelatedByUserId($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('NotificationRelatedByUserId');
->>>>>>> 7089aaae578297e1e28a26f884daf6f034050977
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -1215,22 +1128,14 @@ abstract class BaseUserQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-<<<<<<< HEAD
             $this->addJoinObject($join, 'MessageRelatedByFromId');
-=======
-            $this->addJoinObject($join, 'NotificationRelatedByUserId');
->>>>>>> 7089aaae578297e1e28a26f884daf6f034050977
         }
 
         return $this;
     }
 
     /**
-<<<<<<< HEAD
      * Use the MessageRelatedByFromId relation Message object
-=======
-     * Use the NotificationRelatedByUserId relation Notification object
->>>>>>> 7089aaae578297e1e28a26f884daf6f034050977
      *
      * @see       useQuery()
      *
@@ -1238,7 +1143,6 @@ abstract class BaseUserQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-<<<<<<< HEAD
      * @return   \Zerebral\BusinessBundle\Model\Message\MessageQuery A secondary query class using the current class as primary query
      */
     public function useMessageRelatedByFromIdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
@@ -1320,7 +1224,147 @@ abstract class BaseUserQuery extends ModelCriteria
         return $this
             ->joinMessageRelatedByToId($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'MessageRelatedByToId', '\Zerebral\BusinessBundle\Model\Message\MessageQuery');
-=======
+    }
+
+    /**
+     * Filter the query by a related Notification object
+     *
+     * @param   Notification|PropelObjectCollection $notification  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   UserQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByNotificationRelatedByCreatedBy($notification, $comparison = null)
+    {
+        if ($notification instanceof Notification) {
+            return $this
+                ->addUsingAlias(UserPeer::ID, $notification->getCreatedBy(), $comparison);
+        } elseif ($notification instanceof PropelObjectCollection) {
+            return $this
+                ->useNotificationRelatedByCreatedByQuery()
+                ->filterByPrimaryKeys($notification->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByNotificationRelatedByCreatedBy() only accepts arguments of type Notification or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the NotificationRelatedByCreatedBy relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return UserQuery The current query, for fluid interface
+     */
+    public function joinNotificationRelatedByCreatedBy($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('NotificationRelatedByCreatedBy');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'NotificationRelatedByCreatedBy');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the NotificationRelatedByCreatedBy relation Notification object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Zerebral\BusinessBundle\Model\Notification\NotificationQuery A secondary query class using the current class as primary query
+     */
+    public function useNotificationRelatedByCreatedByQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinNotificationRelatedByCreatedBy($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'NotificationRelatedByCreatedBy', '\Zerebral\BusinessBundle\Model\Notification\NotificationQuery');
+    }
+
+    /**
+     * Filter the query by a related Notification object
+     *
+     * @param   Notification|PropelObjectCollection $notification  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   UserQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByNotificationRelatedByUserId($notification, $comparison = null)
+    {
+        if ($notification instanceof Notification) {
+            return $this
+                ->addUsingAlias(UserPeer::ID, $notification->getUserId(), $comparison);
+        } elseif ($notification instanceof PropelObjectCollection) {
+            return $this
+                ->useNotificationRelatedByUserIdQuery()
+                ->filterByPrimaryKeys($notification->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByNotificationRelatedByUserId() only accepts arguments of type Notification or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the NotificationRelatedByUserId relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return UserQuery The current query, for fluid interface
+     */
+    public function joinNotificationRelatedByUserId($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('NotificationRelatedByUserId');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'NotificationRelatedByUserId');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the NotificationRelatedByUserId relation Notification object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
      * @return   \Zerebral\BusinessBundle\Model\Notification\NotificationQuery A secondary query class using the current class as primary query
      */
     public function useNotificationRelatedByUserIdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
@@ -1328,7 +1372,6 @@ abstract class BaseUserQuery extends ModelCriteria
         return $this
             ->joinNotificationRelatedByUserId($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'NotificationRelatedByUserId', '\Zerebral\BusinessBundle\Model\Notification\NotificationQuery');
->>>>>>> 7089aaae578297e1e28a26f884daf6f034050977
     }
 
     /**
