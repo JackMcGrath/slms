@@ -20,6 +20,7 @@ use Zerebral\BusinessBundle\Model\File\File;
 use Zerebral\BusinessBundle\Model\File\FileReferences;
 use Zerebral\BusinessBundle\Model\File\FileReferencesPeer;
 use Zerebral\BusinessBundle\Model\File\FileReferencesQuery;
+use Zerebral\BusinessBundle\Model\Message\Message;
 
 /**
  * @method FileReferencesQuery orderByfileId($order = Criteria::ASC) Order by the file_id column
@@ -45,6 +46,10 @@ use Zerebral\BusinessBundle\Model\File\FileReferencesQuery;
  * @method FileReferencesQuery leftJoinstudentAssignmentReferenceId($relationAlias = null) Adds a LEFT JOIN clause to the query using the studentAssignmentReferenceId relation
  * @method FileReferencesQuery rightJoinstudentAssignmentReferenceId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the studentAssignmentReferenceId relation
  * @method FileReferencesQuery innerJoinstudentAssignmentReferenceId($relationAlias = null) Adds a INNER JOIN clause to the query using the studentAssignmentReferenceId relation
+ *
+ * @method FileReferencesQuery leftJoinmessageReferenceId($relationAlias = null) Adds a LEFT JOIN clause to the query using the messageReferenceId relation
+ * @method FileReferencesQuery rightJoinmessageReferenceId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the messageReferenceId relation
+ * @method FileReferencesQuery innerJoinmessageReferenceId($relationAlias = null) Adds a INNER JOIN clause to the query using the messageReferenceId relation
  *
  * @method FileReferences findOne(PropelPDO $con = null) Return the first FileReferences matching the query
  * @method FileReferences findOneOrCreate(PropelPDO $con = null) Return the first FileReferences matching the query, or a new FileReferences object populated from the query conditions when no match is found
@@ -292,6 +297,8 @@ abstract class BaseFileReferencesQuery extends ModelCriteria
      * @see       filterByassignmentReferenceId()
      *
      * @see       filterBystudentAssignmentReferenceId()
+     *
+     * @see       filterBymessageReferenceId()
      *
      * @param     mixed $referenceId The value to use as filter.
      *              Use scalar values for equality.
@@ -565,6 +572,82 @@ abstract class BaseFileReferencesQuery extends ModelCriteria
         return $this
             ->joinstudentAssignmentReferenceId($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'studentAssignmentReferenceId', '\Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentQuery');
+    }
+
+    /**
+     * Filter the query by a related Message object
+     *
+     * @param   Message|PropelObjectCollection $message The related object(s) to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   FileReferencesQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterBymessageReferenceId($message, $comparison = null)
+    {
+        if ($message instanceof Message) {
+            return $this
+                ->addUsingAlias(FileReferencesPeer::REFERENCE_ID, $message->getId(), $comparison);
+        } elseif ($message instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(FileReferencesPeer::REFERENCE_ID, $message->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterBymessageReferenceId() only accepts arguments of type Message or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the messageReferenceId relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return FileReferencesQuery The current query, for fluid interface
+     */
+    public function joinmessageReferenceId($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('messageReferenceId');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'messageReferenceId');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the messageReferenceId relation Message object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Zerebral\BusinessBundle\Model\Message\MessageQuery A secondary query class using the current class as primary query
+     */
+    public function usemessageReferenceIdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinmessageReferenceId($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'messageReferenceId', '\Zerebral\BusinessBundle\Model\Message\MessageQuery');
     }
 
     /**

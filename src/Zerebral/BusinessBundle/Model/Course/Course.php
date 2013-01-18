@@ -66,23 +66,4 @@ class Course extends BaseCourse
 
         return false;
     }
-
-    /**
-     * @param \Zerebral\BusinessBundle\Model\User\User $user
-     *
-     * @return \PropelObjectCollection|\Zerebral\BusinessBundle\Model\Feed\FeedItem[]
-     */
-    public function getFeedForUser(User $user)
-    {
-        $criteria = new \Criteria();
-
-        if ($user->isStudent()) {
-            $criteria->addJoin(StudentAssignmentPeer::ASSIGNMENT_ID, FeedItemPeer::ASSIGNMENT_ID, \Criteria::RIGHT_JOIN);
-            $criteria->addAnd(StudentAssignmentPeer::STUDENT_ID, $user->getStudent()->getId(), \Criteria::EQUAL);
-            $criteria->addOr(FeedItemPeer::ASSIGNMENT_ID, null, \Criteria::ISNULL);
-        }
-        $criteria->addDescendingOrderByColumn('created_at');
-
-        return parent::getFeedItems($criteria);
-    }
 }

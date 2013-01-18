@@ -39,7 +39,7 @@ class LoginSuccessHandler implements AuthenticationSuccessHandlerInterface
             return new RedirectResponse($this->router->generate('course_add'));
         }
 
-        $targetPath = $request->getSession()->get('_security.secured_area.target_path', $this->router->generate('courses'));
+        $targetPath = $request->getSession()->get('_security.secured_area.target_path', $this->router->generate('dashboard'));
 
         return new RedirectResponse($targetPath);
     }

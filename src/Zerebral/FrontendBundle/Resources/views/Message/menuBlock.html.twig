@@ -1,0 +1,20 @@
+<div class="">
+    <div class="block folders">
+        <h4>All messages</h4>
+
+        <ul class="marker">
+            <li{% if folder == 'inbox' %} class="active"{% endif %}>
+            <i class="marker">▸</i>
+            <a href="{{ path('messages_inbox') }}">Inbox{% if unreadCount > 0 %} ({{ unreadCount }}){% endif %}</a>
+            </li>
+            <li{% if folder == 'sent' %} class="active"{% endif %}>
+            <i class="marker">▸</i>
+            <a href="{{ path('messages_sent') }}">Sent</a>
+            </li>
+            <li>
+                <i class="marker">▸</i>
+                <a href="#">Archive</a>
+            </li>
+        </ul>
+    </div>
+</div>

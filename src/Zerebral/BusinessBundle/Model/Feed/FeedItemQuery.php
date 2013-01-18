@@ -7,29 +7,54 @@ use Zerebral\BusinessBundle\Model\Feed\om\BaseFeedItemQuery;
 use Zerebral\BusinessBundle\Model\Course\CourseStudentPeer;
 use Zerebral\BusinessBundle\Model\Course\CourseTeacherPeer;
 use Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentPeer;
+use Zerebral\BusinessBundle\Model\Course\CoursePeer;
 
 class FeedItemQuery extends BaseFeedItemQuery
 {
-    public function getItemsForUser(\Zerebral\BusinessBundle\Model\User\User $user)
+    public function getGlobalFeed(\Zerebral\BusinessBundle\Model\User\User $user)
     {
-        $criteria = new \Criteria();
-
         if ($user->isStudent()) {
+            $this->addJoin(FeedItemPeer::COURSE_ID, CourseStudentPeer::COURSE_ID, \Criteria::LEFT_JOIN);
+            $this->addAnd(CourseStudentPeer::STUDENT_ID, $user->getStudent()->getId(), \Criteria::EQUAL);
+            $this->addOr(FeedItemPeer::COURSE_ID, null, \Criteria::ISNULL);
 
-            $criteria->addJoin(FeedItemPeer::COURSE_ID, CourseStudentPeer::COURSE_ID, \Criteria::LEFT_JOIN);
-            $criteria->addAnd(CourseStudentPeer::STUDENT_ID, $user->getStudent()->getId(), \Criteria::EQUAL);
-            $criteria->addOr(FeedItemPeer::COURSE_ID, null, \Criteria::ISNULL);
-
-            $criteria->addJoin(FeedItemPeer::ASSIGNMENT_ID, StudentAssignmentPeer::ASSIGNMENT_ID, \Criteria::LEFT_JOIN);
-            $criteria->addAnd(StudentAssignmentPeer::STUDENT_ID, $user->getStudent()->getId(), \Criteria::EQUAL);
-            $criteria->addOr(FeedItemPeer::ASSIGNMENT_ID, null, \Criteria::ISNULL);
+            $this->addJoin(FeedItemPeer::ASSIGNMENT_ID, StudentAssignmentPeer::ASSIGNMENT_ID, \Criteria::LEFT_JOIN);
+            $this->addAnd(StudentAssignmentPeer::STUDENT_ID, $user->getStudent()->getId(), \Criteria::EQUAL);
+            $this->addOr(FeedItemPeer::ASSIGNMENT_ID, null, \Criteria::ISNULL);
         } else {
-            $criteria->addJoin(FeedItemPeer::COURSE_ID, CourseTeacherPeer::COURSE_ID, \Criteria::LEFT_JOIN);
-            $criteria->addAnd(CourseTeacherPeer::TEACHER_ID, $user->getTeacher()->getId(), \Criteria::EQUAL);
-            $criteria->addOr(FeedItemPeer::COURSE_ID, null, \Criteria::ISNULL);
+            $this->addJoin(FeedItemPeer::COURSE_ID, CourseTeacherPeer::COURSE_ID, \Criteria::LEFT_JOIN);
+            $this->addAnd(CourseTeacherPeer::TEACHER_ID, $user->getTeacher()->getId(), \Criteria::EQUAL);
+            $this->addOr(FeedItemPeer::COURSE_ID, null, \Criteria::ISNULL);
         }
-        $criteria->addDescendingOrderByColumn('created_at');
 
-        return parent::create(null, $criteria)->find();
+        $relatedUsers = $user->getRelatedUsers();
+        $ids = array();
+        foreach($relatedUsers as $relatedUser) {
+            $ids[] = $relatedUser->getId();
+        }
+
+        $this->addAnd(FeedItemPeer::CREATED_BY, $ids, \Criteria::IN);
+        $this->addDescendingOrderByColumn('created_at');
+
+        return $this;
+    }
+
+    public function getCourseFeed(\Zerebral\BusinessBundle\Model\Course\Course $course, \Zerebral\BusinessBundle\Model\User\User $user)
+    {
+        if ($user->isStudent()) {
+            $this->addJoin(FeedItemPeer::ASSIGNMENT_ID, StudentAssignmentPeer::ASSIGNMENT_ID, \Criteria::LEFT_JOIN);
+            $this->addAnd(StudentAssignmentPeer::STUDENT_ID, $user->getStudent()->getId(), \Criteria::EQUAL);
+            $this->addOr(FeedItemPeer::ASSIGNMENT_ID, null, \Criteria::ISNULL);
+        }
+        $this->addJoin(FeedItemPeer::COURSE_ID, CoursePeer::ID, \Criteria::LEFT_JOIN);
+        $this->addAnd(CoursePeer::ID, $course->getId(), \Criteria::EQUAL);
+        $this->addDescendingOrderByColumn('created_at');
+
+        return $this;
+    }
+
+    public function filterNewer($lastItemId)
+    {
+        return $this->clearOrderByColumns()->addDescendingOrderByColumn(FeedItemPeer::ID)->filterById($lastItemId, \Criteria::GREATER_THAN);
     }
 }

@@ -8,6 +8,8 @@ use JMS\SecurityExtraBundle\Annotation\Secure;
 
 use Zerebral\FrontendBundle\Form\Type as FormType;
 
+use \Zerebral\BusinessBundle\Model\Feed\FeedItemQuery;
+
 class DashboardController extends \Zerebral\CommonBundle\Component\Controller
 {
     /**
@@ -25,14 +27,13 @@ class DashboardController extends \Zerebral\CommonBundle\Component\Controller
         $feedItemFormType = new FormType\FeedItemType();
         $feedItemForm = $this->createForm($feedItemFormType, null);
 
-        $feedItemQuery = new \Zerebral\BusinessBundle\Model\Feed\FeedItemQuery();
-        $feeds = $feedItemQuery->getItemsForUser($this->getUser());
+        $feeds = FeedItemQuery::create()->getGlobalFeed($this->getUser())->find();
+
 
         return array(
             'target' => 'home',
             'feedItemForm' => $feedItemForm->createView(),
-            'feedItems' => $feeds,
-            'target' => 'feed',
+            'feedItems' => $feeds
         );
     }
 }

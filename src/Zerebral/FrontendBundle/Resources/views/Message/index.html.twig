@@ -1,0 +1,67 @@
+{% extends 'ZerebralFrontendBundle::layout.html.twig' %}
+{% import "ZerebralFrontendBundle:Macro:main.html.twig" as mainPartials %}
+
+{% block content %}
+    {% javascripts
+    '@ZerebralFrontendBundle/Resources/public/js/controllers/message/inbox.js'
+    output='js/compiled/assignment_index.js' %}
+    <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+
+
+    <div class="row-fluid messages-list">
+        <div class="span6 main-list-block">
+            <div class="row-fluid">
+                <h2 class="pull-left form-title">
+                    Messages {% if unreadCount > 0 %}<small>{{ unreadCount }} unread</small>{% endif %}
+                </h2>
+            </div>
+            <hr/>
+
+            <div class="messages-head">
+                <div class="pull-right">
+                    <input type="submit" value="Delete" class="btn btn-danger" name="delete" />
+                    <input type="submit" value="Mark as Read" class="btn" name="mark-as-read" />
+                    <input type="submit" value="Mark as Unread" class="btn" name="mark-as-unread" />
+                </div>
+                <input type="checkbox" /> <a href="#">Select</a> / <a href="#">deselect all</a>
+            </div>
+            <div class="messages messageslist">
+                {% if messages and messages.count %}
+                    {% for message in messages %}
+                        {{ block('message') }}
+                    {% endfor %}
+                    <div class="clearfix"></div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="right-navbar pull-left">
+
+            <a class="btn big-button top-buttons compose-message" href="{{ path('message_compose') }}">compose message</a>
+
+            <div class="block">
+                {% include "ZerebralFrontendBundle:Message:menuBlock.html.twig" %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block message %}
+    {% set user = (folder == 'inbox' ? message.userRelatedByFromId : message.userRelatedByToId) %}
+    <div class="message-row {{ message.getUnreadCount > 0 ? 'unread' : '' }}">
+        <div class="check"><input type="checkbox" /></div>
+        <div class="avatar">
+            <img src="{{ get_file_storage_link(user.getAvatarFile()) | imagine_filter('thumbnail') }}" width="32" height="32" />
+        </div>
+        <div class="name">
+            <a href="#">{{ user.fullName }}</a>
+            <p>{{ message.getLastMessageDate | date('M d \\a\\t g:i a') }}</p>
+        </div>
+        <div class="message-content">
+            <a href="{{ path('message_reply', {id: message.threadId}) }}">{{ message.subject }}{% if message.getUnreadCount > 0 %} ({{ message.getUnreadCount }}){% endif %}</a>
+            <p>{{ message.shortBody | slice(0, 70) }}</p>
+        </div>
+
+    </div>
+{% endblock %}

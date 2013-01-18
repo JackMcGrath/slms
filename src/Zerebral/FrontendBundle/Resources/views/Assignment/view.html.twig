@@ -57,7 +57,7 @@
             </div>
 
 
-            {{ feed.assignment_details_feed(feedCommentForm, path('ajax_feed_add_comment', {feedItemId: assignment.feedItem.id }), assignment.feedItem.feedComments, app.user) }}
+            {{ feed.assignment_details_feed(feedCommentForm, assignment.feedItem) }}
         </div>
 
         <div class="right-navbar pull-left">

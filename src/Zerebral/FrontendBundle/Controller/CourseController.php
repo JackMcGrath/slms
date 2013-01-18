@@ -17,6 +17,7 @@ use Zerebral\BusinessBundle\Calendar\EventProviders\CourseAssignmentEventsProvid
 
 use Zerebral\CommonBundle\Component\Calendar\Calendar;
 use Zerebral\BusinessBundle\Model\User\StudentQuery;
+use Zerebral\BusinessBundle\Model\Feed\FeedItemQuery;
 
 /**
  * @Route("/courses")
@@ -87,6 +88,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
 
         return array(
             'course' => $course,
+            'feedItems' => FeedItemQuery::create()->getCourseFeed($course, $this->getUser())->find(),
             'upcomingAssignments' => $upcomingAssignments,
             'recentMaterials' => $recentMaterials,
             'feedItemForm' => $feedItemForm->createView(),

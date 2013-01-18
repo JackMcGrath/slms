@@ -1,0 +1,134 @@
+{% extends 'ZerebralFrontendBundle::layout.html.twig' %}
+{% import "ZerebralFrontendBundle:Macro:main.html.twig" as mainPartials %}
+
+{% form_theme form _self %}
+{% block form_rows %}
+    {% spaceless %}
+        {% for child in form %}
+            {{ form_widget(child) }}
+        {% endfor %}
+    {% endspaceless %}
+{% endblock form_rows %}
+{% block file_widget %}
+    {% spaceless %}
+        <div class="file-item">
+            {% if value %}
+                {% if value.name == '' %}
+                    <input type="file" name="assignment[files][{{ name }}][uploadedFile]" /> <i class="icon-small-trash-bin"></i><a class="remove-uploaded-file" href="#">remove</a> <span class="help-inline">Please select file for uploading</span>
+                {% else %}
+                    <span>{{ value.name }}</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="hidden" name="assignment[files][{{ name }}][uploadedFile]" /><a class="remove-uploaded-file" href="#"><i class="icon-small-trash-bin"></i></a>
+                {% endif %}
+            {% else %}
+                <input type="file" {{ block('widget_attributes') }} /> <a class="remove-uploaded-file" href="#"><i class="icon-small-trash-bin"></i></a>
+            {% endif %}
+        </div>
+    {% endspaceless %}
+{% endblock file_widget %}
+
+{% block content %}
+    {% javascripts
+    '@ZerebralFrontendBundle/Resources/public/js/plugins/bootstrap-typeahead-objects-array.js'
+    '@ZerebralFrontendBundle/Resources/public/js/controllers/message/compose.js'
+    output='js/compiled/assignment_index.js' %}
+    <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+
+
+    <div class="row-fluid messages-list">
+        <div class="span6 main-list-block">
+            <div class="row-fluid">
+                <h2 class="pull-left form-title">
+                    Messages
+                </h2>
+            </div>
+            <hr/>
+
+            <div class="messages">
+                <form method="post" {{ form_enctype(form) }}>
+                    {{ form_widget(form._token) }}
+                    <div class="message-form">
+                        <div class="to">
+                            {{ form_row(form.toName, {
+                                label: 'To',
+                                form_type: 'horizontal',
+                                attr: {
+                                    class: '',
+                                    'hiddennId': 'message_to_id',
+                                    autocomplete: 'off'
+                                }
+                                })
+                            }}
+                            {{ form_row(form.to_id, {
+                                label: 'To',
+                                form_type: 'horizontal',
+                                attr: {}
+                                })
+                            }}
+                            {#<input type="hidden" name="message[to_id]" id="message_to_id">#}
+                        </div>
+                        <div class="subject">
+                            {{ form_row(form.subject, {
+                                form_type: 'horizontal',
+                                attr: {
+                                    class: 'input-xlarge primary-input'
+                                }
+                            }) }}
+                        </div>
+                    </div>
+                    <div class="reply">
+
+
+                        {{ form_row(form.body, {
+                            label: '',
+                            form_type: 'horizontal',
+                            attr: {
+                                class: '',
+                                rows: 6
+                            }
+                        }) }}
+
+                        <div class="control-group radio-control-group">
+                            <label class="control-label">Attachments</label>
+                            <div id="attachments_div" class="controls" data-prototype="{{ form_widget(form.files.vars.prototype)|e }}">
+                                <div id="upload_files_div">
+                                    {{ form_widget(form.files) }}
+                                </div>
+                                <a href="#" class="add_file_link">Add another file</a> <span class="gray"></span>
+                            </div>
+                        </div>
+
+                        <input type="submit" value="Send" />
+
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="right-navbar pull-left">
+            <div class="block">
+                {% include "ZerebralFrontendBundle:Message:menuBlock.html.twig" %}
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block message %}
+    <div class="message">
+        <div class="info">
+            <a href="#">{{ message.userRelatedByFromId.getFullName() }}</a>
+            <p>{{ message.createdAt.format('m/d/Y <b\\r/>\\a\\t g:i a') | raw }}</p>
+        </div>
+        {{ message.body | raw }}
+    </div>
+{% endblock %}
+
+{% block hiddenMessage %}
+    <div class="message hide">
+        <div class="info">
+            <a href="#">{{ message.userRelatedByFromId.getFullName() }}</a>
+            <p>{{ message.createdAt.format('m/d/Y <b\\r/>\\a\\t g:i a') | raw }}</p>
+        </div>
+        {{ message.body | raw }}
+    </div>
+{% endblock %}
