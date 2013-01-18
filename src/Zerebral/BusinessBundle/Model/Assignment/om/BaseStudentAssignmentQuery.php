@@ -20,6 +20,7 @@ use Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentPeer;
 use Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentQuery;
 use Zerebral\BusinessBundle\Model\File\File;
 use Zerebral\BusinessBundle\Model\File\FileReferences;
+use Zerebral\BusinessBundle\Model\Message\Message;
 use Zerebral\BusinessBundle\Model\User\Student;
 
 /**
@@ -695,6 +696,23 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
         return $this
             ->useFileReferencesQuery()
             ->filterByassignmentReferenceId($assignment, $comparison)
+            ->endUse();
+    }
+
+    /**
+     * Filter the query by a related Message object
+     * using the file_references table as cross reference
+     *
+     * @param   Message $message the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   StudentAssignmentQuery The current query, for fluid interface
+     */
+    public function filterBymessageReferenceId($message, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useFileReferencesQuery()
+            ->filterBymessageReferenceId($message, $comparison)
             ->endUse();
     }
 

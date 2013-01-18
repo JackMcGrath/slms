@@ -1,0 +1,132 @@
+{% extends 'ZerebralFrontendBundle::layout.html.twig' %}
+{% import "ZerebralFrontendBundle:Macro:main.html.twig" as mainPartials %}
+
+{% form_theme form _self %}
+{% block form_rows %}
+    {% spaceless %}
+        {% for child in form %}
+            {{ form_widget(child) }}
+        {% endfor %}
+    {% endspaceless %}
+{% endblock form_rows %}
+{% block file_widget %}
+    {% spaceless %}
+        <div class="file-item">
+            {% if value %}
+                {% if value.name == '' %}
+                    <input type="file" name="assignment[files][{{ name }}][uploadedFile]" /> <i class="icon-small-trash-bin"></i><a class="remove-uploaded-file" href="#">remove</a> <span class="help-inline">Please select file for uploading</span>
+                {% else %}
+                    <span>{{ value.name }}</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="hidden" name="assignment[files][{{ name }}][uploadedFile]" /><a class="remove-uploaded-file" href="#"><i class="icon-small-trash-bin"></i></a>
+                {% endif %}
+            {% else %}
+                <input type="file" {{ block('widget_attributes') }} /> <a class="remove-uploaded-file" href="#"><i class="icon-small-trash-bin"></i></a>
+            {% endif %}
+        </div>
+    {% endspaceless %}
+{% endblock file_widget %}
+
+{% block content %}
+    {% javascripts
+    '@ZerebralFrontendBundle/Resources/public/js/controllers/message/reply.js'
+    output='js/compiled/assignment_index.js' %}
+    <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+
+
+    <div class="row-fluid messages-list">
+        <div class="span6 main-list-block">
+            <div class="row-fluid">
+                <h2 class="pull-left form-title">
+                    Messages
+                </h2>
+            </div>
+            <hr/>
+
+            <div class="messages">
+                {% if thread and thread.count %}
+                    <h1>{{ thread.getFirst().subject }}</h1>
+                    {% if collapsedMessagesCount >= 5 %}
+                        <div class="collapsed"><a href="#" id="show-hidden">{{ collapsedMessagesCount }} messages</a></div>
+                    {% endif %}
+                    <div>
+                        {% for key,message in thread %}
+                            {% set classHidden = (collapsedMessagesCount == 0 or message.isRead == false or message.isMarkedAsRead == true or key == (thread | length - 1)) ? '' : 'hide' %}
+                            {{ block('message') }}
+                        {% endfor %}
+                    </div>
+                    <div class="reply">
+                        <form method="post"{{ form_enctype(form) }}>
+                            {{ form_widget(form._token) }}
+                            {{ form_row(form.body, {
+                                label: 'Reply',
+                                form_type: 'horizontal',
+                                attr: {
+                                    class: '',
+                                    rows: 6
+                                }
+                            }) }}
+                            <div class="control-group radio-control-group">
+                                <label class="control-label">Attachments</label>
+                                <div id="attachments_div" class="controls" data-prototype="{{ form_widget(form.files.vars.prototype)|e }}">
+                                    <div id="upload_files_div">
+                                        {{ form_widget(form.files) }}
+                                    </div>
+                                    <a href="#" class="add_file_link">Add another file</a> <span class="gray"></span>
+                                </div>
+                            </div>
+
+                            <input type="submit" value="Send" />
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="right-navbar pull-left">
+
+            <a class="btn big-button top-buttons compose-message" href="{{ path('message_compose') }}">compose message</a>
+
+            <div class="block">
+                {% include "ZerebralFrontendBundle:Message:menuBlock.html.twig" %}
+            </div>
+
+            <div class="block">
+                <div class="">
+                    <img src="{{ get_file_storage_link(thread.getFirst().userRelatedByFromId.getAvatarFile()) | imagine_filter('thumbnail') }}" width="42" height="42" />
+                    <a href="#">{{ thread.getFirst().userRelatedByFromId.getFullName() }}</a>
+                </div>
+            </div>
+
+            <div class="block">
+                <div class="">
+                    Links and Attachments
+                    {% for key,message in thread %}
+                        {% for file in message.getFiles %}
+                            <div><i class="icon-search"></i> <a class="link" target="_blank" href="{{ get_file_storage_link(file) }}">{{ file.name }}</a></div>
+                        {% endfor %}
+                    {% endfor %}
+                    <span>Showing the last 20 links and attachments</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block message %}
+    <div class="message {{ classHidden }}">
+        <div class="info {{ message.fromId == message.userId ? 'self' : '' }}">
+            <a href="#">{{ message.fromId == message.userId ? 'Me' : message.userRelatedByFromId.getFullName() }}</a>
+            <p>{{ message.createdAt.format('m/d/Y <b\\r/>\\a\\t g:i a') | raw }}</p>
+        </div>
+        {{ message.body | raw }}
+        {% if message.getFiles | length %}
+            <div class="attached-files">
+                <strong>Attached files:</strong>
+                {% for file in message.getFiles %}
+                    <div><i class="icon-search"></i> <a class="link" target="_blank" href="{{ get_file_storage_link(file) }}">{{ file.name }}</a></div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

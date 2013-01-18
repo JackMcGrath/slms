@@ -17,6 +17,7 @@ use Glorpen\PropelEvent\PropelEventBundle\Events\QueryEvent;
 use Zerebral\BusinessBundle\Model\Feed\FeedComment;
 use Zerebral\BusinessBundle\Model\Feed\FeedItem;
 use Zerebral\BusinessBundle\Model\File\File;
+use Zerebral\BusinessBundle\Model\Message\Message;
 use Zerebral\BusinessBundle\Model\User\Student;
 use Zerebral\BusinessBundle\Model\User\Teacher;
 use Zerebral\BusinessBundle\Model\User\User;
@@ -69,6 +70,18 @@ use Zerebral\BusinessBundle\Model\User\UserQuery;
  * @method UserQuery leftJoinFeedComment($relationAlias = null) Adds a LEFT JOIN clause to the query using the FeedComment relation
  * @method UserQuery rightJoinFeedComment($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FeedComment relation
  * @method UserQuery innerJoinFeedComment($relationAlias = null) Adds a INNER JOIN clause to the query using the FeedComment relation
+ *
+ * @method UserQuery leftJoinMessageRelatedByUserId($relationAlias = null) Adds a LEFT JOIN clause to the query using the MessageRelatedByUserId relation
+ * @method UserQuery rightJoinMessageRelatedByUserId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the MessageRelatedByUserId relation
+ * @method UserQuery innerJoinMessageRelatedByUserId($relationAlias = null) Adds a INNER JOIN clause to the query using the MessageRelatedByUserId relation
+ *
+ * @method UserQuery leftJoinMessageRelatedByFromId($relationAlias = null) Adds a LEFT JOIN clause to the query using the MessageRelatedByFromId relation
+ * @method UserQuery rightJoinMessageRelatedByFromId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the MessageRelatedByFromId relation
+ * @method UserQuery innerJoinMessageRelatedByFromId($relationAlias = null) Adds a INNER JOIN clause to the query using the MessageRelatedByFromId relation
+ *
+ * @method UserQuery leftJoinMessageRelatedByToId($relationAlias = null) Adds a LEFT JOIN clause to the query using the MessageRelatedByToId relation
+ * @method UserQuery rightJoinMessageRelatedByToId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the MessageRelatedByToId relation
+ * @method UserQuery innerJoinMessageRelatedByToId($relationAlias = null) Adds a INNER JOIN clause to the query using the MessageRelatedByToId relation
  *
  * @method UserQuery leftJoinStudent($relationAlias = null) Adds a LEFT JOIN clause to the query using the Student relation
  * @method UserQuery rightJoinStudent($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Student relation
@@ -980,6 +993,228 @@ abstract class BaseUserQuery extends ModelCriteria
         return $this
             ->joinFeedComment($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'FeedComment', '\Zerebral\BusinessBundle\Model\Feed\FeedCommentQuery');
+    }
+
+    /**
+     * Filter the query by a related Message object
+     *
+     * @param   Message|PropelObjectCollection $message  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   UserQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByMessageRelatedByUserId($message, $comparison = null)
+    {
+        if ($message instanceof Message) {
+            return $this
+                ->addUsingAlias(UserPeer::ID, $message->getUserId(), $comparison);
+        } elseif ($message instanceof PropelObjectCollection) {
+            return $this
+                ->useMessageRelatedByUserIdQuery()
+                ->filterByPrimaryKeys($message->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByMessageRelatedByUserId() only accepts arguments of type Message or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the MessageRelatedByUserId relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return UserQuery The current query, for fluid interface
+     */
+    public function joinMessageRelatedByUserId($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('MessageRelatedByUserId');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'MessageRelatedByUserId');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the MessageRelatedByUserId relation Message object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Zerebral\BusinessBundle\Model\Message\MessageQuery A secondary query class using the current class as primary query
+     */
+    public function useMessageRelatedByUserIdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinMessageRelatedByUserId($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'MessageRelatedByUserId', '\Zerebral\BusinessBundle\Model\Message\MessageQuery');
+    }
+
+    /**
+     * Filter the query by a related Message object
+     *
+     * @param   Message|PropelObjectCollection $message  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   UserQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByMessageRelatedByFromId($message, $comparison = null)
+    {
+        if ($message instanceof Message) {
+            return $this
+                ->addUsingAlias(UserPeer::ID, $message->getFromId(), $comparison);
+        } elseif ($message instanceof PropelObjectCollection) {
+            return $this
+                ->useMessageRelatedByFromIdQuery()
+                ->filterByPrimaryKeys($message->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByMessageRelatedByFromId() only accepts arguments of type Message or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the MessageRelatedByFromId relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return UserQuery The current query, for fluid interface
+     */
+    public function joinMessageRelatedByFromId($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('MessageRelatedByFromId');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'MessageRelatedByFromId');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the MessageRelatedByFromId relation Message object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Zerebral\BusinessBundle\Model\Message\MessageQuery A secondary query class using the current class as primary query
+     */
+    public function useMessageRelatedByFromIdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinMessageRelatedByFromId($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'MessageRelatedByFromId', '\Zerebral\BusinessBundle\Model\Message\MessageQuery');
+    }
+
+    /**
+     * Filter the query by a related Message object
+     *
+     * @param   Message|PropelObjectCollection $message  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   UserQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByMessageRelatedByToId($message, $comparison = null)
+    {
+        if ($message instanceof Message) {
+            return $this
+                ->addUsingAlias(UserPeer::ID, $message->getToId(), $comparison);
+        } elseif ($message instanceof PropelObjectCollection) {
+            return $this
+                ->useMessageRelatedByToIdQuery()
+                ->filterByPrimaryKeys($message->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByMessageRelatedByToId() only accepts arguments of type Message or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the MessageRelatedByToId relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return UserQuery The current query, for fluid interface
+     */
+    public function joinMessageRelatedByToId($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('MessageRelatedByToId');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'MessageRelatedByToId');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the MessageRelatedByToId relation Message object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Zerebral\BusinessBundle\Model\Message\MessageQuery A secondary query class using the current class as primary query
+     */
+    public function useMessageRelatedByToIdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinMessageRelatedByToId($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'MessageRelatedByToId', '\Zerebral\BusinessBundle\Model\Message\MessageQuery');
     }
 
     /**

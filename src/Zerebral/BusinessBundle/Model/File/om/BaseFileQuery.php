@@ -21,6 +21,7 @@ use Zerebral\BusinessBundle\Model\File\FilePeer;
 use Zerebral\BusinessBundle\Model\File\FileQuery;
 use Zerebral\BusinessBundle\Model\File\FileReferences;
 use Zerebral\BusinessBundle\Model\Material\CourseMaterial;
+use Zerebral\BusinessBundle\Model\Message\Message;
 use Zerebral\BusinessBundle\Model\User\User;
 
 /**
@@ -744,6 +745,23 @@ abstract class BaseFileQuery extends ModelCriteria
         return $this
             ->useFileReferencesQuery()
             ->filterBystudentAssignmentReferenceId($studentAssignment, $comparison)
+            ->endUse();
+    }
+
+    /**
+     * Filter the query by a related Message object
+     * using the file_references table as cross reference
+     *
+     * @param   Message $message the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   FileQuery The current query, for fluid interface
+     */
+    public function filterBymessageReferenceId($message, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useFileReferencesQuery()
+            ->filterBymessageReferenceId($message, $comparison)
             ->endUse();
     }
 
