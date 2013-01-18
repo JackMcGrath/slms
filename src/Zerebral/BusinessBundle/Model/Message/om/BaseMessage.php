@@ -1,6 +1,6 @@
 <?php
 
-namespace Zerebral\BusinessBundle\Model\File\om;
+namespace Zerebral\BusinessBundle\Model\Message\om;
 
 use \BaseObject;
 use \BasePeer;
@@ -22,29 +22,27 @@ use Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery;
 use Zerebral\BusinessBundle\Model\Assignment\StudentAssignment;
 use Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentQuery;
 use Zerebral\BusinessBundle\Model\File\File;
-use Zerebral\BusinessBundle\Model\File\FilePeer;
 use Zerebral\BusinessBundle\Model\File\FileQuery;
 use Zerebral\BusinessBundle\Model\File\FileReferences;
 use Zerebral\BusinessBundle\Model\File\FileReferencesQuery;
-use Zerebral\BusinessBundle\Model\Material\CourseMaterial;
-use Zerebral\BusinessBundle\Model\Material\CourseMaterialQuery;
 use Zerebral\BusinessBundle\Model\Message\Message;
+use Zerebral\BusinessBundle\Model\Message\MessagePeer;
 use Zerebral\BusinessBundle\Model\Message\MessageQuery;
 use Zerebral\BusinessBundle\Model\User\User;
 use Zerebral\BusinessBundle\Model\User\UserQuery;
 
-abstract class BaseFile extends BaseObject implements Persistent
+abstract class BaseMessage extends BaseObject implements Persistent
 {
     /**
      * Peer class name
      */
-    const PEER = 'Zerebral\\BusinessBundle\\Model\\File\\FilePeer';
+    const PEER = 'Zerebral\\BusinessBundle\\Model\\Message\\MessagePeer';
 
     /**
      * The Peer class.
      * Instance provides a convenient way of calling static methods on a class
      * that calling code may not be able to identify.
-     * @var        FilePeer
+     * @var        MessagePeer
      */
     protected static $peer;
 
@@ -61,35 +59,47 @@ abstract class BaseFile extends BaseObject implements Persistent
     protected $id;
 
     /**
-     * The value for the name field.
+     * The value for the thread_id field.
      * @var        string
      */
-    protected $name;
+    protected $thread_id;
 
     /**
-     * The value for the description field.
-     * @var        string
-     */
-    protected $description;
-
-    /**
-     * The value for the size field.
+     * The value for the from_id field.
      * @var        int
      */
-    protected $size;
+    protected $from_id;
 
     /**
-     * The value for the mime_type field.
-     * @var        string
+     * The value for the to_id field.
+     * @var        int
      */
-    protected $mime_type;
+    protected $to_id;
 
     /**
-     * The value for the storage field.
-     * Note: this column has a database default value of: 'local'
+     * The value for the is_read field.
+     * Note: this column has a database default value of: false
+     * @var        boolean
+     */
+    protected $is_read;
+
+    /**
+     * The value for the user_id field.
+     * @var        int
+     */
+    protected $user_id;
+
+    /**
+     * The value for the subject field.
      * @var        string
      */
-    protected $storage;
+    protected $subject;
+
+    /**
+     * The value for the body field.
+     * @var        string
+     */
+    protected $body;
 
     /**
      * The value for the created_at field.
@@ -98,22 +108,30 @@ abstract class BaseFile extends BaseObject implements Persistent
     protected $created_at;
 
     /**
+     * @var        User
+     */
+    protected $aUserRelatedByUserId;
+
+    /**
+     * @var        User
+     */
+    protected $aUserRelatedByFromId;
+
+    /**
+     * @var        User
+     */
+    protected $aUserRelatedByToId;
+
+    /**
      * @var        PropelObjectCollection|FileReferences[] Collection to store aggregation of FileReferences objects.
      */
     protected $collFileReferencess;
     protected $collFileReferencessPartial;
 
     /**
-     * @var        PropelObjectCollection|CourseMaterial[] Collection to store aggregation of CourseMaterial objects.
+     * @var        PropelObjectCollection|File[] Collection to store aggregation of File objects.
      */
-    protected $collCourseMaterials;
-    protected $collCourseMaterialsPartial;
-
-    /**
-     * @var        PropelObjectCollection|User[] Collection to store aggregation of User objects.
-     */
-    protected $collUsers;
-    protected $collUsersPartial;
+    protected $collFiles;
 
     /**
      * @var        PropelObjectCollection|Assignment[] Collection to store aggregation of Assignment objects.
@@ -124,11 +142,6 @@ abstract class BaseFile extends BaseObject implements Persistent
      * @var        PropelObjectCollection|StudentAssignment[] Collection to store aggregation of StudentAssignment objects.
      */
     protected $collstudentAssignmentReferenceIds;
-
-    /**
-     * @var        PropelObjectCollection|Message[] Collection to store aggregation of Message objects.
-     */
-    protected $collmessageReferenceIds;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -154,6 +167,12 @@ abstract class BaseFile extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
+    protected $filesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
     protected $assignmentReferenceIdsScheduledForDeletion = null;
 
     /**
@@ -166,25 +185,7 @@ abstract class BaseFile extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $messageReferenceIdsScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
     protected $fileReferencessScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $courseMaterialsScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $usersScheduledForDeletion = null;
 
     /**
      * Applies default values to this object.
@@ -194,11 +195,11 @@ abstract class BaseFile extends BaseObject implements Persistent
      */
     public function applyDefaultValues()
     {
-        $this->storage = 'local';
+        $this->is_read = false;
     }
 
     /**
-     * Initializes internal state of BaseFile object.
+     * Initializes internal state of BaseMessage object.
      * @see        applyDefaults()
      */
     public function __construct()
@@ -219,53 +220,73 @@ abstract class BaseFile extends BaseObject implements Persistent
     }
 
     /**
-     * Get the [name] column value.
+     * Get the [thread_id] column value.
      *
      * @return string
      */
-    public function getName()
+    public function getThreadId()
     {
-        return $this->name;
+        return $this->thread_id;
     }
 
     /**
-     * Get the [description] column value.
-     *
-     * @return string
-     */
-    public function getDescription()
-    {
-        return $this->description;
-    }
-
-    /**
-     * Get the [size] column value.
+     * Get the [from_id] column value.
      *
      * @return int
      */
-    public function getSize()
+    public function getFromId()
     {
-        return $this->size;
+        return $this->from_id;
     }
 
     /**
-     * Get the [mime_type] column value.
+     * Get the [to_id] column value.
      *
-     * @return string
+     * @return int
      */
-    public function getMimeType()
+    public function getToId()
     {
-        return $this->mime_type;
+        return $this->to_id;
     }
 
     /**
-     * Get the [storage] column value.
+     * Get the [is_read] column value.
+     *
+     * @return boolean
+     */
+    public function getIsRead()
+    {
+        return $this->is_read;
+    }
+
+    /**
+     * Get the [user_id] column value.
+     *
+     * @return int
+     */
+    public function getUserId()
+    {
+        return $this->user_id;
+    }
+
+    /**
+     * Get the [subject] column value.
      *
      * @return string
      */
-    public function getStorage()
+    public function getSubject()
     {
-        return $this->storage;
+        return $this->subject;
+    }
+
+    /**
+     * Get the [body] column value.
+     *
+     * @return string
+     */
+    public function getBody()
+    {
+        return $this->body;
     }
 
     /**
@@ -312,7 +333,7 @@ abstract class BaseFile extends BaseObject implements Persistent
      * Set the value of [id] column.
      *
      * @param int $v new value
-     * @return File The current object (for fluent API support)
+     * @return Message The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -322,7 +343,7 @@ abstract class BaseFile extends BaseObject implements Persistent
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = FilePeer::ID;
+            $this->modifiedColumns[] = MessagePeer::ID;
         }
 
 
@@ -330,116 +351,178 @@ abstract class BaseFile extends BaseObject implements Persistent
     } // setId()
 
     /**
-     * Set the value of [name] column.
+     * Set the value of [thread_id] column.
      *
      * @param string $v new value
-     * @return File The current object (for fluent API support)
+     * @return Message The current object (for fluent API support)
      */
-    public function setName($v)
+    public function setThreadId($v)
     {
         if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
-        if ($this->name !== $v) {
-            $this->name = $v;
-            $this->modifiedColumns[] = FilePeer::NAME;
+        if ($this->thread_id !== $v) {
+            $this->thread_id = $v;
+            $this->modifiedColumns[] = MessagePeer::THREAD_ID;
         }
 
 
         return $this;
-    } // setName()
+    } // setThreadId()
 
     /**
-     * Set the value of [description] column.
-     *
-     * @param string $v new value
-     * @return File The current object (for fluent API support)
-     */
-    public function setDescription($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (string) $v;
-        }
-
-        if ($this->description !== $v) {
-            $this->description = $v;
-            $this->modifiedColumns[] = FilePeer::DESCRIPTION;
-        }
-
-
-        return $this;
-    } // setDescription()
-
-    /**
-     * Set the value of [size] column.
+     * Set the value of [from_id] column.
      *
      * @param int $v new value
-     * @return File The current object (for fluent API support)
+     * @return Message The current object (for fluent API support)
      */
-    public function setSize($v)
+    public function setFromId($v)
     {
         if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
-        if ($this->size !== $v) {
-            $this->size = $v;
-            $this->modifiedColumns[] = FilePeer::SIZE;
+        if ($this->from_id !== $v) {
+            $this->from_id = $v;
+            $this->modifiedColumns[] = MessagePeer::FROM_ID;
+        }
+
+        if ($this->aUserRelatedByFromId !== null && $this->aUserRelatedByFromId->getId() !== $v) {
+            $this->aUserRelatedByFromId = null;
         }
 
 
         return $this;
-    } // setSize()
+    } // setFromId()
 
     /**
-     * Set the value of [mime_type] column.
+     * Set the value of [to_id] column.
+     *
+     * @param int $v new value
+     * @return Message The current object (for fluent API support)
+     */
+    public function setToId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->to_id !== $v) {
+            $this->to_id = $v;
+            $this->modifiedColumns[] = MessagePeer::TO_ID;
+        }
+
+        if ($this->aUserRelatedByToId !== null && $this->aUserRelatedByToId->getId() !== $v) {
+            $this->aUserRelatedByToId = null;
+        }
+
+
+        return $this;
+    } // setToId()
+
+    /**
+     * Sets the value of the [is_read] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param boolean|integer|string $v The new value
+     * @return Message The current object (for fluent API support)
+     */
+    public function setIsRead($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->is_read !== $v) {
+            $this->is_read = $v;
+            $this->modifiedColumns[] = MessagePeer::IS_READ;
+        }
+
+
+        return $this;
+    } // setIsRead()
+
+    /**
+     * Set the value of [user_id] column.
+     *
+     * @param int $v new value
+     * @return Message The current object (for fluent API support)
+     */
+    public function setUserId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->user_id !== $v) {
+            $this->user_id = $v;
+            $this->modifiedColumns[] = MessagePeer::USER_ID;
+        }
+
+        if ($this->aUserRelatedByUserId !== null && $this->aUserRelatedByUserId->getId() !== $v) {
+            $this->aUserRelatedByUserId = null;
+        }
+
+
+        return $this;
+    } // setUserId()
+
+    /**
+     * Set the value of [subject] column.
      *
      * @param string $v new value
-     * @return File The current object (for fluent API support)
+     * @return Message The current object (for fluent API support)
      */
-    public function setMimeType($v)
+    public function setSubject($v)
     {
         if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
-        if ($this->mime_type !== $v) {
-            $this->mime_type = $v;
-            $this->modifiedColumns[] = FilePeer::MIME_TYPE;
+        if ($this->subject !== $v) {
+            $this->subject = $v;
+            $this->modifiedColumns[] = MessagePeer::SUBJECT;
         }
 
 
         return $this;
-    } // setMimeType()
+    } // setSubject()
 
     /**
-     * Set the value of [storage] column.
+     * Set the value of [body] column.
      *
      * @param string $v new value
-     * @return File The current object (for fluent API support)
+     * @return Message The current object (for fluent API support)
      */
-    public function setStorage($v)
+    public function setBody($v)
     {
         if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
-        if ($this->storage !== $v) {
-            $this->storage = $v;
-            $this->modifiedColumns[] = FilePeer::STORAGE;
+        if ($this->body !== $v) {
+            $this->body = $v;
+            $this->modifiedColumns[] = MessagePeer::BODY;
         }
 
 
         return $this;
-    } // setStorage()
+    } // setBody()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param mixed $v string, integer (timestamp), or DateTime value.
      *               Empty strings are treated as null.
-     * @return File The current object (for fluent API support)
+     * @return Message The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -449,7 +532,7 @@ abstract class BaseFile extends BaseObject implements Persistent
             $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
             if ($currentDateAsString !== $newDateAsString) {
                 $this->created_at = $newDateAsString;
-                $this->modifiedColumns[] = FilePeer::CREATED_AT;
+                $this->modifiedColumns[] = MessagePeer::CREATED_AT;
             }
         } // if either are not null
 
@@ -467,7 +550,7 @@ abstract class BaseFile extends BaseObject implements Persistent
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->storage !== 'local') {
+            if ($this->is_read !== false) {
                 return false;
             }
 
@@ -494,12 +577,14 @@ abstract class BaseFile extends BaseObject implements Persistent
         try {
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-            $this->name = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
-            $this->description = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-            $this->size = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
-            $this->mime_type = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
-            $this->storage = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-            $this->created_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+            $this->thread_id = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
+            $this->from_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
+            $this->to_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
+            $this->is_read = ($row[$startcol + 4] !== null) ? (boolean) $row[$startcol + 4] : null;
+            $this->user_id = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
+            $this->subject = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+            $this->body = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+            $this->created_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -508,10 +593,10 @@ abstract class BaseFile extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 7; // 7 = FilePeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 9; // 9 = MessagePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating File object", $e);
+            throw new PropelException("Error populating Message object", $e);
         }
     }
 
@@ -531,6 +616,15 @@ abstract class BaseFile extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aUserRelatedByFromId !== null && $this->from_id !== $this->aUserRelatedByFromId->getId()) {
+            $this->aUserRelatedByFromId = null;
+        }
+        if ($this->aUserRelatedByToId !== null && $this->to_id !== $this->aUserRelatedByToId->getId()) {
+            $this->aUserRelatedByToId = null;
+        }
+        if ($this->aUserRelatedByUserId !== null && $this->user_id !== $this->aUserRelatedByUserId->getId()) {
+            $this->aUserRelatedByUserId = null;
+        }
     } // ensureConsistency
 
     /**
@@ -554,13 +648,13 @@ abstract class BaseFile extends BaseObject implements Persistent
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(FilePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(MessagePeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $stmt = FilePeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+        $stmt = MessagePeer::doSelectStmt($this->buildPkeyCriteria(), $con);
         $row = $stmt->fetch(PDO::FETCH_NUM);
         $stmt->closeCursor();
         if (!$row) {
@@ -570,15 +664,14 @@ abstract class BaseFile extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->aUserRelatedByUserId = null;
+            $this->aUserRelatedByFromId = null;
+            $this->aUserRelatedByToId = null;
             $this->collFileReferencess = null;
 
-            $this->collCourseMaterials = null;
-
-            $this->collUsers = null;
-
+            $this->collFiles = null;
             $this->collassignmentReferenceIds = null;
             $this->collstudentAssignmentReferenceIds = null;
-            $this->collmessageReferenceIds = null;
         } // if (deep)
     }
 
@@ -599,12 +692,12 @@ abstract class BaseFile extends BaseObject implements Persistent
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(FilePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(MessagePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = FileQuery::create()
+            $deleteQuery = MessageQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             // event behavior
@@ -646,30 +739,39 @@ abstract class BaseFile extends BaseObject implements Persistent
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(FilePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(MessagePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         $con->beginTransaction();
-        // $isInsert = $this->isNew();
+        $isInsert = $this->isNew();
         try {
-            $ret = true;
-            if ($this->isNew() || $this->isModified()) {
-                $ret = $this->preSave($con);
+            $ret = $this->preSave($con);
             // event behavior
             EventDispatcherProxy::trigger('model.save.pre', new ModelEvent($this));
-            }
-            if ($this->isNew()) {
+            if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
                 // event behavior
                 EventDispatcherProxy::trigger('model.insert.pre', new ModelEvent($this));
-            } elseif ($this->isModified()) {
+            } else {
                 $ret = $ret && $this->preUpdate($con);
                 // event behavior
                 EventDispatcherProxy::trigger(array('update.pre', 'model.update.pre'), new ModelEvent($this));
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
-                FilePeer::addInstanceToPool($this);
+                if ($isInsert) {
+                    $this->postInsert($con);
+                    // event behavior
+                    EventDispatcherProxy::trigger('model.insert.post', new ModelEvent($this));
+                } else {
+                    $this->postUpdate($con);
+                    // event behavior
+                    EventDispatcherProxy::trigger(array('update.post', 'model.update.post'), new ModelEvent($this));
+                }
+                $this->postSave($con);
+                // event behavior
+                EventDispatcherProxy::trigger('model.save.post', new ModelEvent($this));
+                MessagePeer::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -698,8 +800,32 @@ abstract class BaseFile extends BaseObject implements Persistent
         $affectedRows = 0; // initialize var to track total num of affected rows
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
-            $isInsert = $this->isNew();
-            $isUpdate = $this->isModified();
+
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aUserRelatedByUserId !== null) {
+                if ($this->aUserRelatedByUserId->isModified() || $this->aUserRelatedByUserId->isNew()) {
+                    $affectedRows += $this->aUserRelatedByUserId->save($con);
+                }
+                $this->setUserRelatedByUserId($this->aUserRelatedByUserId);
+            }
+
+            if ($this->aUserRelatedByFromId !== null) {
+                if ($this->aUserRelatedByFromId->isModified() || $this->aUserRelatedByFromId->isNew()) {
+                    $affectedRows += $this->aUserRelatedByFromId->save($con);
+                }
+                $this->setUserRelatedByFromId($this->aUserRelatedByFromId);
+            }
+
+            if ($this->aUserRelatedByToId !== null) {
+                if ($this->aUserRelatedByToId->isModified() || $this->aUserRelatedByToId->isNew()) {
+                    $affectedRows += $this->aUserRelatedByToId->save($con);
+                }
+                $this->setUserRelatedByToId($this->aUserRelatedByToId);
+            }
 
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
@@ -712,12 +838,38 @@ abstract class BaseFile extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
+            if ($this->filesScheduledForDeletion !== null) {
+                if (!$this->filesScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk = $this->getPrimaryKey();
+                    foreach ($this->filesScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($remotePk, $pk);
+                    }
+                    FileReferencesQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->filesScheduledForDeletion = null;
+                }
+
+                foreach ($this->getFiles() as $file) {
+                    if ($file->isModified()) {
+                        $file->save($con);
+                    }
+                }
+            } elseif ($this->collFiles) {
+                foreach ($this->collFiles as $file) {
+                    if ($file->isModified()) {
+                        $file->save($con);
+                    }
+                }
+            }
+
             if ($this->assignmentReferenceIdsScheduledForDeletion !== null) {
                 if (!$this->assignmentReferenceIdsScheduledForDeletion->isEmpty()) {
                     $pks = array();
                     $pk = $this->getPrimaryKey();
                     foreach ($this->assignmentReferenceIdsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
-                        $pks[] = array($pk, $remotePk);
+                        $pks[] = array($remotePk, $pk);
                     }
                     FileReferencesQuery::create()
                         ->filterByPrimaryKeys($pks)
@@ -743,7 +895,7 @@ abstract class BaseFile extends BaseObject implements Persistent
                     $pks = array();
                     $pk = $this->getPrimaryKey();
                     foreach ($this->studentAssignmentReferenceIdsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
-                        $pks[] = array($pk, $remotePk);
+                        $pks[] = array($remotePk, $pk);
                     }
                     FileReferencesQuery::create()
                         ->filterByPrimaryKeys($pks)
@@ -760,32 +912,6 @@ abstract class BaseFile extends BaseObject implements Persistent
                 foreach ($this->collstudentAssignmentReferenceIds as $studentAssignmentReferenceId) {
                     if ($studentAssignmentReferenceId->isModified()) {
                         $studentAssignmentReferenceId->save($con);
-                    }
-                }
-            }
-
-            if ($this->messageReferenceIdsScheduledForDeletion !== null) {
-                if (!$this->messageReferenceIdsScheduledForDeletion->isEmpty()) {
-                    $pks = array();
-                    $pk = $this->getPrimaryKey();
-                    foreach ($this->messageReferenceIdsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
-                        $pks[] = array($pk, $remotePk);
-                    }
-                    FileReferencesQuery::create()
-                        ->filterByPrimaryKeys($pks)
-                        ->delete($con);
-                    $this->messageReferenceIdsScheduledForDeletion = null;
-                }
-
-                foreach ($this->getmessageReferenceIds() as $messageReferenceId) {
-                    if ($messageReferenceId->isModified()) {
-                        $messageReferenceId->save($con);
-                    }
-                }
-            } elseif ($this->collmessageReferenceIds) {
-                foreach ($this->collmessageReferenceIds as $messageReferenceId) {
-                    if ($messageReferenceId->isModified()) {
-                        $messageReferenceId->save($con);
                     }
                 }
             }
@@ -807,58 +933,8 @@ abstract class BaseFile extends BaseObject implements Persistent
                 }
             }
 
-            if ($this->courseMaterialsScheduledForDeletion !== null) {
-                if (!$this->courseMaterialsScheduledForDeletion->isEmpty()) {
-                    CourseMaterialQuery::create()
-                        ->filterByPrimaryKeys($this->courseMaterialsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->courseMaterialsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collCourseMaterials !== null) {
-                foreach ($this->collCourseMaterials as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
-            if ($this->usersScheduledForDeletion !== null) {
-                if (!$this->usersScheduledForDeletion->isEmpty()) {
-                    foreach ($this->usersScheduledForDeletion as $user) {
-                        // need to save related object because we set the relation to null
-                        $user->save($con);
-                    }
-                    $this->usersScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collUsers !== null) {
-                foreach ($this->collUsers as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
             $this->alreadyInSave = false;
 
-            if ($isInsert) {
-                $this->postInsert($con);
-                    // event behavior
-                    EventDispatcherProxy::trigger('model.insert.post', new ModelEvent($this));
-            }
-            if ($isUpdate) {
-                $this->postUpdate($con);
-                    // event behavior
-                    EventDispatcherProxy::trigger(array('update.post', 'model.update.post'), new ModelEvent($this));
-            }
-            if ($isUpdate || $isInsert) {
-                $this->postSave($con);
-                    // event behavior
-                    EventDispatcherProxy::trigger('model.save.post', new ModelEvent($this));
-            }
         }
 
         return $affectedRows;
@@ -877,36 +953,42 @@ abstract class BaseFile extends BaseObject implements Persistent
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = FilePeer::ID;
+        $this->modifiedColumns[] = MessagePeer::ID;
         if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . FilePeer::ID . ')');
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . MessagePeer::ID . ')');
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(FilePeer::ID)) {
+        if ($this->isColumnModified(MessagePeer::ID)) {
             $modifiedColumns[':p' . $index++]  = '`id`';
         }
-        if ($this->isColumnModified(FilePeer::NAME)) {
-            $modifiedColumns[':p' . $index++]  = '`name`';
+        if ($this->isColumnModified(MessagePeer::THREAD_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`thread_id`';
         }
-        if ($this->isColumnModified(FilePeer::DESCRIPTION)) {
-            $modifiedColumns[':p' . $index++]  = '`description`';
+        if ($this->isColumnModified(MessagePeer::FROM_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`from_id`';
         }
-        if ($this->isColumnModified(FilePeer::SIZE)) {
-            $modifiedColumns[':p' . $index++]  = '`size`';
+        if ($this->isColumnModified(MessagePeer::TO_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`to_id`';
         }
-        if ($this->isColumnModified(FilePeer::MIME_TYPE)) {
-            $modifiedColumns[':p' . $index++]  = '`mime_type`';
+        if ($this->isColumnModified(MessagePeer::IS_READ)) {
+            $modifiedColumns[':p' . $index++]  = '`is_read`';
         }
-        if ($this->isColumnModified(FilePeer::STORAGE)) {
-            $modifiedColumns[':p' . $index++]  = '`storage`';
+        if ($this->isColumnModified(MessagePeer::USER_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`user_id`';
         }
-        if ($this->isColumnModified(FilePeer::CREATED_AT)) {
+        if ($this->isColumnModified(MessagePeer::SUBJECT)) {
+            $modifiedColumns[':p' . $index++]  = '`subject`';
+        }
+        if ($this->isColumnModified(MessagePeer::BODY)) {
+            $modifiedColumns[':p' . $index++]  = '`body`';
+        }
+        if ($this->isColumnModified(MessagePeer::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`created_at`';
         }
 
         $sql = sprintf(
-            'INSERT INTO `files` (%s) VALUES (%s)',
+            'INSERT INTO `messages` (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -918,20 +1000,26 @@ abstract class BaseFile extends BaseObject implements Persistent
                     case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`name`':
-                        $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
+                    case '`thread_id`':
+                        $stmt->bindValue($identifier, $this->thread_id, PDO::PARAM_STR);
                         break;
-                    case '`description`':
-                        $stmt->bindValue($identifier, $this->description, PDO::PARAM_STR);
+                    case '`from_id`':
+                        $stmt->bindValue($identifier, $this->from_id, PDO::PARAM_INT);
                         break;
-                    case '`size`':
-                        $stmt->bindValue($identifier, $this->size, PDO::PARAM_INT);
+                    case '`to_id`':
+                        $stmt->bindValue($identifier, $this->to_id, PDO::PARAM_INT);
                         break;
-                    case '`mime_type`':
-                        $stmt->bindValue($identifier, $this->mime_type, PDO::PARAM_STR);
+                    case '`is_read`':
+                        $stmt->bindValue($identifier, (int) $this->is_read, PDO::PARAM_INT);
                         break;
-                    case '`storage`':
-                        $stmt->bindValue($identifier, $this->storage, PDO::PARAM_STR);
+                    case '`user_id`':
+                        $stmt->bindValue($identifier, $this->user_id, PDO::PARAM_INT);
+                        break;
+                    case '`subject`':
+                        $stmt->bindValue($identifier, $this->subject, PDO::PARAM_STR);
+                        break;
+                    case '`body`':
+                        $stmt->bindValue($identifier, $this->body, PDO::PARAM_STR);
                         break;
                     case '`created_at`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
@@ -1030,29 +1118,37 @@ abstract class BaseFile extends BaseObject implements Persistent
             $failureMap = array();
 
 
-            if (($retval = FilePeer::doValidate($this, $columns)) !== true) {
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aUserRelatedByUserId !== null) {
+                if (!$this->aUserRelatedByUserId->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aUserRelatedByUserId->getValidationFailures());
+                }
+            }
+
+            if ($this->aUserRelatedByFromId !== null) {
+                if (!$this->aUserRelatedByFromId->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aUserRelatedByFromId->getValidationFailures());
+                }
+            }
+
+            if ($this->aUserRelatedByToId !== null) {
+                if (!$this->aUserRelatedByToId->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aUserRelatedByToId->getValidationFailures());
+                }
+            }
+
+
+            if (($retval = MessagePeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
 
                 if ($this->collFileReferencess !== null) {
                     foreach ($this->collFileReferencess as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
-                    }
-                }
-
-                if ($this->collCourseMaterials !== null) {
-                    foreach ($this->collCourseMaterials as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
-                    }
-                }
-
-                if ($this->collUsers !== null) {
-                    foreach ($this->collUsers as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -1078,7 +1174,7 @@ abstract class BaseFile extends BaseObject implements Persistent
      */
     public function getByName($name, $type = BasePeer::TYPE_PHPNAME)
     {
-        $pos = FilePeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+        $pos = MessagePeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -1098,21 +1194,27 @@ abstract class BaseFile extends BaseObject implements Persistent
                 return $this->getId();
                 break;
             case 1:
-                return $this->getName();
+                return $this->getThreadId();
                 break;
             case 2:
-                return $this->getDescription();
+                return $this->getFromId();
                 break;
             case 3:
-                return $this->getSize();
+                return $this->getToId();
                 break;
             case 4:
-                return $this->getMimeType();
+                return $this->getIsRead();
                 break;
             case 5:
-                return $this->getStorage();
+                return $this->getUserId();
                 break;
             case 6:
+                return $this->getSubject();
+                break;
+            case 7:
+                return $this->getBody();
+                break;
+            case 8:
                 return $this->getCreatedAt();
                 break;
             default:
@@ -1138,29 +1240,34 @@ abstract class BaseFile extends BaseObject implements Persistent
      */
     public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['File'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['Message'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['File'][$this->getPrimaryKey()] = true;
-        $keys = FilePeer::getFieldNames($keyType);
+        $alreadyDumpedObjects['Message'][$this->getPrimaryKey()] = true;
+        $keys = MessagePeer::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getName(),
-            $keys[2] => $this->getDescription(),
-            $keys[3] => $this->getSize(),
-            $keys[4] => $this->getMimeType(),
-            $keys[5] => $this->getStorage(),
-            $keys[6] => $this->getCreatedAt(),
+            $keys[1] => $this->getThreadId(),
+            $keys[2] => $this->getFromId(),
+            $keys[3] => $this->getToId(),
+            $keys[4] => $this->getIsRead(),
+            $keys[5] => $this->getUserId(),
+            $keys[6] => $this->getSubject(),
+            $keys[7] => $this->getBody(),
+            $keys[8] => $this->getCreatedAt(),
         );
         if ($includeForeignObjects) {
+            if (null !== $this->aUserRelatedByUserId) {
+                $result['UserRelatedByUserId'] = $this->aUserRelatedByUserId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aUserRelatedByFromId) {
+                $result['UserRelatedByFromId'] = $this->aUserRelatedByFromId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aUserRelatedByToId) {
+                $result['UserRelatedByToId'] = $this->aUserRelatedByToId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
             if (null !== $this->collFileReferencess) {
                 $result['FileReferencess'] = $this->collFileReferencess->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
-            if (null !== $this->collCourseMaterials) {
-                $result['CourseMaterials'] = $this->collCourseMaterials->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
-            if (null !== $this->collUsers) {
-                $result['Users'] = $this->collUsers->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1180,7 +1287,7 @@ abstract class BaseFile extends BaseObject implements Persistent
      */
     public function setByName($name, $value, $type = BasePeer::TYPE_PHPNAME)
     {
-        $pos = FilePeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+        $pos = MessagePeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
 
         $this->setByPosition($pos, $value);
     }
@@ -1200,21 +1307,27 @@ abstract class BaseFile extends BaseObject implements Persistent
                 $this->setId($value);
                 break;
             case 1:
-                $this->setName($value);
+                $this->setThreadId($value);
                 break;
             case 2:
-                $this->setDescription($value);
+                $this->setFromId($value);
                 break;
             case 3:
-                $this->setSize($value);
+                $this->setToId($value);
                 break;
             case 4:
-                $this->setMimeType($value);
+                $this->setIsRead($value);
                 break;
             case 5:
-                $this->setStorage($value);
+                $this->setUserId($value);
                 break;
             case 6:
+                $this->setSubject($value);
+                break;
+            case 7:
+                $this->setBody($value);
+                break;
+            case 8:
                 $this->setCreatedAt($value);
                 break;
         } // switch()
@@ -1239,15 +1352,17 @@ abstract class BaseFile extends BaseObject implements Persistent
      */
     public function fromArray($arr, $keyType = BasePeer::TYPE_PHPNAME)
     {
-        $keys = FilePeer::getFieldNames($keyType);
+        $keys = MessagePeer::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setName($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setDescription($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setSize($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setMimeType($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setStorage($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
+        if (array_key_exists($keys[1], $arr)) $this->setThreadId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setFromId($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setToId($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setIsRead($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setUserId($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setSubject($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setBody($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setCreatedAt($arr[$keys[8]]);
     }
 
     /**
@@ -1257,15 +1372,17 @@ abstract class BaseFile extends BaseObject implements Persistent
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(FilePeer::DATABASE_NAME);
+        $criteria = new Criteria(MessagePeer::DATABASE_NAME);
 
-        if ($this->isColumnModified(FilePeer::ID)) $criteria->add(FilePeer::ID, $this->id);
-        if ($this->isColumnModified(FilePeer::NAME)) $criteria->add(FilePeer::NAME, $this->name);
-        if ($this->isColumnModified(FilePeer::DESCRIPTION)) $criteria->add(FilePeer::DESCRIPTION, $this->description);
-        if ($this->isColumnModified(FilePeer::SIZE)) $criteria->add(FilePeer::SIZE, $this->size);
-        if ($this->isColumnModified(FilePeer::MIME_TYPE)) $criteria->add(FilePeer::MIME_TYPE, $this->mime_type);
-        if ($this->isColumnModified(FilePeer::STORAGE)) $criteria->add(FilePeer::STORAGE, $this->storage);
-        if ($this->isColumnModified(FilePeer::CREATED_AT)) $criteria->add(FilePeer::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(MessagePeer::ID)) $criteria->add(MessagePeer::ID, $this->id);
+        if ($this->isColumnModified(MessagePeer::THREAD_ID)) $criteria->add(MessagePeer::THREAD_ID, $this->thread_id);
+        if ($this->isColumnModified(MessagePeer::FROM_ID)) $criteria->add(MessagePeer::FROM_ID, $this->from_id);
+        if ($this->isColumnModified(MessagePeer::TO_ID)) $criteria->add(MessagePeer::TO_ID, $this->to_id);
+        if ($this->isColumnModified(MessagePeer::IS_READ)) $criteria->add(MessagePeer::IS_READ, $this->is_read);
+        if ($this->isColumnModified(MessagePeer::USER_ID)) $criteria->add(MessagePeer::USER_ID, $this->user_id);
+        if ($this->isColumnModified(MessagePeer::SUBJECT)) $criteria->add(MessagePeer::SUBJECT, $this->subject);
+        if ($this->isColumnModified(MessagePeer::BODY)) $criteria->add(MessagePeer::BODY, $this->body);
+        if ($this->isColumnModified(MessagePeer::CREATED_AT)) $criteria->add(MessagePeer::CREATED_AT, $this->created_at);
 
         return $criteria;
     }
@@ -1280,8 +1397,8 @@ abstract class BaseFile extends BaseObject implements Persistent
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(FilePeer::DATABASE_NAME);
-        $criteria->add(FilePeer::ID, $this->id);
+        $criteria = new Criteria(MessagePeer::DATABASE_NAME);
+        $criteria->add(MessagePeer::ID, $this->id);
 
         return $criteria;
     }
@@ -1322,18 +1439,20 @@ abstract class BaseFile extends BaseObject implements Persistent
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param object $copyObj An object of File (or compatible) type.
+     * @param object $copyObj An object of Message (or compatible) type.
      * @param boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setName($this->getName());
-        $copyObj->setDescription($this->getDescription());
-        $copyObj->setSize($this->getSize());
-        $copyObj->setMimeType($this->getMimeType());
-        $copyObj->setStorage($this->getStorage());
+        $copyObj->setThreadId($this->getThreadId());
+        $copyObj->setFromId($this->getFromId());
+        $copyObj->setToId($this->getToId());
+        $copyObj->setIsRead($this->getIsRead());
+        $copyObj->setUserId($this->getUserId());
+        $copyObj->setSubject($this->getSubject());
+        $copyObj->setBody($this->getBody());
         $copyObj->setCreatedAt($this->getCreatedAt());
 
         if ($deepCopy && !$this->startCopy) {
@@ -1346,18 +1465,6 @@ abstract class BaseFile extends BaseObject implements Persistent
             foreach ($this->getFileReferencess() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addFileReferences($relObj->copy($deepCopy));
-                }
-            }
-
-            foreach ($this->getCourseMaterials() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addCourseMaterial($relObj->copy($deepCopy));
-                }
-            }
-
-            foreach ($this->getUsers() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addUser($relObj->copy($deepCopy));
                 }
             }
 
@@ -1380,7 +1487,7 @@ abstract class BaseFile extends BaseObject implements Persistent
      * objects.
      *
      * @param boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return File Clone of current object.
+     * @return Message Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1400,15 +1507,171 @@ abstract class BaseFile extends BaseObject implements Persistent
      * same instance for all member of this class. The method could therefore
      * be static, but this would prevent one from overriding the behavior.
      *
-     * @return FilePeer
+     * @return MessagePeer
      */
     public function getPeer()
     {
         if (self::$peer === null) {
-            self::$peer = new FilePeer();
+            self::$peer = new MessagePeer();
         }
 
         return self::$peer;
+    }
+
+    /**
+     * Declares an association between this object and a User object.
+     *
+     * @param             User $v
+     * @return Message The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setUserRelatedByUserId(User $v = null)
+    {
+        if ($v === null) {
+            $this->setUserId(NULL);
+        } else {
+            $this->setUserId($v->getId());
+        }
+
+        $this->aUserRelatedByUserId = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the User object, it will not be re-added.
+        if ($v !== null) {
+            $v->addMessageRelatedByUserId($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated User object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return User The associated User object.
+     * @throws PropelException
+     */
+    public function getUserRelatedByUserId(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->aUserRelatedByUserId === null && ($this->user_id !== null) && $doQuery) {
+            $this->aUserRelatedByUserId = UserQuery::create()->findPk($this->user_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aUserRelatedByUserId->addMessagesRelatedByUserId($this);
+             */
+        }
+
+        return $this->aUserRelatedByUserId;
+    }
+
+    /**
+     * Declares an association between this object and a User object.
+     *
+     * @param             User $v
+     * @return Message The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setUserRelatedByFromId(User $v = null)
+    {
+        if ($v === null) {
+            $this->setFromId(NULL);
+        } else {
+            $this->setFromId($v->getId());
+        }
+
+        $this->aUserRelatedByFromId = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the User object, it will not be re-added.
+        if ($v !== null) {
+            $v->addMessageRelatedByFromId($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated User object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return User The associated User object.
+     * @throws PropelException
+     */
+    public function getUserRelatedByFromId(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->aUserRelatedByFromId === null && ($this->from_id !== null) && $doQuery) {
+            $this->aUserRelatedByFromId = UserQuery::create()->findPk($this->from_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aUserRelatedByFromId->addMessagesRelatedByFromId($this);
+             */
+        }
+
+        return $this->aUserRelatedByFromId;
+    }
+
+    /**
+     * Declares an association between this object and a User object.
+     *
+     * @param             User $v
+     * @return Message The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setUserRelatedByToId(User $v = null)
+    {
+        if ($v === null) {
+            $this->setToId(NULL);
+        } else {
+            $this->setToId($v->getId());
+        }
+
+        $this->aUserRelatedByToId = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the User object, it will not be re-added.
+        if ($v !== null) {
+            $v->addMessageRelatedByToId($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated User object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return User The associated User object.
+     * @throws PropelException
+     */
+    public function getUserRelatedByToId(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->aUserRelatedByToId === null && ($this->to_id !== null) && $doQuery) {
+            $this->aUserRelatedByToId = UserQuery::create()->findPk($this->to_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aUserRelatedByToId->addMessagesRelatedByToId($this);
+             */
+        }
+
+        return $this->aUserRelatedByToId;
     }
 
 
@@ -1425,12 +1688,6 @@ abstract class BaseFile extends BaseObject implements Persistent
         if ('FileReferences' == $relationName) {
             $this->initFileReferencess();
         }
-        if ('CourseMaterial' == $relationName) {
-            $this->initCourseMaterials();
-        }
-        if ('User' == $relationName) {
-            $this->initUsers();
-        }
     }
 
     /**
@@ -1439,7 +1696,7 @@ abstract class BaseFile extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return File The current object (for fluent API support)
+     * @return Message The current object (for fluent API support)
      * @see        addFileReferencess()
      */
     public function clearFileReferencess()
@@ -1487,7 +1744,7 @@ abstract class BaseFile extends BaseObject implements Persistent
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
      * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this File is new, it will return
+     * If this Message is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
@@ -1504,7 +1761,7 @@ abstract class BaseFile extends BaseObject implements Persistent
                 $this->initFileReferencess();
             } else {
                 $collFileReferencess = FileReferencesQuery::create(null, $criteria)
-                    ->filterByFile($this)
+                    ->filterBymessageReferenceId($this)
                     ->find($con);
                 if (null !== $criteria) {
                     if (false !== $this->collFileReferencessPartial && count($collFileReferencess)) {
@@ -1547,7 +1804,7 @@ abstract class BaseFile extends BaseObject implements Persistent
      *
      * @param PropelCollection $fileReferencess A Propel collection.
      * @param PropelPDO $con Optional connection object
-     * @return File The current object (for fluent API support)
+     * @return Message The current object (for fluent API support)
      */
     public function setFileReferencess(PropelCollection $fileReferencess, PropelPDO $con = null)
     {
@@ -1556,7 +1813,7 @@ abstract class BaseFile extends BaseObject implements Persistent
         $this->fileReferencessScheduledForDeletion = unserialize(serialize($fileReferencessToDelete));
 
         foreach ($fileReferencessToDelete as $fileReferencesRemoved) {
-            $fileReferencesRemoved->setFile(null);
+            $fileReferencesRemoved->setmessageReferenceId(null);
         }
 
         $this->collFileReferencess = null;
@@ -1596,7 +1853,7 @@ abstract class BaseFile extends BaseObject implements Persistent
             }
 
             return $query
-                ->filterByFile($this)
+                ->filterBymessageReferenceId($this)
                 ->count($con);
         }
 
@@ -1608,7 +1865,7 @@ abstract class BaseFile extends BaseObject implements Persistent
      * through the FileReferences foreign key attribute.
      *
      * @param    FileReferences $l FileReferences
-     * @return File The current object (for fluent API support)
+     * @return Message The current object (for fluent API support)
      */
     public function addFileReferences(FileReferences $l)
     {
@@ -1629,12 +1886,12 @@ abstract class BaseFile extends BaseObject implements Persistent
     protected function doAddFileReferences($fileReferences)
     {
         $this->collFileReferencess[]= $fileReferences;
-        $fileReferences->setFile($this);
+        $fileReferences->setmessageReferenceId($this);
     }
 
     /**
      * @param	FileReferences $fileReferences The fileReferences object to remove.
-     * @return File The current object (for fluent API support)
+     * @return Message The current object (for fluent API support)
      */
     public function removeFileReferences($fileReferences)
     {
@@ -1645,7 +1902,7 @@ abstract class BaseFile extends BaseObject implements Persistent
                 $this->fileReferencessScheduledForDeletion->clear();
             }
             $this->fileReferencessScheduledForDeletion[]= clone $fileReferences;
-            $fileReferences->setFile(null);
+            $fileReferences->setmessageReferenceId(null);
         }
 
         return $this;
@@ -1655,13 +1912,38 @@ abstract class BaseFile extends BaseObject implements Persistent
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
-     * Otherwise if this File is new, it will return
-     * an empty collection; or if this File has previously
+     * Otherwise if this Message is new, it will return
+     * an empty collection; or if this Message has previously
      * been saved, it will retrieve related FileReferencess from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
-     * actually need in File.
+     * actually need in Message.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|FileReferences[] List of FileReferences objects
+     */
+    public function getFileReferencessJoinFile($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = FileReferencesQuery::create(null, $criteria);
+        $query->joinWith('File', $join_behavior);
+
+        return $this->getFileReferencess($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Message is new, it will return
+     * an empty collection; or if this Message has previously
+     * been saved, it will retrieve related FileReferencess from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Message.
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
@@ -1680,13 +1962,13 @@ abstract class BaseFile extends BaseObject implements Persistent
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
-     * Otherwise if this File is new, it will return
-     * an empty collection; or if this File has previously
+     * Otherwise if this Message is new, it will return
+     * an empty collection; or if this Message has previously
      * been saved, it will retrieve related FileReferencess from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
-     * actually need in File.
+     * actually need in Message.
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
@@ -1701,537 +1983,179 @@ abstract class BaseFile extends BaseObject implements Persistent
         return $this->getFileReferencess($query, $con);
     }
 
-
     /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this File is new, it will return
-     * an empty collection; or if this File has previously
-     * been saved, it will retrieve related FileReferencess from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in File.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|FileReferences[] List of FileReferences objects
-     */
-    public function getFileReferencessJoinmessageReferenceId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = FileReferencesQuery::create(null, $criteria);
-        $query->joinWith('messageReferenceId', $join_behavior);
-
-        return $this->getFileReferencess($query, $con);
-    }
-
-    /**
-     * Clears out the collCourseMaterials collection
+     * Clears out the collFiles collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return File The current object (for fluent API support)
-     * @see        addCourseMaterials()
+     * @return Message The current object (for fluent API support)
+     * @see        addFiles()
      */
-    public function clearCourseMaterials()
+    public function clearFiles()
     {
-        $this->collCourseMaterials = null; // important to set this to null since that means it is uninitialized
-        $this->collCourseMaterialsPartial = null;
+        $this->collFiles = null; // important to set this to null since that means it is uninitialized
+        $this->collFilesPartial = null;
 
         return $this;
     }
 
     /**
-     * reset is the collCourseMaterials collection loaded partially
+     * Initializes the collFiles collection.
      *
-     * @return void
-     */
-    public function resetPartialCourseMaterials($v = true)
-    {
-        $this->collCourseMaterialsPartial = $v;
-    }
-
-    /**
-     * Initializes the collCourseMaterials collection.
-     *
-     * By default this just sets the collCourseMaterials collection to an empty array (like clearcollCourseMaterials());
+     * By default this just sets the collFiles collection to an empty collection (like clearFiles());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
      * @return void
      */
-    public function initCourseMaterials($overrideExisting = true)
+    public function initFiles()
     {
-        if (null !== $this->collCourseMaterials && !$overrideExisting) {
-            return;
-        }
-        $this->collCourseMaterials = new PropelObjectCollection();
-        $this->collCourseMaterials->setModel('CourseMaterial');
+        $this->collFiles = new PropelObjectCollection();
+        $this->collFiles->setModel('File');
     }
 
     /**
-     * Gets an array of CourseMaterial objects which contain a foreign key that references this object.
+     * Gets a collection of File objects related by a many-to-many relationship
+     * to the current object by way of the file_references cross-reference table.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
      * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this File is new, it will return
+     * If this Message is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|CourseMaterial[] List of CourseMaterial objects
-     * @throws PropelException
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return PropelObjectCollection|File[] List of File objects
      */
-    public function getCourseMaterials($criteria = null, PropelPDO $con = null)
+    public function getFiles($criteria = null, PropelPDO $con = null)
     {
-        $partial = $this->collCourseMaterialsPartial && !$this->isNew();
-        if (null === $this->collCourseMaterials || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collCourseMaterials) {
+        if (null === $this->collFiles || null !== $criteria) {
+            if ($this->isNew() && null === $this->collFiles) {
                 // return empty collection
-                $this->initCourseMaterials();
+                $this->initFiles();
             } else {
-                $collCourseMaterials = CourseMaterialQuery::create(null, $criteria)
-                    ->filterByFile($this)
+                $collFiles = FileQuery::create(null, $criteria)
+                    ->filterBymessageReferenceId($this)
                     ->find($con);
+
                 if (null !== $criteria) {
-                    if (false !== $this->collCourseMaterialsPartial && count($collCourseMaterials)) {
-                      $this->initCourseMaterials(false);
-
-                      foreach($collCourseMaterials as $obj) {
-                        if (false == $this->collCourseMaterials->contains($obj)) {
-                          $this->collCourseMaterials->append($obj);
-                        }
-                      }
-
-                      $this->collCourseMaterialsPartial = true;
-                    }
-
-                    $collCourseMaterials->getInternalIterator()->rewind();
-                    return $collCourseMaterials;
+                    return $collFiles;
                 }
-
-                if($partial && $this->collCourseMaterials) {
-                    foreach($this->collCourseMaterials as $obj) {
-                        if($obj->isNew()) {
-                            $collCourseMaterials[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collCourseMaterials = $collCourseMaterials;
-                $this->collCourseMaterialsPartial = false;
+                $this->collFiles = $collFiles;
             }
         }
 
-        return $this->collCourseMaterials;
+        return $this->collFiles;
     }
 
     /**
-     * Sets a collection of CourseMaterial objects related by a one-to-many relationship
-     * to the current object.
+     * Sets a collection of File objects related by a many-to-many relationship
+     * to the current object by way of the file_references cross-reference table.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param PropelCollection $courseMaterials A Propel collection.
+     * @param PropelCollection $files A Propel collection.
      * @param PropelPDO $con Optional connection object
-     * @return File The current object (for fluent API support)
+     * @return Message The current object (for fluent API support)
      */
-    public function setCourseMaterials(PropelCollection $courseMaterials, PropelPDO $con = null)
+    public function setFiles(PropelCollection $files, PropelPDO $con = null)
     {
-        $courseMaterialsToDelete = $this->getCourseMaterials(new Criteria(), $con)->diff($courseMaterials);
+        $this->clearFiles();
+        $currentFiles = $this->getFiles();
 
-        $this->courseMaterialsScheduledForDeletion = unserialize(serialize($courseMaterialsToDelete));
+        $this->filesScheduledForDeletion = $currentFiles->diff($files);
 
-        foreach ($courseMaterialsToDelete as $courseMaterialRemoved) {
-            $courseMaterialRemoved->setFile(null);
+        foreach ($files as $file) {
+            if (!$currentFiles->contains($file)) {
+                $this->doAddFile($file);
+            }
         }
 
-        $this->collCourseMaterials = null;
-        foreach ($courseMaterials as $courseMaterial) {
-            $this->addCourseMaterial($courseMaterial);
-        }
-
-        $this->collCourseMaterials = $courseMaterials;
-        $this->collCourseMaterialsPartial = false;
+        $this->collFiles = $files;
 
         return $this;
     }
 
     /**
-     * Returns the number of related CourseMaterial objects.
+     * Gets the number of File objects related by a many-to-many relationship
+     * to the current object by way of the file_references cross-reference table.
      *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related CourseMaterial objects.
-     * @throws PropelException
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param boolean $distinct Set to true to force count distinct
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return int the number of related File objects
      */
-    public function countCourseMaterials(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function countFiles($criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        $partial = $this->collCourseMaterialsPartial && !$this->isNew();
-        if (null === $this->collCourseMaterials || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collCourseMaterials) {
+        if (null === $this->collFiles || null !== $criteria) {
+            if ($this->isNew() && null === $this->collFiles) {
                 return 0;
-            }
-
-            if($partial && !$criteria) {
-                return count($this->getCourseMaterials());
-            }
-            $query = CourseMaterialQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByFile($this)
-                ->count($con);
-        }
-
-        return count($this->collCourseMaterials);
-    }
-
-    /**
-     * Method called to associate a CourseMaterial object to this object
-     * through the CourseMaterial foreign key attribute.
-     *
-     * @param    CourseMaterial $l CourseMaterial
-     * @return File The current object (for fluent API support)
-     */
-    public function addCourseMaterial(CourseMaterial $l)
-    {
-        if ($this->collCourseMaterials === null) {
-            $this->initCourseMaterials();
-            $this->collCourseMaterialsPartial = true;
-        }
-        if (!in_array($l, $this->collCourseMaterials->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddCourseMaterial($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	CourseMaterial $courseMaterial The courseMaterial object to add.
-     */
-    protected function doAddCourseMaterial($courseMaterial)
-    {
-        $this->collCourseMaterials[]= $courseMaterial;
-        $courseMaterial->setFile($this);
-    }
-
-    /**
-     * @param	CourseMaterial $courseMaterial The courseMaterial object to remove.
-     * @return File The current object (for fluent API support)
-     */
-    public function removeCourseMaterial($courseMaterial)
-    {
-        if ($this->getCourseMaterials()->contains($courseMaterial)) {
-            $this->collCourseMaterials->remove($this->collCourseMaterials->search($courseMaterial));
-            if (null === $this->courseMaterialsScheduledForDeletion) {
-                $this->courseMaterialsScheduledForDeletion = clone $this->collCourseMaterials;
-                $this->courseMaterialsScheduledForDeletion->clear();
-            }
-            $this->courseMaterialsScheduledForDeletion[]= clone $courseMaterial;
-            $courseMaterial->setFile(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this File is new, it will return
-     * an empty collection; or if this File has previously
-     * been saved, it will retrieve related CourseMaterials from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in File.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|CourseMaterial[] List of CourseMaterial objects
-     */
-    public function getCourseMaterialsJoinTeacher($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = CourseMaterialQuery::create(null, $criteria);
-        $query->joinWith('Teacher', $join_behavior);
-
-        return $this->getCourseMaterials($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this File is new, it will return
-     * an empty collection; or if this File has previously
-     * been saved, it will retrieve related CourseMaterials from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in File.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|CourseMaterial[] List of CourseMaterial objects
-     */
-    public function getCourseMaterialsJoinCourse($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = CourseMaterialQuery::create(null, $criteria);
-        $query->joinWith('Course', $join_behavior);
-
-        return $this->getCourseMaterials($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this File is new, it will return
-     * an empty collection; or if this File has previously
-     * been saved, it will retrieve related CourseMaterials from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in File.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|CourseMaterial[] List of CourseMaterial objects
-     */
-    public function getCourseMaterialsJoinCourseFolder($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = CourseMaterialQuery::create(null, $criteria);
-        $query->joinWith('CourseFolder', $join_behavior);
-
-        return $this->getCourseMaterials($query, $con);
-    }
-
-    /**
-     * Clears out the collUsers collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return File The current object (for fluent API support)
-     * @see        addUsers()
-     */
-    public function clearUsers()
-    {
-        $this->collUsers = null; // important to set this to null since that means it is uninitialized
-        $this->collUsersPartial = null;
-
-        return $this;
-    }
-
-    /**
-     * reset is the collUsers collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialUsers($v = true)
-    {
-        $this->collUsersPartial = $v;
-    }
-
-    /**
-     * Initializes the collUsers collection.
-     *
-     * By default this just sets the collUsers collection to an empty array (like clearcollUsers());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initUsers($overrideExisting = true)
-    {
-        if (null !== $this->collUsers && !$overrideExisting) {
-            return;
-        }
-        $this->collUsers = new PropelObjectCollection();
-        $this->collUsers->setModel('User');
-    }
-
-    /**
-     * Gets an array of User objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this File is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|User[] List of User objects
-     * @throws PropelException
-     */
-    public function getUsers($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collUsersPartial && !$this->isNew();
-        if (null === $this->collUsers || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collUsers) {
-                // return empty collection
-                $this->initUsers();
             } else {
-                $collUsers = UserQuery::create(null, $criteria)
-                    ->filterByAvatar($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collUsersPartial && count($collUsers)) {
-                      $this->initUsers(false);
-
-                      foreach($collUsers as $obj) {
-                        if (false == $this->collUsers->contains($obj)) {
-                          $this->collUsers->append($obj);
-                        }
-                      }
-
-                      $this->collUsersPartial = true;
-                    }
-
-                    $collUsers->getInternalIterator()->rewind();
-                    return $collUsers;
+                $query = FileQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
                 }
 
-                if($partial && $this->collUsers) {
-                    foreach($this->collUsers as $obj) {
-                        if($obj->isNew()) {
-                            $collUsers[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collUsers = $collUsers;
-                $this->collUsersPartial = false;
+                return $query
+                    ->filterBymessageReferenceId($this)
+                    ->count($con);
             }
+        } else {
+            return count($this->collFiles);
         }
-
-        return $this->collUsers;
     }
 
     /**
-     * Sets a collection of User objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
+     * Associate a File object to this object
+     * through the file_references cross reference table.
      *
-     * @param PropelCollection $users A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     * @return File The current object (for fluent API support)
+     * @param  File $file The FileReferences object to relate
+     * @return Message The current object (for fluent API support)
      */
-    public function setUsers(PropelCollection $users, PropelPDO $con = null)
+    public function addFile(File $file)
     {
-        $usersToDelete = $this->getUsers(new Criteria(), $con)->diff($users);
-
-        $this->usersScheduledForDeletion = unserialize(serialize($usersToDelete));
-
-        foreach ($usersToDelete as $userRemoved) {
-            $userRemoved->setAvatar(null);
+        if ($this->collFiles === null) {
+            $this->initFiles();
         }
+        if (!$this->collFiles->contains($file)) { // only add it if the **same** object is not already associated
+            $this->doAddFile($file);
 
-        $this->collUsers = null;
-        foreach ($users as $user) {
-            $this->addUser($user);
-        }
-
-        $this->collUsers = $users;
-        $this->collUsersPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related User objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related User objects.
-     * @throws PropelException
-     */
-    public function countUsers(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collUsersPartial && !$this->isNew();
-        if (null === $this->collUsers || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collUsers) {
-                return 0;
-            }
-
-            if($partial && !$criteria) {
-                return count($this->getUsers());
-            }
-            $query = UserQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByAvatar($this)
-                ->count($con);
-        }
-
-        return count($this->collUsers);
-    }
-
-    /**
-     * Method called to associate a User object to this object
-     * through the User foreign key attribute.
-     *
-     * @param    User $l User
-     * @return File The current object (for fluent API support)
-     */
-    public function addUser(User $l)
-    {
-        if ($this->collUsers === null) {
-            $this->initUsers();
-            $this->collUsersPartial = true;
-        }
-        if (!in_array($l, $this->collUsers->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddUser($l);
+            $this->collFiles[]= $file;
         }
 
         return $this;
     }
 
     /**
-     * @param	User $user The user object to add.
+     * @param	File $file The file object to add.
      */
-    protected function doAddUser($user)
+    protected function doAddFile($file)
     {
-        $this->collUsers[]= $user;
-        $user->setAvatar($this);
+        $fileReferences = new FileReferences();
+        $fileReferences->setFile($file);
+        $this->addFileReferences($fileReferences);
     }
 
     /**
-     * @param	User $user The user object to remove.
-     * @return File The current object (for fluent API support)
+     * Remove a File object to this object
+     * through the file_references cross reference table.
+     *
+     * @param File $file The FileReferences object to relate
+     * @return Message The current object (for fluent API support)
      */
-    public function removeUser($user)
+    public function removeFile(File $file)
     {
-        if ($this->getUsers()->contains($user)) {
-            $this->collUsers->remove($this->collUsers->search($user));
-            if (null === $this->usersScheduledForDeletion) {
-                $this->usersScheduledForDeletion = clone $this->collUsers;
-                $this->usersScheduledForDeletion->clear();
+        if ($this->getFiles()->contains($file)) {
+            $this->collFiles->remove($this->collFiles->search($file));
+            if (null === $this->filesScheduledForDeletion) {
+                $this->filesScheduledForDeletion = clone $this->collFiles;
+                $this->filesScheduledForDeletion->clear();
             }
-            $this->usersScheduledForDeletion[]= $user;
-            $user->setAvatar(null);
+            $this->filesScheduledForDeletion[]= $file;
         }
 
         return $this;
@@ -2243,7 +2167,7 @@ abstract class BaseFile extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return File The current object (for fluent API support)
+     * @return Message The current object (for fluent API support)
      * @see        addassignmentReferenceIds()
      */
     public function clearassignmentReferenceIds()
@@ -2276,7 +2200,7 @@ abstract class BaseFile extends BaseObject implements Persistent
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
      * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this File is new, it will return
+     * If this Message is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
      * @param Criteria $criteria Optional query object to filter the query
@@ -2292,7 +2216,7 @@ abstract class BaseFile extends BaseObject implements Persistent
                 $this->initassignmentReferenceIds();
             } else {
                 $collassignmentReferenceIds = AssignmentQuery::create(null, $criteria)
-                    ->filterByFile($this)
+                    ->filterBymessageReferenceId($this)
                     ->find($con);
                 if (null !== $criteria) {
                     return $collassignmentReferenceIds;
@@ -2312,7 +2236,7 @@ abstract class BaseFile extends BaseObject implements Persistent
      *
      * @param PropelCollection $assignmentReferenceIds A Propel collection.
      * @param PropelPDO $con Optional connection object
-     * @return File The current object (for fluent API support)
+     * @return Message The current object (for fluent API support)
      */
     public function setassignmentReferenceIds(PropelCollection $assignmentReferenceIds, PropelPDO $con = null)
     {
@@ -2354,7 +2278,7 @@ abstract class BaseFile extends BaseObject implements Persistent
                 }
 
                 return $query
-                    ->filterByFile($this)
+                    ->filterBymessageReferenceId($this)
                     ->count($con);
             }
         } else {
@@ -2367,7 +2291,7 @@ abstract class BaseFile extends BaseObject implements Persistent
      * through the file_references cross reference table.
      *
      * @param  Assignment $assignment The FileReferences object to relate
-     * @return File The current object (for fluent API support)
+     * @return Message The current object (for fluent API support)
      */
     public function addassignmentReferenceId(Assignment $assignment)
     {
@@ -2398,7 +2322,7 @@ abstract class BaseFile extends BaseObject implements Persistent
      * through the file_references cross reference table.
      *
      * @param Assignment $assignment The FileReferences object to relate
-     * @return File The current object (for fluent API support)
+     * @return Message The current object (for fluent API support)
      */
     public function removeassignmentReferenceId(Assignment $assignment)
     {
@@ -2420,7 +2344,7 @@ abstract class BaseFile extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return File The current object (for fluent API support)
+     * @return Message The current object (for fluent API support)
      * @see        addstudentAssignmentReferenceIds()
      */
     public function clearstudentAssignmentReferenceIds()
@@ -2453,7 +2377,7 @@ abstract class BaseFile extends BaseObject implements Persistent
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
      * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this File is new, it will return
+     * If this Message is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
      * @param Criteria $criteria Optional query object to filter the query
@@ -2469,7 +2393,7 @@ abstract class BaseFile extends BaseObject implements Persistent
                 $this->initstudentAssignmentReferenceIds();
             } else {
                 $collstudentAssignmentReferenceIds = StudentAssignmentQuery::create(null, $criteria)
-                    ->filterByFile($this)
+                    ->filterBymessageReferenceId($this)
                     ->find($con);
                 if (null !== $criteria) {
                     return $collstudentAssignmentReferenceIds;
@@ -2489,7 +2413,7 @@ abstract class BaseFile extends BaseObject implements Persistent
      *
      * @param PropelCollection $studentAssignmentReferenceIds A Propel collection.
      * @param PropelPDO $con Optional connection object
-     * @return File The current object (for fluent API support)
+     * @return Message The current object (for fluent API support)
      */
     public function setstudentAssignmentReferenceIds(PropelCollection $studentAssignmentReferenceIds, PropelPDO $con = null)
     {
@@ -2531,7 +2455,7 @@ abstract class BaseFile extends BaseObject implements Persistent
                 }
 
                 return $query
-                    ->filterByFile($this)
+                    ->filterBymessageReferenceId($this)
                     ->count($con);
             }
         } else {
@@ -2544,7 +2468,7 @@ abstract class BaseFile extends BaseObject implements Persistent
      * through the file_references cross reference table.
      *
      * @param  StudentAssignment $studentAssignment The FileReferences object to relate
-     * @return File The current object (for fluent API support)
+     * @return Message The current object (for fluent API support)
      */
     public function addstudentAssignmentReferenceId(StudentAssignment $studentAssignment)
     {
@@ -2575,7 +2499,7 @@ abstract class BaseFile extends BaseObject implements Persistent
      * through the file_references cross reference table.
      *
      * @param StudentAssignment $studentAssignment The FileReferences object to relate
-     * @return File The current object (for fluent API support)
+     * @return Message The current object (for fluent API support)
      */
     public function removestudentAssignmentReferenceId(StudentAssignment $studentAssignment)
     {
@@ -2592,193 +2516,18 @@ abstract class BaseFile extends BaseObject implements Persistent
     }
 
     /**
-     * Clears out the collmessageReferenceIds collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return File The current object (for fluent API support)
-     * @see        addmessageReferenceIds()
-     */
-    public function clearmessageReferenceIds()
-    {
-        $this->collmessageReferenceIds = null; // important to set this to null since that means it is uninitialized
-        $this->collmessageReferenceIdsPartial = null;
-
-        return $this;
-    }
-
-    /**
-     * Initializes the collmessageReferenceIds collection.
-     *
-     * By default this just sets the collmessageReferenceIds collection to an empty collection (like clearmessageReferenceIds());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @return void
-     */
-    public function initmessageReferenceIds()
-    {
-        $this->collmessageReferenceIds = new PropelObjectCollection();
-        $this->collmessageReferenceIds->setModel('Message');
-    }
-
-    /**
-     * Gets a collection of Message objects related by a many-to-many relationship
-     * to the current object by way of the file_references cross-reference table.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this File is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria Optional query object to filter the query
-     * @param PropelPDO $con Optional connection object
-     *
-     * @return PropelObjectCollection|Message[] List of Message objects
-     */
-    public function getmessageReferenceIds($criteria = null, PropelPDO $con = null)
-    {
-        if (null === $this->collmessageReferenceIds || null !== $criteria) {
-            if ($this->isNew() && null === $this->collmessageReferenceIds) {
-                // return empty collection
-                $this->initmessageReferenceIds();
-            } else {
-                $collmessageReferenceIds = MessageQuery::create(null, $criteria)
-                    ->filterByFile($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    return $collmessageReferenceIds;
-                }
-                $this->collmessageReferenceIds = $collmessageReferenceIds;
-            }
-        }
-
-        return $this->collmessageReferenceIds;
-    }
-
-    /**
-     * Sets a collection of Message objects related by a many-to-many relationship
-     * to the current object by way of the file_references cross-reference table.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $messageReferenceIds A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     * @return File The current object (for fluent API support)
-     */
-    public function setmessageReferenceIds(PropelCollection $messageReferenceIds, PropelPDO $con = null)
-    {
-        $this->clearmessageReferenceIds();
-        $currentmessageReferenceIds = $this->getmessageReferenceIds();
-
-        $this->messageReferenceIdsScheduledForDeletion = $currentmessageReferenceIds->diff($messageReferenceIds);
-
-        foreach ($messageReferenceIds as $messageReferenceId) {
-            if (!$currentmessageReferenceIds->contains($messageReferenceId)) {
-                $this->doAddmessageReferenceId($messageReferenceId);
-            }
-        }
-
-        $this->collmessageReferenceIds = $messageReferenceIds;
-
-        return $this;
-    }
-
-    /**
-     * Gets the number of Message objects related by a many-to-many relationship
-     * to the current object by way of the file_references cross-reference table.
-     *
-     * @param Criteria $criteria Optional query object to filter the query
-     * @param boolean $distinct Set to true to force count distinct
-     * @param PropelPDO $con Optional connection object
-     *
-     * @return int the number of related Message objects
-     */
-    public function countmessageReferenceIds($criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        if (null === $this->collmessageReferenceIds || null !== $criteria) {
-            if ($this->isNew() && null === $this->collmessageReferenceIds) {
-                return 0;
-            } else {
-                $query = MessageQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByFile($this)
-                    ->count($con);
-            }
-        } else {
-            return count($this->collmessageReferenceIds);
-        }
-    }
-
-    /**
-     * Associate a Message object to this object
-     * through the file_references cross reference table.
-     *
-     * @param  Message $message The FileReferences object to relate
-     * @return File The current object (for fluent API support)
-     */
-    public function addmessageReferenceId(Message $message)
-    {
-        if ($this->collmessageReferenceIds === null) {
-            $this->initmessageReferenceIds();
-        }
-        if (!$this->collmessageReferenceIds->contains($message)) { // only add it if the **same** object is not already associated
-            $this->doAddmessageReferenceId($message);
-
-            $this->collmessageReferenceIds[]= $message;
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	messageReferenceId $messageReferenceId The messageReferenceId object to add.
-     */
-    protected function doAddmessageReferenceId($messageReferenceId)
-    {
-        $fileReferences = new FileReferences();
-        $fileReferences->setmessageReferenceId($messageReferenceId);
-        $this->addFileReferences($fileReferences);
-    }
-
-    /**
-     * Remove a Message object to this object
-     * through the file_references cross reference table.
-     *
-     * @param Message $message The FileReferences object to relate
-     * @return File The current object (for fluent API support)
-     */
-    public function removemessageReferenceId(Message $message)
-    {
-        if ($this->getmessageReferenceIds()->contains($message)) {
-            $this->collmessageReferenceIds->remove($this->collmessageReferenceIds->search($message));
-            if (null === $this->messageReferenceIdsScheduledForDeletion) {
-                $this->messageReferenceIdsScheduledForDeletion = clone $this->collmessageReferenceIds;
-                $this->messageReferenceIdsScheduledForDeletion->clear();
-            }
-            $this->messageReferenceIdsScheduledForDeletion[]= $message;
-        }
-
-        return $this;
-    }
-
-    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
     {
         $this->id = null;
-        $this->name = null;
-        $this->description = null;
-        $this->size = null;
-        $this->mime_type = null;
-        $this->storage = null;
+        $this->thread_id = null;
+        $this->from_id = null;
+        $this->to_id = null;
+        $this->is_read = null;
+        $this->user_id = null;
+        $this->subject = null;
+        $this->body = null;
         $this->created_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
@@ -2808,13 +2557,8 @@ abstract class BaseFile extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collCourseMaterials) {
-                foreach ($this->collCourseMaterials as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
-            if ($this->collUsers) {
-                foreach ($this->collUsers as $o) {
+            if ($this->collFiles) {
+                foreach ($this->collFiles as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -2828,10 +2572,14 @@ abstract class BaseFile extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collmessageReferenceIds) {
-                foreach ($this->collmessageReferenceIds as $o) {
-                    $o->clearAllReferences($deep);
-                }
+            if ($this->aUserRelatedByUserId instanceof Persistent) {
+              $this->aUserRelatedByUserId->clearAllReferences($deep);
+            }
+            if ($this->aUserRelatedByFromId instanceof Persistent) {
+              $this->aUserRelatedByFromId->clearAllReferences($deep);
+            }
+            if ($this->aUserRelatedByToId instanceof Persistent) {
+              $this->aUserRelatedByToId->clearAllReferences($deep);
             }
 
             $this->alreadyInClearAllReferencesDeep = false;
@@ -2841,14 +2589,10 @@ abstract class BaseFile extends BaseObject implements Persistent
             $this->collFileReferencess->clearIterator();
         }
         $this->collFileReferencess = null;
-        if ($this->collCourseMaterials instanceof PropelCollection) {
-            $this->collCourseMaterials->clearIterator();
+        if ($this->collFiles instanceof PropelCollection) {
+            $this->collFiles->clearIterator();
         }
-        $this->collCourseMaterials = null;
-        if ($this->collUsers instanceof PropelCollection) {
-            $this->collUsers->clearIterator();
-        }
-        $this->collUsers = null;
+        $this->collFiles = null;
         if ($this->collassignmentReferenceIds instanceof PropelCollection) {
             $this->collassignmentReferenceIds->clearIterator();
         }
@@ -2857,10 +2601,9 @@ abstract class BaseFile extends BaseObject implements Persistent
             $this->collstudentAssignmentReferenceIds->clearIterator();
         }
         $this->collstudentAssignmentReferenceIds = null;
-        if ($this->collmessageReferenceIds instanceof PropelCollection) {
-            $this->collmessageReferenceIds->clearIterator();
-        }
-        $this->collmessageReferenceIds = null;
+        $this->aUserRelatedByUserId = null;
+        $this->aUserRelatedByFromId = null;
+        $this->aUserRelatedByToId = null;
     }
 
     /**
@@ -2870,7 +2613,7 @@ abstract class BaseFile extends BaseObject implements Persistent
      */
     public function __toString()
     {
-        return (string) $this->exportTo(FilePeer::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(MessagePeer::DEFAULT_STRING_FORMAT);
     }
 
     /**

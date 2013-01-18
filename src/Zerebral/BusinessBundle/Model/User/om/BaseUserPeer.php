@@ -14,7 +14,11 @@ use Glorpen\PropelEvent\PropelEventBundle\Events\PeerEvent;
 use Zerebral\BusinessBundle\Model\Feed\FeedCommentPeer;
 use Zerebral\BusinessBundle\Model\Feed\FeedItemPeer;
 use Zerebral\BusinessBundle\Model\File\FilePeer;
+<<<<<<< HEAD
+use Zerebral\BusinessBundle\Model\Message\MessagePeer;
+=======
 use Zerebral\BusinessBundle\Model\Notification\NotificationPeer;
+>>>>>>> 7089aaae578297e1e28a26f884daf6f034050977
 use Zerebral\BusinessBundle\Model\User\User;
 use Zerebral\BusinessBundle\Model\User\UserPeer;
 use Zerebral\BusinessBundle\Model\User\map\UserTableMap;
@@ -507,12 +511,24 @@ abstract class BaseUserPeer
         // Invalidate objects in FeedCommentPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         FeedCommentPeer::clearInstancePool();
+<<<<<<< HEAD
+        // Invalidate objects in MessagePeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        MessagePeer::clearInstancePool();
+        // Invalidate objects in MessagePeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        MessagePeer::clearInstancePool();
+        // Invalidate objects in MessagePeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        MessagePeer::clearInstancePool();
+=======
         // Invalidate objects in NotificationPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         NotificationPeer::clearInstancePool();
         // Invalidate objects in NotificationPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         NotificationPeer::clearInstancePool();
+>>>>>>> 7089aaae578297e1e28a26f884daf6f034050977
     }
 
     /**

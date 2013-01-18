@@ -193,4 +193,3 @@ Zerebral\BusinessBundle\Model\Feed\FeedContent:
         text:
           - NotBlank:
               message: Please write comment text
-                                          

@@ -122,7 +122,11 @@
                             <a href="{{ path("assignments") }}"><i class="icon-big-bookmark"></i>Assignments</a>
                         </div>
                     </li>
-                    <li class="{{ target is defined and target == 'messages' ? 'active' : ''}}"><div class="menu-item"><i class="icon-big-mail"></i>Messages</div></li>
+                    <li class="{{ target is defined and target == 'messages' ? 'active' : ''}}">
+                        <div class="menu-item">
+                            <a href="{{ path("messages_inbox") }}"><i class="icon-big-mail"></i>Messages</a>
+                        </div>
+                    </li>
                     {#<li class="{{ target is defined and target == 'calendar' ? 'active' : ''}}"><div class="menu-item"><i class="icon-big-calendar"></i>Calendar</div></li>#}
                     {#<li class="{{ target is defined and target == 'members' ? 'active' : ''}}">#}
                         {#<div class="menu-item">#}
