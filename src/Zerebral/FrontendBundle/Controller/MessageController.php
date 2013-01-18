@@ -103,7 +103,7 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
                 $readInThreadCount++;
             } else {
                 $message->markAsRead();
-                $readInThreadCount++;
+//                $readInThreadCount++;
             }
         }
 
@@ -161,28 +161,34 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
         );
     }
 
-//     /**
-//     * @Route("/delete/{id}", name="assignment_delete")
-//     * @Route("/delete/{id}/{courseId}", name="course_assignment_delete")
-//     * @ParamConverter("assignment", options={"mapping": {"id": "id"}})
-//     * @ParamConverter("course", options={"mapping": {"courseId": "id"}})
-//     *
-//     * @SecureParam(name="assignment", permissions="DELETE")
-//     * @PreAuthorize("hasRole('ROLE_TEACHER')")
-//     * @Template()
-//     */
-//    public function deleteAction(Model\Assignment\Assignment $assignment, Model\Course\Course $course = null)
-//    {
-//        $assignment->delete();
-//        $this->setFlash(
-//            'delete_assignment_success',
-//                'Assignment <b>' . $assignment->getName() . '</b> has been successfully deleted from course ' . $assignment->getCourse()->getName() . '.'
-//        );
-//        if ($course) {
-//            return $this->redirect($this->generateUrl('course_assignments', array('id' => $course->getId())));
-//        } else {
-//            return $this->redirect($this->generateUrl('assignments'));
-//        }
-//
-//    }
+     /**
+     * @Route("/edit", name="message_edit")
+     *
+     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @Template()
+     */
+    public function editAction()
+    {
+        $threads = $this->getRequest()->get('Collection', array());
+        if ($threads) {
+            $messages = \Zerebral\BusinessBundle\Model\Message\MessageQuery::create()->filterByUserId($this->getUser()->getId())->filterByThreadId($threads)->find();
+            if ($this->getRequest()->get('delete', false)) {
+                foreach ($messages as $message) {
+                    $message->delete();
+                }
+            } else if ($this->getRequest()->get('mark-as-read', false)) {
+                foreach ($messages as $message) {
+                    $message->setIsRead(true);
+                    $message->save();
+                }
+            } else if ($this->getRequest()->get('mark-as-unread', false)) {
+                foreach ($messages as $message) {
+                    $message->setIsRead(false);
+                    $message->save();
+                }
+            }
+        }
+
+        return $this->redirect($this->generateUrl('messages_inbox'));
+    }
 }

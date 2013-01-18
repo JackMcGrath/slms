@@ -17,23 +17,24 @@
                 </h2>
             </div>
             <hr/>
-
-            <div class="messages-head">
-                <div class="pull-right">
-                    <input type="submit" value="Delete" class="btn btn-danger" name="delete" />
-                    <input type="submit" value="Mark as Read" class="btn" name="mark-as-read" />
-                    <input type="submit" value="Mark as Unread" class="btn" name="mark-as-unread" />
+            <form method="post" action="{{ path('message_edit') }}">
+                <div class="messages-head">
+                    <div class="pull-right">
+                        <input type="submit" value="Delete" class="btn btn-danger" name="delete" />
+                        <input type="submit" value="Mark as Read" class="btn" name="mark-as-read" />
+                        <input type="submit" value="Mark as Unread" class="btn" name="mark-as-unread" />
+                    </div>
+                    <input type="checkbox" class="select-all" /> <a href="#" class="select-all">Select</a> / <a href="#" class="deselect-all">deselect all</a>
                 </div>
-                <input type="checkbox" /> <a href="#">Select</a> / <a href="#">deselect all</a>
-            </div>
-            <div class="messages messageslist">
-                {% if messages and messages.count %}
-                    {% for message in messages %}
-                        {{ block('message') }}
-                    {% endfor %}
-                    <div class="clearfix"></div>
-                {% endif %}
-            </div>
+                <div class="messages messageslist">
+                    {% if messages and messages.count %}
+                        {% for message in messages %}
+                            {{ block('message') }}
+                        {% endfor %}
+                        <div class="clearfix"></div>
+                    {% endif %}
+                </div>
+            </form>
         </div>
 
         <div class="right-navbar pull-left">
@@ -50,7 +51,7 @@
 {% block message %}
     {% set user = (folder == 'inbox' ? message.userRelatedByFromId : message.userRelatedByToId) %}
     <div class="message-row {{ message.getUnreadCount > 0 ? 'unread' : '' }}">
-        <div class="check"><input type="checkbox" /></div>
+        <div class="check"><input type="checkbox" class="message-check" name="Collection[]" value="{{ message.threadId }}" /></div>
         <div class="avatar">
             <img src="{{ get_file_storage_link(user.getAvatarFile()) | imagine_filter('thumbnail') }}" width="32" height="32" />
         </div>
