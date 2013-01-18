@@ -62,4 +62,9 @@ class Message extends BaseMessage
         parent::postInsert($con);
     }
 
+    public function getShortBody()
+    {
+        return strip_tags($this->body);
+    }
+
 }
