@@ -27,12 +27,16 @@ use Zerebral\BusinessBundle\Model\User\Student;
  * @method StudentAssignmentQuery orderByStudentId($order = Criteria::ASC) Order by the student_id column
  * @method StudentAssignmentQuery orderByAssignmentId($order = Criteria::ASC) Order by the assignment_id column
  * @method StudentAssignmentQuery orderByIsSubmitted($order = Criteria::ASC) Order by the is_submitted column
+ * @method StudentAssignmentQuery orderByGrading($order = Criteria::ASC) Order by the grading column
+ * @method StudentAssignmentQuery orderByGradingComment($order = Criteria::ASC) Order by the grading_comment column
  * @method StudentAssignmentQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  *
  * @method StudentAssignmentQuery groupById() Group by the id column
  * @method StudentAssignmentQuery groupByStudentId() Group by the student_id column
  * @method StudentAssignmentQuery groupByAssignmentId() Group by the assignment_id column
  * @method StudentAssignmentQuery groupByIsSubmitted() Group by the is_submitted column
+ * @method StudentAssignmentQuery groupByGrading() Group by the grading column
+ * @method StudentAssignmentQuery groupByGradingComment() Group by the grading_comment column
  * @method StudentAssignmentQuery groupByCreatedAt() Group by the created_at column
  *
  * @method StudentAssignmentQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
@@ -57,12 +61,16 @@ use Zerebral\BusinessBundle\Model\User\Student;
  * @method StudentAssignment findOneByStudentId(int $student_id) Return the first StudentAssignment filtered by the student_id column
  * @method StudentAssignment findOneByAssignmentId(int $assignment_id) Return the first StudentAssignment filtered by the assignment_id column
  * @method StudentAssignment findOneByIsSubmitted(boolean $is_submitted) Return the first StudentAssignment filtered by the is_submitted column
+ * @method StudentAssignment findOneByGrading(string $grading) Return the first StudentAssignment filtered by the grading column
+ * @method StudentAssignment findOneByGradingComment(string $grading_comment) Return the first StudentAssignment filtered by the grading_comment column
  * @method StudentAssignment findOneByCreatedAt(string $created_at) Return the first StudentAssignment filtered by the created_at column
  *
  * @method array findById(int $id) Return StudentAssignment objects filtered by the id column
  * @method array findByStudentId(int $student_id) Return StudentAssignment objects filtered by the student_id column
  * @method array findByAssignmentId(int $assignment_id) Return StudentAssignment objects filtered by the assignment_id column
  * @method array findByIsSubmitted(boolean $is_submitted) Return StudentAssignment objects filtered by the is_submitted column
+ * @method array findByGrading(string $grading) Return StudentAssignment objects filtered by the grading column
+ * @method array findByGradingComment(string $grading_comment) Return StudentAssignment objects filtered by the grading_comment column
  * @method array findByCreatedAt(string $created_at) Return StudentAssignment objects filtered by the created_at column
  */
 abstract class BaseStudentAssignmentQuery extends ModelCriteria
@@ -166,7 +174,7 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `student_id`, `assignment_id`, `is_submitted`, `created_at` FROM `student_assignments` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `student_id`, `assignment_id`, `is_submitted`, `grading`, `grading_comment`, `created_at` FROM `student_assignments` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -393,6 +401,64 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(StudentAssignmentPeer::IS_SUBMITTED, $isSubmitted, $comparison);
+    }
+
+    /**
+     * Filter the query on the grading column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByGrading('fooValue');   // WHERE grading = 'fooValue'
+     * $query->filterByGrading('%fooValue%'); // WHERE grading LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $grading The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return StudentAssignmentQuery The current query, for fluid interface
+     */
+    public function filterByGrading($grading = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($grading)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $grading)) {
+                $grading = str_replace('*', '%', $grading);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(StudentAssignmentPeer::GRADING, $grading, $comparison);
+    }
+
+    /**
+     * Filter the query on the grading_comment column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByGradingComment('fooValue');   // WHERE grading_comment = 'fooValue'
+     * $query->filterByGradingComment('%fooValue%'); // WHERE grading_comment LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $gradingComment The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return StudentAssignmentQuery The current query, for fluid interface
+     */
+    public function filterByGradingComment($gradingComment = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($gradingComment)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $gradingComment)) {
+                $gradingComment = str_replace('*', '%', $gradingComment);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(StudentAssignmentPeer::GRADING_COMMENT, $gradingComment, $comparison);
     }
 
     /**
