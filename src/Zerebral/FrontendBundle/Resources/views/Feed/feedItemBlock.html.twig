@@ -89,7 +89,7 @@
 
 
 {% import _self as self %}
-<div class="feed-item">
+<div class="feed-item" id="feedItem{{ feedItem.id }}">
     <div class="avatar"><img class="rounded" src="{{ get_file_storage_link(feedItem.user.getAvatarFile()) | imagine_filter('thumbnail') }}"></div>
     <div class="content {% if app.user.id == feedItem.user.id and feedItem.feedContent.type != 'assignment' %} is_author {% endif %}">
         {% if app.user.id == feedItem.user.id %}<a href="{{ path('ajax_remove_feed_item', {feedItemId: feedItem.id}) }}" class="gray delete-link delete-feed-item"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
@@ -115,7 +115,13 @@
         {% endif %}
         <i class="icon-comment"></i> <a class="show-comment-form-link" data-comments-count="{{ feedItem.feedComments|length }}" href="#">Comment (<span>{{ feedItem.feedComments|length }}</span>)</a>
     </div>
-    <div class="comments">
+    {% set lastFeedComments = feedItem.lastFeedComments %}
+    {% if lastFeedComments|length > 0 %}
+        {% set lastItemCommentId = lastFeedComments.last.id %}
+    {% else %}
+        {% set lastItemCommentId = 0 %}
+    {% endif %}
+    <div class="comments" data-item-id="{{ feedItem.id }}" data-last-item-comment-id="{{ lastItemCommentId }}">
         {% set lastFeedComments = feedItem.lastFeedComments %}
         {% if lastFeedComments|length < feedItem.feedComments|length %}
             <div class="comment load-more">

@@ -29,4 +29,18 @@ class FeedCommentQuery extends BaseFeedCommentQuery
             ->filterByFeedItem($feedItem)
             ->filterById($lastCommentId, \Criteria::GREATER_THAN);
     }
+
+    public function getNewComments($parameters)
+    {
+        $this->clearOrderByColumns()->addAscendingOrderByColumn(FeedCommentPeer::ID);
+        $criteria = new \Criteria();
+        foreach($parameters as $feedItemId => $feedCommentId) {
+            $itemCondition = $criteria->getNewCriterion(FeedCommentPeer::FEED_ITEM_ID, $feedItemId, \Criteria::EQUAL);
+            $commentCondition = $criteria->getNewCriterion(FeedCommentPeer::ID, $feedCommentId, \Criteria::GREATER_THAN);
+            $itemCondition->addAnd($commentCondition);
+            $this->addOr($itemCondition);
+        }
+        return $this;
+
+    }
 }
