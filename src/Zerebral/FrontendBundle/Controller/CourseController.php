@@ -309,6 +309,35 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
             'dateRaw' => $dateRaw,
             'target' => 'course'
         );
+    }
 
+    /**
+     * @Route("/grading/{id}", name="course_grading")
+     * @PreAuthorize("hasRole('ROLE_TEACHER')")
+     * @ParamConverter("course")
+     * @Template()
+     */
+    public function gradingAction(Model\Course\Course $course)
+    {
+        $assignments = \Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery::create()->findSortedByCourse($course)->filterByDueAt(null, \Criteria::ISNOTNULL)->find();
+
+        $grading = array();
+        foreach ($assignments as $assignment) {
+            foreach ($assignment->getStudentAssignments() as $studentAssignment) {
+                $grading[$studentAssignment->getStudentId()][$studentAssignment->getAssignmentId()] = $studentAssignment;
+            }
+        }
+        $students = StudentQuery::create()->findByCourse($course)->find();
+
+        $studentAssignment = \Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentQuery::create()->findPk(448);
+
+        return array(
+            'grading' => $grading,
+            'students' => $students,
+            'course' => $course,
+            'assignments' => $assignments,
+            'studentAssignment' => $studentAssignment,
+            'target' => 'course'
+        );
     }
 }

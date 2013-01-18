@@ -1,6 +1,6 @@
 $(document).ready(function(){
     $('textarea').wysihtml5();
-
+	var timer;
 	// Dynamic files fields creating
 	var addAttachmentField = function(e) {
 		if (e) {
@@ -23,18 +23,27 @@ $(document).ready(function(){
 	});
 
 	$('#message_toName').typeahead({
-		minLength: 3,
+		minLength: 1,
 		source: function(query, process) {
-			$.ajax({
-				url: '/messages/suggest-user/',
-				type: "get",
-				data: {
-					username: $('#message_toName').val()
-				},
-				success: function(response) {
-					return process(response.users);
-				}
-			});
+			clearTimeout(timer);
+			timer = setTimeout(function() {
+				getSuggest(process);
+			}, 300);
+
 		}
 	});
+
+	var getSuggest = function(process)
+	{
+		$.ajax({
+			url: '/user/suggest',
+			type: "get",
+			data: {
+				username: $('#message_toName').val()
+			},
+			success: function(response) {
+				return process(response.users);
+			}
+		});
+	}
 });

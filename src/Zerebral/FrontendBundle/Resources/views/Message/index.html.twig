@@ -60,7 +60,7 @@
         </div>
         <div class="message-content">
             <a href="{{ path('message_reply', {id: message.threadId}) }}">{{ message.subject }}{% if message.getUnreadCount > 0 %} ({{ message.getUnreadCount }}){% endif %}</a>
-            <p>{{ message.body | slice(0, 70) }}</p>
+            <p>{{ message.shortBody | slice(0, 70) }}</p>
         </div>
 
     </div>

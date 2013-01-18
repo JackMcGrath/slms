@@ -128,6 +128,11 @@ Zerebral\BusinessBundle\Model\Assignment\StudentAssignment:
             - Valid: ~
             - Count:
                 min: 1
+        grading:
+            - Type:
+                groups: [grading]
+                type: numeric
+                message: Grade should be numerical
 
 Zerebral\BusinessBundle\Model\Course\CourseScheduleDay:
     properties:
@@ -193,3 +198,4 @@ Zerebral\BusinessBundle\Model\Feed\FeedContent:
         text:
           - NotBlank:
               message: Please write comment text
+

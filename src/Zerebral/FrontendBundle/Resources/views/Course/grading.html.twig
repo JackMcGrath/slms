@@ -1,0 +1,92 @@
+{% extends 'ZerebralFrontendBundle::layout.html.twig' %}
+{% import "ZerebralFrontendBundle:Macro:main.html.twig" as mainPartials %}
+
+{% block content %}
+    {% javascripts
+    '@ZerebralFrontendBundle/Resources/public/js/plugins/jquery.dataTables.min.js'
+    '@ZerebralFrontendBundle/Resources/public/js/plugins/FixedColumns.min.js'
+    '@ZerebralFrontendBundle/Resources/public/js/controllers/course/grading.js'
+    output='js/compiled/grading.js' %}
+    <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+
+    <div class="top-second-navbar">
+        {{ mainPartials.topMenu('grading', course) }}
+    </div>
+    <div class="row-fluid grade-book">
+        <div class="span12">
+            <div class="row-fluid">
+                <h2 class="pull-left form-title">
+                    {{ course.name }} <small>Gradebook</small>
+                </h2>
+            </div>
+
+            <div>
+                <table class="table table-bordered table-striped grading">
+                    <thead>
+                        <tr>
+                            <th class="name">Student name</th>
+                            {% for assignment in assignments %}
+                                <th class="assignment-name"><a href="{{ path('assignment_view', {id: assignment.id}) }}">{{ assignment.name }}</a></th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for student in students %}
+                        <tr>
+                            <td class="name">{{ student.formattedName }}</td>
+                            {% for assignment in assignments %}
+                                {{ block('grading_value') }}
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                    <tr>
+                        <td></td>
+                    {% for assignment in assignments %}
+                        <td class="due-date">{{ assignment.dueAt ? "due " ~ assignment.dueAt | date('M, d') : '' }}</td>
+                    {% endfor %}
+                    </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal hide" id="gradingModal" role="dialog" aria-hidden="true">
+        <form edit-action="/grading/edit" method="POST" class="grading-form">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3>Grade student</h3>
+            </div>
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-danger">Submit</button>
+                <a href="#" class="btn btn-danger">Submit & Continue</a>
+                <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}
+
+{% block grading_value %}
+    {% if grading[student.id][assignment.id] is defined %}
+        {% if grading[student.id][assignment.id].grading is null %}
+            <td class="new" studentAssignment="{{ grading[student.id][assignment.id].id }}">
+                <a href="#" data-toggle="modal" data-toggle="modal"><i class="icon-new-plus-add"></i></a>
+            </td>
+        {% else %}
+            <td class="" studentAssignment="{{ grading[student.id][assignment.id].id }}">
+                <div class="grade-value" value="{{ grading[student.id][assignment.id].grading }}">{{ grading[student.id][assignment.id].grading }}</div>
+            </td>
+        {% endif %}
+        </td>
+    {% else %}
+        <td class="">
+            <i class="icon-new-lock-transparent"></i>
+        </td>
+    {% endif %}
+{% endblock %}

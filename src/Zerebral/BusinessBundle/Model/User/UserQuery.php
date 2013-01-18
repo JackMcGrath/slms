@@ -8,9 +8,15 @@ class UserQuery extends BaseUserQuery
 {
     public function findForSuggestByNameForUser($name, User $user)
     {
+        $request = explode(' ', $name);
+        foreach ($request as $word) {
+            $this->addAnd('LCASE(first_name)', '%' . strtolower(trim($word)) . '%', \Criteria::LIKE);
+            $this->addOr('LCASE(last_name)', '%' . trim($word) . '%', \Criteria::LIKE);
+        }
+        $this->_and();
         $this->filterById($user->getId(), \Criteria::NOT_EQUAL);
-        $this->add('LCASE(first_name)', strtolower($name) . '%', \Criteria::LIKE);
-        $this->addOr('LCASE(last_name)', $name . '%', \Criteria::LIKE);
+
+        $this->limit(10);
 
         return $this->find();
     }

@@ -41,6 +41,10 @@ ZerebralAjaxForm.prototype = {
                     element.parent().append(errorHtml);
                 }
             });
+        } else {
+            if (typeof this.options.onSuccess == 'function') {
+                this.options.onSuccess(response);
+            }
         }
     },
 

@@ -68,4 +68,14 @@ class AssignmentQuery extends BaseAssignmentQuery
         $this->groupBy('assignments.id');
         return $this;
     }
+
+    public function findSortedByCourse($course)
+    {
+        $this->filterByCourse($course);
+        $this->leftJoinStudentAssignment();
+        $this->addAscendingOrderByColumn('assignments.due_at');
+        $this->groupBy('assignments.id');
+
+        return $this;
+    }
 }

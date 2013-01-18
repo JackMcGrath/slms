@@ -161,32 +161,6 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
         );
     }
 
-    /**
-     * @Route("/suggest-user/", name="ajax_message_suggest_user")
-     *
-     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
-     * @Template()
-     */
-    public function suggestUserAction()
-    {
-        $name = $this->getRequest()->get('username');
-        if ($name) {
-            $userList = \Zerebral\BusinessBundle\Model\User\UserQuery::create()->findForSuggestByNameForUser($name, $this->getUser());
-            $response = array();
-            if (count($userList)) {
-                foreach ($userList as $user) {
-                    $response[] = array(
-                        'id' => $user->getId(),
-                        'name' => $user->getFullName(),
-                    );
-                }
-            }
-            return new JsonResponse(array('success' => true, 'users' => $response));
-        }
-
-        throw new \Symfony\Component\HttpKernel\Exception\HttpException(404, 'User name is empty.');
-    }
-
 //     /**
 //     * @Route("/delete/{id}", name="assignment_delete")
 //     * @Route("/delete/{id}/{courseId}", name="course_assignment_delete")
