@@ -3,7 +3,7 @@
 
 {% block content %}
     {% javascripts
-    '@ZerebralFrontendBundle/Resources/public/js/plugins/jquery.dataTables.js'
+    '@ZerebralFrontendBundle/Resources/public/js/plugins/jquery.dataTables.min.js'
     '@ZerebralFrontendBundle/Resources/public/js/plugins/FixedColumns.min.js'
     '@ZerebralFrontendBundle/Resources/public/js/controllers/course/grading.js'
     output='js/compiled/grading.js' %}
@@ -11,7 +11,7 @@
     {% endjavascripts %}
 
     <div class="top-second-navbar">
-        {{ mainPartials.topMenu('assignments', course) }}
+        {{ mainPartials.topMenu('grading', course) }}
     </div>
     <div class="row-fluid grade-book">
         <div class="span12">
