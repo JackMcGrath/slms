@@ -18,6 +18,7 @@ use Zerebral\BusinessBundle\Model as Model;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery;
 use Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentQuery;
 
+// TODO: rename to AssignmentSolutionController
 class SolutionController extends \Zerebral\CommonBundle\Component\Controller
 {
     /**
@@ -26,9 +27,12 @@ class SolutionController extends \Zerebral\CommonBundle\Component\Controller
      * @ParamConverter("course", options={"mapping": {"courseId": "id"}})
      * @PreAuthorize("hasRole('ROLE_TEACHER')")
      * @Template()
+     *
+     * TODO: verify that teacher has access to course
      */
     public function indexAction(Model\Course\Course $course = null)
     {
+        // TODO: need to create common way to store page states
         $session = $this->getRequest()->getSession();
         $fileGroupingType = $this->getRequest()->get('SolutionFileGrouping') ?: ($session->has('SolutionFileGrouping') ? $session->get('SolutionFileGrouping') : 'date');
         $session->set('SolutionFileGrouping', $fileGroupingType);
@@ -57,9 +61,12 @@ class SolutionController extends \Zerebral\CommonBundle\Component\Controller
      * @ParamConverter("assignment", options={"mapping": {"assignmentId": "id"}})
      * @PreAuthorize("hasRole('ROLE_TEACHER')")
      * @Template()
+     *
+     * TODO: verify that teacher has access to assignment
      */
     public function studentsAction(Model\Assignment\Assignment $assignment)
     {
+        // TODO: need to create common way to store page states
         $session = $this->getRequest()->getSession();
         $fileGroupingType = $this->getRequest()->get('StudentFileGrouping') ?: ($session->has('StudentFileGrouping') ? $session->get('StudentFileGrouping') : 'date');
         $session->set('StudentFileGrouping', $fileGroupingType);
@@ -87,9 +94,13 @@ class SolutionController extends \Zerebral\CommonBundle\Component\Controller
      * @ParamConverter("assignment", options={"mapping": {"assignmentId": "id"}})
      * @ParamConverter("student", options={"mapping": {"studentId": "id"}})
      * @PreAuthorize("hasRole('ROLE_TEACHER')")
+     *
+     * TODO: verify that teacher has access to this assignment
      */
     public function downloadZipAction(Model\Assignment\Assignment $assignment, Model\User\Student $student = null)
     {
+        // TODO: we definitely should have separate class for archive building
+
         $zip = new \ZipArchive();
 
         $filename = preg_replace(array("[\s]", "/[^a-z0-9_]/i"), array("_", ""), ($assignment ? $assignment->getName() : '') . ($student ? '_' . $student->getFullName() : ''));

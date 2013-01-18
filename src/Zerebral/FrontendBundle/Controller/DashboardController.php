@@ -6,6 +6,10 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 
+use Zerebral\FrontendBundle\Form\Type as FormType;
+
+use \Zerebral\BusinessBundle\Model\Feed\FeedItemQuery;
+
 class DashboardController extends \Zerebral\CommonBundle\Component\Controller
 {
     /**
@@ -15,9 +19,21 @@ class DashboardController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function indexAction()
     {
+//        foreach(\Zerebral\BusinessBundle\Model\Notification\NotificationQuery::create()->find() as $not) {
+//            echo $not->getId() . ' ' . get_class($not) . PHP_EOL;
+//        }
+//        die();
+
+        $feedItemFormType = new FormType\FeedItemType();
+        $feedItemForm = $this->createForm($feedItemFormType, null);
+
+        $feeds = FeedItemQuery::create()->getGlobalFeed($this->getUser())->find();
+
+
         return array(
-            'name' => 'dev',
-            'target' => 'home'
+            'target' => 'home',
+            'feedItemForm' => $feedItemForm->createView(),
+            'feedItems' => $feeds
         );
     }
 }

@@ -8,15 +8,18 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Zerebral\BusinessBundle\Model\User\User;
 
+// TODO: comments + type hints
 class UserProfileType extends AbstractType
 {
     protected $fileStorage;
 
-    public function setFileStorage($fileStorage) {
+    public function setFileStorage($fileStorage)
+    {
         $this->fileStorage = $fileStorage;
     }
 
-    public function getFileStorage() {
+    public function getFileStorage()
+    {
         return $this->fileStorage;
     }
 
@@ -24,11 +27,15 @@ class UserProfileType extends AbstractType
     {
         $builder->add('birthday', 'date', array('required' => false, 'input' => 'datetime', 'widget' => 'single_text', 'format' => 'MM/dd/yyyy'));
         $builder->add('gender', 'choice', array('required' => false, 'choices' => array('male' => 'Male', 'female' => 'Female')));
-        $builder->add('avatar', new \Zerebral\FrontendBundle\Form\Type\FileType(), array(
-            'storage' => $this->getFileStorage(),
-            'by_reference' => true,
-            'required' => false
-        ));
+        $builder->add(
+            'avatar',
+            new \Zerebral\FrontendBundle\Form\Type\FileType(),
+            array(
+                'storage' => $this->getFileStorage(),
+                'by_reference' => true,
+                'required' => false
+            )
+        );
     }
 
     public function getName()
@@ -39,9 +46,11 @@ class UserProfileType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setOptional(array('fileQuery'));
-        $resolver->setDefaults(array(
-            'data_class' => 'Zerebral\BusinessBundle\Model\User\User',
-            'validation_groups' => array('profile')
-        ));
+        $resolver->setDefaults(
+            array(
+                'data_class' => 'Zerebral\BusinessBundle\Model\User\User',
+                'validation_groups' => array('profile')
+            )
+        );
     }
 }

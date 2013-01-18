@@ -8,16 +8,21 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints\Collection;
 
 
-class FeedItemType extends AbstractType {
-    public function buildForm(FormBuilderInterface $builder, array $options) {
+class FeedItemType extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
         $builder->add('feedContent', new FeedContentType(), array('required' => true));
+        $builder->add('courseId', 'integer', array('required' => false));
     }
 
-    public function getName() {
+    public function getName()
+    {
         return 'feed_item';
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver) {
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
 
         $resolver->setDefaults(
             array(

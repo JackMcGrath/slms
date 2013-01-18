@@ -58,7 +58,7 @@ class Fetcher
     }
 
 
-    /** @todo: Need to parse uncorrect HTML to get meta*/
+    /** @todo: Need to parse uncorrect HTML to get meta */
     public function parse()
     {
         $dom = new \DOMDocument();
@@ -68,14 +68,16 @@ class Fetcher
         //$this->title = isset($metaTags['og:title']) ? $metaTags['og:title'] : (isset($metaTags['title']) ? $metaTags['title'] : $dom->getElementsByTagName('title')->item(0)->nodeValue);
         if (isset($metaTags['og:title'])) {
             $this->title = $metaTags['og:title'];
-        } else if (isset($metaTags['title'])) {
-            $this->title = $metaTags['title'];
         } else {
-            $titleTag = $dom->getElementsByTagName('title')->item(0);//
-            if (is_null($titleTag)) {
-                $this->title = $this->url;
+            if (isset($metaTags['title'])) {
+                $this->title = $metaTags['title'];
             } else {
-                $this->title = $titleTag->nodeValue;
+                $titleTag = $dom->getElementsByTagName('title')->item(0); //
+                if (is_null($titleTag)) {
+                    $this->title = $this->url;
+                } else {
+                    $this->title = $titleTag->nodeValue;
+                }
             }
         }
         $this->title = mb_strimwidth($this->title, 0, 97, '...');
@@ -83,10 +85,12 @@ class Fetcher
         //$this->description = mb_strimwidth((isset($metaTags['og:description']) ? $metaTags['og:description'] : (isset($metaTags['description']) ? $metaTags['description'] : '')), 0, 253, '...');
         if (isset($metaTags['og:description'])) {
             $this->description = $metaTags['og:description'];
-        } else if (isset($metaTags['description'])) {
-            $this->description = $metaTags['description'];
         } else {
-            $this->description = '';
+            if (isset($metaTags['description'])) {
+                $this->description = $metaTags['description'];
+            } else {
+                $this->description = '';
+            }
         }
         $this->description = mb_strimwidth($this->description, 0, 253, '...');
 
@@ -94,14 +98,16 @@ class Fetcher
         //$thumbnailUrl = isset($metaTags['og:image']) ? $metaTags['og:image'] : (isset($metaTags['image_src']) ? $metaTags['image_src'] : $dom->getElementsByTagName('img')->item(0)->getAttribute('src'));
         if (isset($metaTags['og:image'])) {
             $this->thumbmnailUrl = $metaTags['og:image'];
-        } else if (isset($metaTags['image_src'])) {
-            $this->thumbmnailUrl = $metaTags['image_src'];
         } else {
-            $imageTag = $dom->getElementsByTagName('img')->item(0);
-            if (is_null($imageTag)) {
-                $this->thumbmnailUrl = null;
+            if (isset($metaTags['image_src'])) {
+                $this->thumbmnailUrl = $metaTags['image_src'];
             } else {
-                $this->thumbmnailUrl = $imageTag->getAttribute('src');
+                $imageTag = $dom->getElementsByTagName('img')->item(0);
+                if (is_null($imageTag)) {
+                    $this->thumbmnailUrl = null;
+                } else {
+                    $this->thumbmnailUrl = $imageTag->getAttribute('src');
+                }
             }
         }
 
@@ -112,7 +118,7 @@ class Fetcher
                 if (strtolower(substr($thumbnailUrl, 0, 2)) == '//') {
                     $this->thumbmnailUrl = $urlInfo['scheme'] . ':' . $thumbnailUrl;
                 } else {
-                    $thumbnailUrl  = ltrim($thumbnailUrl, '/');
+                    $thumbnailUrl = ltrim($thumbnailUrl, '/');
                     $this->thumbmnailUrl = $urlInfo['scheme'] . '://' . $urlInfo['host'] . '/' . $thumbnailUrl;
                 }
             }
@@ -127,14 +133,14 @@ class Fetcher
         $options = array(
             CURLOPT_URL => $this->url,
             CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_RETURNTRANSFER => true,     // return web page
-            CURLOPT_HEADER => false,            // do not return headers
-            CURLOPT_FOLLOWLOCATION => true,     // follow redirects
-            CURLOPT_USERAGENT => "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:15.0) Gecko/20120427 Firefox/15.0a1",      // who am i
-            CURLOPT_AUTOREFERER => true,        // set referer on redirect
-            CURLOPT_CONNECTTIMEOUT => 120,      // timeout on connect
-            CURLOPT_TIMEOUT => 120,             // timeout on response
-            CURLOPT_MAXREDIRS => 10             // stop after 10 redirects
+            CURLOPT_RETURNTRANSFER => true, // return web page
+            CURLOPT_HEADER => false, // do not return headers
+            CURLOPT_FOLLOWLOCATION => true, // follow redirects
+            CURLOPT_USERAGENT => "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:15.0) Gecko/20120427 Firefox/15.0a1", // who am i
+            CURLOPT_AUTOREFERER => true, // set referer on redirect
+            CURLOPT_CONNECTTIMEOUT => 120, // timeout on connect
+            CURLOPT_TIMEOUT => 120, // timeout on response
+            CURLOPT_MAXREDIRS => 10 // stop after 10 redirects
         );
         curl_setopt_array($curlHandler, $options);
         $this->urlContent = curl_exec($curlHandler);
@@ -151,15 +157,19 @@ class Fetcher
     public function isMatchType($type)
     {
         switch ($type) {
-            case 'website': return (strtolower(substr($this->urlType, 0, 9)) === 'text/html');
-            case 'image': return (strtolower(substr($this->urlType, 0, 5)) === 'image');
-            case 'video': {
+            case 'website':
+                return (strtolower(substr($this->urlType, 0, 9)) === 'text/html');
+            case 'image':
+                return (strtolower(substr($this->urlType, 0, 5)) === 'image');
+            case 'video':
+            {
                 $urlInfo = parse_url($this->url);
                 $host = strtolower(ltrim($urlInfo['host'], 'www.'));
                 return in_array($host, array('vimeo.com', 'youtube.com'));
                 break;
             }
-            default: return true;
+            default:
+                return true;
         }
     }
 }

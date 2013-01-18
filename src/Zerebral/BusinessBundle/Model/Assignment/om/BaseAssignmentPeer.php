@@ -19,6 +19,7 @@ use Zerebral\BusinessBundle\Model\Assignment\map\AssignmentTableMap;
 use Zerebral\BusinessBundle\Model\Course\CoursePeer;
 use Zerebral\BusinessBundle\Model\Feed\FeedItemPeer;
 use Zerebral\BusinessBundle\Model\File\FileReferencesPeer;
+use Zerebral\BusinessBundle\Model\Notification\NotificationPeer;
 use Zerebral\BusinessBundle\Model\User\TeacherPeer;
 
 abstract class BaseAssignmentPeer
@@ -414,6 +415,9 @@ abstract class BaseAssignmentPeer
         // Invalidate objects in FileReferencesPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         FileReferencesPeer::clearInstancePool();
+        // Invalidate objects in NotificationPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        NotificationPeer::clearInstancePool();
     }
 
     /**

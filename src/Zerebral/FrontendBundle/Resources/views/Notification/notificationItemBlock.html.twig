@@ -1,0 +1,140 @@
+{% macro mainBlock(notification) %}
+    {% set type = notification.type %}
+    {{ _self.title(notification) }}
+    {{ _self.date(notification) }}
+    {{ _self.text(notification) }}
+{% endmacro %}
+
+{% macro simpleBlock(notification) %}
+    {{ _self.avatar(notification) }}
+    {{ _self.text(notification) }}
+{% endmacro %}
+
+{% macro courseUpdate(notification) %}
+    <a href="#">{{ notification.userRelatedByCreatedBy ? notification.userRelatedByCreatedBy.fullName : '' }}</a> has updated the course details for <a href="{{ path('course_view', {id: notification.course.id}) }}">{{ notification.course.name }}</a>
+{% endmacro %}
+
+{% macro assignmentCreate(notification) %}
+    <a href="#">{{ notification.userRelatedByCreatedBy ? notification.userRelatedByCreatedBy.fullName : '' }}</a> has posted a new assignment <a href="{{ path('assignment_view', {id: notification.assignment.id}) }}">{{ notification.assignment.name }}</a> in <a href="{{ path('course_view', {id: notification.course.id}) }}">{{ notification.course.name }}</a>
+{% endmacro %}
+
+{% macro assignmentUpdate(notification) %}
+    <a href="#">{{ notification.userRelatedByCreatedBy ? notification.userRelatedByCreatedBy.fullName : '' }}</a> has updated the assignment details for <a href="{{ path('assignment_view', {id: notification.assignment.id}) }}">{{ notification.assignment.name }}</a> in <a href="{{ path('course_view', {id: notification.course.id}) }}">{{ notification.course.name }}</a>
+{% endmacro %}
+
+{% macro materialCreate(notification) %}
+    <a href="#">{{ notification.userRelatedByCreatedBy ? notification.userRelatedByCreatedBy.fullName : '' }}</a> has uploaded a new file to <a href="{{ path('course_view', {id: notification.course.id}) }}">{{ notification.course.name }}</a>
+{% endmacro %}
+
+{% macro assignmentFileCreate(notification) %}
+    <a href="#">{{ notification.userRelatedByCreatedBy ? notification.userRelatedByCreatedBy.fullName : '' }}</a> has added a new file to <a href="{{ path('assignment_view', {id: notification.assignment.id}) }}">{{ notification.assignment.name }}</a>
+{% endmacro %}
+
+{% macro attendanceStatus(notification) %}
+    <a href="#">{{ notification.userRelatedByCreatedBy ? notification.userRelatedByCreatedBy.fullName : '' }}</a> has marked you as <b>{{ notification.getParam('status') }}</b> for <a href="{{ path('course_view', {id: notification.course.id}) }}">{{ notification.course.name }}</a> at {{ notification.getParam('date') | date('m/d/Y') }}
+{% endmacro %}
+
+{% macro courseFeedComment(notification) %}
+    <a href="#">{{ notification.userRelatedByCreatedBy ? notification.userRelatedByCreatedBy.fullName : '' }}</a> has posted a new comment in <a href="{{ path('course_view', {id: notification.course.id}) }}">{{ notification.course.name }}</a>
+{% endmacro %}
+
+{% macro assignmentDueSingle(notification) %}
+    <a href="{{ path('assignment_view', {id: notification.assignment.id}) }}">{{ notification.assignment.name }}</a> is due today for <a href="{{ path('course_view', {id: notification.course.id}) }}">{{ notification.course.name }}</a>
+{% endmacro %}
+
+{% macro assignmentDueMultiple(notification) %}
+    You have {{ notification.getParam('assignmentsCount') }} due today
+{% endmacro %}
+
+{% macro assignmentComplete(notification) %}
+    <a href="{{ path('assignment_view', {id: notification.assignment.id}) }}">{{ notification.assignment.name }}</a> is complete and ready for grading
+{% endmacro %}
+
+{% macro assignmentInComplete(notification) %}
+    <a href="{{ path('assignment_view', {id: notification.assignment.id}) }}">{{ notification.assignment.name }}</a> is incomplete. Assignment is missing {{ notification.getParam('missedSubmissionsCount') }} submissions
+{% endmacro %}
+
+
+{% macro title(notification) %}
+    {% set type = notification.type %}
+    <h3>
+    {% if type == 'course_update' %}
+        Course Details
+    {% elseif type == 'assignment_create' %}
+        New Assignment
+    {% elseif type == 'assignment_update' %}
+        Assignment Details
+    {% elseif type == 'material_create' %}
+        New Syllabus Materials
+    {% elseif type == 'assignment_file_create' %}
+        New Assignment File
+    {% elseif type == 'attendance_status' %}
+        Attendance Updated
+    {% elseif type == 'course_feed_comment_create' %}
+        Response to Comment
+    {% elseif type == 'assignment_due_single_student' %}
+        Assignment due date
+    {% elseif type == 'assignment_due_single_teacher' %}
+        Assignment due date
+    {% elseif type == 'assignment_due_multiple_student' %}
+        Assignments due date
+    {% elseif type == 'assignment_due_multiple_teacher' %}
+        Assignments due date
+    {% elseif type == 'assignment_complete' %}
+        Assignment complete
+    {% elseif type == 'assignment_incomplete' %}
+        Assignment incomplete
+    {% endif %}
+    </h3>
+{% endmacro %}
+
+{% macro text(notification) %}
+    {% set type = notification.type %}
+    <p>
+    {% if type == 'course_update' %}
+        {{ _self.courseUpdate(notification) }}
+    {% elseif type == 'assignment_create' %}
+        {{ _self.assignmentCreate(notification) }}
+    {% elseif type == 'assignment_update' %}
+         {{ _self.assignmentUpdate(notification) }}
+    {% elseif type == 'material_create' %}
+        {{ _self.materialCreate(notification) }}
+    {% elseif type == 'assignment_file_create' %}
+        {{ _self.assignmentFileCreate(notification) }}
+    {% elseif type == 'attendance_status' %}
+        {{ _self.attendanceStatus(notification) }}
+    {% elseif type == 'course_feed_comment_create' %}
+        {{ _self.courseFeedComment(notification) }}
+    {% elseif type == 'assignment_due_single_student' %}
+        {{ _self.assignmentDueSingle(notification) }}
+    {% elseif type == 'assignment_due_single_teacher' %}
+        {{ _self.assignmentDueSingle(notification) }}
+    {% elseif type == 'assignment_due_multiple_student' %}
+        {{ _self.assignmentDueMultiple(notification) }}
+    {% elseif type == 'assignment_due_multiple_teacher' %}
+        {{ _self.assignmentDueMultiple(notification) }}
+    {% elseif type == 'assignment_complete' %}
+        {{ _self.assignmentComplete(notification) }}
+    {% elseif type == 'assignment_incomplete' %}
+        {{ _self.assignmentInComplete(notification) }}
+    {% endif %}
+    </p>
+{% endmacro %}
+
+{% macro date(notification) %}
+    <div class="date">
+        {{ time_diff(notification.createdAt) }}
+    </div>
+{% endmacro %}
+
+{% macro avatar(notification) %}
+    {% if notification.userRelatedByCreatedBy %}
+        <img class="avatar rounded" src="{{ get_file_storage_link(notification.userRelatedByCreatedBy.getAvatarFile()) | imagine_filter('thumbnail') }}"/>
+    {% else %}
+        <img class="avatar"/>
+    {% endif %}
+{% endmacro %}
+
+
+
+

@@ -1,12 +1,27 @@
-{% extends "ZerebralFrontendBundle::layout.html.twig" %}
+{% extends 'ZerebralFrontendBundle::layout.html.twig' %}
+{% import "ZerebralFrontendBundle:Macro:main.html.twig" as mainPartials %}
+{% import "ZerebralFrontendBundle:Feed:feed.html.twig" as feed %}
 
 {% block content %}
-    <h1>Hello {{ name }}!</h1>
-    <p>Check out <a href="{{ path('courses') }}">courses</a>!</p>
+    {% javascripts
+    '@ZerebralFrontendBundle/Resources/public/js/controllers/dashboard/index.js'
+    output='js/compiled/dashboard_index.js' %}
+    <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
 
+    <div class="row-fluid courses-list course-details">
+        <div class="span6 main-list-block">
+            <div class="row-fluid manage">
+                <h2 class="pull-left form-title">
+                    <small>recent updates</small>
+                </h2>
+            </div>
 
+            <br />
 
+            {{ feed.course_details_feed(feedItemForm, feedItems) }}
 
-
+        </div>
+    </div>
 {% endblock %}
 

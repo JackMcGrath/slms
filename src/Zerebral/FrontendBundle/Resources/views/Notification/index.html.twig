@@ -1,0 +1,25 @@
+{% extends 'ZerebralFrontendBundle::layout.html.twig' %}
+{% import "ZerebralFrontendBundle:Macro:main.html.twig" as mainPartials %}
+{% import "ZerebralFrontendBundle:Notification:notificationItemBlock.html.twig" as notificationPartial %}
+
+{% block content %}
+    <div class="row-fluid notifications-list">
+        <div class="span6 main-list-block">
+            <div class="row-fluid">
+                <h2 class="pull-left form-title">
+                    Your notifications
+                </h2>
+            </div>
+            <hr/>
+
+            <div class="span9 items-list{% if is_granted('ROLE_TEACHER') %} teacher-role{% endif %}">
+                {% for notification in notifications %}
+                    <div class="list-item span12{{ loop.last ? ' last' : '' }} {{ notification.type }}">
+                        {{ notificationPartial.mainBlock(notification) }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

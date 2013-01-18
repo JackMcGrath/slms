@@ -1,4 +1,5 @@
 <?php
+// TODO: remove non-english comment
 /**
  * Example: {{ (users_count ~ " пользовател")|plural("ь", "я", "ей") }}
  * @license BSD
@@ -36,8 +37,12 @@ class PluralExtension extends \Twig_Extension
     public function nplural($text, $e1, $e2, $e3, $digit)
     {
         $digit = ($digit > 20) ? $digit % 10 : $digit;
-        if ($digit >= 5 || $digit == 0) return $text . $e3;
-        if ($digit >= 2) return $text . $e2;
+        if ($digit >= 5 || $digit == 0) {
+            return $text . $e3;
+        }
+        if ($digit >= 2) {
+            return $text . $e2;
+        }
         return $text . $e1;
     }
 

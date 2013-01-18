@@ -66,6 +66,7 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
         $optionalReturn = array();
 
         if ($user->isStudent()) {
+             // TODO: move to partial similar to CourseMaterialFolder::form
             $assignmentSolutionType = new FormType\AssignmentSolutionType();
             $assignmentSolutionType->setFileStorage($this->container->get('zerebral.file_storage')->getFileStorage('local'));
 
@@ -80,6 +81,7 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
         }
 
 
+        // TODO: move to partial similar to CourseMaterialFolder::form
         $feedCommentFormType = new FormType\FeedCommentType();
         $feedCommentForm = $this->createForm($feedCommentFormType, null);
 
@@ -199,7 +201,7 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
                 $assignment->setCourse($course);
                 $assignment->setTeacherId($this->getRoleUser()->getId());
 
-                // @todo redo with collection type
+                // TODO: redo with choice type
                 $studentAssignments = new \PropelCollection();
                 foreach ($this->getRequest()->get('students', array()) as $studentId) {
                     $studentAssignmentModel = StudentAssignmentQuery::create()->filterByAssignmentId($assignment->getId())->filterByStudentId($studentId)->findOne();

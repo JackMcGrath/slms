@@ -32,6 +32,8 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
      */
     private $passwordEncoder;
 
+    private $relatedUsers = null;
+
     public function __construct()
     {
         $this->setIsActive(true);
@@ -335,5 +337,20 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
 
     public function isTeacher() {
         return $this->getRole() == self::ROLE_TEACHER;
+    }
+
+    public function getUnreadNotifications()
+    {
+        $c = new \Criteria();
+        $c->add('is_read', 0, \Criteria::EQUAL);
+        return $this->getNotificationsRelatedByUserId($c);
+    }
+
+    public function getRelatedUsers()
+    {
+        if (is_null($this->relatedUsers)) {
+            $this->relatedUsers = UserQuery::create()->getRelatedUsers($this)->find();
+        }
+        return $this->relatedUsers;
     }
 }

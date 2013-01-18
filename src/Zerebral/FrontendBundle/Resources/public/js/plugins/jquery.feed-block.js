@@ -25,6 +25,12 @@ ZerebralCourseDetailFeedBlock.prototype = {
     feedItemsDiv: undefined,
 
 
+    timeOffset: null,
+
+    ajaxInProgress: false,
+    errorHasAppeared: 0,
+
+
     init: function() {
         var self = this;
         this.feedItemFormTextarea.click($.proxy(self.expandFeedItemForm, self));
@@ -41,9 +47,14 @@ ZerebralCourseDetailFeedBlock.prototype = {
 
         this.commentsDiv.on('click', 'a.load-more-link', $.proxy(self.loadComments, self));
 
+        self.timeOffset = moment(this.feedItemsDiv.data('serverTime'), 'YYYY-MM-DD HH:mm:ss').diff(moment(), 'seconds');
+        self.updateFeed();
+        setInterval($.proxy(self.updateFeed, self), 5000);
+
         this.feedItemForm.zerebralAjaxForm({
             dataType: 'json',
             beforeSend: function() {
+                self.ajaxInProgress = true;
                 self.feedItemForm.find('.control-group').removeClass('error');
                 self.feedItemFormTextarea.attr('disabled', true);
                 self.feedItemForm.find('.attached-link-field').attr('disabled', true);
@@ -64,7 +75,8 @@ ZerebralCourseDetailFeedBlock.prototype = {
                         ul.append($('<li>' + response['errors'][fieldName][0] + '</li>'));
                     }
                 } else {
-                    self.addItemBlock(response['content']);
+                    self.feedItemsDiv.data('lastItemId', response['lastItemId']);
+                    self.addItemBlock(response['content'], true);
                 }
             },
             error: function() { alert('Oops, seems like unknown error has appeared!'); },
@@ -74,6 +86,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
                 self.feedItemForm.find('input[type="submit"]').attr('disabled', false).val('Post message');
                 self.feedItemForm.find('a.cancel-link').show();
                 self.feedItemForm.find('.attached-link-delete').show();
+                self.ajaxInProgress = false;
             }
         });
 
@@ -105,6 +118,35 @@ ZerebralCourseDetailFeedBlock.prototype = {
                 dataType: 'json'
             });
         })
+    },
+
+    updateFeed: function() {
+        var self = this;
+
+        if (!self.ajaxInProgress && self.errorHasAppeared < 2) {
+            $.ajax({
+                dataType: 'json',
+                url: self.feedItemsDiv.data('checkoutUrl'),
+                data: {
+                    lastItemId: self.feedItemsDiv.data('lastItemId')
+                },
+                success: function(response) {
+                    if (response.success) {
+                        self.feedItemsDiv.data('lastItemId', response['lastItemId']);
+                        $.proxy(self.addItemBlock(response['content'], false), self);
+                    }
+                },
+                error: function() { self.errorHasAppeared++; }
+            });
+        }
+
+        var currentTime = moment().add('seconds', self.timeOffset);
+        var timestamps = this.feedItemsDiv.find('span.timestamp, div.timestamp>span.gray');
+        $.each(timestamps, function(index, value) {
+            var itemDate = moment($(value).data('date'), 'YYYY-MM-DD HH:mm:ss');
+            var humanDate = itemDate.from(currentTime);
+            $(value).html(humanDate);
+        });
     },
 
     loadComments: function(event) {
@@ -239,7 +281,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
         var link = $(event.target);
         link.parents('.feed-item').find('.comment.hidden').removeClass('hidden');
     },
-    addItemBlock: function(response) {
+    addItemBlock: function(response, collapseForm) {
         var self = this;
         var itemBlock = $(response);
         var form = itemBlock.find('form');
@@ -270,7 +312,9 @@ ZerebralCourseDetailFeedBlock.prototype = {
 
         });
         this.feedItemsDiv.find('.empty').remove().end().prepend(itemBlock);
-        this.collapseFeedItemForm();
+        if (collapseForm) {
+            this.collapseFeedItemForm();
+        }
     },
     deleteItemBlock: function(event) {
         event.preventDefault();
@@ -347,6 +391,10 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
     feedCommentFormDiv: undefined,
     feedCommentForm: undefined,
     feedCommentsDiv: undefined,
+    timeOffset: null,
+
+    ajaxInProgress: false,
+    errorHasAppeared: 0,
 
 
         init: function() {
@@ -356,10 +404,15 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
 
         this.feedCommentsDiv.on('click', 'a.delete-link', $.proxy(self.deleteCommentBlock, self));
 
+        self.timeOffset = moment(this.feedCommentsDiv.data('serverTime'), 'YYYY-MM-DD HH:mm:ss').diff(moment(), 'seconds');
+        self.updateFeed();
+        setInterval($.proxy(self.updateFeed, self), 5000);
+
 
         this.feedCommentForm.zerebralAjaxForm({
             data: { feedType: 'assignment' },
             beforeSend: function() {
+                self.ajaxInProgress = true;
                 self.feedCommentForm.find('.control-group').removeClass('error');
                 self.feedCommentForm.find('textarea').attr('disabled', true);
                 self.feedCommentForm.find('.attached-link-field').attr('disabled', true);
@@ -381,6 +434,7 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
                     }
                 } else {
                     self.addCommentBlock(response['content']);
+                    self.feedCommentsDiv.data('lastCommentId', response['lastCommentId']);
                 }
             },
             error: function() { alert('Oops, seems like unknown error has appeared!'); },
@@ -389,6 +443,7 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
                 self.feedCommentForm.find('.attached-link-field').attr('disabled', false);
                 self.feedCommentForm.find('input[type="submit"]').attr('disabled', false).val('Post message');
                 self.feedCommentForm.find('.attached-link-delete').show();
+                self.ajaxInProgress = false;
             },
             dataType: 'json'
         });
@@ -420,6 +475,42 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
             }
         }
     },
+
+    updateFeed: function() {
+        var self = this;
+        if (!self.ajaxInProgress && self.errorHasAppeared < 2) {
+            $.ajax({
+                dataType: 'json',
+                url: self.feedCommentsDiv.data('checkoutUrl'),
+                data: {
+                    lastCommentId: self.feedCommentsDiv.data('lastCommentId')
+                },
+                success: function(response) {
+                    if (response.success) {
+                        self.feedCommentsDiv.data('lastCommentId', response['lastCommentId']);
+                        var commentBlock = $(response['content']);
+                        commentBlock.css('display', 'none');
+                        if (self.feedCommentsDiv.find('.comment:last').length > 0) {
+                            self.feedCommentsDiv.find('.comment:last').after(commentBlock);
+                        } else {
+                            self.feedCommentsDiv.find('.empty').remove().end().append(commentBlock);
+                        }
+                        commentBlock.slideDown();
+                    }
+                },
+                error: function() { self.errorHasAppeared++; }
+            });
+        }
+
+        var currentTime = moment().add('seconds', self.timeOffset);
+        var timestamps = self.feedCommentsDiv.find('span.timestamp');
+        $.each(timestamps, function(index, value) {
+            var date = moment($(value).data('date'), 'YYYY-MM-DD HH:mm:ss');
+            var humanDate = date.from(currentTime);
+            $(value).html(humanDate);
+        });
+    },
+
     resetMainFormType: function(event) {
         event.preventDefault();
         var link = $(event.target);

@@ -1,0 +1,137 @@
+.notifications-popup {
+    position: fixed;
+    width: 500px;
+    padding: 20px 0 5px;
+    border:1px solid #eee;
+    background: @white;
+    top: 40px;
+    left: 80px;
+    z-index: 100;
+    .box-shadow(0 5px 10px rgba(0,0,0,.2));
+
+    .title {
+        padding: 0 20px;
+        border-bottom: 1px solid #dddfe7;
+        padding-bottom: 15px;
+        h4 {
+            display: inline-block;
+            font-size: 14px;
+            font-weight: normal;
+        }
+        a.view-all {
+            float: right;
+        }
+    }
+    .notifications-popup-list {
+        max-height: 400px;
+        overflow: auto;
+
+        .loading {
+            padding: 0px 20px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        .no-notifications {
+            padding: 0px 20px;
+            margin-top: 20px;
+            b {
+                font-size: 13px;
+                margin-bottom: 10px;
+                display: block;
+                font-style: none;
+            }
+            p {
+                color: #ababab;
+            }
+        }
+
+        .item {
+            padding: 10px 20px;
+            margin: 5px 0;
+            border-bottom: 1px dashed #eee;
+            &.last {
+                border-bottom: none;
+                padding-bottom: 0px;
+            }
+            img.avatar {
+                margin-right: 10px;
+                width: 43px;
+                height: 43px;
+                vertical-align: top;
+                display: inline-block;
+            }
+            p {
+                display: inline-block;
+                width: 380px;
+                margin: 0;
+                padding: 0;
+                a {
+                    color: #458dba;
+                    font-weight: bold;
+                }
+            }
+        }
+    }
+}
+
+.notifications-list {
+    .list-item {
+        h3 {
+            font-size: 18px;
+            font-style: normal;
+            display: inline-block;
+            float: left;
+        }
+        .date {
+            color: #9a9a9a;
+            float: right;
+            display: inline-block;
+            margin-top: 15px;
+            font-size: 11px;
+        }
+        &.course_update p, &.assignment_update p {
+            .icon-color-cutter;
+        }
+        &.assignment_create p {
+            .icon-color-bookmark;
+        }
+        &.assignment_file_create p, &.material_create p {
+            .icon-color-attachment;
+        }
+        &.course_feed_comment_create p {
+            .icon-color-exclamation;
+        }
+        &.attendance_status p {
+            .icon-color-abacus;
+        }
+        &.assignment_due_single_student p, &.assignment_due_single_teacher p, &.assignment_due_multiple_student p,
+        &.assignment_due_multiple_teacher p, &.assignment_complete p, &.assignment_incomplete p {
+            .icon-color-abacus;
+        }
+        p {
+            display: block;
+            clear: both;
+            color: #626262;
+            background-repeat: no-repeat;
+            padding-left: 20px;
+            a {
+                color: #458dba;
+                font-weight: bold;
+            }
+        }
+    }
+}
+
+.notifications-list .main-list-block .items-list {
+    .list-item {
+        padding-top: 15px;
+        padding-bottom: 15px;
+    }
+}
+
+i.notifications {
+    cursor: pointer;
+    small {
+        font-style: normal;
+    }
+}

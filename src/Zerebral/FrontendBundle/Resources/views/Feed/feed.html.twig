@@ -1,4 +1,4 @@
-{% macro assignment_details_feed(feedCommentForm, feedCommentFormPath, comments) %}
+{% macro assignment_details_feed(feedCommentForm, feedItem) %}
     <div class="assignment-details-feed">
     <div class="feed-comment-alert-block alert alert-block alert-error" style="display: none;">
         <button type="button" class="close" data-dismiss="alert">×</button>
@@ -8,7 +8,7 @@
         </ul>
     </div>
     <div class="feed-comment-form">
-        <form id="ajaxFeedCommentForm" method="post" {{ form_enctype(feedCommentForm) }} action="{{ feedCommentFormPath }}">
+        <form id="ajaxFeedCommentForm" method="post" {{ form_enctype(feedCommentForm) }} action="{{ path('ajax_feed_add_comment', {feedItemId: feedItem.id }) }}">
             <div class="control-group">
                 <textarea class="feed-comment-textarea" name="feed_comment[feedContent][text]" placeholder="Leave a new comment" ></textarea>
             </div>
@@ -34,7 +34,13 @@
             </div>
         </form>
     </div>
-    <div class="comments">
+    {% set comments = feedItem.feedComments %}
+    {% if comments|length > 0 %}
+        {% set lastCommentId = comments.last.id %}
+    {% else %}
+        {% set lastCommentId = 0 %}
+    {% endif %}
+    <div class="comments" data-last-comment-id="{{ lastCommentId }}" data-server-time="{{ "now"|date("Y-m-d H:i:s") }}" data-checkout-url="{{ path('ajax_checkout_comments', {feedItemId: feedItem.id}) }}">
         {% for comment in comments %}
             {% include "ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig" with {'feedType': 'assignment'} %}
         {% else %}
@@ -47,8 +53,13 @@
 <!--      CourseDetails   --->
 
 
-{% macro course_details_feed(feedItemForm, feedItemFormPath, feedItems) %}
+{% macro course_details_feed(feedItemForm, feedItems, course = null) %}
     {% import _self as self %}
+    {% if course is null %}
+        {% set isGlobal = true %}
+    {% else %}
+        {% set isGlobal = false %}
+    {% endif %}
     <div class="course-details-feed">
     <div class="feed-item-alert-block alert alert-block alert-error" style="display: none;">
         <button type="button" class="close" data-dismiss="alert">×</button>
@@ -58,7 +69,7 @@
         </ul>
     </div>
     <div class="feed-item-form">
-        <form id="ajaxFeedItemForm" method="post" {{ form_enctype(feedItemForm) }} action="{{ feedItemFormPath }}">
+        <form id="ajaxFeedItemForm" method="post" {{ form_enctype(feedItemForm) }} action="{{ path('ajax_add_feed_item') }}">
             <div class="control-group">
                 <textarea class="feed-item-textarea" name="feed_item[feedContent][text]" placeholder="Share what's new..." ></textarea>
             </div>
@@ -68,6 +79,9 @@
                         <input class="attached-link-field" type="text" name="feed_item[feedContent][linkUrl]" placeholder="Enter link..." />
                     </div>
                     <input class="comment-type" type="hidden" name="feed_item[feedContent][type]" value="text" />
+                    {% if course is not null%}
+                        <input class="comment-course-id" type="hidden" name="feed_item[courseId]" value="{{ course.id }}" />
+                    {% endif %}
                     <div class="attached-link-delete" style="">
                         <i class="icon-small-trash-bin"></i> <a class="gray" href="#">Delete</a>
                     </div>
@@ -86,7 +100,17 @@
         </form>
     </div>
     <hr />
-    <div class="feed-items">
+    {% if feedItems|length > 0 %}
+        {% set lastItemId = feedItems.first.id %}
+    {% else %}
+        {% set lastItemId = 0 %}
+    {% endif %}
+    {% if course is null %}
+        {% set checkoutUrl = path('ajax_checkout_items') %}
+    {% else %}
+        {% set checkoutUrl = path('ajax_checkout_items', {courseId: course.id}) %}
+    {% endif %}
+    <div class="feed-items" data-server-time="{{ "now"|date("Y-m-d H:i:s") }}" data-last-item-id="{{ lastItemId }}" data-checkout-url="{{ checkoutUrl }}" >
         {% for feedItem in feedItems %}
         {% include "ZerebralFrontendBundle:Feed:feedItemBlock.html.twig" %}
         {% else %}

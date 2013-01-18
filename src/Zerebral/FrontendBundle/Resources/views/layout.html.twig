@@ -17,12 +17,14 @@
         '@ZerebralFrontendBundle/Resources/public/js/vendors/bootstrap/bootstrap-timepicker.js'
         '@ZerebralFrontendBundle/Resources/public/js/vendors/bootstrap/bootstrap-tooltip.js'
         '@ZerebralFrontendBundle/Resources/public/js/vendors/wysihtml5/wysihtml5-0.3.0.js'
+        '@ZerebralFrontendBundle/Resources/public/js/vendors/moment/moment-1.7.2.min.js'
         '@ZerebralFrontendBundle/Resources/public/js/vendors/bootstrap/bootstrap-wysihtml5-0.0.2.js'
         '@ZerebralFrontendBundle/Resources/public/js/plugins/jquery.registry.js'
         '@ZerebralFrontendBundle/Resources/public/js/plugins/jquery.feed-block.js'
         '@ZerebralFrontendBundle/Resources/public/js/plugins/jquery.ajax-form.js'
         '@ZerebralFrontendBundle/Resources/public/js/plugins/optional-model.js'
         '@ZerebralFrontendBundle/Resources/public/js/bootstrap.js'
+        '@ZerebralFrontendBundle/Resources/public/js/plugins/jquery.notifications.js'
         output='js/compiled/layout.js' %}
         <script type="text/javascript" src="{{ asset_url }}"></script>
     {% endjavascripts %}
@@ -60,7 +62,10 @@
                         <ul class="nav">
                             <li class="divider-vertical"></li>
                         </ul>
-                        <i class="icon-bell pull-left"><small>7</small></i>
+                        {% set notificationsCount = app.user.unreadNotifications.count %}
+                        <i class="icon-bell pull-left notifications">
+                            {% if notificationsCount %}<small>{{ notificationsCount }}</small>{% endif %}
+                        </i>
                         <form class="navbar-search pull-left" _lpchecked="1">
                             <input type="text" class="search-query icon-search-glass" placeholder="Search">
                         </form>
@@ -81,6 +86,13 @@
                 </div>
             </div>
         </div>
+        <div class="notifications-popup hide">
+            <div class="title">
+                <h4>Notifications</h4>
+                <a href="{{ path('notifications') }}" class="view-all">View all</a>
+            </div>
+            <div class="notifications-popup-list"></div>
+        </div>
     {% endblock %}
 
     <div class="container-fluid" id="main">
@@ -92,11 +104,14 @@
                             <a href="{{ path('dashboard') }}"><i class="icon-big-home"></i>Home</a>
                         </div>
                     </li>
-                    <li class="{{ target is defined and target == 'notifications' ? 'active' : ''}}">
-                        <div class="menu-item notice">
-                            <a href="#"><i class="icon-big-bell"> <small>7</small></i>Notifications</a>
-                        </div>
-                    </li>
+                    {#<li class="{{ target is defined and target == 'notifications' ? 'active' : ''}}">#}
+                        {#{% set notificationsCount = app.user.unreadNotifications.count %}#}
+                        {#<div class="menu-item notice">#}
+                            {#<a href="{{ path('notifications') }}">#}
+                                {#<i class="icon-big-bell">{% if notificationsCount %}<small>{{ notificationsCount }}</small>{% endif %}</i>Notifications#}
+                            {#</a>#}
+                        {#</div>#}
+                    {#</li>#}
                     <li class="{{ target is defined and target == 'courses' ? 'active' : ''}}">
                         <div class="menu-item">
                             <a href="{{ path("courses") }}"><i class="icon-big-notepad"></i>Courses</a>
@@ -112,16 +127,16 @@
                             <a href="{{ path("messages_inbox") }}"><i class="icon-big-mail"></i>Messages</a>
                         </div>
                     </li>
-                    <li class="{{ target is defined and target == 'calendar' ? 'active' : ''}}"><div class="menu-item"><i class="icon-big-calendar"></i>Calendar</div></li>
-                    <li class="{{ target is defined and target == 'members' ? 'active' : ''}}">
-                        <div class="menu-item">
-                            {% if course is defined and course %}
-                                <a href="{{ path('course_members', {id: course.id}) }}"><i class="icon-big-members"></i>Members</a>
-                            {% else %}
-                                <i class="icon-big-members"></i>Members
-                            {% endif %}
-                        </div>
-                    </li>
+                    {#<li class="{{ target is defined and target == 'calendar' ? 'active' : ''}}"><div class="menu-item"><i class="icon-big-calendar"></i>Calendar</div></li>#}
+                    {#<li class="{{ target is defined and target == 'members' ? 'active' : ''}}">#}
+                        {#<div class="menu-item">#}
+                            {#{% if course is defined and course %}#}
+                                {#<a href="{{ path('course_members', {id: course.id}) }}"><i class="icon-big-members"></i>Members</a>#}
+                            {#{% else %}#}
+                                {#<i class="icon-big-members"></i>Members#}
+                            {#{% endif %}#}
+                        {#</div>#}
+                    {#</li>#}
                     {% if app.user.isTeacher %}
                     <li class="{{ target is defined and target == 'files' ? 'active' : ''}}">
                         <div class="menu-item">

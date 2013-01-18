@@ -15,14 +15,15 @@ use Zerebral\BusinessBundle\Model\Feed\FeedItemQuery;
 
 class FeedCommand extends ContainerAwareCommand
 {
-    protected function configure() {
-        set_time_limit(0);
-        ini_set('memory_limit', '10G');
-
-        $this->setName('feed:create')->setDescription('Creating feeds items for assignments');
+    protected function configure()
+    {
+        $this
+            ->setName('feed:create')
+            ->setDescription('Creating feeds items for assignments');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
         $assignmentQuery = new \Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery();
 
         $output->write('Creating feed items for "Assignments"... ');
@@ -59,8 +60,6 @@ class FeedCommand extends ContainerAwareCommand
         }
 
         $output->writeln('Total feeds created: ' . $createdFeedsCount);
-
-
 
 
     }

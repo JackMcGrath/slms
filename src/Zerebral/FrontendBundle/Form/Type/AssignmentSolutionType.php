@@ -8,6 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints\Collection;
 
+// TODO: comments + type hints
 class AssignmentSolutionType extends AbstractType
 {
     protected $fileStorage;
