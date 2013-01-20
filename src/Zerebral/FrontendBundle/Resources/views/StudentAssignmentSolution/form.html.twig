@@ -1,0 +1,37 @@
+{% extends 'ZerebralFrontendBundle::empty.html.twig' %}
+
+{% form_theme form _self %}
+
+{% block form_rows %}
+    {% spaceless %}
+        {% for child in form %}
+            {{ form_widget(child) }}
+        {% endfor %}
+    {% endspaceless %}
+{% endblock form_rows %}
+
+{% block content %}
+<script type="text/template" id="solution_form">
+    {{ form_widget(form.files.vars.prototype)|raw }}
+</script>
+<div class="modal hide fade" id="uploadModal">
+    <form id="ajaxUploadSolutionsForm" method="post" {{ form_enctype(form) }} class="member-form"
+          action="{{ path('ajax_student_assignment_solution_save', {id: studentAssignment.id}) }}">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h3>Upload solution files</h3>
+        </div>
+        <div class="modal-body">
+            <div class="uploadedFiles" data-last-index="{{ form.files.vars.data|max_key }}">
+                {{ form_widget(form.files, {label: ''}) }}
+            </div>
+            <a id="addUploadFile" href="#">Add another file</a>
+        </div>
+        <div class="modal-footer">
+            <input type="submit" class="btn btn-danger" value="Upload"/>
+            <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Cancel</a>
+        </div>
+        {{ form_widget(form._token) }}
+    </form>
+</div>
+{% endblock content %}

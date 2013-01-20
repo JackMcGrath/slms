@@ -11,11 +11,13 @@ use \PropelException;
 use \PropelPDO;
 use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\PeerEvent;
+use Zerebral\BusinessBundle\Model\Assignment\AssignmentFilePeer;
+use Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentFilePeer;
 use Zerebral\BusinessBundle\Model\File\File;
 use Zerebral\BusinessBundle\Model\File\FilePeer;
-use Zerebral\BusinessBundle\Model\File\FileReferencesPeer;
 use Zerebral\BusinessBundle\Model\File\map\FileTableMap;
 use Zerebral\BusinessBundle\Model\Material\CourseMaterialPeer;
+use Zerebral\BusinessBundle\Model\Message\MessageFilePeer;
 use Zerebral\BusinessBundle\Model\User\UserPeer;
 
 abstract class BaseFilePeer
@@ -34,16 +36,19 @@ abstract class BaseFilePeer
     const TM_CLASS = 'FileTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 7;
+    const NUM_COLUMNS = 8;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 7;
+    const NUM_HYDRATE_COLUMNS = 8;
 
     /** the column name for the id field */
     const ID = 'files.id';
+
+    /** the column name for the path field */
+    const PATH = 'files.path';
 
     /** the column name for the name field */
     const NAME = 'files.name';
@@ -87,12 +92,12 @@ abstract class BaseFilePeer
      * e.g. FilePeer::$fieldNames[FilePeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'Description', 'Size', 'MimeType', 'Storage', 'CreatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'description', 'size', 'mimeType', 'storage', 'createdAt', ),
-        BasePeer::TYPE_COLNAME => array (FilePeer::ID, FilePeer::NAME, FilePeer::DESCRIPTION, FilePeer::SIZE, FilePeer::MIME_TYPE, FilePeer::STORAGE, FilePeer::CREATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', 'DESCRIPTION', 'SIZE', 'MIME_TYPE', 'STORAGE', 'CREATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'description', 'size', 'mime_type', 'storage', 'created_at', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Path', 'Name', 'Description', 'Size', 'MimeType', 'Storage', 'CreatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'path', 'name', 'description', 'size', 'mimeType', 'storage', 'createdAt', ),
+        BasePeer::TYPE_COLNAME => array (FilePeer::ID, FilePeer::PATH, FilePeer::NAME, FilePeer::DESCRIPTION, FilePeer::SIZE, FilePeer::MIME_TYPE, FilePeer::STORAGE, FilePeer::CREATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PATH', 'NAME', 'DESCRIPTION', 'SIZE', 'MIME_TYPE', 'STORAGE', 'CREATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'path', 'name', 'description', 'size', 'mime_type', 'storage', 'created_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -102,12 +107,12 @@ abstract class BaseFilePeer
      * e.g. FilePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'Description' => 2, 'Size' => 3, 'MimeType' => 4, 'Storage' => 5, 'CreatedAt' => 6, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'description' => 2, 'size' => 3, 'mimeType' => 4, 'storage' => 5, 'createdAt' => 6, ),
-        BasePeer::TYPE_COLNAME => array (FilePeer::ID => 0, FilePeer::NAME => 1, FilePeer::DESCRIPTION => 2, FilePeer::SIZE => 3, FilePeer::MIME_TYPE => 4, FilePeer::STORAGE => 5, FilePeer::CREATED_AT => 6, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, 'DESCRIPTION' => 2, 'SIZE' => 3, 'MIME_TYPE' => 4, 'STORAGE' => 5, 'CREATED_AT' => 6, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'description' => 2, 'size' => 3, 'mime_type' => 4, 'storage' => 5, 'created_at' => 6, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Path' => 1, 'Name' => 2, 'Description' => 3, 'Size' => 4, 'MimeType' => 5, 'Storage' => 6, 'CreatedAt' => 7, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'path' => 1, 'name' => 2, 'description' => 3, 'size' => 4, 'mimeType' => 5, 'storage' => 6, 'createdAt' => 7, ),
+        BasePeer::TYPE_COLNAME => array (FilePeer::ID => 0, FilePeer::PATH => 1, FilePeer::NAME => 2, FilePeer::DESCRIPTION => 3, FilePeer::SIZE => 4, FilePeer::MIME_TYPE => 5, FilePeer::STORAGE => 6, FilePeer::CREATED_AT => 7, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PATH' => 1, 'NAME' => 2, 'DESCRIPTION' => 3, 'SIZE' => 4, 'MIME_TYPE' => 5, 'STORAGE' => 6, 'CREATED_AT' => 7, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'path' => 1, 'name' => 2, 'description' => 3, 'size' => 4, 'mime_type' => 5, 'storage' => 6, 'created_at' => 7, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /** The enumerated values for this table */
@@ -235,6 +240,7 @@ abstract class BaseFilePeer
     {
         if (null === $alias) {
             $criteria->addSelectColumn(FilePeer::ID);
+            $criteria->addSelectColumn(FilePeer::PATH);
             $criteria->addSelectColumn(FilePeer::NAME);
             $criteria->addSelectColumn(FilePeer::DESCRIPTION);
             $criteria->addSelectColumn(FilePeer::SIZE);
@@ -243,6 +249,7 @@ abstract class BaseFilePeer
             $criteria->addSelectColumn(FilePeer::CREATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.path');
             $criteria->addSelectColumn($alias . '.name');
             $criteria->addSelectColumn($alias . '.description');
             $criteria->addSelectColumn($alias . '.size');
@@ -455,12 +462,18 @@ abstract class BaseFilePeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in FileReferencesPeer instance pool,
+        // Invalidate objects in AssignmentFilePeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        FileReferencesPeer::clearInstancePool();
+        AssignmentFilePeer::clearInstancePool();
+        // Invalidate objects in StudentAssignmentFilePeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        StudentAssignmentFilePeer::clearInstancePool();
         // Invalidate objects in CourseMaterialPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         CourseMaterialPeer::clearInstancePool();
+        // Invalidate objects in MessageFilePeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        MessageFilePeer::clearInstancePool();
         // Invalidate objects in UserPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         UserPeer::clearInstancePool();

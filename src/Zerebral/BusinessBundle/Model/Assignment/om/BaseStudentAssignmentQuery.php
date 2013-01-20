@@ -16,11 +16,10 @@ use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\QueryEvent;
 use Zerebral\BusinessBundle\Model\Assignment\Assignment;
 use Zerebral\BusinessBundle\Model\Assignment\StudentAssignment;
+use Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentFile;
 use Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentPeer;
 use Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentQuery;
 use Zerebral\BusinessBundle\Model\File\File;
-use Zerebral\BusinessBundle\Model\File\FileReferences;
-use Zerebral\BusinessBundle\Model\Message\Message;
 use Zerebral\BusinessBundle\Model\User\Student;
 
 /**
@@ -52,9 +51,9 @@ use Zerebral\BusinessBundle\Model\User\Student;
  * @method StudentAssignmentQuery rightJoinAssignment($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Assignment relation
  * @method StudentAssignmentQuery innerJoinAssignment($relationAlias = null) Adds a INNER JOIN clause to the query using the Assignment relation
  *
- * @method StudentAssignmentQuery leftJoinFileReferences($relationAlias = null) Adds a LEFT JOIN clause to the query using the FileReferences relation
- * @method StudentAssignmentQuery rightJoinFileReferences($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FileReferences relation
- * @method StudentAssignmentQuery innerJoinFileReferences($relationAlias = null) Adds a INNER JOIN clause to the query using the FileReferences relation
+ * @method StudentAssignmentQuery leftJoinStudentAssignmentFile($relationAlias = null) Adds a LEFT JOIN clause to the query using the StudentAssignmentFile relation
+ * @method StudentAssignmentQuery rightJoinStudentAssignmentFile($relationAlias = null) Adds a RIGHT JOIN clause to the query using the StudentAssignmentFile relation
+ * @method StudentAssignmentQuery innerJoinStudentAssignmentFile($relationAlias = null) Adds a INNER JOIN clause to the query using the StudentAssignmentFile relation
  *
  * @method StudentAssignment findOne(PropelPDO $con = null) Return the first StudentAssignment matching the query
  * @method StudentAssignment findOneOrCreate(PropelPDO $con = null) Return the first StudentAssignment matching the query, or a new StudentAssignment object populated from the query conditions when no match is found
@@ -93,7 +92,7 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
      * Returns a new StudentAssignmentQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     StudentAssignmentQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   StudentAssignmentQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return StudentAssignmentQuery
      */
@@ -155,8 +154,8 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   StudentAssignment A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 StudentAssignment A model object, or null if the key is not found
+     * @throws PropelException
      */
      public function findOneById($key, $con = null)
      {
@@ -170,8 +169,8 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   StudentAssignment A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 StudentAssignment A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -271,7 +270,8 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -284,8 +284,22 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(StudentAssignmentPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(StudentAssignmentPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(StudentAssignmentPeer::ID, $id, $comparison);
@@ -298,7 +312,8 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
      * <code>
      * $query->filterByStudentId(1234); // WHERE student_id = 1234
      * $query->filterByStudentId(array(12, 34)); // WHERE student_id IN (12, 34)
-     * $query->filterByStudentId(array('min' => 12)); // WHERE student_id > 12
+     * $query->filterByStudentId(array('min' => 12)); // WHERE student_id >= 12
+     * $query->filterByStudentId(array('max' => 12)); // WHERE student_id <= 12
      * </code>
      *
      * @see       filterByStudent()
@@ -341,7 +356,8 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
      * <code>
      * $query->filterByAssignmentId(1234); // WHERE assignment_id = 1234
      * $query->filterByAssignmentId(array(12, 34)); // WHERE assignment_id IN (12, 34)
-     * $query->filterByAssignmentId(array('min' => 12)); // WHERE assignment_id > 12
+     * $query->filterByAssignmentId(array('min' => 12)); // WHERE assignment_id >= 12
+     * $query->filterByAssignmentId(array('max' => 12)); // WHERE assignment_id <= 12
      * </code>
      *
      * @see       filterByAssignment()
@@ -511,8 +527,8 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
      * @param   Student|PropelObjectCollection $student The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   StudentAssignmentQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 StudentAssignmentQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByStudent($student, $comparison = null)
     {
@@ -587,8 +603,8 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
      * @param   Assignment|PropelObjectCollection $assignment The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   StudentAssignmentQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 StudentAssignmentQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByAssignment($assignment, $comparison = null)
     {
@@ -658,41 +674,41 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related FileReferences object
+     * Filter the query by a related StudentAssignmentFile object
      *
-     * @param   FileReferences|PropelObjectCollection $fileReferences  the related object to use as filter
+     * @param   StudentAssignmentFile|PropelObjectCollection $studentAssignmentFile  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   StudentAssignmentQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 StudentAssignmentQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
-    public function filterByFileReferences($fileReferences, $comparison = null)
+    public function filterByStudentAssignmentFile($studentAssignmentFile, $comparison = null)
     {
-        if ($fileReferences instanceof FileReferences) {
+        if ($studentAssignmentFile instanceof StudentAssignmentFile) {
             return $this
-                ->addUsingAlias(StudentAssignmentPeer::ID, $fileReferences->getreferenceId(), $comparison);
-        } elseif ($fileReferences instanceof PropelObjectCollection) {
+                ->addUsingAlias(StudentAssignmentPeer::ID, $studentAssignmentFile->getstudentAssignmentId(), $comparison);
+        } elseif ($studentAssignmentFile instanceof PropelObjectCollection) {
             return $this
-                ->useFileReferencesQuery()
-                ->filterByPrimaryKeys($fileReferences->getPrimaryKeys())
+                ->useStudentAssignmentFileQuery()
+                ->filterByPrimaryKeys($studentAssignmentFile->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByFileReferences() only accepts arguments of type FileReferences or PropelCollection');
+            throw new PropelException('filterByStudentAssignmentFile() only accepts arguments of type StudentAssignmentFile or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the FileReferences relation
+     * Adds a JOIN clause to the query using the StudentAssignmentFile relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return StudentAssignmentQuery The current query, for fluid interface
      */
-    public function joinFileReferences($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinStudentAssignmentFile($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('FileReferences');
+        $relationMap = $tableMap->getRelation('StudentAssignmentFile');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -707,14 +723,14 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'FileReferences');
+            $this->addJoinObject($join, 'StudentAssignmentFile');
         }
 
         return $this;
     }
 
     /**
-     * Use the FileReferences relation FileReferences object
+     * Use the StudentAssignmentFile relation StudentAssignmentFile object
      *
      * @see       useQuery()
      *
@@ -722,18 +738,18 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Zerebral\BusinessBundle\Model\File\FileReferencesQuery A secondary query class using the current class as primary query
+     * @return   \Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentFileQuery A secondary query class using the current class as primary query
      */
-    public function useFileReferencesQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useStudentAssignmentFileQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinFileReferences($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'FileReferences', '\Zerebral\BusinessBundle\Model\File\FileReferencesQuery');
+            ->joinStudentAssignmentFile($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'StudentAssignmentFile', '\Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentFileQuery');
     }
 
     /**
      * Filter the query by a related File object
-     * using the file_references table as cross reference
+     * using the student_assignment_files table as cross reference
      *
      * @param   File $file the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
@@ -743,42 +759,8 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
     public function filterByFile($file, $comparison = Criteria::EQUAL)
     {
         return $this
-            ->useFileReferencesQuery()
+            ->useStudentAssignmentFileQuery()
             ->filterByFile($file, $comparison)
-            ->endUse();
-    }
-
-    /**
-     * Filter the query by a related Assignment object
-     * using the file_references table as cross reference
-     *
-     * @param   Assignment $assignment the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   StudentAssignmentQuery The current query, for fluid interface
-     */
-    public function filterByassignmentReferenceId($assignment, $comparison = Criteria::EQUAL)
-    {
-        return $this
-            ->useFileReferencesQuery()
-            ->filterByassignmentReferenceId($assignment, $comparison)
-            ->endUse();
-    }
-
-    /**
-     * Filter the query by a related Message object
-     * using the file_references table as cross reference
-     *
-     * @param   Message $message the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   StudentAssignmentQuery The current query, for fluid interface
-     */
-    public function filterBymessageReferenceId($message, $comparison = Criteria::EQUAL)
-    {
-        return $this
-            ->useFileReferencesQuery()
-            ->filterBymessageReferenceId($message, $comparison)
             ->endUse();
     }
 

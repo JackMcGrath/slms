@@ -1,7 +1,7 @@
+imports:
+    - { resource: file_storage.yml }
+
 parameters:
 #    zerebral_common.example.class: Zerebral\CommonBundle\Example
 
 services:
-    zerebral.file_storage:
-        class:      Zerebral\CommonBundle\Component\FileStorage\FileStorageFactory
-        arguments:  [%storage%]

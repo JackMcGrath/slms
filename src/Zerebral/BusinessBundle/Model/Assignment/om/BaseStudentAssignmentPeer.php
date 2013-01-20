@@ -13,9 +13,9 @@ use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\PeerEvent;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer;
 use Zerebral\BusinessBundle\Model\Assignment\StudentAssignment;
+use Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentFilePeer;
 use Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentPeer;
 use Zerebral\BusinessBundle\Model\Assignment\map\StudentAssignmentTableMap;
-use Zerebral\BusinessBundle\Model\File\FileReferencesPeer;
 use Zerebral\BusinessBundle\Model\User\StudentPeer;
 
 abstract class BaseStudentAssignmentPeer
@@ -397,9 +397,9 @@ abstract class BaseStudentAssignmentPeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in FileReferencesPeer instance pool,
+        // Invalidate objects in StudentAssignmentFilePeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        FileReferencesPeer::clearInstancePool();
+        StudentAssignmentFilePeer::clearInstancePool();
     }
 
     /**
@@ -1365,15 +1365,6 @@ abstract class BaseStudentAssignmentPeer
                 }
             }
         } else {
-
-        if ($obj->isNew() || $obj->isColumnModified(StudentAssignmentPeer::STUDENT_ID))
-            $columns[StudentAssignmentPeer::STUDENT_ID] = $obj->getStudentId();
-
-        if ($obj->isNew() || $obj->isColumnModified(StudentAssignmentPeer::ASSIGNMENT_ID))
-            $columns[StudentAssignmentPeer::ASSIGNMENT_ID] = $obj->getAssignmentId();
-
-        if ($obj->isNew() || $obj->isColumnModified(StudentAssignmentPeer::CREATED_AT))
-            $columns[StudentAssignmentPeer::CREATED_AT] = $obj->getCreatedAt();
 
         }
 

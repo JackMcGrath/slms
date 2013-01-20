@@ -3,111 +3,125 @@
 namespace Zerebral\BusinessBundle\Model\File;
 
 use Zerebral\BusinessBundle\Model\File\om\BaseFile;
+use Glorpen\PropelEvent\PropelEventBundle\Events\ModelEvent;
 
 use Zerebral\CommonBundle\Component\FileStorage\FileStorageInterface;
+use Zerebral\CommonBundle\File\Storage\Storage;
 use \Symfony\Component\HttpFoundation\File\UploadedFile;
+use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 
-class File extends BaseFile
+class File extends BaseFile implements \Zerebral\CommonBundle\File\Model\FileStorageAware
 {
-    /** @var null|FileStorageInterface */
+    /**
+     * File storage
+     *
+     * @var Storage|null
+     */
     protected $fileStorage = null;
 
-    /** @var null|string */
-    protected $sourcePath = null;
-
-    /** @var UploadedFile null */
-    protected $uploadedFile= null;
+    /**
+     * Uploaded file reference
+     *
+     * @var UploadedFile|null
+     */
+    protected $uploadedFile = null;
 
     /**
-     * Autofilling filename
+     * Temporary uploaded file name
      *
-     * @param null|string $sourcePath
-     *
-     * @throws \Exception
-     * @return void
+     * @var string|null
      */
-    public function setSourcePath($sourcePath) {
-        $this->sourcePath = $sourcePath;
+    protected $temporaryFile = null;
 
-        if (!file_exists($this->sourcePath)) {
-            throw new \Exception('File "' . $this->sourcePath . '" was not found');
-        }
+    /**
+     * File folder
+     *
+     * @var string
+     */
+    protected $folder = "";
 
-        if (is_null($this->getName())) {
-            $fileInfo = pathinfo($this->sourcePath);
-            $this->setName($fileInfo['basename']);
-        }
-        $this->setSize(filesize($this->sourcePath));
-        $this->setMimeType(mime_content_type($this->sourcePath));
+    public function __construct()
+    {
+        parent::__construct();
+        EventDispatcherProxy::trigger('model.file_storage.set_default', new ModelEvent($this));
     }
 
     /**
-     * @return null|string
+     * @deprecated
+     * @return string
      */
-    public function getSourcePath() {
-        return $this->sourcePath;
+    public function getLink()
+    {
+        return $this->getUrl();
     }
 
-    public function getLink() {
-        return $this->getFileStorage()->getWebPath() . $this->getName();
+    public function getUrl()
+    {
+        return $this->getFileStorage()->getUrl($this->getPath());
     }
 
-    public function getAbsolutePath() {
-        return $this->getFileStorage()->getPath() . '/' .  $this->getName();
+    /**
+     * this method required for files archiving
+     * TODO: we should handle cases when files are not locally placed
+     *
+     * @return string
+     */
+    public function getAbsolutePath()
+    {
+        return $this->getFileStorage()->getAbsolutePath($this->getPath());
     }
 
     /**
      * @param \Symfony\Component\HttpFoundation\File\UploadedFile $uploadedFile
      * @throws \Exception
      */
-    public function setUploadedFile(UploadedFile $uploadedFile) {
+    public function setUploadedFile(UploadedFile $uploadedFile)
+    {
         $this->uploadedFile = $uploadedFile;
-        $this->setName($uploadedFile->getClientOriginalName());
 
-        if ($uploadedFile->getError() == UPLOAD_ERR_OK) {
-            $this->setSourcePath($uploadedFile->getRealPath());
+        if ($uploadedFile->isValid()) {
+            $this->setName($uploadedFile->getClientOriginalName());
+            $this->setMimeType($uploadedFile->getClientMimeType());
+            $this->setSize($uploadedFile->getFileInfo()->getSize());
+
+            $this->temporaryFile = $this->getFileStorage()->createTemporaryFile($uploadedFile);
         }
     }
 
     /**
      * @return \Symfony\Component\HttpFoundation\File\UploadedFile
      */
-    public function getUploadedFile() {
+    public function getUploadedFile()
+    {
         return $this->uploadedFile;
     }
 
 
     /**
-     * @param \Zerebral\CommonBundle\Component\FileStorage\FileStorageInterface $fileStorage
-     */
-    public function setFileStorage(FileStorageInterface $fileStorage) {
-        $this->fileStorage = $fileStorage;
-        $this->setStorage($fileStorage->getName());
-    }
-
-    /**
-     * @return \Zerebral\CommonBundle\Component\FileStorage\FileStorageInterface
-     */
-    public function getFileStorage() {
-        return $this->fileStorage;
-    }
-
-    /**
      * @param \PropelPDO $con
      * @return bool
      */
-    public function preSave(\PropelPDO $con = null) {
-        if (!is_null($this->getFileStorage())) {
-            if ($this->getFileStorage()->save($this->getSourcePath(), $this->getName())) {
-                parent::preSave($con);
-            } else {
-                return false;
-            }
+    public function preSave(\PropelPDO $con = null)
+    {
+        if (!is_null($this->getFileStorage()) && !empty($this->temporaryFile)) {
+            $temporaryFile = $this->getFileStorage()->getTemporaryFile($this->temporaryFile);
+            $this->setPath($this->getFileStorage()->upload($temporaryFile, $this->getFolder(), $this->getName()));
+            $this->setSize(filesize($temporaryFile));
         }
-        return true;
+        return parent::preSave($con);
     }
 
-    public function __sleep() {
+    public function postSave(\PropelPDO $con = null)
+    {
+        if (!empty($this->temporaryFile)) {
+            $this->getFileStorage()->removeTemporaryFile($this->temporaryFile);
+        }
+        parent::postSave();
+
+    }
+
+    public function __sleep()
+    {
         $properties = parent::__sleep();
         $editedProperties = array();
         foreach ($properties as $field) {
@@ -118,6 +132,101 @@ class File extends BaseFile
         return $editedProperties;
     }
 
+    public function postHydrate($row, $startcol = 0, $rehydrate = false)
+    {
+        parent::postHydrate($row, $startcol, $rehydrate);
+        EventDispatcherProxy::trigger('model.file_storage.update', new ModelEvent($this));
+    }
 
+    public function setStorage($v)
+    {
+        parent::setStorage($v);
 
+        if ($this->isColumnModified(FilePeer::STORAGE)) {
+            EventDispatcherProxy::trigger('model.file_storage.update', new ModelEvent($this));
+        }
+        return $this;
+    }
+
+    /**
+     * Set file storage
+     *
+     * @param \Zerebral\CommonBundle\File\Storage\Storage $storage
+     *
+     */
+    public function setFileStorage(\Zerebral\CommonBundle\File\Storage\Storage $storage = null)
+    {
+        $this->fileStorage = $storage;
+
+        $storageAlias = !empty($storage) ? $storage->getAlias() : null;
+        if ($this->getStorage() != $storageAlias) {
+            $this->setStorage($storageAlias);
+        }
+    }
+
+    /**
+     * Get file storage
+     *
+     * @return \Zerebral\CommonBundle\File\Storage\Storage|null $storage
+     */
+    public function getFileStorage()
+    {
+        return $this->fileStorage;
+    }
+
+    /**
+     * Get file storage alias
+     *
+     * @return string
+     */
+    public function getFileStorageAlias()
+    {
+        return $this->getStorage();
+    }
+
+    /**
+     * Set files storage alias
+     * @param string $alias
+     *
+     */
+    public function setFileStorageAlias($alias)
+    {
+        $this->setStorage($alias);
+    }
+
+    /**
+     * @param null|string $temporaryFile
+     */
+    public function setTemporaryFile($temporaryFile)
+    {
+        $this->temporaryFile = $temporaryFile;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getTemporaryFile()
+    {
+        return $this->temporaryFile;
+    }
+
+    /**
+     * Set file folder
+     *
+     * @param string $folder
+     */
+    public function setFolder($folder)
+    {
+        $this->folder = $folder;
+    }
+
+    /**
+     * Get file folder
+     *
+     * @return string
+     */
+    public function getFolder()
+    {
+        return $this->folder;
+    }
 }

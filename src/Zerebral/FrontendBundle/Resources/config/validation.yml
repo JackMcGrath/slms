@@ -83,7 +83,8 @@ Zerebral\BusinessBundle\Model\Course\Discipline:
 Zerebral\BusinessBundle\Model\File\File:
      getters:
          name:
-             - NotBlank: ~
+             - NotBlank:
+                message: Please, select file for uploading
          uploadedFile:
              - Image:
                  groups: [profile]
@@ -167,9 +168,6 @@ Zerebral\BusinessBundle\Model\Material\CourseMaterial:
             - Valid: ~
             - NotNull:
                 message: File can not be empty
-        courseId:
-            - NotBlank:
-                message: Course id can not be blank
                 
 Zerebral\BusinessBundle\Model\Attendance\StudentAttendance:
     getters:

@@ -104,6 +104,19 @@
             <index-column name="assignment_category_id"/>
         </index>
     </table>
+
+    <table name="assignment_files" phpName="AssignmentFile" isCrossRef="true">
+        <column name="file_id" phpName="fileId" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" required="true"/>
+        <column name="assignment_id" phpName="assignmentId" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" required="true"/>
+
+        <foreign-key foreignTable="files" name="assignment_files_files" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="file_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="assignments" name="assignment_files_assignments" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="assignment_id" foreign="id"/>
+        </foreign-key>
+    </table>
+
     <table name="student_assignments" phpName="StudentAssignment" idMethod="native" isCrossRef="true">
         <column name="id" phpName="Id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="student_id" phpName="StudentId" type="INTEGER" sqlType="int(11) unsigned" required="true"/>
@@ -112,25 +125,6 @@
         <column name="grading" phpName="Grading" type="VARCHAR" size="10" required="false"/>
         <column name="grading_comment" phpName="GradingComment" type="LONGVARCHAR" required="false"/>
         <column name="created_at" phpName="CreatedAt" type="TIMESTAMP" required="true"/>
-        <validator column="id">
-            <rule name="required" message="The field id is required."/>
-            <rule name="maxValue" value="REPLACEME" message="The field id must be not greater than REPLACEME."/>
-            <rule name="type" value="int" message="The column id must be an int value."/>
-        </validator>
-        <validator column="student_id">
-            <rule name="required" message="The field student_id is required."/>
-            <rule name="maxValue" value="REPLACEME" message="The field student_id must be not greater than REPLACEME."/>
-            <rule name="type" value="int" message="The column student_id must be an int value."/>
-        </validator>
-        <validator column="assignment_id">
-            <rule name="required" message="The field assignment_id is required."/>
-            <rule name="maxValue" value="REPLACEME" message="The field assignment_id must be not greater than REPLACEME."/>
-            <rule name="type" value="int" message="The column assignment_id must be an int value."/>
-        </validator>
-        <validator column="created_at">
-            <rule name="required" message="The field created_at is required."/>
-            <rule name="type" value="string" message="The column created_at must be an string value."/>
-        </validator>
         <foreign-key foreignTable="students" name="student_assignments_student" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="student_id" foreign="id"/>
         </foreign-key>
@@ -143,5 +137,17 @@
         <index name="student_assignments_assignments">
             <index-column name="assignment_id"/>
         </index>
+    </table>
+
+    <table name="student_assignment_files" phpName="StudentAssignmentFile" isCrossRef="true">
+        <column name="file_id" phpName="fileId" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" required="true"/>
+        <column name="student_assignment_id" phpName="studentAssignmentId" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" required="true"/>
+
+        <foreign-key foreignTable="files" name="student_assignment_files_files" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="file_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="student_assignments" name="student_assignment_files_student_assignments" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="student_assignment_id" foreign="id"/>
+        </foreign-key>
     </table>
 </database>

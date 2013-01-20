@@ -3,20 +3,11 @@
 namespace Zerebral\BusinessBundle\Model\Message;
 
 use Zerebral\BusinessBundle\Model\Message\om\BaseMessage;
-use \Zerebral\BusinessBundle\Model\File\FileReferences;
 
 class Message extends BaseMessage
 {
     public $isMarkedAsRead;
     public $toName;
-
-    protected function doAddFile($file)
-    {
-        $fileReferences = new FileReferences();
-        $fileReferences->setFile($file);
-        $fileReferences->setreferenceType('message');
-        $this->addFileReferences($fileReferences);
-    }
 
     public function markAsRead()
     {
@@ -34,10 +25,6 @@ class Message extends BaseMessage
 
         $sentCopy->setUserId($this->getFromId());
         $sentCopy->setIsRead(true);
-
-        foreach ($sentCopy->getFileReferencess() as $reference) {
-            $reference->setassignmentReferenceId(null);
-        }
 
         $sentCopy->save();
     }

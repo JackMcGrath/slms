@@ -73,7 +73,6 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
 
         $newMessage = new Model\Message\Message();
         $newMessageType = new FormType\MessageType();
-        $newMessageType->setFileStorage($this->container->get('zerebral.file_storage')->getFileStorage('local'));
 
         $form = $this->createForm($newMessageType, $newMessage);
         if ($this->getRequest()->isMethod('POST')) {
@@ -134,7 +133,6 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
     {
         $newMessage = new Model\Message\Message();
         $newMessageType = new FormType\MessageType();
-        $newMessageType->setFileStorage($this->container->get('zerebral.file_storage')->getFileStorage('local'));
 
         $form = $this->createForm($newMessageType, $newMessage);
         if ($this->getRequest()->isMethod('POST')) {

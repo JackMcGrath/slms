@@ -1,0 +1,14 @@
+parameters:
+    file_storage.manager.class: Zerebral\CommonBundle\File\Storage\StorageManager
+#  database.table_param_converter.class: Sems\CommonBundle\Database\Request\TableParamConverter
+
+services:
+    file_storage.manager:
+        class: "%file_storage.manager.class%"
+
+    file_storage.model_event_handler:
+        class: Zerebral\CommonBundle\File\EventHandler\FileStorageAwareModelEventHandler
+        arguments: [@file_storage.manager]
+        public: false
+        tags:
+            - { name: propel.event }

@@ -8,28 +8,32 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints as Constraint;
 
-// TODO: comments + type hints
+use Zerebral\BusinessBundle\Model\Course\Course;
+use Zerebral\BusinessBundle\Model\Material\CourseMaterial;
+
 class CourseMaterialsType extends AbstractType
 {
-    protected $fileStorage;
+    /**
+     * Materials course
+     * @var Course
+     */
     protected $course;
 
-
-    public function setFileStorage($fileStorage)
-    {
-        $this->fileStorage = $fileStorage;
-    }
-
-    public function getFileStorage()
-    {
-        return $this->fileStorage;
-    }
-
-    public function setCourse($course)
+    /**
+     * Set course
+     *
+     * @param \Zerebral\BusinessBundle\Model\Course\Course $course
+     */
+    public function setCourse(Course $course)
     {
         $this->course = $course;
     }
 
+    /**
+     * Get course
+     *
+     * @return \Zerebral\BusinessBundle\Model\Course\Course
+     */
     public function getCourse()
     {
         return $this->course;
@@ -39,19 +43,28 @@ class CourseMaterialsType extends AbstractType
     {
         $course = $this->getCourse();
 
-        $builder->add('courseMaterials', 'collection', array(
+        $builder->add('materials', 'collection', array(
             'type'   => new CourseMaterialType(),
             'allow_add' => true,
             'allow_delete' => true,
             'by_reference' => false,
             'options'  => array(
                 'required'  => false,
-                'storage' => $this->getFileStorage()
+                'error_mapping' => array(
+                    '.' => 'description',
+                )
             ),
             'cascade_validation' => true,
+            'constraints' => array(
+                new \Symfony\Component\Validator\Constraints\All(array(
+                    'constraints' => array(
+                        new \Symfony\Component\Validator\Constraints\NotBlank(array('message' => 'Please, select file for uploading')),
+                    )
+                )),
+            ),
         ));
 
-        $builder->add('courseMaterialFolder', new OptionalModelType(), array(
+        $builder->add('folder', new OptionalModelType(), array(
             'choices' => \Zerebral\BusinessBundle\Model\Material\CourseFolderQuery::create()->findAvailableByCourse($course),
             'create_model' => function($text) use ($course) {
                 $courseFolder = new \Zerebral\BusinessBundle\Model\Material\CourseFolder();
@@ -65,6 +78,17 @@ class CourseMaterialsType extends AbstractType
             'choose_exists_label' => 'Choose existing folder',
             'cascade_validation' => true,
         ));
+
+        $builder->addEventListener(\Symfony\Component\Form\FormEvents::POST_BIND, function(\Symfony\Component\Form\FormEvent $event) use ($course) {
+            /** @var $materials CourseMaterial[] */
+            $materials = $event->getForm()->get('materials')->getData();
+            foreach($materials as $material) {
+                if (!empty($material)) {
+                    $material->setCourse($course);
+                }
+
+            }
+        });
 
     }
 

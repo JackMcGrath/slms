@@ -19,16 +19,16 @@ class AssignmentQuery extends BaseAssignmentQuery
         $this->leftJoinStudentAssignment();
         $this->leftJoinCourse();
 
-        $this->leftJoin('StudentAssignment.FileReferences FileReference');
+        $this->leftJoin('StudentAssignment.StudentAssignmentFile StudentAssignmentFile');
         $this->add('student_assignments.id', null, \Criteria::ISNOTNULL);
 
         if ($course) {
             $this->filterByCourseId($course->getId());
         }
 
-        $this->withColumn('COUNT(DISTINCT IF(student_assignments.is_submitted = 1 AND `FileReference`.file_id is not null, student_assignments.id, null))', 'completedCount');
-        $this->withColumn('COUNT(DISTINCT student_assignments.id) - COUNT(DISTINCT IF(student_assignments.is_submitted = 1 AND `FileReference`.file_id is not null, student_assignments.id, null))', 'remainingCount');
-        $this->withColumn('COUNT(DISTINCT IF(student_assignments.is_submitted = 1, `FileReference`.file_id , null))', 'filesCount');
+        $this->withColumn('COUNT(DISTINCT IF(student_assignments.is_submitted = 1 AND `StudentAssignmentFile`.file_id is not null, student_assignments.id, null))', 'completedCount');
+        $this->withColumn('COUNT(DISTINCT student_assignments.id) - COUNT(DISTINCT IF(student_assignments.is_submitted = 1 AND `StudentAssignmentFile`.file_id is not null, student_assignments.id, null))', 'remainingCount');
+        $this->withColumn('COUNT(DISTINCT IF(student_assignments.is_submitted = 1, `StudentAssignmentFile`.file_id , null))', 'filesCount');
 
         $this->addGroupByColumn('assignments.id');
 

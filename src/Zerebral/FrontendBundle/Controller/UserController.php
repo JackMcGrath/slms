@@ -29,9 +29,7 @@ class UserController extends \Zerebral\CommonBundle\Component\Controller
         } else {
             $profileType = new FormType\StudentProfileType();
         }
-        
-        
-        $profileType->setFileStorage($this->container->get('zerebral.file_storage')->getFileStorage('local'));
+
 
         $user = $this->getRoleUser();
         $form = $this->createForm($profileType, $user);

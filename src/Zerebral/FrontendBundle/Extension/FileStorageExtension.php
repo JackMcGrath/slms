@@ -3,17 +3,14 @@ namespace Zerebral\FrontendBundle\Extension;
 
 use Twig_Extension;
 
-use Zerebral\CommonBundle\Component\FileStorage\FileStorageFactory;
 use Zerebral\BusinessBundle\Model\File\File;
 
 // TODO: tbd about this class, I guess his involved not only in file storage operations
 class FileStorageExtension extends \Twig_Extension
 {
-    /** @var FileStorageFactory */
-    protected $fileStorageFactory;
 
-    protected static $mimeTypeIconsPath = 'icons/files/pack_01/';
-    protected static $mimeTypeSmallIconsPath = 'icons/files/pack_small/';
+    protected static $mimeTypeIconsPath = '/img/icons/files/pack_01/';
+    protected static $mimeTypeSmallIconsPath = '/img/icons/files/pack_small/';
 
     protected static $mimeTypeIcons = array(
         'text' => 'text.png',
@@ -29,14 +26,6 @@ class FileStorageExtension extends \Twig_Extension
         'general' => 'file.png'
     );
 
-    /**
-     * @param \Zerebral\CommonBundle\Component\FileStorage\FileStorageFactory $fileStorageFactory
-     */
-    public function __construct(FileStorageFactory $fileStorageFactory)
-    {
-        $this->fileStorageFactory = $fileStorageFactory;
-    }
-
 
     public function getFilters()
     {
@@ -48,22 +37,9 @@ class FileStorageExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'get_file_storage_link' => new \Twig_Function_Method($this, 'getFileStorageLink'),
-            'get_file_icon' => new \Twig_Function_Method($this, 'getFileIcon')
+            'get_file_icon' => new \Twig_Function_Method($this, 'getFileIcon'),
+            'user_avatar' => new \Twig_Function_Method($this, 'getUserAvatar'),
         );
-    }
-
-    /**
-     * @param File $file
-     * @return string
-     */
-    public function getFileStorageLink(File $file)
-    {
-        if (!is_null($file)) {
-            $file->setFileStorage($this->fileStorageFactory->getFileStorage($file->getStorage()));
-            return $file->getLink();
-        }
-        return '404.png';
     }
 
     /**
@@ -82,42 +58,38 @@ class FileStorageExtension extends \Twig_Extension
             $icon = isset($icon[$mimeTypeArray[1]]) ? $icon[$mimeTypeArray[1]] : $icons['general'];
         }
 
-        $iconFile = new File();
         $mimeTypeIconsPath = $size == 'small' ? self::$mimeTypeSmallIconsPath : self::$mimeTypeIconsPath;
-        $iconFile->setName($mimeTypeIconsPath . $icon);
-        $iconFile->setStorage('dummy');
 
-        return $iconFile;
+        return $mimeTypeIconsPath . $icon;
     }
 
     public function bytesToHuman($bytes, $precision = 2)
     {
-        $kilobyte = 1024;
-        $megabyte = $kilobyte * 1024;
-        $gigabyte = $megabyte * 1024;
-        $terabyte = $gigabyte * 1024;
+        static $unitLabels = array('B', 'KB', 'MB', 'GB', 'TB');
 
-        if (($bytes >= 0) && ($bytes < $kilobyte)) {
-            return $bytes . ' B';
+        $unit = floor(log($bytes, 1024));
+        $size = round($bytes / pow(1024, $unit), $precision);
 
-        } elseif (($bytes >= $kilobyte) && ($bytes < $megabyte)) {
-            return round($bytes / $kilobyte, $precision) . ' KB';
-
-        } elseif (($bytes >= $megabyte) && ($bytes < $gigabyte)) {
-            return round($bytes / $megabyte, $precision) . ' MB';
-
-        } elseif (($bytes >= $gigabyte) && ($bytes < $terabyte)) {
-            return round($bytes / $gigabyte, $precision) . ' GB';
-
-        } elseif ($bytes >= $terabyte) {
-            return round($bytes / $terabyte, $precision) . ' TB';
-        } else {
-            return $bytes . ' B';
-        }
+        return $size . ' ' . $unitLabels[$unit];
     }
 
     public function getName()
     {
         return 'file_storage_extension';
+    }
+
+    public function getUserAvatar($user)
+    {
+        $avatar = $user->getAvatar();
+
+        if (empty($avatar)) {
+            return '/img/avatar-placeholder.jpg';
+        }
+
+        if (!$avatar->getUrl()) {
+            return '/img/avatar-placeholder.jpg';
+        }
+
+        return $avatar->getUrl();
     }
 }

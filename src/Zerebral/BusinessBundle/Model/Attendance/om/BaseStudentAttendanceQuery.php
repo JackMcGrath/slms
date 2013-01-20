@@ -75,7 +75,7 @@ abstract class BaseStudentAttendanceQuery extends ModelCriteria
      * Returns a new StudentAttendanceQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     StudentAttendanceQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   StudentAttendanceQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return StudentAttendanceQuery
      */
@@ -139,8 +139,8 @@ abstract class BaseStudentAttendanceQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   StudentAttendance A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 StudentAttendance A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -252,7 +252,8 @@ abstract class BaseStudentAttendanceQuery extends ModelCriteria
      * <code>
      * $query->filterByAttendanceId(1234); // WHERE attendance_id = 1234
      * $query->filterByAttendanceId(array(12, 34)); // WHERE attendance_id IN (12, 34)
-     * $query->filterByAttendanceId(array('min' => 12)); // WHERE attendance_id > 12
+     * $query->filterByAttendanceId(array('min' => 12)); // WHERE attendance_id >= 12
+     * $query->filterByAttendanceId(array('max' => 12)); // WHERE attendance_id <= 12
      * </code>
      *
      * @see       filterByAttendance()
@@ -267,8 +268,22 @@ abstract class BaseStudentAttendanceQuery extends ModelCriteria
      */
     public function filterByAttendanceId($attendanceId = null, $comparison = null)
     {
-        if (is_array($attendanceId) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($attendanceId)) {
+            $useMinMax = false;
+            if (isset($attendanceId['min'])) {
+                $this->addUsingAlias(StudentAttendancePeer::ATTENDANCE_ID, $attendanceId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($attendanceId['max'])) {
+                $this->addUsingAlias(StudentAttendancePeer::ATTENDANCE_ID, $attendanceId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(StudentAttendancePeer::ATTENDANCE_ID, $attendanceId, $comparison);
@@ -281,7 +296,8 @@ abstract class BaseStudentAttendanceQuery extends ModelCriteria
      * <code>
      * $query->filterByStudentId(1234); // WHERE student_id = 1234
      * $query->filterByStudentId(array(12, 34)); // WHERE student_id IN (12, 34)
-     * $query->filterByStudentId(array('min' => 12)); // WHERE student_id > 12
+     * $query->filterByStudentId(array('min' => 12)); // WHERE student_id >= 12
+     * $query->filterByStudentId(array('max' => 12)); // WHERE student_id <= 12
      * </code>
      *
      * @see       filterByStudent()
@@ -296,8 +312,22 @@ abstract class BaseStudentAttendanceQuery extends ModelCriteria
      */
     public function filterByStudentId($studentId = null, $comparison = null)
     {
-        if (is_array($studentId) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($studentId)) {
+            $useMinMax = false;
+            if (isset($studentId['min'])) {
+                $this->addUsingAlias(StudentAttendancePeer::STUDENT_ID, $studentId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($studentId['max'])) {
+                $this->addUsingAlias(StudentAttendancePeer::STUDENT_ID, $studentId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(StudentAttendancePeer::STUDENT_ID, $studentId, $comparison);
@@ -367,8 +397,8 @@ abstract class BaseStudentAttendanceQuery extends ModelCriteria
      * @param   Attendance|PropelObjectCollection $attendance The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   StudentAttendanceQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 StudentAttendanceQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByAttendance($attendance, $comparison = null)
     {
@@ -443,8 +473,8 @@ abstract class BaseStudentAttendanceQuery extends ModelCriteria
      * @param   Student|PropelObjectCollection $student The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   StudentAttendanceQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 StudentAttendanceQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByStudent($student, $comparison = null)
     {

@@ -92,7 +92,7 @@
 
             <div class="block">
                 <div class="">
-                    <img src="{{ get_file_storage_link(thread.getFirst().userRelatedByFromId.getAvatarFile()) | imagine_filter('thumbnail') }}" width="42" height="42" />
+                    <img src="{{ user_avatar(thread.getFirst().userRelatedByFromId) | imagine_filter('thumbnail') }}" width="42" height="42" />
                     <a href="#">{{ thread.getFirst().userRelatedByFromId.getFullName() }}</a>
                 </div>
             </div>
@@ -102,7 +102,7 @@
                     Links and Attachments
                     {% for key,message in thread %}
                         {% for file in message.getFiles %}
-                            <div><i class="icon-search"></i> <a class="link" target="_blank" href="{{ get_file_storage_link(file) }}">{{ file.name }}</a></div>
+                            <div><i class="icon-search"></i> <a class="link" target="_blank" href="{{ file.url }}">{{ file.name }}</a></div>
                         {% endfor %}
                     {% endfor %}
                     <span>Showing the last 20 links and attachments</span>
@@ -124,7 +124,7 @@
             <div class="attached-files">
                 <strong>Attached files:</strong>
                 {% for file in message.getFiles %}
-                    <div><i class="icon-search"></i> <a class="link" target="_blank" href="{{ get_file_storage_link(file) }}">{{ file.name }}</a></div>
+                    <div><i class="icon-search"></i> <a class="link" target="_blank" href="{{ file.url }}">{{ file.name }}</a></div>
                 {% endfor %}
             </div>
         {% endif %}

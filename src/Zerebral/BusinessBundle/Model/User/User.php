@@ -82,7 +82,8 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
             )
         );
     }
-/**
+
+    /**
      * {@inheritDoc}
      */
     public function unserialize($serialized)
@@ -297,7 +298,11 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
             $criteries[] = 'courseId';
         }
         if ($this->isTeacher()) {
-            $c->addJoin(\Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer::ID, \Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentPeer::ASSIGNMENT_ID, \Criteria::LEFT_JOIN);
+            $c->addJoin(
+                \Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer::ID,
+                \Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentPeer::ASSIGNMENT_ID,
+                \Criteria::LEFT_JOIN
+            );
             $c->addCond('students', 'student_assignments.id', null, \Criteria::ISNOTNULL);
             $c->addGroupByColumn('assignments.id');
             $criteries[] = 'students';
@@ -319,23 +324,27 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
         return $this->getRoleModel()->getAssignments($c);
     }
 
-     public function getAvatarFile(PropelPDO $con = null, $doQuery = true) {
-         $avatar = parent::getAvatar($con, $doQuery);
-         if (is_null($avatar)) {
-             $avatarFile = new File();
-             $avatarFile->setName('avatar-placeholder.jpg');
-             $avatarFile->setStorage('dummy');
-             return $avatarFile;
-         } else {
-             return $avatar;
-         }
-     }
+//    public function getAvatarFile(PropelPDO $con = null, $doQuery = true)
+//    {
+//        $avatar = parent::getAvatar($con, $doQuery);
+//        if (is_null($avatar)) {
+//            $avatarFile = new File();
+//            $avatarFile->setName('avatar-placeholder.jpg');
+//            // TODO: need to handle it in other manner
+////             $avatarFile->setStorage('dummy');
+//            return $avatarFile;
+//        } else {
+//            return $avatar;
+//        }
+//    }
 
-    public function isStudent() {
+    public function isStudent()
+    {
         return $this->getRole() == self::ROLE_STUDENT;
     }
 
-    public function isTeacher() {
+    public function isTeacher()
+    {
         return $this->getRole() == self::ROLE_TEACHER;
     }
 

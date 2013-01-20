@@ -14,8 +14,8 @@
 
     {% for file in studentAssignment.files %}
         <li class="file">
-            <img class="icon" src="{{ get_file_storage_link(get_file_icon(file)) | imagine_filter('file_icon') }}" />
-            <a class="link" target="_blank" href="{{ get_file_storage_link(file) }}">{{ file.name }}</a><br >
+            <img class="icon" src="{{ get_file_icon(file) | imagine_filter('file_icon') }}" />
+            <a class="link" target="_blank" href="{{ file.url }}">{{ file.name }}</a><br >
             <span class="size">{{ file.size | bytes_to_human }}</span>
         </li>
     {% else %}
