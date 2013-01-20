@@ -97,7 +97,7 @@ abstract class BaseFeedItemQuery extends ModelCriteria
      * Returns a new FeedItemQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     FeedItemQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   FeedItemQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return FeedItemQuery
      */
@@ -159,8 +159,8 @@ abstract class BaseFeedItemQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   FeedItem A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 FeedItem A model object, or null if the key is not found
+     * @throws PropelException
      */
      public function findOneById($key, $con = null)
      {
@@ -174,8 +174,8 @@ abstract class BaseFeedItemQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   FeedItem A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 FeedItem A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -275,7 +275,8 @@ abstract class BaseFeedItemQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -288,8 +289,22 @@ abstract class BaseFeedItemQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(FeedItemPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(FeedItemPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(FeedItemPeer::ID, $id, $comparison);
@@ -302,7 +317,8 @@ abstract class BaseFeedItemQuery extends ModelCriteria
      * <code>
      * $query->filterByAssignmentId(1234); // WHERE assignment_id = 1234
      * $query->filterByAssignmentId(array(12, 34)); // WHERE assignment_id IN (12, 34)
-     * $query->filterByAssignmentId(array('min' => 12)); // WHERE assignment_id > 12
+     * $query->filterByAssignmentId(array('min' => 12)); // WHERE assignment_id >= 12
+     * $query->filterByAssignmentId(array('max' => 12)); // WHERE assignment_id <= 12
      * </code>
      *
      * @see       filterByAssignment()
@@ -345,7 +361,8 @@ abstract class BaseFeedItemQuery extends ModelCriteria
      * <code>
      * $query->filterByCourseId(1234); // WHERE course_id = 1234
      * $query->filterByCourseId(array(12, 34)); // WHERE course_id IN (12, 34)
-     * $query->filterByCourseId(array('min' => 12)); // WHERE course_id > 12
+     * $query->filterByCourseId(array('min' => 12)); // WHERE course_id >= 12
+     * $query->filterByCourseId(array('max' => 12)); // WHERE course_id <= 12
      * </code>
      *
      * @see       filterByCourse()
@@ -388,7 +405,8 @@ abstract class BaseFeedItemQuery extends ModelCriteria
      * <code>
      * $query->filterByFeedContentId(1234); // WHERE feed_content_id = 1234
      * $query->filterByFeedContentId(array(12, 34)); // WHERE feed_content_id IN (12, 34)
-     * $query->filterByFeedContentId(array('min' => 12)); // WHERE feed_content_id > 12
+     * $query->filterByFeedContentId(array('min' => 12)); // WHERE feed_content_id >= 12
+     * $query->filterByFeedContentId(array('max' => 12)); // WHERE feed_content_id <= 12
      * </code>
      *
      * @see       filterByFeedContent()
@@ -431,7 +449,8 @@ abstract class BaseFeedItemQuery extends ModelCriteria
      * <code>
      * $query->filterByCreatedBy(1234); // WHERE created_by = 1234
      * $query->filterByCreatedBy(array(12, 34)); // WHERE created_by IN (12, 34)
-     * $query->filterByCreatedBy(array('min' => 12)); // WHERE created_by > 12
+     * $query->filterByCreatedBy(array('min' => 12)); // WHERE created_by >= 12
+     * $query->filterByCreatedBy(array('max' => 12)); // WHERE created_by <= 12
      * </code>
      *
      * @see       filterByUser()
@@ -516,8 +535,8 @@ abstract class BaseFeedItemQuery extends ModelCriteria
      * @param   FeedContent|PropelObjectCollection $feedContent The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   FeedItemQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 FeedItemQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByFeedContent($feedContent, $comparison = null)
     {
@@ -592,8 +611,8 @@ abstract class BaseFeedItemQuery extends ModelCriteria
      * @param   Assignment|PropelObjectCollection $assignment The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   FeedItemQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 FeedItemQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByAssignment($assignment, $comparison = null)
     {
@@ -668,8 +687,8 @@ abstract class BaseFeedItemQuery extends ModelCriteria
      * @param   Course|PropelObjectCollection $course The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   FeedItemQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 FeedItemQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByCourse($course, $comparison = null)
     {
@@ -744,8 +763,8 @@ abstract class BaseFeedItemQuery extends ModelCriteria
      * @param   User|PropelObjectCollection $user The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   FeedItemQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 FeedItemQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByUser($user, $comparison = null)
     {
@@ -820,8 +839,8 @@ abstract class BaseFeedItemQuery extends ModelCriteria
      * @param   FeedComment|PropelObjectCollection $feedComment  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   FeedItemQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 FeedItemQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByFeedComment($feedComment, $comparison = null)
     {

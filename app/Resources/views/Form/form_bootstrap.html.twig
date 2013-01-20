@@ -582,3 +582,21 @@
         <div class="clearfix"></div>
     {% endspaceless %}
 {% endblock %}
+
+{% block custom_file_widget %}
+    {% spaceless %}
+        <div class="file-item control-group">
+            {% if value and value.name != '' %}
+                <span class="file-name">{{ value.name }}</span>
+                {{ form_row(form.name, {value: value.name}) }}
+                {{ form_row(form.temporaryFile, {value: value.temporaryFile}) }}
+                {{ form_row(form.mimeType, {value: value.mimeType}) }}
+            {% else %}
+                {{ form_widget(form.uploadedFile) }}
+            {% endif %}
+            {{ form_widget(form.description, {placeholder: 'Description'}) }}
+            <a class="remove-uploaded-file delete" href="#"><i class="icon-small-trash-bin"></i> remove</a>
+            <div>{{ form_errors(form.uploadedFile) }}{{ form_errors(form) }}</div>
+        </div>
+    {% endspaceless %}
+{% endblock custom_file_widget %}

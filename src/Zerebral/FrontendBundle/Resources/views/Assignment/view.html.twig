@@ -47,8 +47,8 @@
                     <ul>
                     {% for file in assignment.files %}
                         <li class="file">
-                            <img class="icon" src="{{ get_file_storage_link(get_file_icon(file)) | imagine_filter('file_icon') }}" />
-                            <a class="link" target="_blank" href="{{ get_file_storage_link(file) }}">{{ file.name }}</a><br >
+                            <img class="icon" src="{{ get_file_icon(file) }}" />
+                            <a class="link" target="_blank" href="{{ file.url }}">{{ file.name }}</a><br >
                             <span class="size">{{ file.size | bytes_to_human }}</span>
                         </li>
                     {% endfor %}
@@ -74,12 +74,12 @@
                         {% for file in studentAssignment.files %}
                             <li class="file">
                                 <i class="icon-search"></i>
-                                <a class="link" target="_blank" href="{{ get_file_storage_link(file) }}">{{ file.name }}</a>
+                                <a class="link" target="_blank" href="{{ file.url }}">{{ file.name }}</a>
                                 {% if file.description %}
                                     <i rel="tooltip" title="{{ file.description }}" class="icon-small-info file-info"></i>
                                 {% endif %}
                                 {% if not studentAssignment.isSubmitted %}
-                                <i class="icon-small-trash-bin"></i><a class="remove-uploaded-file" href="{{ path('ajax_student_assignment_solutions_remove', {id: studentAssignment.id, fileId: file.id}) }}">Delete</a>
+                                <i class="icon-small-trash-bin"></i><a class="remove-uploaded-file" href="{{ path('student_assignment_solution_remove', {id: studentAssignment.id, fileId: file.id}) }}">Delete</a>
                                 {% endif %}
                             </li>
                         {% else %}
@@ -96,25 +96,27 @@
                 </div>
             </div>
 
-            <div class="modal hide fade" id="uploadModal">
-                <form id="ajaxUploadSolutionsForm" method="post" {{ form_enctype(solutionForm) }} class="member-form" action="{{ path('ajax_student_assignment_solutions_upload', {id: studentAssignment.id}) }}">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                        <h3>Upload solution files</h3>
-                    </div>
-                    <div class="modal-body">
-                        <ul class="uploadedFiles">
+            {% render url('student_assignment_solution_form', {id: studentAssignment.id}) %}
 
-                        </ul>
-                        <a id="addUploadFile" href="#">Add another file</a>
-                    </div>
-                    <div class="modal-footer">
-                        <input type="submit" class="btn btn-danger" value="Upload" />
-                        <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Cancel</a>
-                    </div>
-                    {{ form_widget(solutionForm._token) }}
-                </form>
-            </div>
+            {#<div class="modal hide fade" id="uploadModal">#}
+                {#<form id="ajaxUploadSolutionsForm" method="post" {{ form_enctype(solutionForm) }} class="member-form" action="{{ path('ajax_student_assignment_solutions_upload', {id: studentAssignment.id}) }}">#}
+                    {#<div class="modal-header">#}
+                        {#<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>#}
+                        {#<h3>Upload solution files</h3>#}
+                    {#</div>#}
+                    {#<div class="modal-body">#}
+                        {#<ul class="uploadedFiles">#}
+
+                        {#</ul>#}
+                        {#<a id="addUploadFile" href="#">Add another file</a>#}
+                    {#</div>#}
+                    {#<div class="modal-footer">#}
+                        {#<input type="submit" class="btn btn-danger" value="Upload" />#}
+                        {#<a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Cancel</a>#}
+                    {#</div>#}
+                    {#{{ form_widget(solutionForm._token) }}#}
+                {#</form>#}
+            {#</div>#}
 
             {% endif %}
 

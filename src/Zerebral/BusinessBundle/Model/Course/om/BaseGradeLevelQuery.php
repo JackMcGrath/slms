@@ -61,7 +61,7 @@ abstract class BaseGradeLevelQuery extends ModelCriteria
      * Returns a new GradeLevelQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     GradeLevelQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   GradeLevelQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return GradeLevelQuery
      */
@@ -123,8 +123,8 @@ abstract class BaseGradeLevelQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   GradeLevel A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 GradeLevel A model object, or null if the key is not found
+     * @throws PropelException
      */
      public function findOneById($key, $con = null)
      {
@@ -138,8 +138,8 @@ abstract class BaseGradeLevelQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   GradeLevel A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 GradeLevel A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -239,7 +239,8 @@ abstract class BaseGradeLevelQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -308,8 +309,8 @@ abstract class BaseGradeLevelQuery extends ModelCriteria
      * @param   Course|PropelObjectCollection $course  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   GradeLevelQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 GradeLevelQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByCourse($course, $comparison = null)
     {

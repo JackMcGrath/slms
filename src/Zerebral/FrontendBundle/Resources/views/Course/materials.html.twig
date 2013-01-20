@@ -31,11 +31,11 @@
                     {% for material in materials %}
                         <div class="material-item{{ loop.last ? ' last' : '' }}">
                             <div class="type">
-                                <img src="/img/{{ get_file_icon(material.file).name }}" width="30"/>
+                                <img src="{{ get_file_icon(material.file) }}" width="30"/>
                             </div>
                             <div class="details">
                                 <div class="title">
-                                    <h3><a href="{{ get_file_storage_link(material.file) }}">{{ material.file.name }}</a></h3>
+                                    <h3><a href="{{ material.file.url }}">{{ material.file.name }}</a></h3>
                                 </div>
                                 <div class="description">{{ material.description }}</div>
                                 <div class="info">
@@ -43,7 +43,7 @@
                                     {% if is_granted('ROLE_TEACHER') %}
                                         <span class="separator">/</span>
                                         <div class="manage-buttons">
-                                            <a href="{{ path('delete_course_material', {id: material.id}) }}" class="delete-confirm" confirm="Do you really want to delete file?" ><i class="icon-small-trash-bin"></i>Delete</a>
+                                            <a href="{{ path('course_material_delete', {id: material.id}) }}" class="delete-confirm" confirm="Do you really want to delete file?" ><i class="icon-small-trash-bin"></i>Delete</a>
                                         </div>
                                     {% endif %}
                                 </div>
@@ -102,64 +102,12 @@
     </div>
 
     {% if is_granted('EDIT', course) %}
-    {% render url('course_material_folder_form', {courseId: course.id}) %}
+        {% render url('course_material_folder_form', {courseId: course.id}) %}
     {% endif %}
 
-    {#<div class="modal hide fade" id="editFolderModal">#}
-        {#<form class="form-vertical folder-form" data-action-edit="{{ path('ajax_edit_folder', {courseId: course.id, id: ''}) }}" data-action-add="{{ path('ajax_add_folder', {courseId: course.id}) }}" method="post" {{ form_enctype(folderRenameForm) }} novalidate>#}
-            {#<div class="modal-header">#}
-                {#<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>#}
-                {#<h3>Rename folder</h3>#}
-            {#</div>#}
-            {#<div class="modal-body">#}
-                {#{{ form_row(folderRenameForm.name, {#}
-                    {#label: 'Name',#}
-                    {#form_type: 'horizontal',#}
-                    {#placeholder: 'Folder name',#}
-                    {#attr: {#}
-                        {#class: 'input-xlarge'#}
-                    {#}#}
-                {#}) }}#}
-
-                {#{{ form_rest(folderRenameForm) }}#}
-
-            {#</div>#}
-            {#<div class="modal-footer">#}
-                {#<button type="submit" class="btn btn-danger">Save</button>#}
-            {#</div>#}
-        {#</form>#}
-    {#</div>#}
-
-    <div class="modal hide fade" id="uploadMaterialModal">
-        <form method="post" {{ form_enctype(courseMaterialForm) }} class="upload-material" action="{{ path('ajax_course_material_upload', {id: course.id}) }}">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h3>Upload syllabus files</h3>
-            </div>
-            <div class="modal-body">
-                <div class="form-inline upload-folder">
-                    {{ form_row(courseMaterialForm.courseMaterialFolder, {
-                        label: 'Choose folder',
-                        form_type: 'horizontal',
-                        placeholder: 'Folder name',
-                        attr: {
-                            class: 'input-xlarge'
-                        }
-                    }) }}
-
-                </div>
-                <div class="clearfix"></div>
-
-                <ul class="uploadedFiles"></ul>
-
-                <a id="addUploadFile" href="#">Add another file</a>
-            </div>
-            <div class="modal-footer">
-                <input type="submit" class="btn btn-danger" value="Upload" />
-                <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Cancel</a>
-            </div>
-        </form>
-    </div>
+    {% if is_granted('EDIT', course) %}
+        {% render url('course_material_form', {courseId: course.id}) %}
+    {% endif %}
 
     <script type="text/javascript">
         $(document).on('init', function () {

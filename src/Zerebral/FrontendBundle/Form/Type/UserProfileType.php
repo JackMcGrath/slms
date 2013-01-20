@@ -4,36 +4,21 @@ namespace Zerebral\FrontendBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Zerebral\BusinessBundle\Model\User\User;
 
-// TODO: comments + type hints
 class UserProfileType extends AbstractType
 {
-    protected $fileStorage;
-
-    public function setFileStorage($fileStorage)
-    {
-        $this->fileStorage = $fileStorage;
-    }
-
-    public function getFileStorage()
-    {
-        return $this->fileStorage;
-    }
-
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('birthday', 'date', array('required' => false, 'input' => 'datetime', 'widget' => 'single_text', 'format' => 'MM/dd/yyyy'));
         $builder->add('gender', 'choice', array('required' => false, 'choices' => array('male' => 'Male', 'female' => 'Female')));
         $builder->add(
             'avatar',
-            new \Zerebral\FrontendBundle\Form\Type\FileType(),
+            new \Zerebral\CommonBundle\File\Form\Type\FileType,
             array(
-                'storage' => $this->getFileStorage(),
                 'by_reference' => true,
-                'required' => false
+                'required' => false,
+                'folder' => 'user-avatar'
             )
         );
     }

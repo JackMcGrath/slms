@@ -10,8 +10,10 @@ use Zerebral\BusinessBundle\Model\Assignment\AssignmentCategoryQuery;
 
 use Zerebral\BusinessBundle\Model\File\File;
 
-class AssignmentTest extends \Zerebral\BusinessBundle\Tests\TestCase {
-    public function testAssignmentCreation() {
+class AssignmentTest extends \Zerebral\BusinessBundle\Tests\TestCase
+{
+    public function testAssignmentCreation()
+    {
 
         $teacherQuery = new TeacherQuery();
         $courseQuery = new CourseQuery();

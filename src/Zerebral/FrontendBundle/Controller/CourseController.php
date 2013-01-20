@@ -186,15 +186,6 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     {
         $session = $this->getRequest()->getSession();
 
-         // TODO: remove
-        $folderType = new FormType\CourseFolderType();
-        $folderForm = $this->createForm($folderType);
-
-         // TODO: move to partial similar to CourseMaterialFolder::form
-        $courseMaterialType = new FormType\CourseMaterialsType();
-        $courseMaterialType->setCourse($course);
-        $courseMaterialForm = $this->createForm($courseMaterialType);
-
         $materialGroupingType = $this->getRequest()->get('MaterialGrouping') ?: ($session->has('MaterialGrouping') ? $session->get('MaterialGrouping') : 'date');
         $session->set('MaterialGrouping', $materialGroupingType);
 
@@ -202,8 +193,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
 
         return array(
             'dayMaterials' => $materials,
-            'folderRenameForm' => $folderForm->createView(),
-            'courseMaterialForm' => $courseMaterialForm->createView(),
+
             'materialGrouping' => $materialGroupingType,
             'folder' => $folder,
             'course' => $course,

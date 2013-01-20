@@ -1,5 +1,5 @@
 imports:
-    - { resource: config_dev.yml }
+    - { resource: config.yml }
 
 framework:
     test: ~
@@ -12,3 +12,25 @@ web_profiler:
 
 swiftmailer:
     disable_delivery: true
+
+propel:
+    dbal:
+        driver:               mysql
+        user:                 dev
+        password:             dev
+        dsn:                  mysql:host=weavora-2;dbname=zerebral;charset=UTF8
+        options:              {}
+        attributes:           {}
+
+services:
+    zerebral.local_file_storage:
+        class: Zerebral\CommonBundle\File\Storage\LocalStorage
+        arguments: ["%kernel.root_dir%/../web/data", "%kernel.root_dir%/../tmp", "/data"]
+        tags:
+          - { name: file_storage, alias: local, default: true }
+
+    zerebral.s3_file_storage:
+        class: Zerebral\CommonBundle\File\Storage\LocalStorage
+        arguments: ["%kernel.root_dir%/../web/data", "%kernel.root_dir%/../tmp", "/data"]
+        tags:
+          - { name: file_storage, alias: s3 }

@@ -7,9 +7,7 @@ class NativeTwigFunction extends \Twig_Extension
 {
     public function getFunctions()
     {
-        return array(
-
-        );
+        return array();
     }
 
     /**
@@ -23,21 +21,39 @@ class NativeTwigFunction extends \Twig_Extension
 
         // hook for models
         // uasort couldn't work with lazy-loaded properties because they modify array
-        foreach($collection as $item) {
+        foreach ($collection as $item) {
             $property->getValue($item);
         }
 
-        uasort($collection, function($a, $b) use ($property) {
-            return strcasecmp($property->getValue($a), $property->getValue($b));
-        });
+        uasort(
+            $collection,
+            function ($a, $b) use ($property) {
+                return strcasecmp($property->getValue($a), $property->getValue($b));
+            }
+        );
 
         return $collection;
+    }
+
+    public function max($collection)
+    {
+        if (empty($collection)) {
+            return -1;
+        }
+        return max($collection);
+    }
+
+    public function maxKey($collection)
+    {
+        return $this->max(array_keys((array)$collection));
     }
 
     public function getFilters()
     {
         return array(
             'sort_by' => new \Twig_Filter_Method($this, 'sortBy'),
+            'max' => new \Twig_Filter_Method($this, 'max'),
+            'max_key' => new \Twig_Filter_Method($this, 'maxKey'),
         );
     }
 
