@@ -6,7 +6,7 @@
         <column name="name" phpName="Name" type="VARCHAR" size="255" required="true"/>
         <column name="description" phpName="Description" type="VARCHAR" size="255" required="false"/>
         <column name="size" phpName="Size" type="INTEGER" sqlType="int(10) unsigned" required="true"/>
-        <column name="mime_type" phpName="MimeType" type="VARCHAR" size="30" required="true"/>
+        <column name="mime_type" phpName="MimeType" type="VARCHAR" size="100" required="true"/>
         <column name="storage" phpName="Storage" type="CHAR" valueSet="local,dropbox,s3" sqlType="enum('local','dropbox','s3')" required="true" defaultValue="local"/>
         <column name="created_at" phpName="CreatedAt" type="TIMESTAMP" required="true"/>
     </table>
