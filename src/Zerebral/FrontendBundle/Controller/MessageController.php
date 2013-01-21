@@ -74,7 +74,7 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
         $newMessage = new Model\Message\Message();
         $newMessageType = new FormType\MessageType();
 
-        $form = $this->createForm($newMessageType, $newMessage);
+        $form = $this->createForm($newMessageType, $newMessage, array('validation_groups' => array('Default', 'reply')));
         if ($this->getRequest()->isMethod('POST')) {
 
             $form->bind($this->getRequest());
@@ -134,7 +134,7 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
         $newMessage = new Model\Message\Message();
         $newMessageType = new FormType\MessageType();
 
-        $form = $this->createForm($newMessageType, $newMessage);
+        $form = $this->createForm($newMessageType, $newMessage, array('validation_groups' => array('Default', 'compose')));
         if ($this->getRequest()->isMethod('POST')) {
 
             $form->bind($this->getRequest());

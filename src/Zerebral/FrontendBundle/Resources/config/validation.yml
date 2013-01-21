@@ -197,3 +197,26 @@ Zerebral\BusinessBundle\Model\Feed\FeedContent:
           - NotBlank:
               message: Please write comment text
 
+Zerebral\BusinessBundle\Model\Message\Message:
+    getters:
+        files:
+            - Valid: ~
+            - NotNull:
+                message: File can not be empty
+        body:
+            - NotNull:
+                groups: [reply, compose]
+                message: Message body can not be empty
+        subject:
+            - NotNull:
+                groups: [compose]
+                message: Message subject can not be empty
+        toId:
+            - NotNull:
+                groups: [compose]
+                message: Recipient can not be empty
+        toName:
+            - NotNull:
+                groups: [compose]
+                message: Recipient can not be empty
+

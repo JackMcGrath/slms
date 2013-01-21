@@ -159,6 +159,7 @@
         .controls {
           display: inline-block;
           width: 599px;
+          position:relative;
 
           input {
             width: 100%;
@@ -167,6 +168,13 @@
             border: none;
             margin: 0;
             padding: 11px 5px;
+          }
+
+          .help-inline {
+            position: absolute;
+            left: 0;
+            top: 27px;
+            z-index: 1000;
           }
         }
       }
