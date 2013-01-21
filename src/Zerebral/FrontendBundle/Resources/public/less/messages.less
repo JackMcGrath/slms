@@ -1,7 +1,4 @@
 .messages-list {
-  .messages-head {
-
-  }
   .messages {
     margin-top: 30px;
     border: 2px solid #e6e6e2;
@@ -92,7 +89,7 @@
 
       div {
         height: 32px;
-        padding: 12px 0 3px 0;
+        padding: 14px 0 7px 0;
         display: table-cell;
         vertical-align: middle;
         border-top: 1px solid #ebebeb;
@@ -124,6 +121,9 @@
         a {
           font-size: 12px;
           color: #34a3f8;
+        }
+        p {
+          font-size: 13px;
         }
       }
     }
@@ -159,7 +159,6 @@
         .controls {
           display: inline-block;
           width: 599px;
-          position:relative;
 
           input {
             width: 100%;
@@ -168,15 +167,16 @@
             border: none;
             margin: 0;
             padding: 11px 5px;
+            background: transparent;
           }
 
           .help-inline {
-            position: absolute;
-            left: 0;
-            top: 27px;
-            z-index: 1000;
+            display: none;
           }
         }
+      }
+      .error {
+        background: #F2DEDE;
       }
       .to {
         .control-group {
@@ -185,6 +185,9 @@
       }
     }
   }
+  .alert {
+    margin: 4px 0;
+  }
   .messageslist {
     margin-top: 0;
     display: table;
@@ -192,11 +195,11 @@
   }
   .messages-head {
     line-height: 18px;
-    padding: 19px 0 11px 8px;
+    padding: 19px 0 16px 8px;
     height: 26px;
 
     label {
-      font-size: 11px;
+      font-size: 12px;
       color: #666;
       input[type=checkbox] {
         margin: 0 12px 0 4px;
@@ -271,6 +274,13 @@
       margin-top: 15px;
       color: #c4c4c4;
       font-size: 12px;
+    }
+  }
+
+  .folders {
+    a {
+      font-weight: bold;
+      font-size: 13px;
     }
   }
 }
