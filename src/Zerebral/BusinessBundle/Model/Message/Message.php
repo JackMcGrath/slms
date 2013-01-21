@@ -54,4 +54,9 @@ class Message extends BaseMessage
         return strip_tags($this->body);
     }
 
+    public function getToName()
+    {
+        return $this->toName;
+    }
+
 }

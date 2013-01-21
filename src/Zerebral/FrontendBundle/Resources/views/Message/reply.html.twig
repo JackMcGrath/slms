@@ -40,7 +40,7 @@
                         {% endfor %}
                     </div>
                     <div class="reply">
-                        <form method="post"{{ form_enctype(form) }}>
+                        <form method="post"{{ form_enctype(form) }} novalidate>
                             {{ form_widget(form._token) }}
                             {{ form_row(form.body, {
                                 label: 'Reply',
