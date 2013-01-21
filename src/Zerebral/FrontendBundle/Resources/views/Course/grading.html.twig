@@ -20,8 +20,10 @@
                     {{ course.name }} <small>Gradebook</small>
                 </h2>
             </div>
+            <hr/>
 
-            <div>
+            <div class="grade-table">
+                {% if grading | length %}
                 <table class="table table-bordered table-striped grading">
                     <thead>
                         <tr>
@@ -48,7 +50,9 @@
                     </tr>
                     </tbody>
                 </table>
-
+                {% else %}
+                    No one student in assignments
+                {% endif %}
             </div>
         </div>
     </div>
@@ -64,7 +68,7 @@
             </div>
             <div class="modal-footer">
                 <button type="submit" class="btn btn-danger">Submit</button>
-                <a href="#" class="btn btn-danger">Submit & Continue</a>
+                {#<a href="#" class="btn btn-danger">Submit & Continue</a>#}
                 <a href="#" class="btn" data-dismiss="modal">Cancel</a>
             </div>
         </form>

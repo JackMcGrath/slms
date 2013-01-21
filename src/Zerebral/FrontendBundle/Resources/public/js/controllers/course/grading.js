@@ -22,7 +22,7 @@ Controller.prototype = {
         var oTable = $('table.grading').dataTable( {
             "sScrollY": "100%",
             "sScrollX": "100%",
-            "sWidth": "1100px",
+
             "bScrollCollapse": false,
             "bPaginate": false,
             "bSort": false,

@@ -71,7 +71,7 @@ abstract class BaseCourseTeacherQuery extends ModelCriteria
      * Returns a new CourseTeacherQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param   CourseTeacherQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param     CourseTeacherQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return CourseTeacherQuery
      */
@@ -135,8 +135,8 @@ abstract class BaseCourseTeacherQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return                 CourseTeacher A model object, or null if the key is not found
-     * @throws PropelException
+     * @return   CourseTeacher A model object, or null if the key is not found
+     * @throws   PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -248,8 +248,7 @@ abstract class BaseCourseTeacherQuery extends ModelCriteria
      * <code>
      * $query->filterByCourseId(1234); // WHERE course_id = 1234
      * $query->filterByCourseId(array(12, 34)); // WHERE course_id IN (12, 34)
-     * $query->filterByCourseId(array('min' => 12)); // WHERE course_id >= 12
-     * $query->filterByCourseId(array('max' => 12)); // WHERE course_id <= 12
+     * $query->filterByCourseId(array('min' => 12)); // WHERE course_id > 12
      * </code>
      *
      * @see       filterByCourse()
@@ -264,22 +263,8 @@ abstract class BaseCourseTeacherQuery extends ModelCriteria
      */
     public function filterByCourseId($courseId = null, $comparison = null)
     {
-        if (is_array($courseId)) {
-            $useMinMax = false;
-            if (isset($courseId['min'])) {
-                $this->addUsingAlias(CourseTeacherPeer::COURSE_ID, $courseId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($courseId['max'])) {
-                $this->addUsingAlias(CourseTeacherPeer::COURSE_ID, $courseId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
+        if (is_array($courseId) && null === $comparison) {
+            $comparison = Criteria::IN;
         }
 
         return $this->addUsingAlias(CourseTeacherPeer::COURSE_ID, $courseId, $comparison);
@@ -292,8 +277,7 @@ abstract class BaseCourseTeacherQuery extends ModelCriteria
      * <code>
      * $query->filterByTeacherId(1234); // WHERE teacher_id = 1234
      * $query->filterByTeacherId(array(12, 34)); // WHERE teacher_id IN (12, 34)
-     * $query->filterByTeacherId(array('min' => 12)); // WHERE teacher_id >= 12
-     * $query->filterByTeacherId(array('max' => 12)); // WHERE teacher_id <= 12
+     * $query->filterByTeacherId(array('min' => 12)); // WHERE teacher_id > 12
      * </code>
      *
      * @see       filterByTeacher()
@@ -308,22 +292,8 @@ abstract class BaseCourseTeacherQuery extends ModelCriteria
      */
     public function filterByTeacherId($teacherId = null, $comparison = null)
     {
-        if (is_array($teacherId)) {
-            $useMinMax = false;
-            if (isset($teacherId['min'])) {
-                $this->addUsingAlias(CourseTeacherPeer::TEACHER_ID, $teacherId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($teacherId['max'])) {
-                $this->addUsingAlias(CourseTeacherPeer::TEACHER_ID, $teacherId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
+        if (is_array($teacherId) && null === $comparison) {
+            $comparison = Criteria::IN;
         }
 
         return $this->addUsingAlias(CourseTeacherPeer::TEACHER_ID, $teacherId, $comparison);
@@ -378,8 +348,8 @@ abstract class BaseCourseTeacherQuery extends ModelCriteria
      * @param   Course|PropelObjectCollection $course The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 CourseTeacherQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
+     * @return   CourseTeacherQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
      */
     public function filterByCourse($course, $comparison = null)
     {
@@ -454,8 +424,8 @@ abstract class BaseCourseTeacherQuery extends ModelCriteria
      * @param   Teacher|PropelObjectCollection $teacher The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 CourseTeacherQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
+     * @return   CourseTeacherQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
      */
     public function filterByTeacher($teacher, $comparison = null)
     {
