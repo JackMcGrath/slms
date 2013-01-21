@@ -78,7 +78,11 @@
 
 {% block grading_value %}
     {% if grading[student.id][assignment.id] is defined %}
-        {% if grading[student.id][assignment.id].grading is null %}
+        {% if grading[student.id][assignment.id].isSubmitted == 0 %}
+            <td class="">
+                <i class="icon-new-lock-transparent"></i>
+            </td>
+        {% elseif grading[student.id][assignment.id].grading is null %}
             <td class="new" studentAssignment="{{ grading[student.id][assignment.id].id }}">
                 <a href="#" data-toggle="modal" data-toggle="modal"><i class="icon-new-plus-add"></i></a>
             </td>
@@ -90,7 +94,7 @@
         </td>
     {% else %}
         <td class="">
-            <i class="icon-new-lock-transparent"></i>
+            <i class="icon-new-cancel"></i>
         </td>
     {% endif %}
 {% endblock %}

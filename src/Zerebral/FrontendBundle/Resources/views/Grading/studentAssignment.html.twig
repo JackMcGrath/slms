@@ -9,17 +9,21 @@
     <img class="rounded" src="{{ user_avatar(studentAssignment.student.user) | imagine_filter('thumbnail') }}"/>
 </div>
 
-<div class="solutions">
+<div class="solutions solutions-files">
     <h5>Download solution files</h5>
-    {% for file in studentAssignment.files %}
-        <li class="file">
-            <img class="icon" src="{{ get_file_icon(file) | imagine_filter('file_icon') }}" />
-            <a class="link" target="_blank" href="{{ file.url }}">{{ file.name }}</a><br >
-            <span class="size">{{ file.size | bytes_to_human }}</span>
-        </li>
+    {% if studentAssignment.files | length %}
+        <ul>
+        {% for file in studentAssignment.files %}
+            <li class="file">
+                <img class="icon" src="{{ get_file_icon(file) | imagine_filter('file_icon') }}" />
+                <a class="link" target="_blank" href="{{ file.url }}">{{ file.name }}</a><br >
+                <span class="size">{{ file.size | bytes_to_human }}</span>
+            </li>
+        {% endfor %}
+        </ul>
     {% else %}
         <span class="gray">No solution files yet.</span>
-    {% endfor %}
+    {% endif %}
 </div>
 
 <div class="grade-block">
