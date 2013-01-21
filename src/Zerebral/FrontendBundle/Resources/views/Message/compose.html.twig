@@ -9,21 +9,6 @@
         {% endfor %}
     {% endspaceless %}
 {% endblock form_rows %}
-{% block file_widget %}
-    {% spaceless %}
-        <div class="file-item">
-            {% if value %}
-                {% if value.name == '' %}
-                    <input type="file" name="assignment[files][{{ name }}][uploadedFile]" /> <i class="icon-small-trash-bin"></i><a class="remove-uploaded-file" href="#">remove</a> <span class="help-inline">Please select file for uploading</span>
-                {% else %}
-                    <span>{{ value.name }}</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="hidden" name="assignment[files][{{ name }}][uploadedFile]" /><a class="remove-uploaded-file" href="#"><i class="icon-small-trash-bin"></i></a>
-                {% endif %}
-            {% else %}
-                <input type="file" {{ block('widget_attributes') }} /> <a class="remove-uploaded-file" href="#"><i class="icon-small-trash-bin"></i></a>
-            {% endif %}
-        </div>
-    {% endspaceless %}
-{% endblock file_widget %}
 
 {% block content %}
     {% javascripts
@@ -87,10 +72,15 @@
                             }
                         }) }}
 
+                        <script type="text/template" id="new_file_form">
+                            {{ form_widget(form.files.vars.prototype)|raw }}
+                        </script>
+
                         <div class="control-group radio-control-group">
                             <label class="control-label">Attachments</label>
-                            <div id="attachments_div" class="controls" data-prototype="{{ form_widget(form.files.vars.prototype)|e }}">
-                                <div id="upload_files_div">
+
+                            <div id="attachments_div" class="controls">
+                                <div id="upload_files_div" data-last-index="{{ form.files.vars.data|max_key }}">
                                     {{ form_widget(form.files) }}
                                 </div>
                                 <a href="#" class="add_file_link">Add another file</a> <span class="gray"></span>

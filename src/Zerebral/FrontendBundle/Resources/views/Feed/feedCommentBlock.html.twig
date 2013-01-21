@@ -45,7 +45,7 @@
 {% macro course_details_comment_block(comment) %}
     {% import _self as self %}
     <div class="comment {% if app.user.id == comment.user.id %} is_author {% endif %}">
-        <div class="avatar"><img class="rounded" src="{{ get_file_storage_link(comment.user.getAvatarFile()) | imagine_filter('small_thumbnail') }}" /></div>
+        <div class="avatar"><img class="rounded" src="{{ user_avatar(comment.user) | imagine_filter('small_thumbnail') }}" /></div>
         <div class="content">
             {% if comment.feedContent.type == 'website' %}
                 {{ self.course_feed_comment_website_block(comment) }}
@@ -138,7 +138,7 @@
 {% macro assignment_details_comment_block(comment) %}
     {% import _self as self %}
     <div class="comment">
-        <div class="avatar"><img class="rounded" src="{{ get_file_storage_link(comment.user.getAvatarFile()) | imagine_filter('thumbnail') }}" /> </div>
+        <div class="avatar"><img class="rounded" src="{{ user_avatar(comment.user) | imagine_filter('thumbnail') }}" /> </div>
         <div class="content">
             {% if comment.feedContent.type == 'website' %}
                 {{ self.assignment_feed_comment_website_block(comment) }}

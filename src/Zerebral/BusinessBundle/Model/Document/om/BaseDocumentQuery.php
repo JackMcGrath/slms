@@ -67,7 +67,7 @@ abstract class BaseDocumentQuery extends ModelCriteria
      * Returns a new DocumentQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     DocumentQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   DocumentQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return DocumentQuery
      */
@@ -131,8 +131,8 @@ abstract class BaseDocumentQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Document A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Document A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -244,7 +244,8 @@ abstract class BaseDocumentQuery extends ModelCriteria
      * <code>
      * $query->filterByReferenceId(1234); // WHERE reference_id = 1234
      * $query->filterByReferenceId(array(12, 34)); // WHERE reference_id IN (12, 34)
-     * $query->filterByReferenceId(array('min' => 12)); // WHERE reference_id > 12
+     * $query->filterByReferenceId(array('min' => 12)); // WHERE reference_id >= 12
+     * $query->filterByReferenceId(array('max' => 12)); // WHERE reference_id <= 12
      * </code>
      *
      * @param     mixed $referenceId The value to use as filter.
@@ -257,8 +258,22 @@ abstract class BaseDocumentQuery extends ModelCriteria
      */
     public function filterByReferenceId($referenceId = null, $comparison = null)
     {
-        if (is_array($referenceId) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($referenceId)) {
+            $useMinMax = false;
+            if (isset($referenceId['min'])) {
+                $this->addUsingAlias(DocumentPeer::REFERENCE_ID, $referenceId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($referenceId['max'])) {
+                $this->addUsingAlias(DocumentPeer::REFERENCE_ID, $referenceId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(DocumentPeer::REFERENCE_ID, $referenceId, $comparison);

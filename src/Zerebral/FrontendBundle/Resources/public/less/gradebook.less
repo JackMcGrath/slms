@@ -1,0 +1,91 @@
+.grade-book {
+    table {
+        table-layout: fixed;
+        margin-bottom: 0px;
+        th.assignment-name {
+            font-size: 10px;
+            width: 80px;
+            overflow: hidden;
+            vertical-align: middle;
+            text-align: center;
+        }
+        td {
+            text-align: center;
+
+            .grade-value {
+                display: block;
+                margin: -8px;
+                text-align: center;
+                line-height: 34px;
+
+                a {
+                    color: @white;
+                    text-decoration: underline;
+                    .icon-new-pencil-green;
+                    height: auto;
+                    width: auto;
+                    background-repeat: no-repeat;
+                    padding-left: 15px;
+                }
+                &.hover {
+                    background: #a09b9b;
+                }
+            }
+        }
+        td.name, th.name {
+            width: 120px;
+            text-align: left;
+            font-size: 14px;
+        }
+        th.name {
+            font-weight: bold;
+            line-height: 30px;
+        }
+        th {
+            background: @tableBackground;
+            font-weight: normal;
+            line-height: 11px;
+            a {
+                color: #005580;
+            }
+        }
+        td.due-date {
+            color: #222222;
+            font-size: 11px;
+        }
+    }
+
+    div.table {
+
+        .table-cell {
+            display: table-cell;
+        }
+        .table-row {
+            display: table-row;
+        }
+    }
+    .students-list, div.table {
+        display: inline-block;
+    }
+
+    .dataTables_wrapper {
+        border-top: 1px solid @tableBorder;
+        table {
+            border: none;
+        }
+        .DTFC_LeftBodyWrapper, .DTFC_LeftHeadWrapper {
+            border-right: 1px solid @tableBorder;
+        }
+        .dataTables_scroll {
+            border-right: 1px solid @tableBorder;
+        }
+
+        table tbody tr:last-child {
+            td {
+                border-bottom: 1px solid @tableBorder;
+            }
+        }
+
+    }
+
+}

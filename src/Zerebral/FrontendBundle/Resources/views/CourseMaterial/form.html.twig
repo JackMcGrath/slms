@@ -1,0 +1,50 @@
+{% extends 'ZerebralFrontendBundle::empty.html.twig' %}
+
+{% form_theme form _self %}
+
+{% block course_material_widget %}
+    <li class="control-group file-item">
+        {{ form_widget(form.file.uploadedFile) }}
+        {{ form_widget(form.description, {
+            placeholder: 'Description (optional)'
+        }) }}
+        <a class="remove-uploaded-file delete" href="#"><i class="icon-small-trash-bin"></i> remove</a>
+    </li>
+{% endblock course_material_widget %}
+
+{% block content %}
+<div class="modal hide fade" id="uploadMaterialModal">
+    <form method="post" {{ form_enctype(form) }} class="upload-material" action="{{ path('ajax_course_material_save', {courseId: course.id}) }}">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h3>Upload syllabus files</h3>
+        </div>
+        <div class="modal-body">
+            <div class="form-inline upload-folder">
+                {{ form_row(form.folder, {
+                    label: 'Choose folder',
+                    form_type: 'horizontal',
+                    placeholder: 'Folder name',
+                    attr: {
+                        class: 'input-xlarge'
+                    }
+                }) }}
+
+            </div>
+            <div class="clearfix"></div>
+
+            <script type="text/template" id="new_material_form">
+                {{ form_widget(form.materials.vars.prototype)|raw }}
+            </script>
+
+            <ul class="uploadedFiles" data-last-index="{{ form.materials.vars.data|max_key }}"></ul>
+
+            <a id="addUploadFile" href="#">Add another file</a>
+        </div>
+        <div class="modal-footer">
+            <input type="submit" class="btn btn-danger" value="Upload" />
+            <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock content %}

@@ -1,0 +1,41 @@
+<div class="info">
+    <h3>{{ studentAssignment.assignment.name }}</h3>
+    <ul>
+        <li><span>Student:</span> {{ studentAssignment.student.fullName }}</li>
+        {% if studentAssignment.assignment.dueAt is not empty %}
+            <li><span>Submitted:</span> <span class="date">{{ studentAssignment.createdAt | date('l, M, d Y h:i a') }}</span></li>
+        {% endif %}
+        <li><span>Assignment:</span> <span class="label">{{ studentAssignment.assignment.name }}</span></li>
+    </ul>
+</div>
+
+<div class="solutions">
+    <h5>Download solution files</h5>
+
+    {% for file in studentAssignment.files %}
+        <li class="file">
+            <img class="icon" src="{{ get_file_icon(file) | imagine_filter('file_icon') }}" />
+            <a class="link" target="_blank" href="{{ file.url }}">{{ file.name }}</a><br >
+            <span class="size">{{ file.size | bytes_to_human }}</span>
+        </li>
+    {% else %}
+        <span class="gray">No solution files yet.</span>
+    {% endfor %}
+</div>
+
+<div class="grade-block">
+    {{ form_row(form.grading, {
+        label: "Enter the number grade below",
+        form_type: 'horizontal',
+        attr: {
+            class: 'input-mini'
+        }
+    }) }}
+
+    <div class="clearfix"></div>
+    {{ form_row(form.grading_comment, {
+        label: "Leave feedback below",
+        form_type: 'horizontal'
+    }) }}
+    {{ form_rest(form) }}
+</div>

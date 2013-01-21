@@ -5,37 +5,30 @@ namespace Zerebral\FrontendBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Zerebral\CommonBundle\Form\Type\OptionalModelType;
 use Zerebral\CommonBundle\Form\DataTransformer\TimeTransformer;
-use Zerebral\FrontendBundle\Form\Type\FileType;
+use Zerebral\CommonBundle\File\Form\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Validator\Constraints\Collection;
 
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentCategoryQuery;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentCategory;
 
-// TODO: comments + type hints
 class AssignmentType extends AbstractType
 {
 
+    /**
+     * Required for new assignment category
+     *
+     * @var \Zerebral\BusinessBundle\Model\User\Teacher
+     */
     protected $teacher;
-    protected $fileStorage;
-
-
-    public function setFileStorage($fileStorage)
-    {
-        $this->fileStorage = $fileStorage;
-    }
-
-    public function getFileStorage()
-    {
-        return $this->fileStorage;
-    }
 
     /**
-     * Set teacher model to class instance for using it in callback function
+     * Set teacher
+     * Will be used in new assignment category
+     *
      * @param \Zerebral\BusinessBundle\Model\User\Teacher $teacher
      */
-    public function setTeacher($teacher)
+    public function setTeacher(\Zerebral\BusinessBundle\Model\User\Teacher $teacher)
     {
         $this->teacher = $teacher;
     }
@@ -84,11 +77,14 @@ class AssignmentType extends AbstractType
             'files',
             'collection',
             array(
-                'type' => new \Zerebral\FrontendBundle\Form\Type\FileType(),
+                'type' => new FileType(),
                 'allow_add' => true,
                 'allow_delete' => true,
                 'by_reference' => false,
-                'options' => array('storage' => $this->getFileStorage(), 'error_bubbling' => true)
+                'options' => array(
+                    'error_bubbling' => true,
+                    'folder' => 'assignment',
+                )
             )
         );
 

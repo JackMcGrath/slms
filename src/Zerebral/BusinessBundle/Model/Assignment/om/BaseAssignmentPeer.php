@@ -13,12 +13,12 @@ use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\PeerEvent;
 use Zerebral\BusinessBundle\Model\Assignment\Assignment;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentCategoryPeer;
+use Zerebral\BusinessBundle\Model\Assignment\AssignmentFilePeer;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer;
 use Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentPeer;
 use Zerebral\BusinessBundle\Model\Assignment\map\AssignmentTableMap;
 use Zerebral\BusinessBundle\Model\Course\CoursePeer;
 use Zerebral\BusinessBundle\Model\Feed\FeedItemPeer;
-use Zerebral\BusinessBundle\Model\File\FileReferencesPeer;
 use Zerebral\BusinessBundle\Model\Notification\NotificationPeer;
 use Zerebral\BusinessBundle\Model\User\TeacherPeer;
 
@@ -406,15 +406,15 @@ abstract class BaseAssignmentPeer
      */
     public static function clearRelatedInstancePool()
     {
+        // Invalidate objects in AssignmentFilePeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        AssignmentFilePeer::clearInstancePool();
         // Invalidate objects in StudentAssignmentPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         StudentAssignmentPeer::clearInstancePool();
         // Invalidate objects in FeedItemPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         FeedItemPeer::clearInstancePool();
-        // Invalidate objects in FileReferencesPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        FileReferencesPeer::clearInstancePool();
         // Invalidate objects in NotificationPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         NotificationPeer::clearInstancePool();

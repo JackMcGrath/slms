@@ -3,35 +3,29 @@
 namespace Zerebral\FrontendBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Zerebral\FrontendBundle\Form\Type\FileType;
+use Zerebral\CommonBundle\File\Form\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints\Collection;
 
-// TODO: comments + type hints
 class AssignmentSolutionType extends AbstractType
 {
-    protected $fileStorage;
-
-
-    public function setFileStorage($fileStorage)
-    {
-        $this->fileStorage = $fileStorage;
-    }
-
-    public function getFileStorage()
-    {
-        return $this->fileStorage;
-    }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('files', 'collection', array(
-            'type' => new \Zerebral\FrontendBundle\Form\Type\FileType(),
+            'type' => new FileType(),
             'allow_add' => true,
-            'allow_delete' => false,
+            'allow_delete' => true,
             'by_reference' => false,
-            'options' => array('storage' => $this->getFileStorage(), 'error_bubbling' => true, 'error_mapping' => array('name' => 'description'))
+            'options' => array(
+                'error_bubbling' => true,
+                'error_mapping' => array(
+                    'name' => 'description'
+                ),
+                'has_description' => true,
+                'folder' => 'assignment-solution'
+            )
         ));
     }
 

@@ -62,10 +62,8 @@ class MessageTableMap extends TableMap
         $this->addRelation('UserRelatedByUserId', 'Zerebral\\BusinessBundle\\Model\\User\\User', RelationMap::MANY_TO_ONE, array('user_id' => 'id', ), 'CASCADE', 'CASCADE');
         $this->addRelation('UserRelatedByFromId', 'Zerebral\\BusinessBundle\\Model\\User\\User', RelationMap::MANY_TO_ONE, array('from_id' => 'id', ), 'CASCADE', 'CASCADE');
         $this->addRelation('UserRelatedByToId', 'Zerebral\\BusinessBundle\\Model\\User\\User', RelationMap::MANY_TO_ONE, array('to_id' => 'id', ), 'CASCADE', 'CASCADE');
-        $this->addRelation('FileReferences', 'Zerebral\\BusinessBundle\\Model\\File\\FileReferences', RelationMap::ONE_TO_MANY, array('id' => 'reference_id', ), 'CASCADE', 'CASCADE', 'FileReferencess');
+        $this->addRelation('MessageFile', 'Zerebral\\BusinessBundle\\Model\\Message\\MessageFile', RelationMap::ONE_TO_MANY, array('id' => 'message_id', ), 'CASCADE', 'CASCADE', 'MessageFiles');
         $this->addRelation('File', 'Zerebral\\BusinessBundle\\Model\\File\\File', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'CASCADE', 'Files');
-        $this->addRelation('assignmentReferenceId', 'Zerebral\\BusinessBundle\\Model\\Assignment\\Assignment', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'CASCADE', 'assignmentReferenceIds');
-        $this->addRelation('studentAssignmentReferenceId', 'Zerebral\\BusinessBundle\\Model\\Assignment\\StudentAssignment', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'CASCADE', 'studentAssignmentReferenceIds');
     } // buildRelations()
 
     /**

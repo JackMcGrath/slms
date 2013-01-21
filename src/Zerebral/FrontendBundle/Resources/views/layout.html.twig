@@ -22,6 +22,7 @@
         '@ZerebralFrontendBundle/Resources/public/js/plugins/jquery.registry.js'
         '@ZerebralFrontendBundle/Resources/public/js/plugins/jquery.feed-block.js'
         '@ZerebralFrontendBundle/Resources/public/js/plugins/jquery.ajax-form.js'
+        '@ZerebralFrontendBundle/Resources/public/js/plugins/jquery.collection-form-type.js'
         '@ZerebralFrontendBundle/Resources/public/js/plugins/optional-model.js'
         '@ZerebralFrontendBundle/Resources/public/js/bootstrap.js'
         '@ZerebralFrontendBundle/Resources/public/js/plugins/jquery.notifications.js'
@@ -36,7 +37,8 @@
     {% endstylesheets %}
 
     {% stylesheets output="css/wysiwyg-color.css"
-    '@ZerebralFrontendBundle/Resources/public/css/wysiwyg-color.css' %}
+    '@ZerebralFrontendBundle/Resources/public/css/wysiwyg-color.css'
+    %}
     <link href="{{ asset_url }}" rel="stylesheet" type="text/css"  media="screen" />
     {% endstylesheets %}
     {% stylesheets
@@ -74,7 +76,7 @@
                         {% if is_granted('ROLE_USER') %}
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            <img width="27" height="27" src="{{ get_file_storage_link(app.user.getAvatarFile()) | imagine_filter('top_thumbnail') }}" /> &nbsp; {{ app.user.firstName }} {{ app.user.lastName }} &nbsp; <b class="caret"></b></a>
+                            <img width="27" height="27" src="{{ user_avatar(app.user) | imagine_filter('top_thumbnail') }}" /> &nbsp; {{ app.user.firstName }} {{ app.user.lastName }} &nbsp; <b class="caret"></b></a>
                             <ul class="dropdown-menu">
                                 <li><a href="{{ path('myprofile') }}"><i class="icon-user"></i> Profile</a></li>
                                 <li class="divider"></li>

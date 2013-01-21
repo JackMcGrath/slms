@@ -29,4 +29,16 @@
             <index-column name="user_id"/>
         </index>
     </table>
+
+    <table name="message_files" phpName="MessageFile" isCrossRef="true">
+        <column name="file_id" phpName="fileId" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" required="true"/>
+        <column name="message_id" phpName="messageId" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" required="true"/>
+
+        <foreign-key foreignTable="files" name="message_files_files" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="file_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="messages" name="message_files_messages" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="message_id" foreign="id"/>
+        </foreign-key>
+    </table>
 </database>

@@ -11,20 +11,55 @@ abstract class TestCase extends WebTestCase
     /**
      * @var Kernel
      */
-    protected static $kernel = null;
+    protected $appKernel;
+
+    /**
+     * @var \Symfony\Component\DependencyInjection\Container
+     */
+    protected $container;
 
     /**
      * @var \PropelPDO
      */
     protected $connection;
 
-
-    protected function setUp()
+    /**
+     * @return null
+     */
+    public function setUp()
     {
-        self::$kernel = static::createKernel();
-        self::$kernel->boot();
+        $this->appKernel = self::createKernel();
+        $this->getAppKernel()->boot();
 
+        $this->container = $this->getAppKernel()->getContainer();
         $this->connection = \Propel::getConnection();
+
+        parent::setUp();
+    }
+
+    /**
+     * @return null
+     */
+    public function tearDown()
+    {
+        $this->getAppKernel()->shutdown();
+        parent::tearDown();
+    }
+
+    /**
+     * @return \Symfony\Component\HttpKernel\Kernel
+     */
+    public function getAppKernel()
+    {
+        return $this->appKernel;
+    }
+
+    /**
+     * @return \Symfony\Component\DependencyInjection\Container
+     */
+    public function getContainer()
+    {
+        return $this->container;
     }
 
     /**

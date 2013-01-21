@@ -17,9 +17,10 @@ propel:
         driver:               mysql
         user:                 dev
         password:             dev
-        dsn:                  mysql:host=weavora-1;dbname=seo_v2;charset=UTF8
+        dsn:                  mysql:host=192.168.1.200;dbname=zerebral;charset=UTF8
         options:              {}
         attributes:           {}
+
 
 #swiftmailer:
 #    transport: "%mailer_transport%"
@@ -27,3 +28,11 @@ propel:
 #    username:  "%mailer_user%"
 #    password:  "%mailer_password%"
 #    spool:     { type: memory }
+
+services:
+    zerebral.local_file_storage:
+        class: Zerebral\CommonBundle\File\Storage\LocalStorage
+        arguments: ["%kernel.root_dir%/../web/data", "%kernel.root_dir%/../tmp", "/data"]
+        tags:
+          - { name: file_storage, alias: local, default: true }
+

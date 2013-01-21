@@ -14,11 +14,9 @@ use \PropelObjectCollection;
 use \PropelPDO;
 use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\QueryEvent;
-use Zerebral\BusinessBundle\Model\Assignment\Assignment;
-use Zerebral\BusinessBundle\Model\Assignment\StudentAssignment;
 use Zerebral\BusinessBundle\Model\File\File;
-use Zerebral\BusinessBundle\Model\File\FileReferences;
 use Zerebral\BusinessBundle\Model\Message\Message;
+use Zerebral\BusinessBundle\Model\Message\MessageFile;
 use Zerebral\BusinessBundle\Model\Message\MessagePeer;
 use Zerebral\BusinessBundle\Model\Message\MessageQuery;
 use Zerebral\BusinessBundle\Model\User\User;
@@ -60,9 +58,9 @@ use Zerebral\BusinessBundle\Model\User\User;
  * @method MessageQuery rightJoinUserRelatedByToId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the UserRelatedByToId relation
  * @method MessageQuery innerJoinUserRelatedByToId($relationAlias = null) Adds a INNER JOIN clause to the query using the UserRelatedByToId relation
  *
- * @method MessageQuery leftJoinFileReferences($relationAlias = null) Adds a LEFT JOIN clause to the query using the FileReferences relation
- * @method MessageQuery rightJoinFileReferences($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FileReferences relation
- * @method MessageQuery innerJoinFileReferences($relationAlias = null) Adds a INNER JOIN clause to the query using the FileReferences relation
+ * @method MessageQuery leftJoinMessageFile($relationAlias = null) Adds a LEFT JOIN clause to the query using the MessageFile relation
+ * @method MessageQuery rightJoinMessageFile($relationAlias = null) Adds a RIGHT JOIN clause to the query using the MessageFile relation
+ * @method MessageQuery innerJoinMessageFile($relationAlias = null) Adds a INNER JOIN clause to the query using the MessageFile relation
  *
  * @method Message findOne(PropelPDO $con = null) Return the first Message matching the query
  * @method Message findOneOrCreate(PropelPDO $con = null) Return the first Message matching the query, or a new Message object populated from the query conditions when no match is found
@@ -105,7 +103,7 @@ abstract class BaseMessageQuery extends ModelCriteria
      * Returns a new MessageQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     MessageQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   MessageQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return MessageQuery
      */
@@ -167,8 +165,8 @@ abstract class BaseMessageQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Message A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Message A model object, or null if the key is not found
+     * @throws PropelException
      */
      public function findOneById($key, $con = null)
      {
@@ -182,8 +180,8 @@ abstract class BaseMessageQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Message A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Message A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -283,7 +281,8 @@ abstract class BaseMessageQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -296,8 +295,22 @@ abstract class BaseMessageQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(MessagePeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(MessagePeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(MessagePeer::ID, $id, $comparison);
@@ -310,7 +323,8 @@ abstract class BaseMessageQuery extends ModelCriteria
      * <code>
      * $query->filterByThreadId(1234); // WHERE thread_id = 1234
      * $query->filterByThreadId(array(12, 34)); // WHERE thread_id IN (12, 34)
-     * $query->filterByThreadId(array('min' => 12)); // WHERE thread_id > 12
+     * $query->filterByThreadId(array('min' => 12)); // WHERE thread_id >= 12
+     * $query->filterByThreadId(array('max' => 12)); // WHERE thread_id <= 12
      * </code>
      *
      * @param     mixed $threadId The value to use as filter.
@@ -351,7 +365,8 @@ abstract class BaseMessageQuery extends ModelCriteria
      * <code>
      * $query->filterByFromId(1234); // WHERE from_id = 1234
      * $query->filterByFromId(array(12, 34)); // WHERE from_id IN (12, 34)
-     * $query->filterByFromId(array('min' => 12)); // WHERE from_id > 12
+     * $query->filterByFromId(array('min' => 12)); // WHERE from_id >= 12
+     * $query->filterByFromId(array('max' => 12)); // WHERE from_id <= 12
      * </code>
      *
      * @see       filterByUserRelatedByFromId()
@@ -394,7 +409,8 @@ abstract class BaseMessageQuery extends ModelCriteria
      * <code>
      * $query->filterByToId(1234); // WHERE to_id = 1234
      * $query->filterByToId(array(12, 34)); // WHERE to_id IN (12, 34)
-     * $query->filterByToId(array('min' => 12)); // WHERE to_id > 12
+     * $query->filterByToId(array('min' => 12)); // WHERE to_id >= 12
+     * $query->filterByToId(array('max' => 12)); // WHERE to_id <= 12
      * </code>
      *
      * @see       filterByUserRelatedByToId()
@@ -464,7 +480,8 @@ abstract class BaseMessageQuery extends ModelCriteria
      * <code>
      * $query->filterByUserId(1234); // WHERE user_id = 1234
      * $query->filterByUserId(array(12, 34)); // WHERE user_id IN (12, 34)
-     * $query->filterByUserId(array('min' => 12)); // WHERE user_id > 12
+     * $query->filterByUserId(array('min' => 12)); // WHERE user_id >= 12
+     * $query->filterByUserId(array('max' => 12)); // WHERE user_id <= 12
      * </code>
      *
      * @see       filterByUserRelatedByUserId()
@@ -607,8 +624,8 @@ abstract class BaseMessageQuery extends ModelCriteria
      * @param   User|PropelObjectCollection $user The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   MessageQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 MessageQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByUserRelatedByUserId($user, $comparison = null)
     {
@@ -683,8 +700,8 @@ abstract class BaseMessageQuery extends ModelCriteria
      * @param   User|PropelObjectCollection $user The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   MessageQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 MessageQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByUserRelatedByFromId($user, $comparison = null)
     {
@@ -759,8 +776,8 @@ abstract class BaseMessageQuery extends ModelCriteria
      * @param   User|PropelObjectCollection $user The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   MessageQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 MessageQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByUserRelatedByToId($user, $comparison = null)
     {
@@ -830,41 +847,41 @@ abstract class BaseMessageQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related FileReferences object
+     * Filter the query by a related MessageFile object
      *
-     * @param   FileReferences|PropelObjectCollection $fileReferences  the related object to use as filter
+     * @param   MessageFile|PropelObjectCollection $messageFile  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   MessageQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 MessageQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
-    public function filterByFileReferences($fileReferences, $comparison = null)
+    public function filterByMessageFile($messageFile, $comparison = null)
     {
-        if ($fileReferences instanceof FileReferences) {
+        if ($messageFile instanceof MessageFile) {
             return $this
-                ->addUsingAlias(MessagePeer::ID, $fileReferences->getreferenceId(), $comparison);
-        } elseif ($fileReferences instanceof PropelObjectCollection) {
+                ->addUsingAlias(MessagePeer::ID, $messageFile->getmessageId(), $comparison);
+        } elseif ($messageFile instanceof PropelObjectCollection) {
             return $this
-                ->useFileReferencesQuery()
-                ->filterByPrimaryKeys($fileReferences->getPrimaryKeys())
+                ->useMessageFileQuery()
+                ->filterByPrimaryKeys($messageFile->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByFileReferences() only accepts arguments of type FileReferences or PropelCollection');
+            throw new PropelException('filterByMessageFile() only accepts arguments of type MessageFile or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the FileReferences relation
+     * Adds a JOIN clause to the query using the MessageFile relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return MessageQuery The current query, for fluid interface
      */
-    public function joinFileReferences($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinMessageFile($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('FileReferences');
+        $relationMap = $tableMap->getRelation('MessageFile');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -879,14 +896,14 @@ abstract class BaseMessageQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'FileReferences');
+            $this->addJoinObject($join, 'MessageFile');
         }
 
         return $this;
     }
 
     /**
-     * Use the FileReferences relation FileReferences object
+     * Use the MessageFile relation MessageFile object
      *
      * @see       useQuery()
      *
@@ -894,18 +911,18 @@ abstract class BaseMessageQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Zerebral\BusinessBundle\Model\File\FileReferencesQuery A secondary query class using the current class as primary query
+     * @return   \Zerebral\BusinessBundle\Model\Message\MessageFileQuery A secondary query class using the current class as primary query
      */
-    public function useFileReferencesQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useMessageFileQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinFileReferences($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'FileReferences', '\Zerebral\BusinessBundle\Model\File\FileReferencesQuery');
+            ->joinMessageFile($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'MessageFile', '\Zerebral\BusinessBundle\Model\Message\MessageFileQuery');
     }
 
     /**
      * Filter the query by a related File object
-     * using the file_references table as cross reference
+     * using the message_files table as cross reference
      *
      * @param   File $file the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
@@ -915,42 +932,8 @@ abstract class BaseMessageQuery extends ModelCriteria
     public function filterByFile($file, $comparison = Criteria::EQUAL)
     {
         return $this
-            ->useFileReferencesQuery()
+            ->useMessageFileQuery()
             ->filterByFile($file, $comparison)
-            ->endUse();
-    }
-
-    /**
-     * Filter the query by a related Assignment object
-     * using the file_references table as cross reference
-     *
-     * @param   Assignment $assignment the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   MessageQuery The current query, for fluid interface
-     */
-    public function filterByassignmentReferenceId($assignment, $comparison = Criteria::EQUAL)
-    {
-        return $this
-            ->useFileReferencesQuery()
-            ->filterByassignmentReferenceId($assignment, $comparison)
-            ->endUse();
-    }
-
-    /**
-     * Filter the query by a related StudentAssignment object
-     * using the file_references table as cross reference
-     *
-     * @param   StudentAssignment $studentAssignment the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   MessageQuery The current query, for fluid interface
-     */
-    public function filterBystudentAssignmentReferenceId($studentAssignment, $comparison = Criteria::EQUAL)
-    {
-        return $this
-            ->useFileReferencesQuery()
-            ->filterBystudentAssignmentReferenceId($studentAssignment, $comparison)
             ->endUse();
     }
 
