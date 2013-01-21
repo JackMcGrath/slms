@@ -10,6 +10,15 @@
     {% endspaceless %}
 {% endblock form_rows %}
 
+{% block error_alert %}
+    {% for error in errorList %}
+        <div class="alert alert-error">
+            <button data-dismiss="alert" class="close" type="button">×</button>
+            {{ error.messageTemplate|trans(error.messageParameters, 'validators') }}
+        </div>
+    {% endfor %}
+{% endblock %}
+
 {% block content %}
     {% javascripts
     '@ZerebralFrontendBundle/Resources/public/js/plugins/bootstrap-typeahead-objects-array.js'
@@ -27,6 +36,16 @@
                 </h2>
             </div>
             <hr/>
+
+            {% if form.toName.vars.errors|length %}
+                {% set errorList = form.toName.vars.errors %}
+                {{ block('error_alert') }}
+            {% endif %}
+
+            {% if form.subject.vars.errors|length %}
+                {% set errorList = form.subject.vars.errors %}
+                {{ block('error_alert') }}
+            {% endif %}
 
             <div class="messages">
                 <form method="post" {{ form_enctype(form) }} novalidate>
@@ -100,25 +119,5 @@
             </div>
 
         </div>
-    </div>
-{% endblock %}
-
-{% block message %}
-    <div class="message">
-        <div class="info">
-            <a href="#">{{ message.userRelatedByFromId.getFullName() }}</a>
-            <p>{{ message.createdAt.format('m/d/Y <b\\r/>\\a\\t g:i a') | raw }}</p>
-        </div>
-        {{ message.body | raw }}
-    </div>
-{% endblock %}
-
-{% block hiddenMessage %}
-    <div class="message hide">
-        <div class="info">
-            <a href="#">{{ message.userRelatedByFromId.getFullName() }}</a>
-            <p>{{ message.createdAt.format('m/d/Y <b\\r/>\\a\\t g:i a') | raw }}</p>
-        </div>
-        {{ message.body | raw }}
     </div>
 {% endblock %}
