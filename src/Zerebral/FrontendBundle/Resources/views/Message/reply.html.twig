@@ -50,7 +50,7 @@
                                     rows: 6
                                 }
                             }) }}
-                            
+
                             <script type="text/template" id="new_file_form">
                                 {{ form_widget(form.files.vars.prototype)|raw }}
                             </script>
@@ -82,21 +82,22 @@
             </div>
 
             <div class="block">
-                <div class="">
-                    <img src="{{ user_avatar(thread.getFirst().userRelatedByFromId) | imagine_filter('thumbnail') }}" width="42" height="42" />
-                    <a href="#">{{ thread.getFirst().userRelatedByFromId.getFullName() }}</a>
+                <div class="user-info">
+                    {% set collocutor = thread.getFirst().toId == thread.getFirst().userId ? thread.getFirst().userRelatedByFromId : thread.getFirst().userRelatedByToId %}
+                    <img src="{{ user_avatar(collocutor) | imagine_filter('thumbnail') }}" width="42" height="42" />
+                    <a href="#">{{ collocutor.getFullName() }}</a>
                 </div>
             </div>
 
             <div class="block">
-                <div class="">
-                    Links and Attachments
+                <div class="attachments">
+                    <p>Attachments</p>
                     {% for key,message in thread %}
                         {% for file in message.getFiles %}
                             <div><i class="icon-search"></i> <a class="link" target="_blank" href="{{ file.url }}">{{ file.name }}</a></div>
                         {% endfor %}
                     {% endfor %}
-                    <span>Showing the last 20 links and attachments</span>
+                    <p class="grey">Showing the last 20 links and attachments</p>
                 </div>
             </div>
 
