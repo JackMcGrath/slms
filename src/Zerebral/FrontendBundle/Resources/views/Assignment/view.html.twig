@@ -61,9 +61,14 @@
         </div>
 
         <div class="right-navbar pull-left">
-            <div class="grading">
-                <h4>Grading: 20</h4> <span class="label label-important">Failed</span> <i class="info-icon icon-small-info"></i>
-            </div>
+            {% if app.user.isStudent %}
+            {% set studentAssignment = assignment.studentAssignmentByStudent(app.user.student) %}
+            {% if studentAssignment.grading %}
+                <div class="grading">
+                    {{ mainPartials.grade(studentAssignment) }}
+                </div>
+            {% endif %}
+            {% endif %}
 
 
             {% if is_granted('UPLOAD_SOLUTION', assignment) or (studentAssignment is defined and is_granted('VIEW', studentAssignment)) %}

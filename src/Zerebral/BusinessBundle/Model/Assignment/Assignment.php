@@ -34,4 +34,10 @@ class Assignment extends BaseAssignment
         $c->add('type', $type);
         return (bool)$this->getNotifications($c)->count();
     }
+
+    /** @param \Zerebral\BusinessBundle\Model\User\Student $student */
+    public function getStudentAssignmentByStudent($student)
+    {
+        return StudentAssignmentQuery::create()->filterByStudent($student)->filterByAssignment($this)->findOne();
+    }
 }
