@@ -151,7 +151,7 @@ abstract class BaseUserQuery extends ModelCriteria
      * Returns a new UserQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param   UserQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param     UserQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return UserQuery
      */
@@ -213,8 +213,8 @@ abstract class BaseUserQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return                 User A model object, or null if the key is not found
-     * @throws PropelException
+     * @return   User A model object, or null if the key is not found
+     * @throws   PropelException
      */
      public function findOneById($key, $con = null)
      {
@@ -228,8 +228,8 @@ abstract class BaseUserQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return                 User A model object, or null if the key is not found
-     * @throws PropelException
+     * @return   User A model object, or null if the key is not found
+     * @throws   PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -329,8 +329,7 @@ abstract class BaseUserQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id >= 12
-     * $query->filterById(array('max' => 12)); // WHERE id <= 12
+     * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -343,22 +342,8 @@ abstract class BaseUserQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id)) {
-            $useMinMax = false;
-            if (isset($id['min'])) {
-                $this->addUsingAlias(UserPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($id['max'])) {
-                $this->addUsingAlias(UserPeer::ID, $id['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
+        if (is_array($id) && null === $comparison) {
+            $comparison = Criteria::IN;
         }
 
         return $this->addUsingAlias(UserPeer::ID, $id, $comparison);
@@ -646,8 +631,7 @@ abstract class BaseUserQuery extends ModelCriteria
      * <code>
      * $query->filterByAvatarId(1234); // WHERE avatar_id = 1234
      * $query->filterByAvatarId(array(12, 34)); // WHERE avatar_id IN (12, 34)
-     * $query->filterByAvatarId(array('min' => 12)); // WHERE avatar_id >= 12
-     * $query->filterByAvatarId(array('max' => 12)); // WHERE avatar_id <= 12
+     * $query->filterByAvatarId(array('min' => 12)); // WHERE avatar_id > 12
      * </code>
      *
      * @see       filterByAvatar()
@@ -802,8 +786,8 @@ abstract class BaseUserQuery extends ModelCriteria
      * @param   File|PropelObjectCollection $file The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 UserQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
+     * @return   UserQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
      */
     public function filterByAvatar($file, $comparison = null)
     {
@@ -878,8 +862,8 @@ abstract class BaseUserQuery extends ModelCriteria
      * @param   FeedItem|PropelObjectCollection $feedItem  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 UserQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
+     * @return   UserQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
      */
     public function filterByFeedItem($feedItem, $comparison = null)
     {
@@ -952,8 +936,8 @@ abstract class BaseUserQuery extends ModelCriteria
      * @param   FeedComment|PropelObjectCollection $feedComment  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 UserQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
+     * @return   UserQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
      */
     public function filterByFeedComment($feedComment, $comparison = null)
     {
@@ -1026,8 +1010,8 @@ abstract class BaseUserQuery extends ModelCriteria
      * @param   Message|PropelObjectCollection $message  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 UserQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
+     * @return   UserQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
      */
     public function filterByMessageRelatedByUserId($message, $comparison = null)
     {
@@ -1100,8 +1084,8 @@ abstract class BaseUserQuery extends ModelCriteria
      * @param   Message|PropelObjectCollection $message  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 UserQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
+     * @return   UserQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
      */
     public function filterByMessageRelatedByFromId($message, $comparison = null)
     {
@@ -1174,8 +1158,8 @@ abstract class BaseUserQuery extends ModelCriteria
      * @param   Message|PropelObjectCollection $message  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 UserQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
+     * @return   UserQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
      */
     public function filterByMessageRelatedByToId($message, $comparison = null)
     {
@@ -1248,8 +1232,8 @@ abstract class BaseUserQuery extends ModelCriteria
      * @param   Notification|PropelObjectCollection $notification  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 UserQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
+     * @return   UserQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
      */
     public function filterByNotificationRelatedByCreatedBy($notification, $comparison = null)
     {
@@ -1322,8 +1306,8 @@ abstract class BaseUserQuery extends ModelCriteria
      * @param   Notification|PropelObjectCollection $notification  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 UserQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
+     * @return   UserQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
      */
     public function filterByNotificationRelatedByUserId($notification, $comparison = null)
     {
@@ -1396,8 +1380,8 @@ abstract class BaseUserQuery extends ModelCriteria
      * @param   Student|PropelObjectCollection $student  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 UserQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
+     * @return   UserQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
      */
     public function filterByStudent($student, $comparison = null)
     {
@@ -1470,8 +1454,8 @@ abstract class BaseUserQuery extends ModelCriteria
      * @param   Teacher|PropelObjectCollection $teacher  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 UserQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
+     * @return   UserQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
      */
     public function filterByTeacher($teacher, $comparison = null)
     {

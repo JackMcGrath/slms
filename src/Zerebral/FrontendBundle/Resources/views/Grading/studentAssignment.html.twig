@@ -1,5 +1,4 @@
-<div class="info">
-    <h3>{{ studentAssignment.assignment.name }}</h3>
+<div class="info assignment-info">
     <ul>
         <li><span>Student:</span> {{ studentAssignment.student.fullName }}</li>
         {% if studentAssignment.assignment.dueAt is not empty %}
@@ -7,11 +6,11 @@
         {% endif %}
         <li><span>Assignment:</span> <span class="label">{{ studentAssignment.assignment.name }}</span></li>
     </ul>
+    <img class="rounded" src="{{ user_avatar(studentAssignment.student.user) | imagine_filter('thumbnail') }}"/>
 </div>
 
 <div class="solutions">
     <h5>Download solution files</h5>
-
     {% for file in studentAssignment.files %}
         <li class="file">
             <img class="icon" src="{{ get_file_icon(file) | imagine_filter('file_icon') }}" />
