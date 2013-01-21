@@ -1,21 +1,30 @@
 $(document).ready(function(){
-	$('a.select-all').click(function(e){
-		e.preventDefault();
-		checkAll();
-	});
-	$('a.deselect-all').click(function(e){
-		e.preventDefault();
-		uncheckAll();
-	});
-
 	$('input.select-all').change(function(e){
 		if (this.checked) {
-			if ($('.message-check:checked').length > 0) {
-				e.preventDefault();
-			}
 			checkAll();
 		} else {
-			uncheckAll();
+			if ($('.message-check:checked').length > 0 && $('.message-check').length > $('.message-check:checked').length) {
+				checkAll();
+				$('input.select-all').prop('checked', true);
+			} else {
+				uncheckAll();
+			}
+		}
+		$('input.select-all').css('opacity', 1);
+	})
+
+	$('input.message-check').change(function(){
+		if ($('.message-check:checked').length > 0) {
+			$('input.select-all').prop('checked', true);
+
+			if ($('.message-check:checked').length == $('.message-check').length) {
+				$('input.select-all').css('opacity', 1);
+			} else {
+				$('input.select-all').css('opacity', 0.5);
+			}
+		} else {
+			$('input.select-all').prop('checked', false);
+			$('input.select-all').css('opacity', 1);
 		}
 	})
 
