@@ -96,3 +96,10 @@
         </div>
     {% endif %}
 {% endmacro %}
+
+{% macro grade(studentAssignment, assignment) %}
+    <h4>Grading: {{ studentAssignment.grading }}</h4> <span class="label label-important">Failed</span>
+    {% if studentAssignment.gradingComment %}
+    <a href="#" rel="tooltip" title="{{ studentAssignment.gradingComment }}"><i class="info-icon icon-small-info"></i></a>
+    {% endif %}
+{% endmacro %}

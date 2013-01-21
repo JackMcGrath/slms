@@ -108,14 +108,12 @@
             </div>
         </div>
         {% if is_granted('ROLE_STUDENT') %}
+            {% set studentAssignment = assignment.studentAssignmentByStudent(app.user.student) %}
+            {% if studentAssignment.grading %}
             <div class="grade pull-right text-center">
-                <h4>Grading: {{ assignment.id + 20 }}</h4>
-                {% if assignment.id <= 10 %}
-                    <span class="label label-important">Failed</span>
-                {% else %}
-                    <span class="label label-success">Success</span>
-                {% endif %}
+                {{ mainPartials.grade(studentAssignment) }}
             </div>
+            {% endif %}
         {% endif %}
     </div>
 {% endblock %}
