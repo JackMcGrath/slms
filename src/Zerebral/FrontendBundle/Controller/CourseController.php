@@ -150,6 +150,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     /**
      * @Route("/assignments/{id}", name="course_assignments")
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @SecureParam(name="course", permissions="VIEW")
      * @ParamConverter("course")
      * @Template()
      */
@@ -178,6 +179,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      * @Route("/syllabus/{courseId}", name="course_materials")
      * @Route("/syllabus/{courseId}/{folderId}", name="course_materials_folder")
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @SecureParam(name="course", permissions="VIEW")
      * @ParamConverter("course", options={"mapping": {"courseId": "id"}})
      * @ParamConverter("folder", options={"mapping": {"folderId": "id"}})
      * @Template()
@@ -205,6 +207,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      * @Route("/members/{id}", name="course_members")
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @ParamConverter("course")
+     * @SecureParam(name="course", permissions="VIEW")
      * @Template()
      */
     public function membersAction(Model\Course\Course $course)
@@ -254,6 +257,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     /**
      * @Route("/attendance/{id}", name="course_attendance")
      * @PreAuthorize("hasRole('ROLE_TEACHER')")
+     * @SecureParam(name="course", permissions="VIEW")
      * @ParamConverter("course")
      * @Template()
      */
@@ -304,6 +308,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     /**
      * @Route("/grading/{id}", name="course_grading")
      * @PreAuthorize("hasRole('ROLE_TEACHER')")
+     * @SecureParam(name="course", permissions="VIEW")
      * @ParamConverter("course")
      * @Template()
      */
