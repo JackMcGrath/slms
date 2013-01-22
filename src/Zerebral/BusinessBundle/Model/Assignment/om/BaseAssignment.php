@@ -20,6 +20,8 @@ use Glorpen\PropelEvent\PropelEventBundle\Events\ModelEvent;
 use Zerebral\BusinessBundle\Model\Assignment\Assignment;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentCategory;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentCategoryQuery;
+use Zerebral\BusinessBundle\Model\Assignment\AssignmentFile;
+use Zerebral\BusinessBundle\Model\Assignment\AssignmentFileQuery;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery;
 use Zerebral\BusinessBundle\Model\Assignment\StudentAssignment;
@@ -30,10 +32,6 @@ use Zerebral\BusinessBundle\Model\Feed\FeedItem;
 use Zerebral\BusinessBundle\Model\Feed\FeedItemQuery;
 use Zerebral\BusinessBundle\Model\File\File;
 use Zerebral\BusinessBundle\Model\File\FileQuery;
-use Zerebral\BusinessBundle\Model\File\FileReferences;
-use Zerebral\BusinessBundle\Model\File\FileReferencesQuery;
-use Zerebral\BusinessBundle\Model\Message\Message;
-use Zerebral\BusinessBundle\Model\Message\MessageQuery;
 use Zerebral\BusinessBundle\Model\Notification\Notification;
 use Zerebral\BusinessBundle\Model\Notification\NotificationQuery;
 use Zerebral\BusinessBundle\Model\User\Student;
@@ -126,6 +124,12 @@ abstract class BaseAssignment extends BaseObject implements Persistent
     protected $aAssignmentCategory;
 
     /**
+     * @var        PropelObjectCollection|AssignmentFile[] Collection to store aggregation of AssignmentFile objects.
+     */
+    protected $collAssignmentFiles;
+    protected $collAssignmentFilesPartial;
+
+    /**
      * @var        PropelObjectCollection|StudentAssignment[] Collection to store aggregation of StudentAssignment objects.
      */
     protected $collStudentAssignments;
@@ -138,21 +142,10 @@ abstract class BaseAssignment extends BaseObject implements Persistent
     protected $collFeedItemsPartial;
 
     /**
-     * @var        PropelObjectCollection|FileReferences[] Collection to store aggregation of FileReferences objects.
-     */
-    protected $collFileReferencess;
-    protected $collFileReferencessPartial;
-
-    /**
      * @var        PropelObjectCollection|Notification[] Collection to store aggregation of Notification objects.
      */
     protected $collNotifications;
     protected $collNotificationsPartial;
-
-    /**
-     * @var        PropelObjectCollection|Student[] Collection to store aggregation of Student objects.
-     */
-    protected $collStudents;
 
     /**
      * @var        PropelObjectCollection|File[] Collection to store aggregation of File objects.
@@ -160,14 +153,9 @@ abstract class BaseAssignment extends BaseObject implements Persistent
     protected $collFiles;
 
     /**
-     * @var        PropelObjectCollection|StudentAssignment[] Collection to store aggregation of StudentAssignment objects.
+     * @var        PropelObjectCollection|Student[] Collection to store aggregation of Student objects.
      */
-    protected $collstudentAssignmentReferenceIds;
-
-    /**
-     * @var        PropelObjectCollection|Message[] Collection to store aggregation of Message objects.
-     */
-    protected $collmessageReferenceIds;
+    protected $collStudents;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -193,25 +181,19 @@ abstract class BaseAssignment extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $studentsScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
     protected $filesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $studentAssignmentReferenceIdsScheduledForDeletion = null;
+    protected $studentsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $messageReferenceIdsScheduledForDeletion = null;
+    protected $assignmentFilesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -224,12 +206,6 @@ abstract class BaseAssignment extends BaseObject implements Persistent
      * @var		PropelObjectCollection
      */
     protected $feedItemsScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $fileReferencessScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -651,18 +627,16 @@ abstract class BaseAssignment extends BaseObject implements Persistent
             $this->aTeacher = null;
             $this->aCourse = null;
             $this->aAssignmentCategory = null;
+            $this->collAssignmentFiles = null;
+
             $this->collStudentAssignments = null;
 
             $this->collFeedItems = null;
 
-            $this->collFileReferencess = null;
-
             $this->collNotifications = null;
 
-            $this->collStudents = null;
             $this->collFiles = null;
-            $this->collstudentAssignmentReferenceIds = null;
-            $this->collmessageReferenceIds = null;
+            $this->collStudents = null;
         } // if (deep)
     }
 
@@ -822,6 +796,32 @@ abstract class BaseAssignment extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
+            if ($this->filesScheduledForDeletion !== null) {
+                if (!$this->filesScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk = $this->getPrimaryKey();
+                    foreach ($this->filesScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($remotePk, $pk);
+                    }
+                    AssignmentFileQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->filesScheduledForDeletion = null;
+                }
+
+                foreach ($this->getFiles() as $file) {
+                    if ($file->isModified()) {
+                        $file->save($con);
+                    }
+                }
+            } elseif ($this->collFiles) {
+                foreach ($this->collFiles as $file) {
+                    if ($file->isModified()) {
+                        $file->save($con);
+                    }
+                }
+            }
+
             if ($this->studentsScheduledForDeletion !== null) {
                 if (!$this->studentsScheduledForDeletion->isEmpty()) {
                     $pks = array();
@@ -848,80 +848,19 @@ abstract class BaseAssignment extends BaseObject implements Persistent
                 }
             }
 
-            if ($this->filesScheduledForDeletion !== null) {
-                if (!$this->filesScheduledForDeletion->isEmpty()) {
-                    $pks = array();
-                    $pk = $this->getPrimaryKey();
-                    foreach ($this->filesScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
-                        $pks[] = array($remotePk, $pk);
-                    }
-                    FileReferencesQuery::create()
-                        ->filterByPrimaryKeys($pks)
+            if ($this->assignmentFilesScheduledForDeletion !== null) {
+                if (!$this->assignmentFilesScheduledForDeletion->isEmpty()) {
+                    AssignmentFileQuery::create()
+                        ->filterByPrimaryKeys($this->assignmentFilesScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->filesScheduledForDeletion = null;
-                }
-
-                foreach ($this->getFiles() as $file) {
-                    if ($file->isModified()) {
-                        $file->save($con);
-                    }
-                }
-            } elseif ($this->collFiles) {
-                foreach ($this->collFiles as $file) {
-                    if ($file->isModified()) {
-                        $file->save($con);
-                    }
+                    $this->assignmentFilesScheduledForDeletion = null;
                 }
             }
 
-            if ($this->studentAssignmentReferenceIdsScheduledForDeletion !== null) {
-                if (!$this->studentAssignmentReferenceIdsScheduledForDeletion->isEmpty()) {
-                    $pks = array();
-                    $pk = $this->getPrimaryKey();
-                    foreach ($this->studentAssignmentReferenceIdsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
-                        $pks[] = array($remotePk, $pk);
-                    }
-                    FileReferencesQuery::create()
-                        ->filterByPrimaryKeys($pks)
-                        ->delete($con);
-                    $this->studentAssignmentReferenceIdsScheduledForDeletion = null;
-                }
-
-                foreach ($this->getstudentAssignmentReferenceIds() as $studentAssignmentReferenceId) {
-                    if ($studentAssignmentReferenceId->isModified()) {
-                        $studentAssignmentReferenceId->save($con);
-                    }
-                }
-            } elseif ($this->collstudentAssignmentReferenceIds) {
-                foreach ($this->collstudentAssignmentReferenceIds as $studentAssignmentReferenceId) {
-                    if ($studentAssignmentReferenceId->isModified()) {
-                        $studentAssignmentReferenceId->save($con);
-                    }
-                }
-            }
-
-            if ($this->messageReferenceIdsScheduledForDeletion !== null) {
-                if (!$this->messageReferenceIdsScheduledForDeletion->isEmpty()) {
-                    $pks = array();
-                    $pk = $this->getPrimaryKey();
-                    foreach ($this->messageReferenceIdsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
-                        $pks[] = array($remotePk, $pk);
-                    }
-                    FileReferencesQuery::create()
-                        ->filterByPrimaryKeys($pks)
-                        ->delete($con);
-                    $this->messageReferenceIdsScheduledForDeletion = null;
-                }
-
-                foreach ($this->getmessageReferenceIds() as $messageReferenceId) {
-                    if ($messageReferenceId->isModified()) {
-                        $messageReferenceId->save($con);
-                    }
-                }
-            } elseif ($this->collmessageReferenceIds) {
-                foreach ($this->collmessageReferenceIds as $messageReferenceId) {
-                    if ($messageReferenceId->isModified()) {
-                        $messageReferenceId->save($con);
+            if ($this->collAssignmentFiles !== null) {
+                foreach ($this->collAssignmentFiles as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
                     }
                 }
             }
@@ -955,23 +894,6 @@ abstract class BaseAssignment extends BaseObject implements Persistent
 
             if ($this->collFeedItems !== null) {
                 foreach ($this->collFeedItems as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
-            if ($this->fileReferencessScheduledForDeletion !== null) {
-                if (!$this->fileReferencessScheduledForDeletion->isEmpty()) {
-                    FileReferencesQuery::create()
-                        ->filterByPrimaryKeys($this->fileReferencessScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->fileReferencessScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collFileReferencess !== null) {
-                foreach ($this->collFileReferencess as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1219,6 +1141,14 @@ abstract class BaseAssignment extends BaseObject implements Persistent
             }
 
 
+                if ($this->collAssignmentFiles !== null) {
+                    foreach ($this->collAssignmentFiles as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
                 if ($this->collStudentAssignments !== null) {
                     foreach ($this->collStudentAssignments as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
@@ -1229,14 +1159,6 @@ abstract class BaseAssignment extends BaseObject implements Persistent
 
                 if ($this->collFeedItems !== null) {
                     foreach ($this->collFeedItems as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
-                    }
-                }
-
-                if ($this->collFileReferencess !== null) {
-                    foreach ($this->collFileReferencess as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -1358,14 +1280,14 @@ abstract class BaseAssignment extends BaseObject implements Persistent
             if (null !== $this->aAssignmentCategory) {
                 $result['AssignmentCategory'] = $this->aAssignmentCategory->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
+            if (null !== $this->collAssignmentFiles) {
+                $result['AssignmentFiles'] = $this->collAssignmentFiles->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collStudentAssignments) {
                 $result['StudentAssignments'] = $this->collStudentAssignments->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collFeedItems) {
                 $result['FeedItems'] = $this->collFeedItems->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
-            if (null !== $this->collFileReferencess) {
-                $result['FileReferencess'] = $this->collFileReferencess->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collNotifications) {
                 $result['Notifications'] = $this->collNotifications->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1557,6 +1479,12 @@ abstract class BaseAssignment extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
+            foreach ($this->getAssignmentFiles() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addAssignmentFile($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getStudentAssignments() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addStudentAssignment($relObj->copy($deepCopy));
@@ -1566,12 +1494,6 @@ abstract class BaseAssignment extends BaseObject implements Persistent
             foreach ($this->getFeedItems() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addFeedItem($relObj->copy($deepCopy));
-                }
-            }
-
-            foreach ($this->getFileReferencess() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addFileReferences($relObj->copy($deepCopy));
                 }
             }
 
@@ -1798,18 +1720,261 @@ abstract class BaseAssignment extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
+        if ('AssignmentFile' == $relationName) {
+            $this->initAssignmentFiles();
+        }
         if ('StudentAssignment' == $relationName) {
             $this->initStudentAssignments();
         }
         if ('FeedItem' == $relationName) {
             $this->initFeedItems();
         }
-        if ('FileReferences' == $relationName) {
-            $this->initFileReferencess();
-        }
         if ('Notification' == $relationName) {
             $this->initNotifications();
         }
+    }
+
+    /**
+     * Clears out the collAssignmentFiles collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Assignment The current object (for fluent API support)
+     * @see        addAssignmentFiles()
+     */
+    public function clearAssignmentFiles()
+    {
+        $this->collAssignmentFiles = null; // important to set this to null since that means it is uninitialized
+        $this->collAssignmentFilesPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collAssignmentFiles collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialAssignmentFiles($v = true)
+    {
+        $this->collAssignmentFilesPartial = $v;
+    }
+
+    /**
+     * Initializes the collAssignmentFiles collection.
+     *
+     * By default this just sets the collAssignmentFiles collection to an empty array (like clearcollAssignmentFiles());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initAssignmentFiles($overrideExisting = true)
+    {
+        if (null !== $this->collAssignmentFiles && !$overrideExisting) {
+            return;
+        }
+        $this->collAssignmentFiles = new PropelObjectCollection();
+        $this->collAssignmentFiles->setModel('AssignmentFile');
+    }
+
+    /**
+     * Gets an array of AssignmentFile objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Assignment is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|AssignmentFile[] List of AssignmentFile objects
+     * @throws PropelException
+     */
+    public function getAssignmentFiles($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collAssignmentFilesPartial && !$this->isNew();
+        if (null === $this->collAssignmentFiles || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collAssignmentFiles) {
+                // return empty collection
+                $this->initAssignmentFiles();
+            } else {
+                $collAssignmentFiles = AssignmentFileQuery::create(null, $criteria)
+                    ->filterByAssignment($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collAssignmentFilesPartial && count($collAssignmentFiles)) {
+                      $this->initAssignmentFiles(false);
+
+                      foreach($collAssignmentFiles as $obj) {
+                        if (false == $this->collAssignmentFiles->contains($obj)) {
+                          $this->collAssignmentFiles->append($obj);
+                        }
+                      }
+
+                      $this->collAssignmentFilesPartial = true;
+                    }
+
+                    $collAssignmentFiles->getInternalIterator()->rewind();
+                    return $collAssignmentFiles;
+                }
+
+                if($partial && $this->collAssignmentFiles) {
+                    foreach($this->collAssignmentFiles as $obj) {
+                        if($obj->isNew()) {
+                            $collAssignmentFiles[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collAssignmentFiles = $collAssignmentFiles;
+                $this->collAssignmentFilesPartial = false;
+            }
+        }
+
+        return $this->collAssignmentFiles;
+    }
+
+    /**
+     * Sets a collection of AssignmentFile objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $assignmentFiles A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Assignment The current object (for fluent API support)
+     */
+    public function setAssignmentFiles(PropelCollection $assignmentFiles, PropelPDO $con = null)
+    {
+        $assignmentFilesToDelete = $this->getAssignmentFiles(new Criteria(), $con)->diff($assignmentFiles);
+
+        $this->assignmentFilesScheduledForDeletion = unserialize(serialize($assignmentFilesToDelete));
+
+        foreach ($assignmentFilesToDelete as $assignmentFileRemoved) {
+            $assignmentFileRemoved->setAssignment(null);
+        }
+
+        $this->collAssignmentFiles = null;
+        foreach ($assignmentFiles as $assignmentFile) {
+            $this->addAssignmentFile($assignmentFile);
+        }
+
+        $this->collAssignmentFiles = $assignmentFiles;
+        $this->collAssignmentFilesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related AssignmentFile objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related AssignmentFile objects.
+     * @throws PropelException
+     */
+    public function countAssignmentFiles(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collAssignmentFilesPartial && !$this->isNew();
+        if (null === $this->collAssignmentFiles || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collAssignmentFiles) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getAssignmentFiles());
+            }
+            $query = AssignmentFileQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByAssignment($this)
+                ->count($con);
+        }
+
+        return count($this->collAssignmentFiles);
+    }
+
+    /**
+     * Method called to associate a AssignmentFile object to this object
+     * through the AssignmentFile foreign key attribute.
+     *
+     * @param    AssignmentFile $l AssignmentFile
+     * @return Assignment The current object (for fluent API support)
+     */
+    public function addAssignmentFile(AssignmentFile $l)
+    {
+        if ($this->collAssignmentFiles === null) {
+            $this->initAssignmentFiles();
+            $this->collAssignmentFilesPartial = true;
+        }
+        if (!in_array($l, $this->collAssignmentFiles->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddAssignmentFile($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	AssignmentFile $assignmentFile The assignmentFile object to add.
+     */
+    protected function doAddAssignmentFile($assignmentFile)
+    {
+        $this->collAssignmentFiles[]= $assignmentFile;
+        $assignmentFile->setAssignment($this);
+    }
+
+    /**
+     * @param	AssignmentFile $assignmentFile The assignmentFile object to remove.
+     * @return Assignment The current object (for fluent API support)
+     */
+    public function removeAssignmentFile($assignmentFile)
+    {
+        if ($this->getAssignmentFiles()->contains($assignmentFile)) {
+            $this->collAssignmentFiles->remove($this->collAssignmentFiles->search($assignmentFile));
+            if (null === $this->assignmentFilesScheduledForDeletion) {
+                $this->assignmentFilesScheduledForDeletion = clone $this->collAssignmentFiles;
+                $this->assignmentFilesScheduledForDeletion->clear();
+            }
+            $this->assignmentFilesScheduledForDeletion[]= clone $assignmentFile;
+            $assignmentFile->setAssignment(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Assignment is new, it will return
+     * an empty collection; or if this Assignment has previously
+     * been saved, it will retrieve related AssignmentFiles from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Assignment.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|AssignmentFile[] List of AssignmentFile objects
+     */
+    public function getAssignmentFilesJoinFile($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = AssignmentFileQuery::create(null, $criteria);
+        $query->joinWith('File', $join_behavior);
+
+        return $this->getAssignmentFiles($query, $con);
     }
 
     /**
@@ -2349,299 +2514,6 @@ abstract class BaseAssignment extends BaseObject implements Persistent
     }
 
     /**
-     * Clears out the collFileReferencess collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return Assignment The current object (for fluent API support)
-     * @see        addFileReferencess()
-     */
-    public function clearFileReferencess()
-    {
-        $this->collFileReferencess = null; // important to set this to null since that means it is uninitialized
-        $this->collFileReferencessPartial = null;
-
-        return $this;
-    }
-
-    /**
-     * reset is the collFileReferencess collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialFileReferencess($v = true)
-    {
-        $this->collFileReferencessPartial = $v;
-    }
-
-    /**
-     * Initializes the collFileReferencess collection.
-     *
-     * By default this just sets the collFileReferencess collection to an empty array (like clearcollFileReferencess());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initFileReferencess($overrideExisting = true)
-    {
-        if (null !== $this->collFileReferencess && !$overrideExisting) {
-            return;
-        }
-        $this->collFileReferencess = new PropelObjectCollection();
-        $this->collFileReferencess->setModel('FileReferences');
-    }
-
-    /**
-     * Gets an array of FileReferences objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Assignment is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|FileReferences[] List of FileReferences objects
-     * @throws PropelException
-     */
-    public function getFileReferencess($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collFileReferencessPartial && !$this->isNew();
-        if (null === $this->collFileReferencess || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collFileReferencess) {
-                // return empty collection
-                $this->initFileReferencess();
-            } else {
-                $collFileReferencess = FileReferencesQuery::create(null, $criteria)
-                    ->filterByassignmentReferenceId($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collFileReferencessPartial && count($collFileReferencess)) {
-                      $this->initFileReferencess(false);
-
-                      foreach($collFileReferencess as $obj) {
-                        if (false == $this->collFileReferencess->contains($obj)) {
-                          $this->collFileReferencess->append($obj);
-                        }
-                      }
-
-                      $this->collFileReferencessPartial = true;
-                    }
-
-                    $collFileReferencess->getInternalIterator()->rewind();
-                    return $collFileReferencess;
-                }
-
-                if($partial && $this->collFileReferencess) {
-                    foreach($this->collFileReferencess as $obj) {
-                        if($obj->isNew()) {
-                            $collFileReferencess[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collFileReferencess = $collFileReferencess;
-                $this->collFileReferencessPartial = false;
-            }
-        }
-
-        return $this->collFileReferencess;
-    }
-
-    /**
-     * Sets a collection of FileReferences objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $fileReferencess A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     * @return Assignment The current object (for fluent API support)
-     */
-    public function setFileReferencess(PropelCollection $fileReferencess, PropelPDO $con = null)
-    {
-        $fileReferencessToDelete = $this->getFileReferencess(new Criteria(), $con)->diff($fileReferencess);
-
-        $this->fileReferencessScheduledForDeletion = unserialize(serialize($fileReferencessToDelete));
-
-        foreach ($fileReferencessToDelete as $fileReferencesRemoved) {
-            $fileReferencesRemoved->setassignmentReferenceId(null);
-        }
-
-        $this->collFileReferencess = null;
-        foreach ($fileReferencess as $fileReferences) {
-            $this->addFileReferences($fileReferences);
-        }
-
-        $this->collFileReferencess = $fileReferencess;
-        $this->collFileReferencessPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related FileReferences objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related FileReferences objects.
-     * @throws PropelException
-     */
-    public function countFileReferencess(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collFileReferencessPartial && !$this->isNew();
-        if (null === $this->collFileReferencess || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collFileReferencess) {
-                return 0;
-            }
-
-            if($partial && !$criteria) {
-                return count($this->getFileReferencess());
-            }
-            $query = FileReferencesQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByassignmentReferenceId($this)
-                ->count($con);
-        }
-
-        return count($this->collFileReferencess);
-    }
-
-    /**
-     * Method called to associate a FileReferences object to this object
-     * through the FileReferences foreign key attribute.
-     *
-     * @param    FileReferences $l FileReferences
-     * @return Assignment The current object (for fluent API support)
-     */
-    public function addFileReferences(FileReferences $l)
-    {
-        if ($this->collFileReferencess === null) {
-            $this->initFileReferencess();
-            $this->collFileReferencessPartial = true;
-        }
-        if (!in_array($l, $this->collFileReferencess->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddFileReferences($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	FileReferences $fileReferences The fileReferences object to add.
-     */
-    protected function doAddFileReferences($fileReferences)
-    {
-        $this->collFileReferencess[]= $fileReferences;
-        $fileReferences->setassignmentReferenceId($this);
-    }
-
-    /**
-     * @param	FileReferences $fileReferences The fileReferences object to remove.
-     * @return Assignment The current object (for fluent API support)
-     */
-    public function removeFileReferences($fileReferences)
-    {
-        if ($this->getFileReferencess()->contains($fileReferences)) {
-            $this->collFileReferencess->remove($this->collFileReferencess->search($fileReferences));
-            if (null === $this->fileReferencessScheduledForDeletion) {
-                $this->fileReferencessScheduledForDeletion = clone $this->collFileReferencess;
-                $this->fileReferencessScheduledForDeletion->clear();
-            }
-            $this->fileReferencessScheduledForDeletion[]= clone $fileReferences;
-            $fileReferences->setassignmentReferenceId(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Assignment is new, it will return
-     * an empty collection; or if this Assignment has previously
-     * been saved, it will retrieve related FileReferencess from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Assignment.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|FileReferences[] List of FileReferences objects
-     */
-    public function getFileReferencessJoinFile($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = FileReferencesQuery::create(null, $criteria);
-        $query->joinWith('File', $join_behavior);
-
-        return $this->getFileReferencess($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Assignment is new, it will return
-     * an empty collection; or if this Assignment has previously
-     * been saved, it will retrieve related FileReferencess from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Assignment.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|FileReferences[] List of FileReferences objects
-     */
-    public function getFileReferencessJoinstudentAssignmentReferenceId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = FileReferencesQuery::create(null, $criteria);
-        $query->joinWith('studentAssignmentReferenceId', $join_behavior);
-
-        return $this->getFileReferencess($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Assignment is new, it will return
-     * an empty collection; or if this Assignment has previously
-     * been saved, it will retrieve related FileReferencess from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Assignment.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|FileReferences[] List of FileReferences objects
-     */
-    public function getFileReferencessJoinmessageReferenceId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = FileReferencesQuery::create(null, $criteria);
-        $query->joinWith('messageReferenceId', $join_behavior);
-
-        return $this->getFileReferencess($query, $con);
-    }
-
-    /**
      * Clears out the collNotifications collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -2935,6 +2807,183 @@ abstract class BaseAssignment extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collFiles collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Assignment The current object (for fluent API support)
+     * @see        addFiles()
+     */
+    public function clearFiles()
+    {
+        $this->collFiles = null; // important to set this to null since that means it is uninitialized
+        $this->collFilesPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * Initializes the collFiles collection.
+     *
+     * By default this just sets the collFiles collection to an empty collection (like clearFiles());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initFiles()
+    {
+        $this->collFiles = new PropelObjectCollection();
+        $this->collFiles->setModel('File');
+    }
+
+    /**
+     * Gets a collection of File objects related by a many-to-many relationship
+     * to the current object by way of the assignment_files cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Assignment is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return PropelObjectCollection|File[] List of File objects
+     */
+    public function getFiles($criteria = null, PropelPDO $con = null)
+    {
+        if (null === $this->collFiles || null !== $criteria) {
+            if ($this->isNew() && null === $this->collFiles) {
+                // return empty collection
+                $this->initFiles();
+            } else {
+                $collFiles = FileQuery::create(null, $criteria)
+                    ->filterByAssignment($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collFiles;
+                }
+                $this->collFiles = $collFiles;
+            }
+        }
+
+        return $this->collFiles;
+    }
+
+    /**
+     * Sets a collection of File objects related by a many-to-many relationship
+     * to the current object by way of the assignment_files cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $files A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Assignment The current object (for fluent API support)
+     */
+    public function setFiles(PropelCollection $files, PropelPDO $con = null)
+    {
+        $this->clearFiles();
+        $currentFiles = $this->getFiles();
+
+        $this->filesScheduledForDeletion = $currentFiles->diff($files);
+
+        foreach ($files as $file) {
+            if (!$currentFiles->contains($file)) {
+                $this->doAddFile($file);
+            }
+        }
+
+        $this->collFiles = $files;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of File objects related by a many-to-many relationship
+     * to the current object by way of the assignment_files cross-reference table.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param boolean $distinct Set to true to force count distinct
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return int the number of related File objects
+     */
+    public function countFiles($criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        if (null === $this->collFiles || null !== $criteria) {
+            if ($this->isNew() && null === $this->collFiles) {
+                return 0;
+            } else {
+                $query = FileQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByAssignment($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collFiles);
+        }
+    }
+
+    /**
+     * Associate a File object to this object
+     * through the assignment_files cross reference table.
+     *
+     * @param  File $file The AssignmentFile object to relate
+     * @return Assignment The current object (for fluent API support)
+     */
+    public function addFile(File $file)
+    {
+        if ($this->collFiles === null) {
+            $this->initFiles();
+        }
+        if (!$this->collFiles->contains($file)) { // only add it if the **same** object is not already associated
+            $this->doAddFile($file);
+
+            $this->collFiles[]= $file;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	File $file The file object to add.
+     */
+    protected function doAddFile($file)
+    {
+        $assignmentFile = new AssignmentFile();
+        $assignmentFile->setFile($file);
+        $this->addAssignmentFile($assignmentFile);
+    }
+
+    /**
+     * Remove a File object to this object
+     * through the assignment_files cross reference table.
+     *
+     * @param File $file The AssignmentFile object to relate
+     * @return Assignment The current object (for fluent API support)
+     */
+    public function removeFile(File $file)
+    {
+        if ($this->getFiles()->contains($file)) {
+            $this->collFiles->remove($this->collFiles->search($file));
+            if (null === $this->filesScheduledForDeletion) {
+                $this->filesScheduledForDeletion = clone $this->collFiles;
+                $this->filesScheduledForDeletion->clear();
+            }
+            $this->filesScheduledForDeletion[]= $file;
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears out the collStudents collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -3112,537 +3161,6 @@ abstract class BaseAssignment extends BaseObject implements Persistent
     }
 
     /**
-     * Clears out the collFiles collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return Assignment The current object (for fluent API support)
-     * @see        addFiles()
-     */
-    public function clearFiles()
-    {
-        $this->collFiles = null; // important to set this to null since that means it is uninitialized
-        $this->collFilesPartial = null;
-
-        return $this;
-    }
-
-    /**
-     * Initializes the collFiles collection.
-     *
-     * By default this just sets the collFiles collection to an empty collection (like clearFiles());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @return void
-     */
-    public function initFiles()
-    {
-        $this->collFiles = new PropelObjectCollection();
-        $this->collFiles->setModel('File');
-    }
-
-    /**
-     * Gets a collection of File objects related by a many-to-many relationship
-     * to the current object by way of the file_references cross-reference table.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Assignment is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria Optional query object to filter the query
-     * @param PropelPDO $con Optional connection object
-     *
-     * @return PropelObjectCollection|File[] List of File objects
-     */
-    public function getFiles($criteria = null, PropelPDO $con = null)
-    {
-        if (null === $this->collFiles || null !== $criteria) {
-            if ($this->isNew() && null === $this->collFiles) {
-                // return empty collection
-                $this->initFiles();
-            } else {
-                $collFiles = FileQuery::create(null, $criteria)
-                    ->filterByassignmentReferenceId($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    return $collFiles;
-                }
-                $this->collFiles = $collFiles;
-            }
-        }
-
-        return $this->collFiles;
-    }
-
-    /**
-     * Sets a collection of File objects related by a many-to-many relationship
-     * to the current object by way of the file_references cross-reference table.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $files A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     * @return Assignment The current object (for fluent API support)
-     */
-    public function setFiles(PropelCollection $files, PropelPDO $con = null)
-    {
-        $this->clearFiles();
-        $currentFiles = $this->getFiles();
-
-        $this->filesScheduledForDeletion = $currentFiles->diff($files);
-
-        foreach ($files as $file) {
-            if (!$currentFiles->contains($file)) {
-                $this->doAddFile($file);
-            }
-        }
-
-        $this->collFiles = $files;
-
-        return $this;
-    }
-
-    /**
-     * Gets the number of File objects related by a many-to-many relationship
-     * to the current object by way of the file_references cross-reference table.
-     *
-     * @param Criteria $criteria Optional query object to filter the query
-     * @param boolean $distinct Set to true to force count distinct
-     * @param PropelPDO $con Optional connection object
-     *
-     * @return int the number of related File objects
-     */
-    public function countFiles($criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        if (null === $this->collFiles || null !== $criteria) {
-            if ($this->isNew() && null === $this->collFiles) {
-                return 0;
-            } else {
-                $query = FileQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByassignmentReferenceId($this)
-                    ->count($con);
-            }
-        } else {
-            return count($this->collFiles);
-        }
-    }
-
-    /**
-     * Associate a File object to this object
-     * through the file_references cross reference table.
-     *
-     * @param  File $file The FileReferences object to relate
-     * @return Assignment The current object (for fluent API support)
-     */
-    public function addFile(File $file)
-    {
-        if ($this->collFiles === null) {
-            $this->initFiles();
-        }
-        if (!$this->collFiles->contains($file)) { // only add it if the **same** object is not already associated
-            $this->doAddFile($file);
-
-            $this->collFiles[]= $file;
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	File $file The file object to add.
-     */
-    protected function doAddFile($file)
-    {
-        $fileReferences = new FileReferences();
-        $fileReferences->setFile($file);
-        $this->addFileReferences($fileReferences);
-    }
-
-    /**
-     * Remove a File object to this object
-     * through the file_references cross reference table.
-     *
-     * @param File $file The FileReferences object to relate
-     * @return Assignment The current object (for fluent API support)
-     */
-    public function removeFile(File $file)
-    {
-        if ($this->getFiles()->contains($file)) {
-            $this->collFiles->remove($this->collFiles->search($file));
-            if (null === $this->filesScheduledForDeletion) {
-                $this->filesScheduledForDeletion = clone $this->collFiles;
-                $this->filesScheduledForDeletion->clear();
-            }
-            $this->filesScheduledForDeletion[]= $file;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Clears out the collstudentAssignmentReferenceIds collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return Assignment The current object (for fluent API support)
-     * @see        addstudentAssignmentReferenceIds()
-     */
-    public function clearstudentAssignmentReferenceIds()
-    {
-        $this->collstudentAssignmentReferenceIds = null; // important to set this to null since that means it is uninitialized
-        $this->collstudentAssignmentReferenceIdsPartial = null;
-
-        return $this;
-    }
-
-    /**
-     * Initializes the collstudentAssignmentReferenceIds collection.
-     *
-     * By default this just sets the collstudentAssignmentReferenceIds collection to an empty collection (like clearstudentAssignmentReferenceIds());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @return void
-     */
-    public function initstudentAssignmentReferenceIds()
-    {
-        $this->collstudentAssignmentReferenceIds = new PropelObjectCollection();
-        $this->collstudentAssignmentReferenceIds->setModel('StudentAssignment');
-    }
-
-    /**
-     * Gets a collection of StudentAssignment objects related by a many-to-many relationship
-     * to the current object by way of the file_references cross-reference table.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Assignment is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria Optional query object to filter the query
-     * @param PropelPDO $con Optional connection object
-     *
-     * @return PropelObjectCollection|StudentAssignment[] List of StudentAssignment objects
-     */
-    public function getstudentAssignmentReferenceIds($criteria = null, PropelPDO $con = null)
-    {
-        if (null === $this->collstudentAssignmentReferenceIds || null !== $criteria) {
-            if ($this->isNew() && null === $this->collstudentAssignmentReferenceIds) {
-                // return empty collection
-                $this->initstudentAssignmentReferenceIds();
-            } else {
-                $collstudentAssignmentReferenceIds = StudentAssignmentQuery::create(null, $criteria)
-                    ->filterByassignmentReferenceId($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    return $collstudentAssignmentReferenceIds;
-                }
-                $this->collstudentAssignmentReferenceIds = $collstudentAssignmentReferenceIds;
-            }
-        }
-
-        return $this->collstudentAssignmentReferenceIds;
-    }
-
-    /**
-     * Sets a collection of StudentAssignment objects related by a many-to-many relationship
-     * to the current object by way of the file_references cross-reference table.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $studentAssignmentReferenceIds A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     * @return Assignment The current object (for fluent API support)
-     */
-    public function setstudentAssignmentReferenceIds(PropelCollection $studentAssignmentReferenceIds, PropelPDO $con = null)
-    {
-        $this->clearstudentAssignmentReferenceIds();
-        $currentstudentAssignmentReferenceIds = $this->getstudentAssignmentReferenceIds();
-
-        $this->studentAssignmentReferenceIdsScheduledForDeletion = $currentstudentAssignmentReferenceIds->diff($studentAssignmentReferenceIds);
-
-        foreach ($studentAssignmentReferenceIds as $studentAssignmentReferenceId) {
-            if (!$currentstudentAssignmentReferenceIds->contains($studentAssignmentReferenceId)) {
-                $this->doAddstudentAssignmentReferenceId($studentAssignmentReferenceId);
-            }
-        }
-
-        $this->collstudentAssignmentReferenceIds = $studentAssignmentReferenceIds;
-
-        return $this;
-    }
-
-    /**
-     * Gets the number of StudentAssignment objects related by a many-to-many relationship
-     * to the current object by way of the file_references cross-reference table.
-     *
-     * @param Criteria $criteria Optional query object to filter the query
-     * @param boolean $distinct Set to true to force count distinct
-     * @param PropelPDO $con Optional connection object
-     *
-     * @return int the number of related StudentAssignment objects
-     */
-    public function countstudentAssignmentReferenceIds($criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        if (null === $this->collstudentAssignmentReferenceIds || null !== $criteria) {
-            if ($this->isNew() && null === $this->collstudentAssignmentReferenceIds) {
-                return 0;
-            } else {
-                $query = StudentAssignmentQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByassignmentReferenceId($this)
-                    ->count($con);
-            }
-        } else {
-            return count($this->collstudentAssignmentReferenceIds);
-        }
-    }
-
-    /**
-     * Associate a StudentAssignment object to this object
-     * through the file_references cross reference table.
-     *
-     * @param  StudentAssignment $studentAssignment The FileReferences object to relate
-     * @return Assignment The current object (for fluent API support)
-     */
-    public function addstudentAssignmentReferenceId(StudentAssignment $studentAssignment)
-    {
-        if ($this->collstudentAssignmentReferenceIds === null) {
-            $this->initstudentAssignmentReferenceIds();
-        }
-        if (!$this->collstudentAssignmentReferenceIds->contains($studentAssignment)) { // only add it if the **same** object is not already associated
-            $this->doAddstudentAssignmentReferenceId($studentAssignment);
-
-            $this->collstudentAssignmentReferenceIds[]= $studentAssignment;
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	studentAssignmentReferenceId $studentAssignmentReferenceId The studentAssignmentReferenceId object to add.
-     */
-    protected function doAddstudentAssignmentReferenceId($studentAssignmentReferenceId)
-    {
-        $fileReferences = new FileReferences();
-        $fileReferences->setstudentAssignmentReferenceId($studentAssignmentReferenceId);
-        $this->addFileReferences($fileReferences);
-    }
-
-    /**
-     * Remove a StudentAssignment object to this object
-     * through the file_references cross reference table.
-     *
-     * @param StudentAssignment $studentAssignment The FileReferences object to relate
-     * @return Assignment The current object (for fluent API support)
-     */
-    public function removestudentAssignmentReferenceId(StudentAssignment $studentAssignment)
-    {
-        if ($this->getstudentAssignmentReferenceIds()->contains($studentAssignment)) {
-            $this->collstudentAssignmentReferenceIds->remove($this->collstudentAssignmentReferenceIds->search($studentAssignment));
-            if (null === $this->studentAssignmentReferenceIdsScheduledForDeletion) {
-                $this->studentAssignmentReferenceIdsScheduledForDeletion = clone $this->collstudentAssignmentReferenceIds;
-                $this->studentAssignmentReferenceIdsScheduledForDeletion->clear();
-            }
-            $this->studentAssignmentReferenceIdsScheduledForDeletion[]= $studentAssignment;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Clears out the collmessageReferenceIds collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return Assignment The current object (for fluent API support)
-     * @see        addmessageReferenceIds()
-     */
-    public function clearmessageReferenceIds()
-    {
-        $this->collmessageReferenceIds = null; // important to set this to null since that means it is uninitialized
-        $this->collmessageReferenceIdsPartial = null;
-
-        return $this;
-    }
-
-    /**
-     * Initializes the collmessageReferenceIds collection.
-     *
-     * By default this just sets the collmessageReferenceIds collection to an empty collection (like clearmessageReferenceIds());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @return void
-     */
-    public function initmessageReferenceIds()
-    {
-        $this->collmessageReferenceIds = new PropelObjectCollection();
-        $this->collmessageReferenceIds->setModel('Message');
-    }
-
-    /**
-     * Gets a collection of Message objects related by a many-to-many relationship
-     * to the current object by way of the file_references cross-reference table.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Assignment is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria Optional query object to filter the query
-     * @param PropelPDO $con Optional connection object
-     *
-     * @return PropelObjectCollection|Message[] List of Message objects
-     */
-    public function getmessageReferenceIds($criteria = null, PropelPDO $con = null)
-    {
-        if (null === $this->collmessageReferenceIds || null !== $criteria) {
-            if ($this->isNew() && null === $this->collmessageReferenceIds) {
-                // return empty collection
-                $this->initmessageReferenceIds();
-            } else {
-                $collmessageReferenceIds = MessageQuery::create(null, $criteria)
-                    ->filterByassignmentReferenceId($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    return $collmessageReferenceIds;
-                }
-                $this->collmessageReferenceIds = $collmessageReferenceIds;
-            }
-        }
-
-        return $this->collmessageReferenceIds;
-    }
-
-    /**
-     * Sets a collection of Message objects related by a many-to-many relationship
-     * to the current object by way of the file_references cross-reference table.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $messageReferenceIds A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     * @return Assignment The current object (for fluent API support)
-     */
-    public function setmessageReferenceIds(PropelCollection $messageReferenceIds, PropelPDO $con = null)
-    {
-        $this->clearmessageReferenceIds();
-        $currentmessageReferenceIds = $this->getmessageReferenceIds();
-
-        $this->messageReferenceIdsScheduledForDeletion = $currentmessageReferenceIds->diff($messageReferenceIds);
-
-        foreach ($messageReferenceIds as $messageReferenceId) {
-            if (!$currentmessageReferenceIds->contains($messageReferenceId)) {
-                $this->doAddmessageReferenceId($messageReferenceId);
-            }
-        }
-
-        $this->collmessageReferenceIds = $messageReferenceIds;
-
-        return $this;
-    }
-
-    /**
-     * Gets the number of Message objects related by a many-to-many relationship
-     * to the current object by way of the file_references cross-reference table.
-     *
-     * @param Criteria $criteria Optional query object to filter the query
-     * @param boolean $distinct Set to true to force count distinct
-     * @param PropelPDO $con Optional connection object
-     *
-     * @return int the number of related Message objects
-     */
-    public function countmessageReferenceIds($criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        if (null === $this->collmessageReferenceIds || null !== $criteria) {
-            if ($this->isNew() && null === $this->collmessageReferenceIds) {
-                return 0;
-            } else {
-                $query = MessageQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByassignmentReferenceId($this)
-                    ->count($con);
-            }
-        } else {
-            return count($this->collmessageReferenceIds);
-        }
-    }
-
-    /**
-     * Associate a Message object to this object
-     * through the file_references cross reference table.
-     *
-     * @param  Message $message The FileReferences object to relate
-     * @return Assignment The current object (for fluent API support)
-     */
-    public function addmessageReferenceId(Message $message)
-    {
-        if ($this->collmessageReferenceIds === null) {
-            $this->initmessageReferenceIds();
-        }
-        if (!$this->collmessageReferenceIds->contains($message)) { // only add it if the **same** object is not already associated
-            $this->doAddmessageReferenceId($message);
-
-            $this->collmessageReferenceIds[]= $message;
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	messageReferenceId $messageReferenceId The messageReferenceId object to add.
-     */
-    protected function doAddmessageReferenceId($messageReferenceId)
-    {
-        $fileReferences = new FileReferences();
-        $fileReferences->setmessageReferenceId($messageReferenceId);
-        $this->addFileReferences($fileReferences);
-    }
-
-    /**
-     * Remove a Message object to this object
-     * through the file_references cross reference table.
-     *
-     * @param Message $message The FileReferences object to relate
-     * @return Assignment The current object (for fluent API support)
-     */
-    public function removemessageReferenceId(Message $message)
-    {
-        if ($this->getmessageReferenceIds()->contains($message)) {
-            $this->collmessageReferenceIds->remove($this->collmessageReferenceIds->search($message));
-            if (null === $this->messageReferenceIdsScheduledForDeletion) {
-                $this->messageReferenceIdsScheduledForDeletion = clone $this->collmessageReferenceIds;
-                $this->messageReferenceIdsScheduledForDeletion->clear();
-            }
-            $this->messageReferenceIdsScheduledForDeletion[]= $message;
-        }
-
-        return $this;
-    }
-
-    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -3677,6 +3195,11 @@ abstract class BaseAssignment extends BaseObject implements Persistent
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->collAssignmentFiles) {
+                foreach ($this->collAssignmentFiles as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collStudentAssignments) {
                 foreach ($this->collStudentAssignments as $o) {
                     $o->clearAllReferences($deep);
@@ -3687,18 +3210,8 @@ abstract class BaseAssignment extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collFileReferencess) {
-                foreach ($this->collFileReferencess as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
             if ($this->collNotifications) {
                 foreach ($this->collNotifications as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
-            if ($this->collStudents) {
-                foreach ($this->collStudents as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -3707,13 +3220,8 @@ abstract class BaseAssignment extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collstudentAssignmentReferenceIds) {
-                foreach ($this->collstudentAssignmentReferenceIds as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
-            if ($this->collmessageReferenceIds) {
-                foreach ($this->collmessageReferenceIds as $o) {
+            if ($this->collStudents) {
+                foreach ($this->collStudents as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -3730,6 +3238,10 @@ abstract class BaseAssignment extends BaseObject implements Persistent
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
+        if ($this->collAssignmentFiles instanceof PropelCollection) {
+            $this->collAssignmentFiles->clearIterator();
+        }
+        $this->collAssignmentFiles = null;
         if ($this->collStudentAssignments instanceof PropelCollection) {
             $this->collStudentAssignments->clearIterator();
         }
@@ -3738,30 +3250,18 @@ abstract class BaseAssignment extends BaseObject implements Persistent
             $this->collFeedItems->clearIterator();
         }
         $this->collFeedItems = null;
-        if ($this->collFileReferencess instanceof PropelCollection) {
-            $this->collFileReferencess->clearIterator();
-        }
-        $this->collFileReferencess = null;
         if ($this->collNotifications instanceof PropelCollection) {
             $this->collNotifications->clearIterator();
         }
         $this->collNotifications = null;
-        if ($this->collStudents instanceof PropelCollection) {
-            $this->collStudents->clearIterator();
-        }
-        $this->collStudents = null;
         if ($this->collFiles instanceof PropelCollection) {
             $this->collFiles->clearIterator();
         }
         $this->collFiles = null;
-        if ($this->collstudentAssignmentReferenceIds instanceof PropelCollection) {
-            $this->collstudentAssignmentReferenceIds->clearIterator();
+        if ($this->collStudents instanceof PropelCollection) {
+            $this->collStudents->clearIterator();
         }
-        $this->collstudentAssignmentReferenceIds = null;
-        if ($this->collmessageReferenceIds instanceof PropelCollection) {
-            $this->collmessageReferenceIds->clearIterator();
-        }
-        $this->collmessageReferenceIds = null;
+        $this->collStudents = null;
         $this->aTeacher = null;
         $this->aCourse = null;
         $this->aAssignmentCategory = null;

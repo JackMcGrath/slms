@@ -150,6 +150,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     /**
      * @Route("/assignments/{id}", name="course_assignments")
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @SecureParam(name="course", permissions="VIEW")
      * @ParamConverter("course")
      * @Template()
      */
@@ -178,6 +179,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      * @Route("/syllabus/{courseId}", name="course_materials")
      * @Route("/syllabus/{courseId}/{folderId}", name="course_materials_folder")
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @SecureParam(name="course", permissions="VIEW")
      * @ParamConverter("course", options={"mapping": {"courseId": "id"}})
      * @ParamConverter("folder", options={"mapping": {"folderId": "id"}})
      * @Template()
@@ -186,15 +188,6 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     {
         $session = $this->getRequest()->getSession();
 
-         // TODO: remove
-        $folderType = new FormType\CourseFolderType();
-        $folderForm = $this->createForm($folderType);
-
-         // TODO: move to partial similar to CourseMaterialFolder::form
-        $courseMaterialType = new FormType\CourseMaterialsType();
-        $courseMaterialType->setCourse($course);
-        $courseMaterialForm = $this->createForm($courseMaterialType);
-
         $materialGroupingType = $this->getRequest()->get('MaterialGrouping') ?: ($session->has('MaterialGrouping') ? $session->get('MaterialGrouping') : 'date');
         $session->set('MaterialGrouping', $materialGroupingType);
 
@@ -202,8 +195,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
 
         return array(
             'dayMaterials' => $materials,
-            'folderRenameForm' => $folderForm->createView(),
-            'courseMaterialForm' => $courseMaterialForm->createView(),
+
             'materialGrouping' => $materialGroupingType,
             'folder' => $folder,
             'course' => $course,
@@ -215,6 +207,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      * @Route("/members/{id}", name="course_members")
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @ParamConverter("course")
+     * @SecureParam(name="course", permissions="VIEW")
      * @Template()
      */
     public function membersAction(Model\Course\Course $course)
@@ -264,6 +257,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     /**
      * @Route("/attendance/{id}", name="course_attendance")
      * @PreAuthorize("hasRole('ROLE_TEACHER')")
+     * @SecureParam(name="course", permissions="VIEW")
      * @ParamConverter("course")
      * @Template()
      */
@@ -309,6 +303,36 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
             'dateRaw' => $dateRaw,
             'target' => 'course'
         );
+    }
 
+    /**
+     * @Route("/grading/{id}", name="course_grading")
+     * @PreAuthorize("hasRole('ROLE_TEACHER')")
+     * @SecureParam(name="course", permissions="VIEW")
+     * @ParamConverter("course")
+     * @Template()
+     */
+    public function gradingAction(Model\Course\Course $course)
+    {
+        $assignments = \Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery::create()->findSortedByCourse($course)->filterByDueAt(null, \Criteria::ISNOTNULL)->find();
+
+        $grading = array();
+        foreach ($assignments as $assignment) {
+            foreach ($assignment->getStudentAssignments() as $studentAssignment) {
+                $grading[$studentAssignment->getStudentId()][$studentAssignment->getAssignmentId()] = $studentAssignment;
+            }
+        }
+        $students = StudentQuery::create()->findByCourse($course)->find();
+
+        $studentAssignment = \Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentQuery::create()->findPk(448);
+
+        return array(
+            'grading' => $grading,
+            'students' => $students,
+            'course' => $course,
+            'assignments' => $assignments,
+            'studentAssignment' => $studentAssignment,
+            'target' => 'course'
+        );
     }
 }

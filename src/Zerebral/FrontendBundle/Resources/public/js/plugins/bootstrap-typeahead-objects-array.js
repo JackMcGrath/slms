@@ -116,6 +116,7 @@
 
   , matcher: function (item) {
       //return ~item.toLowerCase().indexOf(this.query.toLowerCase())
+	  return true;
       return ~item.name.toLowerCase().indexOf(this.query.toLowerCase())
     }
 

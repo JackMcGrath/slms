@@ -6,7 +6,6 @@ use Glorpen\PropelEvent\PropelEventBundle\Events\ModelEvent;
 
 use Zerebral\BusinessBundle\Model\Notification\Notification;
 use Zerebral\BusinessBundle\Model\Notification\NotificationPeer;
-use Zerebral\BusinessBundle\Model\File\FileReferences;
 
 class NotificationEventSubscriber implements \Symfony\Component\EventDispatcher\EventSubscriberInterface
 {
@@ -20,7 +19,7 @@ class NotificationEventSubscriber implements \Symfony\Component\EventDispatcher\
             'assignments.update.post' => 'updateAssignment',
             'courses.update.post' => 'updateCourse',
             'course_materials.insert.post' => 'createMaterial',
-            'file_references.insert.post' => 'createFile', //New Assignment File,
+            'assignment_file.insert.post' => 'createFile', //New Assignment File,
             'attendance.save.post' => 'updateAttendance',
             'feed_items.insert.post' => 'createFeed'
         );
@@ -92,20 +91,18 @@ class NotificationEventSubscriber implements \Symfony\Component\EventDispatcher\
 
     public function createFile(ModelEvent $event)
     {
-        /** @var $fileReference \Zerebral\BusinessBundle\Model\File\FileReferences */
-        $fileReference = $event->getModel();
+        /** @var $assignmentFile \Zerebral\BusinessBundle\Model\Assignment\AssignmentFile */
+        $assignmentFile = $event->getModel();
 
-        if ($fileReference->getreferenceType() == \Zerebral\BusinessBundle\Model\File\FileReferencesPeer::REFERENCE_TYPE_ASSIGNMENT) {
-            foreach ($fileReference->getAssignmentReferenceId()->getStudents() as $student) {
-                $notification = new Notification();
-                $notification->setUserId($student->getStudent()->getUserId());
-                $notification->setType(NotificationPeer::TYPE_ASSIGNMENT_FILE_CREATE);
-                $notification->setCourse($fileReference->getassignmentReferenceId()->getCourse());
-                $notification->setAssignment($fileReference->getassignmentReferenceId());
-                $notification->setCreatedBy($fileReference->getassignmentReferenceId()->getCourse()->getTeachers()->getFirst()->getUserId());
-                $notification->setParam('file_id',$fileReference->getfileId());
-                $notification->save();
-            }
+        foreach ($assignmentFile->getAssignment()->getStudents() as $student) {
+            $notification = new Notification();
+            $notification->setUserId($student->getUserId());
+            $notification->setType(NotificationPeer::TYPE_ASSIGNMENT_FILE_CREATE);
+            $notification->setCourse($assignmentFile->getAssignment()->getCourse());
+            $notification->setAssignment($assignmentFile->getAssignment());
+            $notification->setCreatedBy($assignmentFile->getAssignment()->getCourse()->getTeachers()->getFirst()->getUserId());
+            $notification->setParam('file_id', $assignmentFile->getfileId());
+            $notification->save();
         }
     }
 

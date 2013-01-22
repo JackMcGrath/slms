@@ -11,8 +11,8 @@ use \PropelException;
 use \PropelPDO;
 use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\PeerEvent;
-use Zerebral\BusinessBundle\Model\File\FileReferencesPeer;
 use Zerebral\BusinessBundle\Model\Message\Message;
+use Zerebral\BusinessBundle\Model\Message\MessageFilePeer;
 use Zerebral\BusinessBundle\Model\Message\MessagePeer;
 use Zerebral\BusinessBundle\Model\Message\map\MessageTableMap;
 use Zerebral\BusinessBundle\Model\User\UserPeer;
@@ -406,9 +406,9 @@ abstract class BaseMessagePeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in FileReferencesPeer instance pool,
+        // Invalidate objects in MessageFilePeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        FileReferencesPeer::clearInstancePool();
+        MessageFilePeer::clearInstancePool();
     }
 
     /**

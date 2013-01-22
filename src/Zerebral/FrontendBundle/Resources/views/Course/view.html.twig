@@ -54,7 +54,7 @@
                 <h4>Recent materials</h4>
                 <ul>
                     {% for material in recentMaterials %}
-                        <li><a href="{{ get_file_storage_link(material.file) }}"><img src="/img/{{ get_file_icon(material.file, 'small').name }}"/>{{ material.file.name }}</a></li>
+                        <li><a href="{{ material.file.url }}"><img src="{{ get_file_icon(material.file, 'small') }}"/>{{ material.file.name }}</a></li>
                     {% endfor %}
                 </ul>
             </div>

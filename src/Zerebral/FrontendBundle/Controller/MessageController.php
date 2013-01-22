@@ -73,9 +73,8 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
 
         $newMessage = new Model\Message\Message();
         $newMessageType = new FormType\MessageType();
-        $newMessageType->setFileStorage($this->container->get('zerebral.file_storage')->getFileStorage('local'));
 
-        $form = $this->createForm($newMessageType, $newMessage);
+        $form = $this->createForm($newMessageType, $newMessage, array('validation_groups' => array('Default', 'reply')));
         if ($this->getRequest()->isMethod('POST')) {
 
             $form->bind($this->getRequest());
@@ -103,7 +102,7 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
                 $readInThreadCount++;
             } else {
                 $message->markAsRead();
-                $readInThreadCount++;
+//                $readInThreadCount++;
             }
         }
 
@@ -134,9 +133,8 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
     {
         $newMessage = new Model\Message\Message();
         $newMessageType = new FormType\MessageType();
-        $newMessageType->setFileStorage($this->container->get('zerebral.file_storage')->getFileStorage('local'));
 
-        $form = $this->createForm($newMessageType, $newMessage);
+        $form = $this->createForm($newMessageType, $newMessage, array('validation_groups' => array('Default', 'compose')));
         if ($this->getRequest()->isMethod('POST')) {
 
             $form->bind($this->getRequest());
@@ -161,54 +159,34 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
         );
     }
 
-    /**
-     * @Route("/suggest-user/", name="ajax_message_suggest_user")
+     /**
+     * @Route("/edit", name="message_edit")
      *
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @Template()
      */
-    public function suggestUserAction()
+    public function editAction()
     {
-        $name = $this->getRequest()->get('username');
-        if ($name) {
-            $userList = \Zerebral\BusinessBundle\Model\User\UserQuery::create()->findForSuggestByNameForUser($name, $this->getUser());
-            $response = array();
-            if (count($userList)) {
-                foreach ($userList as $user) {
-                    $response[] = array(
-                        'id' => $user->getId(),
-                        'name' => $user->getFullName(),
-                    );
+        $threads = $this->getRequest()->get('Collection', array());
+        if ($threads) {
+            $messages = \Zerebral\BusinessBundle\Model\Message\MessageQuery::create()->filterByUserId($this->getUser()->getId())->filterByThreadId($threads)->find();
+            if ($this->getRequest()->get('delete', false)) {
+                foreach ($messages as $message) {
+                    $message->delete();
+                }
+            } else if ($this->getRequest()->get('mark-as-read', false)) {
+                foreach ($messages as $message) {
+                    $message->setIsRead(true);
+                    $message->save();
+                }
+            } else if ($this->getRequest()->get('mark-as-unread', false)) {
+                foreach ($messages as $message) {
+                    $message->setIsRead(false);
+                    $message->save();
                 }
             }
-            return new JsonResponse(array('success' => true, 'users' => $response));
         }
 
-        throw new \Symfony\Component\HttpKernel\Exception\HttpException(404, 'User name is empty.');
+        return $this->redirect($this->generateUrl('messages_inbox'));
     }
-
-//     /**
-//     * @Route("/delete/{id}", name="assignment_delete")
-//     * @Route("/delete/{id}/{courseId}", name="course_assignment_delete")
-//     * @ParamConverter("assignment", options={"mapping": {"id": "id"}})
-//     * @ParamConverter("course", options={"mapping": {"courseId": "id"}})
-//     *
-//     * @SecureParam(name="assignment", permissions="DELETE")
-//     * @PreAuthorize("hasRole('ROLE_TEACHER')")
-//     * @Template()
-//     */
-//    public function deleteAction(Model\Assignment\Assignment $assignment, Model\Course\Course $course = null)
-//    {
-//        $assignment->delete();
-//        $this->setFlash(
-//            'delete_assignment_success',
-//                'Assignment <b>' . $assignment->getName() . '</b> has been successfully deleted from course ' . $assignment->getCourse()->getName() . '.'
-//        );
-//        if ($course) {
-//            return $this->redirect($this->generateUrl('course_assignments', array('id' => $course->getId())));
-//        } else {
-//            return $this->redirect($this->generateUrl('assignments'));
-//        }
-//
-//    }
 }

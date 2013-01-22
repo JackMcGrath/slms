@@ -9,7 +9,7 @@ class MessageQuery extends BaseMessageQuery
     public function findInboxByUser(\Zerebral\BusinessBundle\Model\User\User $user)
     {
         $this->filterByUserId($user->getId());
-        $this->filterByToId($user->getId());
+//        $this->filterByToId($user->getId());
 
         $this->groupByThreadId();
 
@@ -17,6 +17,8 @@ class MessageQuery extends BaseMessageQuery
 
         $this->withColumn('MAX(`created_at`)', 'lastMessageDate');
         $this->withColumn('SUM(IF(`is_read` = 0, 1, 0))', 'unreadCount');
+
+        $this->having('SUM(IF(`to_id` = ' . $user->getId() . ', 1, 0)) > 0');
 
         return $this->find();
     }
@@ -49,6 +51,7 @@ class MessageQuery extends BaseMessageQuery
         $this->filterByUserId($user->getId());
         $this->filterByToId($user->getId());
         $this->findByIsRead(false);
+        $this->groupByThreadId();
 
         return $this->count();
     }

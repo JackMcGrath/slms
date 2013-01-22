@@ -10,4 +10,6 @@ $(document).ready(function() {
         var message = $(e.target).closest('a').attr('confirm') || 'Are you sure you want to delete?'
         return confirm(message);
     });
+
+    $('a[rel="tooltip"]').tooltip({html: true});
 });

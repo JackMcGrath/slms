@@ -93,7 +93,7 @@
 
 {% import _self as self %}
 <div class="feed-item" id="feedItem{{ feedItem.id }}">
-    <div class="avatar"><img class="rounded" src="{{ get_file_storage_link(feedItem.user.getAvatarFile()) | imagine_filter('thumbnail') }}"></div>
+    <div class="avatar"><img class="rounded" src="{{ user_avatar(feedItem.user) | imagine_filter('thumbnail') }}"></div>
     <div class="content {% if app.user.id == feedItem.user.id and feedItem.feedContent.type != 'assignment' %} is_author {% endif %}">
         {% if app.user.id == feedItem.user.id %}<a href="{{ path('ajax_remove_feed_item', {feedItemId: feedItem.id}) }}" class="gray delete-link delete-feed-item"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
         {% if feedItem.feedContent.type == 'assignment' %}

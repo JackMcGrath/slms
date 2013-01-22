@@ -1,7 +1,4 @@
 .messages-list {
-  .messages-head {
-
-  }
   .messages {
     margin-top: 30px;
     border: 2px solid #e6e6e2;
@@ -92,7 +89,7 @@
 
       div {
         height: 32px;
-        padding: 12px 0 3px 0;
+        padding: 14px 0 7px 0;
         display: table-cell;
         vertical-align: middle;
         border-top: 1px solid #ebebeb;
@@ -124,6 +121,9 @@
         a {
           font-size: 12px;
           color: #34a3f8;
+        }
+        p {
+          font-size: 13px;
         }
       }
     }
@@ -167,8 +167,16 @@
             border: none;
             margin: 0;
             padding: 11px 5px;
+            background: transparent;
+          }
+
+          .help-inline {
+            display: none;
           }
         }
+      }
+      .error {
+        background: #F2DEDE;
       }
       .to {
         .control-group {
@@ -177,6 +185,9 @@
       }
     }
   }
+  .alert {
+    margin: 4px 0;
+  }
   .messageslist {
     margin-top: 0;
     display: table;
@@ -184,8 +195,18 @@
   }
   .messages-head {
     line-height: 18px;
-    padding: 19px 0 11px 8px;
+    padding: 19px 0 16px 8px;
     height: 26px;
+
+    label {
+      font-size: 12px;
+      color: #666;
+      display: inline;
+
+      input[type=checkbox] {
+        margin: 0 12px 0 4px;
+      }
+    }
 
     input {
       color: #666666;
@@ -194,13 +215,6 @@
     }
     input.btn-danger {
       color: #fff;
-    }
-    input[type=checkbox] {
-      margin: 0 12px 0 4px;
-    }
-    a {
-      font-size: 11px;
-      color: #666;
     }
   }
   .message-row:first-child {
@@ -229,6 +243,46 @@
   li.active {
     a {
       background-image: linear-gradient(to bottom, #C76A67, #B74A47) !important;
+    }
+  }
+}
+
+.right-navbar {
+  .user-info {
+    img {
+      border-radius: 50%;
+    }
+    a {
+      color: #30302f;
+      font-size: 12px;
+    }
+  }
+
+  .attachments {
+    p {
+      color: #30302f;
+      font-size: 13px;
+    }
+
+    div {
+      a {
+        color: #1f9ef4;
+        font-size: 13px;
+      }
+
+      margin-bottom: 9px;
+    }
+    .grey {
+      margin-top: 15px;
+      color: #c4c4c4;
+      font-size: 12px;
+    }
+  }
+
+  .folders {
+    a {
+      font-weight: bold;
+      font-size: 13px;
     }
   }
 }

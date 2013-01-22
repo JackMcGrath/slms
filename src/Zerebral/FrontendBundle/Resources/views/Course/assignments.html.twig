@@ -81,7 +81,7 @@
     <div class="list-item span12{{ loop.last ? ' last' : '' }}">
         <div class="symbol pull-left">
             {% if is_granted('ROLE_STUDENT') %}
-                <img class="rounded" src="{{ get_file_storage_link(assignment.teacher.user.getAvatarFile()) | imagine_filter('thumbnail') }}"/>
+                <img class="rounded" src="{{ user_avatar(assignment.teacher) | imagine_filter('thumbnail') }}"/>
             {% else %}
                 <div class="rounded count-badge {{ badgeClass }}">
                     {% if type is defined and type == 'draft' %}

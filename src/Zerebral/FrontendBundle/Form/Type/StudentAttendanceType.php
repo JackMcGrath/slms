@@ -2,12 +2,8 @@
 namespace Zerebral\FrontendBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Zerebral\CommonBundle\Form\Type\OptionalModelType;
-use Zerebral\CommonBundle\Form\DataTransformer\TimeTransformer;
-use Zerebral\FrontendBundle\Form\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Validator\Constraints\Collection;
 
 class StudentAttendanceType extends AbstractType
 {

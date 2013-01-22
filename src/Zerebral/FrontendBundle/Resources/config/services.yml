@@ -4,7 +4,7 @@ parameters:
 services:
     zerbral.twig.extension.file_storage:
         class: Zerebral\FrontendBundle\Extension\FileStorageExtension
-        arguments:  [@zerebral.file_storage]
+        arguments:  []
         tags:
             -  { name: twig.extension }
     zerebral.twig.extension.plural:
