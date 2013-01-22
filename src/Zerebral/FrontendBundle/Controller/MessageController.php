@@ -165,6 +165,7 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
             'target' => 'messages',
             'folder' => null,
             'unreadCount' => $unreadCount,
+            'hasErrors' => $form->hasErrors(),
             'form' => $form->createView(),
         );
     }

@@ -87,6 +87,7 @@ Zerebral\BusinessBundle\Model\File\File:
                 message: Please, select file for uploading
          uploadedFile:
              - Image:
+                 mimeTypes: [image/jpg, image/jpeg, image/png, image/gif]
                  groups: [profile]
              - File: ~
 
