@@ -10,15 +10,6 @@
     {% endspaceless %}
 {% endblock form_rows %}
 
-{% block error_alert %}
-    {% for error in errorList %}
-        <div class="alert alert-error">
-            <button data-dismiss="alert" class="close" type="button">×</button>
-            {{ error.messageTemplate|trans(error.messageParameters, 'validators') }}
-        </div>
-    {% endfor %}
-{% endblock %}
-
 {% block content %}
     {% javascripts
     '@ZerebralFrontendBundle/Resources/public/js/plugins/bootstrap-typeahead-objects-array.js'
@@ -37,78 +28,67 @@
             </div>
             <hr/>
 
-            {% if form.toName.vars.errors|length %}
-                {% set errorList = form.toName.vars.errors %}
-                {{ block('error_alert') }}
-            {% endif %}
+            <div class="message-form">
+                {% if 1 %}
+                    <div class="alert alert-error">
+                        <button data-dismiss="alert" class="close" type="button">×</button>
+                        <strong>Oh snap!</strong> Change a few things up and try submitting again.
+                    </div>
+                {% endif %}
 
-            {% if form.subject.vars.errors|length %}
-                {% set errorList = form.subject.vars.errors %}
-                {{ block('error_alert') }}
-            {% endif %}
-
-            <div class="messages">
                 <form method="post" {{ form_enctype(form) }} novalidate>
                     {{ form_widget(form._token) }}
-                    <div class="message-form">
-                        <div class="to">
-                            {{ form_row(form.toName, {
-                                label: 'To',
-                                form_type: 'horizontal',
-                                attr: {
-                                    class: '',
-                                    'hiddennId': 'message_to_id',
-                                    autocomplete: 'off'
-                                }
-                                })
-                            }}
-                            {{ form_row(form.to_id, {
-                                label: 'To',
-                                form_type: 'horizontal',
-                                attr: {}
-                                })
-                            }}
-                            {#<input type="hidden" name="message[to_id]" id="message_to_id">#}
-                        </div>
-                        <div class="subject">
-                            {{ form_row(form.subject, {
-                                form_type: 'horizontal',
-                                attr: {
-                                    class: 'input-xlarge primary-input'
-                                }
-                            }) }}
-                        </div>
-                    </div>
-                    <div class="reply">
+                    {{ form_row(form.toName, {
+                        label: 'To',
+                        form_type: 'horizontal',
+                        attr: {
+                            class: '',
+                            'hiddennId': 'message_to_id',
+                            autocomplete: 'off'
+                        }
+                        })
+                    }}
+                    {{ form_row(form.to_id, {
+                        label: 'To',
+                        form_type: 'horizontal',
+                        attr: {}
+                        })
+                    }}
+                    {{ form_row(form.subject, {
+                        form_type: 'horizontal',
+                        attr: {
+                            class: 'input-xlarge primary-input'
+                        }
+                    }) }}
+                    {{ form_row(form.body, {
+                        label: 'Message',
+                        form_type: 'horizontal',
+                        attr: {
+                            class: '',
+                            rows: 6
+                        }
+                    }) }}
 
+                    <script type="text/template" id="new_file_form">
+                        {{ form_widget(form.files.vars.prototype)|raw }}
+                    </script>
 
-                        {{ form_row(form.body, {
-                            label: '',
-                            form_type: 'horizontal',
-                            attr: {
-                                class: '',
-                                rows: 6
-                            }
-                        }) }}
+                    <div class="control-group radio-control-group">
+                        <label class="control-label"></label>
 
-                        <script type="text/template" id="new_file_form">
-                            {{ form_widget(form.files.vars.prototype)|raw }}
-                        </script>
-
-                        <div class="control-group radio-control-group">
-                            <label class="control-label">Attachments</label>
-
-                            <div id="attachments_div" class="controls">
-                                <div id="upload_files_div" data-last-index="{{ form.files.vars.data|max_key }}">
-                                    {{ form_widget(form.files) }}
-                                </div>
-                                <a href="#" class="add_file_link">Add another file</a> <span class="gray"></span>
+                        <div id="attachments_div" class="controls">
+                            <div id="upload_files_div" data-last-index="{{ form.files.vars.data|max_key }}">
+                                {{ form_widget(form.files) }}
                             </div>
+                            <a href="#" class="add_file_link">Add another file</a> <span class="gray"></span>
                         </div>
-
-                        <input type="submit" value="Send" />
-
                     </div>
+
+                    <div class="form-actions">
+                        <input type="submit" value="Send Message" />
+                        <input type="reset" value="Cancel" class="btn">
+                    </div>
+
                 </form>
             </div>
         </div>
