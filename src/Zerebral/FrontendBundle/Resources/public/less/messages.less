@@ -231,6 +231,48 @@
     border-color: #d84b35;
     border-radius: 3px;
   }
+  .pagination {
+    ul {
+      box-shadow: none;
+      li {
+        display: inline-block;
+        border: 2px solid #e6e6e3;
+        border-radius: 3px;
+        margin: 2px;
+        a {
+          display: block;
+          color: #939494;
+          background: transparent;
+          border: none;
+          padding: 1px 9px;
+          font-size: 11px;
+          float: none;
+        }
+      }
+      li.active {
+        border-color: #23acf1;
+        a {
+          color: #23acf1;
+        }
+      }
+      li.inactive {
+        border: 2px solid #e6e6e3;
+        border-radius: 3px;
+        margin: 2px;
+        color: #cdcdcb;
+        padding: 1px 9px;
+        font-size: 11px;
+        background-color: #f7f7f5;
+      }
+      li.skip {
+        border: none;
+        margin: 4px;
+        color: #cdcdcb;
+        padding: 1px;
+        font-size: 11px;
+      }
+    }
+  }
 }
 
 .typeahead {
@@ -276,13 +318,6 @@
       margin-top: 15px;
       color: #c4c4c4;
       font-size: 12px;
-    }
-  }
-
-  .folders {
-    a {
-      font-weight: bold;
-      font-size: 13px;
     }
   }
 }
