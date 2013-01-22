@@ -63,7 +63,7 @@ class AssignmentQuery extends BaseAssignmentQuery
     public function findCompleteNow()
     {
         $this->leftJoinStudentAssignment();
-        $this->where("DATE_FORMAT(due_at, '%Y-%m-%d %H:%i')>'" . date('Y-m-d H:i', strtotime('-1 hour')) . "'");
+        $this->where("DATE_FORMAT(due_at, '%Y-%m-%d %H:%i')>='" . date('Y-m-d H:i', strtotime('-1 hour')) . "'");
         $this->where("StudentAssignment.is_submitted=1");
         $this->groupBy('assignments.id');
         return $this;
