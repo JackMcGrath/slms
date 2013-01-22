@@ -29,7 +29,6 @@ Controller.prototype = {
             "bFilter": false,
             "bInfo" : false,
             "bAutoWidth" : false
-
         } );
         new FixedColumns( oTable , {
             "sLeftWidth": 'relative',

@@ -211,6 +211,7 @@
             min-height: 80px;
             border-bottom: 1px solid #f3f3f3;
             margin-top: 20px;
+            padding-bottom: 10px;
 
             .avatar {
                 width: 70px;
@@ -245,22 +246,37 @@
                 .text {
                     color: #b74a47;
                     font-weight: bold;
-                    font-size: 13px;
+                    font-size: 15px;
                     line-height: 1.5;
                     margin-left: 70px;
                     .link-content {
                         margin-top: 10px;
                         .thumbnail {
+                            position: relative;
                             width: 95px;
                             height: 60px;
                             padding: 0;
                             float: left;
                             margin-right: 10px;
                             // margin-top: 4px;
-                            img {
+                            img.overlay {
+                                position: absolute;
+                                top: 30px;
+                                left: 5px;
+                                width: 35 !important;
+                                height: 26 !important;
+                            }
+                            img.img {
                                 width: 95px;
                                 height: 60px;
                             }
+
+                        }
+                        .video-overlay {
+                            background-image: url('/img/icons/video-overlay-icon.png');
+                            background-repeat: no-repeat;
+                            background-position-y: 30px;
+                            background-position-x: 5px;
                         }
                         .info {
                             color: #333333;
@@ -313,9 +329,11 @@
                 }
                 .comment {
                     background-color: #F8F8F8;
-                    margin-bottom: 5px;
+//                    margin-bottom: 5px;
                     padding: 10px;
                     min-height: 27px;
+                    margin-bottom: 0px;
+                    border-bottom: 1px dashed #fff;
 
 
                     &.is_author:hover {
@@ -373,7 +391,7 @@
                         }
                         .comment-input {
                             margin-bottom: 0;
-                            width: 520px;
+                            width: 572px;
                             resize: none;
                             height: 18px;
                         }

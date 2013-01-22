@@ -19,7 +19,7 @@ class NotificationEventSubscriber implements \Symfony\Component\EventDispatcher\
             'assignments.update.post' => 'updateAssignment',
             'courses.update.post' => 'updateCourse',
             'course_materials.insert.post' => 'createMaterial',
-            'assignment_file.insert.post' => 'createFile', //New Assignment File,
+            'assignment_files.insert.post' => 'createFile', //New Assignment File,
             'attendance.save.post' => 'updateAttendance',
             'feed_items.insert.post' => 'createFeed'
         );
@@ -133,11 +133,15 @@ class NotificationEventSubscriber implements \Symfony\Component\EventDispatcher\
         if (!$feedItem->getAssignmentId() && $feedItem->getCourseId()) {
             foreach ($feedItem->getCourse()->getCourseTeachers() as $teacher) {
                 $notification = new Notification();
-                $notification->setUserId($teacher->getTeacher()->getUserId());
-                $notification->setType(NotificationPeer::TYPE_COURSE_FEED_COMMENT_CREATE);
-                $notification->setCourse($feedItem->getCourse());
-                $notification->setCreatedBy($feedItem->getCreatedBy());
-                $notification->save();
+                $userId = $teacher->getTeacher()->getUserId();
+                $createdByUserId = $feedItem->getCreatedBy();
+                if ($userId != $createdByUserId) {
+                    $notification->setUserId($userId);
+                    $notification->setType(NotificationPeer::TYPE_COURSE_FEED_COMMENT_CREATE);
+                    $notification->setCourse($feedItem->getCourse());
+                    $notification->setCreatedBy($createdByUserId);
+                    $notification->save();
+                }
             }
         }
     }
