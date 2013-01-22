@@ -24,7 +24,7 @@ class UrlExtension extends \Twig_Extension
             return $text;
         }
 
-        return $urlInfo['host'];
+        return isset($urlInfo['host']) ? $urlInfo['host'] : $text;
     }
 
     /**
