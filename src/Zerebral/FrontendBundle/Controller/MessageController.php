@@ -24,6 +24,7 @@ use \Zerebral\BusinessBundle\Model\Message\MessageQuery;
  */
 class MessageController extends \Zerebral\CommonBundle\Component\Controller
 {
+    public $messagesOnPage = 10;
     /**
      * @Route("/", name="messages_inbox")
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
@@ -31,15 +32,20 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function indexAction()
     {
+        $page = $this->getRequest()->get('page', 1);
 
-        $messages = MessageQuery::create()->findInboxByUser($this->getUser());
+        $messages = MessageQuery::create()->filterInboxByUser($this->getUser())->paginate($page, $this->messagesOnPage)->getResults();
         $unreadCount = MessageQuery::create()->getUnreadCount($this->getUser());
+
+
+        $paginator = new \Zerebral\FrontendBundle\Extension\Paginator(MessageQuery::create()->filterInboxByUser($this->getUser())->count(), $page , $this->messagesOnPage, 3);
 
         return array(
             'messages' => $messages,
             'unreadCount' => $unreadCount,
             'target' => 'messages',
             'folder' => 'inbox',
+            'paginator' => $paginator,
         );
     }
 
@@ -50,15 +56,19 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function sentAction()
     {
+        $page = $this->getRequest()->get('page', 1);
 
-        $messages = MessageQuery::create()->findSentByUser($this->getUser());
+        $messages = MessageQuery::create()->filterSentByUser($this->getUser())->paginate($page, $this->messagesOnPage)->getResults();
         $unreadCount = MessageQuery::create()->getUnreadCount($this->getUser());
+
+        $paginator = new \Zerebral\FrontendBundle\Extension\Paginator(MessageQuery::create()->filterSentByUser($this->getUser())->count(), $page , $this->messagesOnPage, 3);
 
         return array(
             'messages' => $messages,
             'unreadCount' => $unreadCount,
             'target' => 'messages',
             'folder' => 'sent',
+            'paginator' => $paginator,
         );
     }
 

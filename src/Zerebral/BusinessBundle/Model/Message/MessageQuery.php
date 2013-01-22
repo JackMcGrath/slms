@@ -6,7 +6,7 @@ use Zerebral\BusinessBundle\Model\Message\om\BaseMessageQuery;
 
 class MessageQuery extends BaseMessageQuery
 {
-    public function findInboxByUser(\Zerebral\BusinessBundle\Model\User\User $user)
+    public function filterInboxByUser(\Zerebral\BusinessBundle\Model\User\User $user)
     {
         $this->filterByUserId($user->getId());
 //        $this->filterByToId($user->getId());
@@ -20,10 +20,10 @@ class MessageQuery extends BaseMessageQuery
 
         $this->having('SUM(IF(`to_id` = ' . $user->getId() . ', 1, 0)) > 0');
 
-        return $this->find();
+        return $this;
     }
 
-    public function findSentByUser(\Zerebral\BusinessBundle\Model\User\User $user)
+    public function filterSentByUser(\Zerebral\BusinessBundle\Model\User\User $user)
     {
         $this->filterByUserId($user->getId());
         $this->filterByFromId($user->getId());
@@ -33,7 +33,7 @@ class MessageQuery extends BaseMessageQuery
         $this->withColumn('created_at', 'lastMessageDate');
         $this->withColumn('IF(`is_read` = 0, 1, 0)', 'unreadCount');
 
-        return $this->find();
+        return $this;
     }
 
     public function findThreadForUser($threadId, \Zerebral\BusinessBundle\Model\User\User $user)

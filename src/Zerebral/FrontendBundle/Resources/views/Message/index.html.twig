@@ -35,6 +35,10 @@
                     {% endif %}
                 </div>
             </form>
+            <div class="pull-right">
+                {% set path = folder == 'inbox' ? 'messages_inbox' : 'messages_sent' %}
+                {% include "ZerebralFrontendBundle:Message:paginator.html.twig" %}
+            </div>
         </div>
 
         <div class="right-navbar pull-left">
