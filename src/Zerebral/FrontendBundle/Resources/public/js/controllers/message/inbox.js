@@ -1,4 +1,20 @@
 $(document).ready(function(){
+	$('input[name=delete]').click(function(e){
+		if ($('.message-check:checked').length > 0) {
+			if (window.confirm('Are you sure you want to delete selected messages?')) {
+				$(this).closest('form').submit();
+			} else {
+				e.preventDefault();
+			}
+		}
+	});
+
+	$('input[type=submit]').click(function(e){
+		if ($('.message-check:checked').length == 0) {
+			e.preventDefault();
+		}
+	});
+
 	$('input.select-all').change(function(e){
 		if (this.checked) {
 			checkAll();
