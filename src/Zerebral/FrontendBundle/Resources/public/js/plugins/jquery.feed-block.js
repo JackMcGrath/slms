@@ -297,6 +297,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
 
         var link = $(event.target);
         link.parents('.feed-item').find('.comment.hidden').removeClass('hidden');
+        link.addClass('expanded');
     },
     addItemBlock: function(response, collapseForm) {
         var self = this;
