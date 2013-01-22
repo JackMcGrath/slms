@@ -51,12 +51,7 @@
             </div>
 
             <div class="block recent-materials">
-                <h4>Recent materials</h4>
-                <ul>
-                    {% for material in recentMaterials %}
-                        <li><a href="{{ material.file.url }}"><img src="{{ get_file_icon(material.file, 'small') }}"/>{{ material.file.name }}</a></li>
-                    {% endfor %}
-                </ul>
+                {{ mainPartials.recentMaterials(upcomingAssignments) }}
             </div>
 
             <div class="block teacher-profile">
