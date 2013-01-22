@@ -22,11 +22,11 @@
     {% import _self as self %}
     {{ self.feed_item_author_block(feedItem, isGlobal) }}
     <div class="text">
-        {{ feedItem.feedContent.text }}
+        {{ feedItem.feedContent.text|nl2br }}
         <div class="link-content">
             {% if feedItem.feedContent.linkThumbnailUrl is not null %}
                 <div class="thumbnail">
-                    <a href="{{ feedItem.feedContent.linkUrl }}" target="_blank"><img width="95" height="60" src="{{ feedItem.feedContent.linkThumbnailUrl }}" alt="{{ feedItem.feedContent.linkTitle }}" /></a>
+                    <a href="{{ feedItem.feedContent.linkUrl }}" target="_blank"><img class="img" width="95" height="60" src="{{ feedItem.feedContent.linkThumbnailUrl }}" alt="{{ feedItem.feedContent.linkTitle }}" /></a>
                 </div>
             {% endif %}
             <div class="info">
@@ -42,11 +42,14 @@
     {% import _self as self %}
     {{ self.feed_item_author_block(feedItem, isGlobal) }}
     <div class="text">
-        {{ feedItem.feedContent.text }}
+        {{ feedItem.feedContent.text|nl2br }}
         <div class="link-content">
             {% if feedItem.feedContent.linkThumbnailUrl is not null %}
                 <div class="thumbnail">
-                    <a href="{{ feedItem.feedContent.linkUrl }}" target="_blank"><img width="95" height="60" src="{{ feedItem.feedContent.linkThumbnailUrl }}" alt="{{ feedItem.feedContent.linkTitle }}" /></a>
+                    <a href="{{ feedItem.feedContent.linkUrl }}" target="_blank">
+                        <img class="img" width="95" height="60" src="{{ feedItem.feedContent.linkThumbnailUrl }}" alt="{{ feedItem.feedContent.linkTitle }}" />
+                        <img class="overlay" width="35" height="26" src="{{ asset('img/icons/video-overlay-icon.png') }}" alt="" />
+                    </a>
                 </div>
             {% endif %}
             <div class="info">
@@ -62,7 +65,7 @@
     {% import _self as self %}
     {{ self.feed_item_author_block(feedItem, isGlobal) }}
     <div class="text">
-        {{ feedItem.feedContent.text }}
+        {{ feedItem.feedContent.text|nl2br }}
         <div class="link-content">
             <a href="{{ feedItem.feedContent.linkUrl }}" target="_blank"><img src="{{ feedItem.feedContent.linkUrl }}" alt="{{ feedItem.feedContent.linkTitle }}" /></a>
         </div>
@@ -83,7 +86,7 @@
     {% import _self as self %}
     {{ self.feed_item_author_block(feedItem, isGlobal) }}
     <div class="text">
-        {{ feedItem.feedContent.text }}
+        {{ feedItem.feedContent.text|nl2br }}
     </div>
 {% endmacro %}
 
@@ -107,11 +110,11 @@
     </div>
     <div class="comments-button">
         {% if feedItem.feedContent.type == 'website' %}
-            <div class="attached-link"><i class="icon-globe"></i> <a href="{{ feedItem.feedContent.linkUrl }}">{{ feedItem.feedContent.linkUrl }}</a></div>
+            <div class="attached-link"><i class="icon-globe"></i> <a href="{{ feedItem.feedContent.linkUrl }}">{{ feedItem.feedContent.linkUrl|get_domain }}</a></div>
         {% elseif feedItem.feedContent.type == 'video' %}
-            <div class="attached-link"><i class="icon-play"></i> <a href="{{ feedItem.feedContent.linkUrl }}">{{ feedItem.feedContent.linkUrl }}</a></div>
+            <div class="attached-link"><i class="icon-play"></i> <a href="{{ feedItem.feedContent.linkUrl }}">{{ feedItem.feedContent.linkUrl|get_domain }}</a></div>
         {% elseif feedItem.feedContent.type == 'image' %}
-            <div class="attached-link"><i class="icon-picture"></i> <a href="{{ feedItem.feedContent.linkUrl }}">{{ feedItem.feedContent.linkUrl }}</a></div>
+            <div class="attached-link"><i class="icon-picture"></i> <a href="{{ feedItem.feedContent.linkUrl }}">{{ feedItem.feedContent.linkUrl|get_domain }}</a></div>
         {% endif %}
         <i class="icon-comment"></i> <a class="show-comment-form-link" data-comments-count="{{ feedItem.feedComments|length }}" href="#">Comment (<span>{{ feedItem.feedComments|length }}</span>)</a>
     </div>
@@ -122,7 +125,6 @@
         {% set lastItemCommentId = 0 %}
     {% endif %}
     <div class="comments" data-item-id="{{ feedItem.id }}" data-last-item-comment-id="{{ lastItemCommentId }}">
-        {% set lastFeedComments = feedItem.lastFeedComments %}
         {% if lastFeedComments|length < feedItem.feedComments|length %}
             <div class="comment load-more">
                 <i class="icon-comment"></i>&nbsp;<span class="load-more-link hidden">Loading...</span><a class="load-more-link" href="{{ path('ajax_load_more_comments', {feedItemId: feedItem.id}) }}" data-loaded-count="{{ lastFeedComments|length }}" data-total-count="{{  feedItem.feedComments|length }}" data-last-comment-id="{{ lastFeedComments.first.id }}">Show more comments</a>
@@ -133,7 +135,6 @@
         {% endfor %}
 
         <div class="comment {% if feedItem.feedComments|length == 0 %} hidden {% endif %}">
-            <div class="avatar"><img class="rounded" src="{{ get_file_storage_link(app.user.getAvatarFile()) | imagine_filter('small_thumbnail') }}" /></div>
             <div class="content">
                 <form class="feed-item-comment-form" action="{{ path('ajax_feed_add_comment', {feedItemId: feedItem.id}) }}" method="post">
                     <div class="control-group">

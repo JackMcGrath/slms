@@ -11,6 +11,10 @@ services:
         class: Zerebral\FrontendBundle\Extension\PluralExtension
         tags:
             -  { name: twig.extension }
+    zerebral.twig.extension.url:
+            class: Zerebral\FrontendBundle\Extension\UrlExtension
+            tags:
+                -  { name: twig.extension }
     twig.extension.native_functions:
         class: Zerebral\FrontendBundle\Extension\NativeTwigFunction
         tags:

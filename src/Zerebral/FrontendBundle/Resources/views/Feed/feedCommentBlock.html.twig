@@ -1,5 +1,5 @@
 {% macro course_feed_comment_text_block(comment) %}
-    <b>{{ comment.user.fullName }}</b>&nbsp;{{ comment.feedContent.text }}
+    <b>{{ comment.user.fullName }}</b>&nbsp;{{ comment.feedContent.text|nl2br }}
 {% endmacro %}
 
 {% macro course_feed_comment_website_block(comment) %}
@@ -74,7 +74,7 @@
     {{ comment.user.fullName }} <span class="gray timestamp" data-date="{{ comment.createdAt.format('Y-m-d H:i:s') }}">{{ time_diff(comment.createdAt) }}</span>
     {% if app.user.id == comment.user.id %}<a href="{{ path('ajax_feed_remove_comment', {feedCommentId: comment.id}) }}" class="gray delete-link delete-comment"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
     </div>
-    <div class="text">{{ comment.feedContent.text }}</div>
+    <div class="text">{{ comment.feedContent.text|nl2br }}</div>
 {% endmacro %}
 
 {% macro assignment_feed_comment_website_block(comment) %}
@@ -83,7 +83,7 @@
         {% if app.user.id == comment.user.id %}<a href="{{ path('ajax_feed_remove_comment', {feedCommentId: comment.id}) }}" class="gray delete-link delete-comment"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
     </div>
     <div class="text">
-        {{ comment.feedContent.text }}
+        {{ comment.feedContent.text|nl2br }}
         <div class="link-content">
             {% if comment.feedContent.linkThumbnailUrl is not null %}
                 <div class="thumbnail">
@@ -105,7 +105,7 @@
         {% if app.user.id == comment.user.id %}<a href="{{ path('ajax_feed_remove_comment', {feedCommentId: comment.id}) }}" class="gray delete-link delete-comment"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
     </div>
     <div class="text">
-        {{ comment.feedContent.text }}
+        {{ comment.feedContent.text|nl2br }}
         <div class="link-content">
             {% if comment.feedContent.linkThumbnailUrl is not null %}
                 <div class="thumbnail">
@@ -127,7 +127,7 @@
         {% if app.user.id == comment.user.id %}<a href="{{ path('ajax_feed_remove_comment', {feedCommentId: comment.id}) }}" class="gray delete-link delete-comment"><i class="icon-small-trash-bin"></i>Delete</a>{% endif %}
     </div>
     <div class="text">
-        {{ comment.feedContent.text }}
+        {{ comment.feedContent.text|nl2br }}
         <div class="link-content">
             <a href="{{ comment.feedContent.linkUrl }}" target="_blank"><img src="{{ comment.feedContent.linkUrl }}" alt="{{ comment.feedContent.linkTitle }}" /></a>
         </div>
