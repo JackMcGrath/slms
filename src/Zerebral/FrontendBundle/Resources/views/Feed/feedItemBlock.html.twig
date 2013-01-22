@@ -108,6 +108,7 @@
             {{ self.feed_item_text_block(feedItem, isGlobal) }}
         {% endif %}
     </div>
+    {% set lastFeedComments = feedItem.lastFeedComments %}
     <div class="comments-button">
         {% if feedItem.feedContent.type == 'website' %}
             <div class="attached-link"><i class="icon-globe"></i> <a href="{{ feedItem.feedContent.linkUrl }}">{{ feedItem.feedContent.linkUrl|get_domain }}</a></div>
@@ -116,9 +117,8 @@
         {% elseif feedItem.feedContent.type == 'image' %}
             <div class="attached-link"><i class="icon-picture"></i> <a href="{{ feedItem.feedContent.linkUrl }}">{{ feedItem.feedContent.linkUrl|get_domain }}</a></div>
         {% endif %}
-        <i class="icon-comment"></i> <a class="show-comment-form-link" data-comments-count="{{ feedItem.feedComments|length }}" href="#">Comment (<span>{{ feedItem.feedComments|length }}</span>)</a>
+        <i class="icon-comment"></i><a class="show-comment-form-link {% if lastFeedComments|length > 0 %} expanded {% endif %}" data-comments-count="{{ feedItem.feedComments|length }}" href="#">&nbsp;Comments (<span>{{ feedItem.feedComments|length }}</span>)</a>
     </div>
-    {% set lastFeedComments = feedItem.lastFeedComments %}
     {% if lastFeedComments|length > 0 %}
         {% set lastItemCommentId = lastFeedComments.last.id %}
     {% else %}

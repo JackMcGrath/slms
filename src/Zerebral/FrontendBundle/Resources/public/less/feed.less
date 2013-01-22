@@ -207,6 +207,9 @@
             margin-bottom: 20px;
         }
         .feed-item {
+            &:last-child {
+                border-bottom: none;
+            }
             clear: both;
             min-height: 80px;
             border-bottom: 1px solid #f3f3f3;
@@ -307,6 +310,29 @@
                 }
                 a.show-comment-form-link {
                     color: #656565;
+                    position: relative;
+                }
+                a.show-comment-form-link.expanded:before {
+                    content: '';
+                    display: inline-block;
+                    border-left: 7px solid transparent;
+                    border-right: 7px solid transparent;
+                    border-bottom: 7px solid #000000;
+                    border-bottom-color: #F8F8F8;
+                    position: absolute;
+                    top: 20px;
+                    left: 9px;
+                }
+
+                a.show-comment-form-link.expanded:after {
+                    content: '';
+                    display: inline-block;
+                    border-left: 6px solid transparent;
+                    border-right: 6px solid transparent;
+                    border-bottom: 6px solid #F8F8F8;
+                    position: absolute;
+                    top: 20px;
+                    left: 10px;
                 }
             }
             .comments {
