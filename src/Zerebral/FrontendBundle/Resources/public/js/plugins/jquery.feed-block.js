@@ -361,19 +361,30 @@ ZerebralCourseDetailFeedBlock.prototype = {
     deleteItemBlock: function(event) {
         event.preventDefault();
         var link = $(event.target);
-        if (window.confirm('Are you sure to delete post?')) {
-            var url = link.attr('href');
-            $.ajax({
-                url: url,
-                type: 'post',
-                dataType: 'json',
-                success: function(response) {
-                    link.parents('.feed-item').slideUp('fast', function() {
-                        link.parents('.feed-item').remove();
-                    });
-                },
-                error: function() {alert('Oops, seems like unknown error has appeared!') }
-            })
+        if (!link.hasClass('processing')) {
+            if (window.confirm('Are you sure to delete post?')) {
+                var url = link.attr('href');
+                $.ajax({
+                    url: url,
+                    type: 'post',
+                    dataType: 'json',
+                    beforeSend: function() {
+                        link.addClass('processing');
+                        link.html('Deleting...').next().find('.timestamp').addClass('hidden');
+                    },
+                    success: function(response) {
+                        link.hide();
+                        link.parents('.feed-item').slideUp('fast', function() {
+                            link.parents('.feed-item').remove();
+                        });
+                    },
+                    error: function() {alert('Oops, seems like unknown error has appeared!') },
+                    complete: function() {
+                        link.removeClass('processing');
+                        link.html('<i class="icon-small-trash-bin"></i>Delete').next().find('.timestamp').removeClass('hidden');
+                    }
+                })
+            }
         }
     },
     addCommentBlock: function(response, lastCommentId) {
@@ -391,12 +402,13 @@ ZerebralCourseDetailFeedBlock.prototype = {
         if (!link.hasClass('processing')) {
             if (window.confirm('Are you sure to delete comment?')) {
                 var url = link.attr('href');
-                link.addClass('processing');
-                link.html('Deleting...').css('display', 'block').css('text-decoration', 'none').prev().css('display', 'none');
                 $.ajax({
                     url: url,
                     type: 'post',
                     dataType: 'json',
+                    beforeSend: function() {
+                        link.addClass('processing').html('Deleting...').prev().addClass('hidden');
+                    },
                     success: function(response) {
                         link.hide();
                         var commentsCount = link.parents('.feed-item').find('.show-comment-form-link').data('commentsCount');
@@ -408,7 +420,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
                     },
                     error: function() {alert('Oops, seems like unknown error has appeared!') },
                     complete: function() {
-                        link.removeClass('processing');
+                        link.removeClass('processing').html('<i class="icon-small-trash-bin"></i>Delete').prev().removeClass('hidden');
                     }
                 })
             }
@@ -606,19 +618,29 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
     deleteCommentBlock: function(event) {
         event.preventDefault();
         var link = $(event.target);
-        if (window.confirm('Are you sure to delete comment?')) {
-            var url = link.attr('href');
-            $.ajax({
-                url: url,
-                type: 'post',
-                dataType: 'json',
-                success: function(response) {
-                    link.parents('.comment').slideUp('fast', function() {
-                        link.parents('.comment').remove();
-                    });
-                },
-                error: function() {alert('Oops, seems like unknown error has appeared!') }
-            })
+        if (!link.hasClass('processing')) {
+            if (window.confirm('Are you sure to delete comment?')) {
+                var url = link.attr('href');
+                $.ajax({
+                    url: url,
+                    type: 'post',
+                    dataType: 'json',
+                    beforeSend: function() {
+                        link.addClass('processing').html('Deleting').parent().find('.timestamp').addClass('hidden');
+                    },
+                    success: function(response) {
+                        link.hide();
+                        link.parents('.comment').slideUp('fast', function() {
+                            link.parents('.comment').remove();
+                        });
+                    },
+                    error: function() {alert('Oops, seems like unknown error has appeared!') },
+                    complete: function() {
+                        link.removeClass('processing').html('<i class="icon-small-trash-bin"></i>Deleting').parent().find('.timestamp').removeClass('hidden');
+                    }
+
+                })
+            }
         }
     },
     _: ''
