@@ -117,20 +117,20 @@
         {% elseif feedItem.feedContent.type == 'image' %}
             <div class="attached-link"><i class="icon-picture"></i> <a href="{{ feedItem.feedContent.linkUrl }}">{{ feedItem.feedContent.linkUrl|get_domain }}</a></div>
         {% endif %}
-        <i class="icon-comment"></i><a class="show-comment-form-link {% if lastFeedComments|length > 0 %} expanded {% endif %}" data-comments-count="{{ feedItem.feedComments|length }}" href="#">&nbsp;Comments (<span>{{ feedItem.feedComments|length }}</span>)</a>
+        <i class="icon-comment"></i><a class="show-comment-form-link {% if lastFeedComments|length > 0 %} expanded {% endif %}" data-comments-count="{{ feedItem.getCommentsCount() }}" href="#">&nbsp;Comments (<span>{{ feedItem.getCommentsCount() }}</span>)</a>
     </div>
     {% set lastItemCommentId = (lastFeedComments|length > 0) ? lastFeedComments.last.id : 0 %}
     <div class="comments" data-item-id="{{ feedItem.id }}" data-last-item-comment-id="{{ lastItemCommentId }}">
-        {% if lastFeedComments|length < feedItem.feedComments|length %}
+        {% if lastFeedComments|length < feedItem.getCommentsCount() %}
             <div class="comment load-more">
-                <i class="icon-comment"></i>&nbsp;<span class="load-more-link hidden">Loading...</span><a class="load-more-link" href="{{ path('ajax_load_more_comments', {feedItemId: feedItem.id}) }}" data-loaded-count="{{ lastFeedComments|length }}" data-total-count="{{  feedItem.feedComments|length }}" data-last-comment-id="{{ lastFeedComments.first.id }}">Show more comments</a>
+                <i class="icon-comment"></i>&nbsp;<span class="load-more-link hidden">Loading...</span><a class="load-more-link" href="{{ path('ajax_load_more_comments', {feedItemId: feedItem.id}) }}" data-loaded-count="{{ lastFeedComments|length }}" data-total-count="{{  feedItem.getCommentsCount() }}" data-last-comment-id="{{ lastFeedComments.first.id }}">Show more comments</a>
             </div>
         {% endif %}
         {% for comment in lastFeedComments %}
             {% include "ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig" with {'feedType': 'course'} %}
         {% endfor %}
 
-        <div class="comment {% if feedItem.feedComments|length == 0 %} hidden {% endif %}">
+        <div class="comment {% if feedItem.getCommentsCount() == 0 %} hidden {% endif %}">
             <div class="content">
                 <form class="feed-item-comment-form" action="{{ path('ajax_feed_add_comment', {feedItemId: feedItem.id}) }}" method="post">
                     <div class="control-group">

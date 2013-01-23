@@ -16,8 +16,11 @@ class FeedItem extends BaseFeedItem
 
     public function getLastFeedComments()
     {
+        if ($this->getCommentsCount() == 0) {
+            return array();
+        }
         $criteria = new \Criteria();
-        $criteria->setLimit($this->defaultCommentsCount)->setOffset($this->countFeedComments() - $this->defaultCommentsCount)->addAscendingOrderByColumn('created_at');
+        $criteria->setLimit($this->defaultCommentsCount)->setOffset($this->getCommentsCount() - $this->defaultCommentsCount);//->addAscendingOrderByColumn(FeedCommentPeer::ID);
         return $this->getFeedComments($criteria);
     }
 }

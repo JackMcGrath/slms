@@ -12,13 +12,12 @@ class FeedCommentQuery extends BaseFeedCommentQuery
     {
         $filter = parent::filterByFeedItem($feedItem, $comparison);
         $filter->joinWith('FeedContent');
-        return $filter->orderByCreatedAt();
+        return $filter->orderById();
     }
 
     public function filterOlder($feedItem, $lastCommentId)
     {
         return $this->clearOrderByColumns()
-            ->addDescendingOrderByColumn(FeedCommentPeer::ID)
             ->filterByFeedItem($feedItem)
             ->filterById($lastCommentId, \Criteria::LESS_THAN);
     }
@@ -26,7 +25,6 @@ class FeedCommentQuery extends BaseFeedCommentQuery
     public function filterNewer($feedItem, $lastCommentId)
     {
         return $this->clearOrderByColumns()
-            ->addAscendingOrderByColumn(FeedCommentPeer::ID)
             ->filterByFeedItem($feedItem)
             ->filterById($lastCommentId, \Criteria::GREATER_THAN);
     }
