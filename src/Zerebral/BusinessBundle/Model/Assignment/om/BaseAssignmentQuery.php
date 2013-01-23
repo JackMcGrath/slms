@@ -35,6 +35,8 @@ use Zerebral\BusinessBundle\Model\User\Teacher;
  * @method AssignmentQuery orderByName($order = Criteria::ASC) Order by the name column
  * @method AssignmentQuery orderByDescription($order = Criteria::ASC) Order by the description column
  * @method AssignmentQuery orderByMaxPoints($order = Criteria::ASC) Order by the max_points column
+ * @method AssignmentQuery orderByGradeType($order = Criteria::ASC) Order by the grade_type column
+ * @method AssignmentQuery orderByThreshold($order = Criteria::ASC) Order by the threshold column
  * @method AssignmentQuery orderByDueAt($order = Criteria::ASC) Order by the due_at column
  *
  * @method AssignmentQuery groupById() Group by the id column
@@ -44,6 +46,8 @@ use Zerebral\BusinessBundle\Model\User\Teacher;
  * @method AssignmentQuery groupByName() Group by the name column
  * @method AssignmentQuery groupByDescription() Group by the description column
  * @method AssignmentQuery groupByMaxPoints() Group by the max_points column
+ * @method AssignmentQuery groupByGradeType() Group by the grade_type column
+ * @method AssignmentQuery groupByThreshold() Group by the threshold column
  * @method AssignmentQuery groupByDueAt() Group by the due_at column
  *
  * @method AssignmentQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
@@ -87,6 +91,8 @@ use Zerebral\BusinessBundle\Model\User\Teacher;
  * @method Assignment findOneByName(string $name) Return the first Assignment filtered by the name column
  * @method Assignment findOneByDescription(string $description) Return the first Assignment filtered by the description column
  * @method Assignment findOneByMaxPoints(int $max_points) Return the first Assignment filtered by the max_points column
+ * @method Assignment findOneByGradeType(string $grade_type) Return the first Assignment filtered by the grade_type column
+ * @method Assignment findOneByThreshold(int $threshold) Return the first Assignment filtered by the threshold column
  * @method Assignment findOneByDueAt(string $due_at) Return the first Assignment filtered by the due_at column
  *
  * @method array findById(int $id) Return Assignment objects filtered by the id column
@@ -96,6 +102,8 @@ use Zerebral\BusinessBundle\Model\User\Teacher;
  * @method array findByName(string $name) Return Assignment objects filtered by the name column
  * @method array findByDescription(string $description) Return Assignment objects filtered by the description column
  * @method array findByMaxPoints(int $max_points) Return Assignment objects filtered by the max_points column
+ * @method array findByGradeType(string $grade_type) Return Assignment objects filtered by the grade_type column
+ * @method array findByThreshold(int $threshold) Return Assignment objects filtered by the threshold column
  * @method array findByDueAt(string $due_at) Return Assignment objects filtered by the due_at column
  */
 abstract class BaseAssignmentQuery extends ModelCriteria
@@ -199,7 +207,7 @@ abstract class BaseAssignmentQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `teacher_id`, `course_id`, `assignment_category_id`, `name`, `description`, `max_points`, `due_at` FROM `assignments` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `teacher_id`, `course_id`, `assignment_category_id`, `name`, `description`, `max_points`, `grade_type`, `threshold`, `due_at` FROM `assignments` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -541,6 +549,76 @@ abstract class BaseAssignmentQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(AssignmentPeer::MAX_POINTS, $maxPoints, $comparison);
+    }
+
+    /**
+     * Filter the query on the grade_type column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByGradeType('fooValue');   // WHERE grade_type = 'fooValue'
+     * $query->filterByGradeType('%fooValue%'); // WHERE grade_type LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $gradeType The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return AssignmentQuery The current query, for fluid interface
+     */
+    public function filterByGradeType($gradeType = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($gradeType)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $gradeType)) {
+                $gradeType = str_replace('*', '%', $gradeType);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(AssignmentPeer::GRADE_TYPE, $gradeType, $comparison);
+    }
+
+    /**
+     * Filter the query on the threshold column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByThreshold(1234); // WHERE threshold = 1234
+     * $query->filterByThreshold(array(12, 34)); // WHERE threshold IN (12, 34)
+     * $query->filterByThreshold(array('min' => 12)); // WHERE threshold > 12
+     * </code>
+     *
+     * @param     mixed $threshold The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return AssignmentQuery The current query, for fluid interface
+     */
+    public function filterByThreshold($threshold = null, $comparison = null)
+    {
+        if (is_array($threshold)) {
+            $useMinMax = false;
+            if (isset($threshold['min'])) {
+                $this->addUsingAlias(AssignmentPeer::THRESHOLD, $threshold['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($threshold['max'])) {
+                $this->addUsingAlias(AssignmentPeer::THRESHOLD, $threshold['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(AssignmentPeer::THRESHOLD, $threshold, $comparison);
     }
 
     /**

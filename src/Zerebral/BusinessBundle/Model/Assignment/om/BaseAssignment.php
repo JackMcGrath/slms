@@ -103,6 +103,19 @@ abstract class BaseAssignment extends BaseObject implements Persistent
     protected $max_points;
 
     /**
+     * The value for the grade_type field.
+     * Note: this column has a database default value of: 'numeric'
+     * @var        string
+     */
+    protected $grade_type;
+
+    /**
+     * The value for the threshold field.
+     * @var        int
+     */
+    protected $threshold;
+
+    /**
      * The value for the due_at field.
      * @var        string
      */
@@ -214,6 +227,28 @@ abstract class BaseAssignment extends BaseObject implements Persistent
     protected $notificationsScheduledForDeletion = null;
 
     /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see        __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->grade_type = 'numeric';
+    }
+
+    /**
+     * Initializes internal state of BaseAssignment object.
+     * @see        applyDefaults()
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->applyDefaultValues();
+        EventDispatcherProxy::trigger(array('construct','model.construct'), new ModelEvent($this));
+}
+
+    /**
      * Get the [id] column value.
      *
      * @return int
@@ -281,6 +316,26 @@ abstract class BaseAssignment extends BaseObject implements Persistent
     public function getMaxPoints()
     {
         return $this->max_points;
+    }
+
+    /**
+     * Get the [grade_type] column value.
+     *
+     * @return string
+     */
+    public function getGradeType()
+    {
+        return $this->grade_type;
+    }
+
+    /**
+     * Get the [threshold] column value.
+     *
+     * @return int
+     */
+    public function getThreshold()
+    {
+        return $this->threshold;
     }
 
     /**
@@ -483,6 +538,48 @@ abstract class BaseAssignment extends BaseObject implements Persistent
     } // setMaxPoints()
 
     /**
+     * Set the value of [grade_type] column.
+     *
+     * @param string $v new value
+     * @return Assignment The current object (for fluent API support)
+     */
+    public function setGradeType($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (string) $v;
+        }
+
+        if ($this->grade_type !== $v) {
+            $this->grade_type = $v;
+            $this->modifiedColumns[] = AssignmentPeer::GRADE_TYPE;
+        }
+
+
+        return $this;
+    } // setGradeType()
+
+    /**
+     * Set the value of [threshold] column.
+     *
+     * @param int $v new value
+     * @return Assignment The current object (for fluent API support)
+     */
+    public function setThreshold($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->threshold !== $v) {
+            $this->threshold = $v;
+            $this->modifiedColumns[] = AssignmentPeer::THRESHOLD;
+        }
+
+
+        return $this;
+    } // setThreshold()
+
+    /**
      * Sets the value of [due_at] column to a normalized version of the date/time value specified.
      *
      * @param mixed $v string, integer (timestamp), or DateTime value.
@@ -515,6 +612,10 @@ abstract class BaseAssignment extends BaseObject implements Persistent
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->grade_type !== 'numeric') {
+                return false;
+            }
+
         // otherwise, everything was equal, so return true
         return true;
     } // hasOnlyDefaultValues()
@@ -544,7 +645,9 @@ abstract class BaseAssignment extends BaseObject implements Persistent
             $this->name = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
             $this->description = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
             $this->max_points = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
-            $this->due_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+            $this->grade_type = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+            $this->threshold = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+            $this->due_at = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -553,7 +656,7 @@ abstract class BaseAssignment extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 8; // 8 = AssignmentPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 10; // 10 = AssignmentPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Assignment object", $e);
@@ -980,6 +1083,12 @@ abstract class BaseAssignment extends BaseObject implements Persistent
         if ($this->isColumnModified(AssignmentPeer::MAX_POINTS)) {
             $modifiedColumns[':p' . $index++]  = '`max_points`';
         }
+        if ($this->isColumnModified(AssignmentPeer::GRADE_TYPE)) {
+            $modifiedColumns[':p' . $index++]  = '`grade_type`';
+        }
+        if ($this->isColumnModified(AssignmentPeer::THRESHOLD)) {
+            $modifiedColumns[':p' . $index++]  = '`threshold`';
+        }
         if ($this->isColumnModified(AssignmentPeer::DUE_AT)) {
             $modifiedColumns[':p' . $index++]  = '`due_at`';
         }
@@ -1014,6 +1123,12 @@ abstract class BaseAssignment extends BaseObject implements Persistent
                         break;
                     case '`max_points`':
                         $stmt->bindValue($identifier, $this->max_points, PDO::PARAM_INT);
+                        break;
+                    case '`grade_type`':
+                        $stmt->bindValue($identifier, $this->grade_type, PDO::PARAM_STR);
+                        break;
+                    case '`threshold`':
+                        $stmt->bindValue($identifier, $this->threshold, PDO::PARAM_INT);
                         break;
                     case '`due_at`':
                         $stmt->bindValue($identifier, $this->due_at, PDO::PARAM_STR);
@@ -1230,6 +1345,12 @@ abstract class BaseAssignment extends BaseObject implements Persistent
                 return $this->getMaxPoints();
                 break;
             case 7:
+                return $this->getGradeType();
+                break;
+            case 8:
+                return $this->getThreshold();
+                break;
+            case 9:
                 return $this->getDueAt();
                 break;
             default:
@@ -1268,7 +1389,9 @@ abstract class BaseAssignment extends BaseObject implements Persistent
             $keys[4] => $this->getName(),
             $keys[5] => $this->getDescription(),
             $keys[6] => $this->getMaxPoints(),
-            $keys[7] => $this->getDueAt(),
+            $keys[7] => $this->getGradeType(),
+            $keys[8] => $this->getThreshold(),
+            $keys[9] => $this->getDueAt(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aTeacher) {
@@ -1348,6 +1471,12 @@ abstract class BaseAssignment extends BaseObject implements Persistent
                 $this->setMaxPoints($value);
                 break;
             case 7:
+                $this->setGradeType($value);
+                break;
+            case 8:
+                $this->setThreshold($value);
+                break;
+            case 9:
                 $this->setDueAt($value);
                 break;
         } // switch()
@@ -1381,7 +1510,9 @@ abstract class BaseAssignment extends BaseObject implements Persistent
         if (array_key_exists($keys[4], $arr)) $this->setName($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setDescription($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setMaxPoints($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setDueAt($arr[$keys[7]]);
+        if (array_key_exists($keys[7], $arr)) $this->setGradeType($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setThreshold($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setDueAt($arr[$keys[9]]);
     }
 
     /**
@@ -1400,6 +1531,8 @@ abstract class BaseAssignment extends BaseObject implements Persistent
         if ($this->isColumnModified(AssignmentPeer::NAME)) $criteria->add(AssignmentPeer::NAME, $this->name);
         if ($this->isColumnModified(AssignmentPeer::DESCRIPTION)) $criteria->add(AssignmentPeer::DESCRIPTION, $this->description);
         if ($this->isColumnModified(AssignmentPeer::MAX_POINTS)) $criteria->add(AssignmentPeer::MAX_POINTS, $this->max_points);
+        if ($this->isColumnModified(AssignmentPeer::GRADE_TYPE)) $criteria->add(AssignmentPeer::GRADE_TYPE, $this->grade_type);
+        if ($this->isColumnModified(AssignmentPeer::THRESHOLD)) $criteria->add(AssignmentPeer::THRESHOLD, $this->threshold);
         if ($this->isColumnModified(AssignmentPeer::DUE_AT)) $criteria->add(AssignmentPeer::DUE_AT, $this->due_at);
 
         return $criteria;
@@ -1470,6 +1603,8 @@ abstract class BaseAssignment extends BaseObject implements Persistent
         $copyObj->setName($this->getName());
         $copyObj->setDescription($this->getDescription());
         $copyObj->setMaxPoints($this->getMaxPoints());
+        $copyObj->setGradeType($this->getGradeType());
+        $copyObj->setThreshold($this->getThreshold());
         $copyObj->setDueAt($this->getDueAt());
 
         if ($deepCopy && !$this->startCopy) {
@@ -3172,11 +3307,14 @@ abstract class BaseAssignment extends BaseObject implements Persistent
         $this->name = null;
         $this->description = null;
         $this->max_points = null;
+        $this->grade_type = null;
+        $this->threshold = null;
         $this->due_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);

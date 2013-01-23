@@ -95,27 +95,50 @@ Zerebral\BusinessBundle\Model\Assignment\Assignment:
         name:
             - NotBlank:
                 message: Enter your assignment name. You can change it later.
+                groups: [numeric, pass]
             - MaxLength: 200
         description:
             - NotBlank:
                 message: Enter assignment description. Any useful information from the student point of view.
-        maxPoints:
-            - NotBlank:
-                message: Max points is required.
-            - Type:
-                type: integer
-                message: Max points should be numerical
-            - Range:
-                min: 1
-                minMessage: Max points should be numerical and positive
-                max: 50000
-                maxMessage: "{{ value }} is too much for grading (max 50000 allowed)"
+                groups: [numeric, pass]
+#        maxPoints:
+#            - NotBlank:
+#                message: Max points is required.
+#                groups: [default]
+#            - Type:
+#                type: integer
+#                message: Max points should be numerical
+#                groups: [default]
+#            - Range:
+#                min: 1
+#                minMessage: Max points should be numerical and positive
+#                max: 50000
+#                maxMessage: "{{ value }} is too much for grading (max 50000 allowed)"
+#                groups: [default]
         assignmentCategory:
             - NotNull:
                 message: Category is required
+                groups: [numeric, pass]
             - Valid: ~
         files:
             - Valid: ~
+        gradeType:
+            - NotBlank:
+                groups: [numeric, pass]
+        threshold:
+            - NotBlank:
+                groups: [numeric]
+            - Type:
+                type: integer
+                message: Threshold should be numerical
+                groups: [numeric]
+            - MaxLength:
+                groups: [numeric]
+                limit: 3
+            - Max:
+                groups: [numeric]
+                limit: 100
+
 
 Zerebral\BusinessBundle\Model\Assignment\AssignmentCategory:
     constraints:

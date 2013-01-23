@@ -38,13 +38,13 @@ abstract class BaseAssignmentPeer
     const TM_CLASS = 'AssignmentTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 8;
+    const NUM_COLUMNS = 10;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 8;
+    const NUM_HYDRATE_COLUMNS = 10;
 
     /** the column name for the id field */
     const ID = 'assignments.id';
@@ -67,8 +67,18 @@ abstract class BaseAssignmentPeer
     /** the column name for the max_points field */
     const MAX_POINTS = 'assignments.max_points';
 
+    /** the column name for the grade_type field */
+    const GRADE_TYPE = 'assignments.grade_type';
+
+    /** the column name for the threshold field */
+    const THRESHOLD = 'assignments.threshold';
+
     /** the column name for the due_at field */
     const DUE_AT = 'assignments.due_at';
+
+    /** The enumerated values for the grade_type field */
+    const GRADE_TYPE_NUMERIC = 'numeric';
+    const GRADE_TYPE_PASS = 'pass';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -89,12 +99,12 @@ abstract class BaseAssignmentPeer
      * e.g. AssignmentPeer::$fieldNames[AssignmentPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'TeacherId', 'CourseId', 'AssignmentCategoryId', 'Name', 'Description', 'MaxPoints', 'DueAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'teacherId', 'courseId', 'assignmentCategoryId', 'name', 'description', 'maxPoints', 'dueAt', ),
-        BasePeer::TYPE_COLNAME => array (AssignmentPeer::ID, AssignmentPeer::TEACHER_ID, AssignmentPeer::COURSE_ID, AssignmentPeer::ASSIGNMENT_CATEGORY_ID, AssignmentPeer::NAME, AssignmentPeer::DESCRIPTION, AssignmentPeer::MAX_POINTS, AssignmentPeer::DUE_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TEACHER_ID', 'COURSE_ID', 'ASSIGNMENT_CATEGORY_ID', 'NAME', 'DESCRIPTION', 'MAX_POINTS', 'DUE_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'teacher_id', 'course_id', 'assignment_category_id', 'name', 'description', 'max_points', 'due_at', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'TeacherId', 'CourseId', 'AssignmentCategoryId', 'Name', 'Description', 'MaxPoints', 'GradeType', 'Threshold', 'DueAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'teacherId', 'courseId', 'assignmentCategoryId', 'name', 'description', 'maxPoints', 'gradeType', 'threshold', 'dueAt', ),
+        BasePeer::TYPE_COLNAME => array (AssignmentPeer::ID, AssignmentPeer::TEACHER_ID, AssignmentPeer::COURSE_ID, AssignmentPeer::ASSIGNMENT_CATEGORY_ID, AssignmentPeer::NAME, AssignmentPeer::DESCRIPTION, AssignmentPeer::MAX_POINTS, AssignmentPeer::GRADE_TYPE, AssignmentPeer::THRESHOLD, AssignmentPeer::DUE_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TEACHER_ID', 'COURSE_ID', 'ASSIGNMENT_CATEGORY_ID', 'NAME', 'DESCRIPTION', 'MAX_POINTS', 'GRADE_TYPE', 'THRESHOLD', 'DUE_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'teacher_id', 'course_id', 'assignment_category_id', 'name', 'description', 'max_points', 'grade_type', 'threshold', 'due_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
     );
 
     /**
@@ -104,12 +114,20 @@ abstract class BaseAssignmentPeer
      * e.g. AssignmentPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'TeacherId' => 1, 'CourseId' => 2, 'AssignmentCategoryId' => 3, 'Name' => 4, 'Description' => 5, 'MaxPoints' => 6, 'DueAt' => 7, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'teacherId' => 1, 'courseId' => 2, 'assignmentCategoryId' => 3, 'name' => 4, 'description' => 5, 'maxPoints' => 6, 'dueAt' => 7, ),
-        BasePeer::TYPE_COLNAME => array (AssignmentPeer::ID => 0, AssignmentPeer::TEACHER_ID => 1, AssignmentPeer::COURSE_ID => 2, AssignmentPeer::ASSIGNMENT_CATEGORY_ID => 3, AssignmentPeer::NAME => 4, AssignmentPeer::DESCRIPTION => 5, AssignmentPeer::MAX_POINTS => 6, AssignmentPeer::DUE_AT => 7, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TEACHER_ID' => 1, 'COURSE_ID' => 2, 'ASSIGNMENT_CATEGORY_ID' => 3, 'NAME' => 4, 'DESCRIPTION' => 5, 'MAX_POINTS' => 6, 'DUE_AT' => 7, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'teacher_id' => 1, 'course_id' => 2, 'assignment_category_id' => 3, 'name' => 4, 'description' => 5, 'max_points' => 6, 'due_at' => 7, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'TeacherId' => 1, 'CourseId' => 2, 'AssignmentCategoryId' => 3, 'Name' => 4, 'Description' => 5, 'MaxPoints' => 6, 'GradeType' => 7, 'Threshold' => 8, 'DueAt' => 9, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'teacherId' => 1, 'courseId' => 2, 'assignmentCategoryId' => 3, 'name' => 4, 'description' => 5, 'maxPoints' => 6, 'gradeType' => 7, 'threshold' => 8, 'dueAt' => 9, ),
+        BasePeer::TYPE_COLNAME => array (AssignmentPeer::ID => 0, AssignmentPeer::TEACHER_ID => 1, AssignmentPeer::COURSE_ID => 2, AssignmentPeer::ASSIGNMENT_CATEGORY_ID => 3, AssignmentPeer::NAME => 4, AssignmentPeer::DESCRIPTION => 5, AssignmentPeer::MAX_POINTS => 6, AssignmentPeer::GRADE_TYPE => 7, AssignmentPeer::THRESHOLD => 8, AssignmentPeer::DUE_AT => 9, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TEACHER_ID' => 1, 'COURSE_ID' => 2, 'ASSIGNMENT_CATEGORY_ID' => 3, 'NAME' => 4, 'DESCRIPTION' => 5, 'MAX_POINTS' => 6, 'GRADE_TYPE' => 7, 'THRESHOLD' => 8, 'DUE_AT' => 9, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'teacher_id' => 1, 'course_id' => 2, 'assignment_category_id' => 3, 'name' => 4, 'description' => 5, 'max_points' => 6, 'grade_type' => 7, 'threshold' => 8, 'due_at' => 9, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+    );
+
+    /** The enumerated values for this table */
+    protected static $enumValueSets = array(
+        AssignmentPeer::GRADE_TYPE => array(
+            AssignmentPeer::GRADE_TYPE_NUMERIC,
+            AssignmentPeer::GRADE_TYPE_PASS,
+        ),
     );
 
     /**
@@ -152,6 +170,50 @@ abstract class BaseAssignmentPeer
     }
 
     /**
+     * Gets the list of values for all ENUM columns
+     * @return array
+     */
+    public static function getValueSets()
+    {
+      return AssignmentPeer::$enumValueSets;
+    }
+
+    /**
+     * Gets the list of values for an ENUM column
+     *
+     * @param string $colname The ENUM column name.
+     *
+     * @return array list of possible values for the column
+     */
+    public static function getValueSet($colname)
+    {
+        $valueSets = AssignmentPeer::getValueSets();
+
+        if (!isset($valueSets[$colname])) {
+            throw new PropelException(sprintf('Column "%s" has no ValueSet.', $colname));
+        }
+
+        return $valueSets[$colname];
+    }
+
+    /**
+     * Gets the SQL value for the ENUM column value
+     *
+     * @param string $colname ENUM column name.
+     * @param string $enumVal ENUM value.
+     *
+     * @return int            SQL value
+     */
+    public static function getSqlValueForEnum($colname, $enumVal)
+    {
+        $values = AssignmentPeer::getValueSet($colname);
+        if (!in_array($enumVal, $values)) {
+            throw new PropelException(sprintf('Value "%s" is not accepted in this enumerated column', $colname));
+        }
+        return array_search($enumVal, $values);
+    }
+
+    /**
      * Convenience method which changes table.column to alias.column.
      *
      * Using this method you can maintain SQL abstraction while using column aliases.
@@ -190,6 +252,8 @@ abstract class BaseAssignmentPeer
             $criteria->addSelectColumn(AssignmentPeer::NAME);
             $criteria->addSelectColumn(AssignmentPeer::DESCRIPTION);
             $criteria->addSelectColumn(AssignmentPeer::MAX_POINTS);
+            $criteria->addSelectColumn(AssignmentPeer::GRADE_TYPE);
+            $criteria->addSelectColumn(AssignmentPeer::THRESHOLD);
             $criteria->addSelectColumn(AssignmentPeer::DUE_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
@@ -199,6 +263,8 @@ abstract class BaseAssignmentPeer
             $criteria->addSelectColumn($alias . '.name');
             $criteria->addSelectColumn($alias . '.description');
             $criteria->addSelectColumn($alias . '.max_points');
+            $criteria->addSelectColumn($alias . '.grade_type');
+            $criteria->addSelectColumn($alias . '.threshold');
             $criteria->addSelectColumn($alias . '.due_at');
         }
     }
