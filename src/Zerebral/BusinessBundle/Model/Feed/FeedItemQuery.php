@@ -46,7 +46,7 @@ class FeedItemQuery extends BaseFeedItemQuery
         $this->addDescendingOrderByColumn(FeedItemPeer::ID);
 
         $this->joinWith('Assignment', \Criteria::LEFT_JOIN);
-        $this->joinWith('Course', \Criteria::LEFT_JOIN);
+        //$this->joinWith('Course', \Criteria::LEFT_JOIN);
         $this->joinWith('FeedContent', \Criteria::LEFT_JOIN);
         $this->addJoin(FeedItemPeer::ID, FeedCommentPeer::FEED_ITEM_ID, \Criteria::LEFT_JOIN);
         $this->joinWith('User', \Criteria::LEFT_JOIN);
