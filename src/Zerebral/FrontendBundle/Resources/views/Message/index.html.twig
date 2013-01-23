@@ -53,7 +53,7 @@
 {% endblock %}
 
 {% block message %}
-    {% set user = (folder == 'inbox' ? message.userRelatedByFromId : message.userRelatedByToId) %}
+    {% set user = (message.toId == message.userId ? message.userRelatedByFromId : message.userRelatedByToId) %}
     <div class="message-row {{ message.getUnreadCount > 0 ? 'unread' : '' }}">
         <div class="check"><input type="checkbox" class="message-check" name="Collection[]" value="{{ message.threadId }}" /></div>
         <div class="avatar">
