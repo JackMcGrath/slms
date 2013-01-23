@@ -138,6 +138,9 @@ Zerebral\BusinessBundle\Model\Assignment\Assignment:
             - Max:
                 groups: [numeric]
                 limit: 100
+            - Min:
+                groups: [numeric]
+                limit: 0
 
 
 Zerebral\BusinessBundle\Model\Assignment\AssignmentCategory:
