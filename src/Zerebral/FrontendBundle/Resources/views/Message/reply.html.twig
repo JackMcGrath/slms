@@ -94,7 +94,7 @@
                     <p>Attachments</p>
                     {% for key,message in thread %}
                         {% for file in message.getFiles %}
-                            <div><i class="icon-search"></i> <a class="link" target="_blank" href="{{ file.url }}">{{ file.name }}</a></div>
+                            <div><i class="icon-search"></i> <a class="link" target="_blank" href="{{ path('download_file', {id: file.id}) }}">{{ file.name }}</a></div>
                         {% endfor %}
                     {% endfor %}
                     <p class="grey">Showing the last 20 links and attachments</p>
@@ -116,7 +116,7 @@
             <div class="attached-files">
                 <strong>Attached files:</strong>
                 {% for file in message.getFiles %}
-                    <div><i class="icon-search"></i> <a class="link" target="_blank" href="{{ file.url }}">{{ file.name }}</a></div>
+                    <div><i class="icon-search"></i> <a class="link" target="_blank" href="{{ path('download_file', {id: file.id}) }}">{{ file.name }}</a></div>
                 {% endfor %}
             </div>
         {% endif %}
