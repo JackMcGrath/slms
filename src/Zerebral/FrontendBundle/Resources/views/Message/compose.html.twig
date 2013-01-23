@@ -29,7 +29,7 @@
             <hr/>
 
             <div class="message-form">
-                {% if 1 %}
+                {% if hasErrors %}
                     <div class="alert alert-error">
                         <button data-dismiss="alert" class="close" type="button">×</button>
                         <strong>Oh snap!</strong> Change a few things up and try submitting again.
@@ -38,26 +38,20 @@
 
                 <form method="post" {{ form_enctype(form) }} novalidate>
                     {{ form_widget(form._token) }}
-                    {{ form_row(form.toName, {
+                    {{ form_row(form.to, {
                         label: 'To',
                         form_type: 'horizontal',
                         attr: {
                             class: '',
-                            'hiddennId': 'message_to_id',
+                            'multiple': true,
                             autocomplete: 'off'
                         }
-                        })
-                    }}
-                    {{ form_row(form.to_id, {
-                        label: 'To',
-                        form_type: 'horizontal',
-                        attr: {}
                         })
                     }}
                     {{ form_row(form.subject, {
                         form_type: 'horizontal',
                         attr: {
-                            class: 'input-xlarge primary-input'
+                            class: 'input-xlarge'
                         }
                     }) }}
                     {{ form_row(form.body, {

@@ -22,6 +22,9 @@ div.right-navbar {
                     margin-right: 12px;
                 }
             }
+            i {
+              background-position: 0;
+            }
             &.active {
                 border-top: 1px solid #dddddd;
                 border-bottom: 1px solid #dddddd;
@@ -36,6 +39,15 @@ div.right-navbar {
                 }
                 i.icon-new-mail {
                     .icon-new-mail-active();
+                }
+                i.icon-inbox {
+                  .icon-inbox-active();
+                }
+                i.icon-outbox {
+                  .icon-outbox-active();
+                }
+                i.icon-archives {
+                  .icon-archives-active();
                 }
             }
         }

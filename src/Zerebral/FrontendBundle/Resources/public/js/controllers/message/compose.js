@@ -9,16 +9,31 @@ $(document).ready(function() {
         template: '#new_file_form'
     });
 
-    $('#message_toName').typeahead({
-        minLength: 1,
-        source: function(query, process) {
-            clearTimeout(timer);
-            timer = setTimeout(function() {
-                getSuggest(process);
-            }, 300);
+	var select = $('#message_to');
 
-        }
-    });
+	if (select.find('option').length && !select.val()) {
+		select.empty();
+	} else if (select.val()) {
+		$.each(select.find('option'), function(i, option){
+			if ($(option).attr('value') != $('#message_to').val()) {
+				$(option).remove();
+			}
+		});
+	}
+
+	select.ajaxChosen({
+		type: 'GET',
+		url: '/user/suggest',
+		dataType: 'json'
+	}, function (data) {
+		var results = [];
+
+		$.each(data.users, function (i, user) {
+			results.push({ value: user.id, text: user.name });
+		});
+
+		return results;
+	});
 
     var getSuggest = function(process) {
         $.ajax({

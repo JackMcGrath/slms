@@ -1,7 +1,7 @@
 <div class="">
     <ul class="nav">
-        <li{% if folder == 'inbox' %} class="active"{% endif %}><a href="{{ path('messages_inbox') }}"><i class="icon-new-mail"></i> Inbox{% if unreadCount > 0 %} ({{ unreadCount }}){% endif %}</a></li>
-        <li{% if folder == 'sent' %} class="active"{% endif %}><a href="{{ path('messages_sent') }}"><i class="icon-new-mail"></i> Sent</a></li>
-        <li><a href="#"><i class="icon-new-mail"></i> Archive</a></li>
+        <li{% if folder == 'inbox' %} class="active"{% endif %}><a href="{{ path('messages_inbox') }}"><i class="icon-inbox"></i> Inbox{% if unreadCount > 0 %} ({{ unreadCount }}){% endif %}</a></li>
+        <li{% if folder == 'sent' %} class="active"{% endif %}><a href="{{ path('messages_sent') }}"><i class="icon-outbox"></i> Sent</a></li>
+        <li><a href="#"><i class="icon-archives"></i> Archive</a></li>
     </ul>
 </div>

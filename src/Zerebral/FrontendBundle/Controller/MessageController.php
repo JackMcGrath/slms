@@ -129,7 +129,7 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
             'unreadCount' => $unreadCount,
             'collapsedMessagesCount' => $collapsedMessagesCount,
             'target' => 'messages',
-            'folder' => null,
+            'folder' => 'inbox',
             'form' => $form->createView(),
         );
     }
@@ -163,9 +163,9 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
 
         return array(
             'target' => 'messages',
-            'folder' => null,
+            'folder' => 'inbox',
             'unreadCount' => $unreadCount,
-            'hasErrors' => $form->hasErrors(),
+            'hasErrors' => $this->getRequest()->isMethod('POST'),
             'form' => $form->createView(),
         );
     }

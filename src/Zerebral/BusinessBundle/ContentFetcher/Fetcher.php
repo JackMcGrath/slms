@@ -3,6 +3,10 @@ namespace Zerebral\BusinessBundle\ContentFetcher;
 
 use Zerebral\BusinessBundle\Model\Feed\FeedContent;
 
+/**
+ * TODO: type hints & comments
+ *
+ */
 class Fetcher
 {
 
@@ -58,7 +62,11 @@ class Fetcher
     }
 
 
-    /** @todo: Need to parse uncorrect HTML to get meta */
+    /**
+     * TODO Need to parse uncorrect HTML to get meta
+     * TODO: redo with regexps
+     * TODO: separate in few smaller methods
+     */
     public function parse()
     {
         $dom = new \DOMDocument();
