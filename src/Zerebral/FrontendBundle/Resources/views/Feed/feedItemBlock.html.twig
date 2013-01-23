@@ -119,11 +119,7 @@
         {% endif %}
         <i class="icon-comment"></i><a class="show-comment-form-link {% if lastFeedComments|length > 0 %} expanded {% endif %}" data-comments-count="{{ feedItem.feedComments|length }}" href="#">&nbsp;Comments (<span>{{ feedItem.feedComments|length }}</span>)</a>
     </div>
-    {% if lastFeedComments|length > 0 %}
-        {% set lastItemCommentId = lastFeedComments.last.id %}
-    {% else %}
-        {% set lastItemCommentId = 0 %}
-    {% endif %}
+    {% set lastItemCommentId = (lastFeedComments|length > 0) ? lastFeedComments.last.id : 0 %}
     <div class="comments" data-item-id="{{ feedItem.id }}" data-last-item-comment-id="{{ lastItemCommentId }}">
         {% if lastFeedComments|length < feedItem.feedComments|length %}
             <div class="comment load-more">

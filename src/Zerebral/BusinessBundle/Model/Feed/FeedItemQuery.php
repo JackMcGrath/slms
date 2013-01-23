@@ -34,7 +34,13 @@ class FeedItemQuery extends BaseFeedItemQuery
         }
 
         $this->addAnd(FeedItemPeer::CREATED_BY, $ids, \Criteria::IN);
-        $this->addDescendingOrderByColumn('created_at');
+        $this->addDescendingOrderByColumn(FeedItemPeer::ID);
+
+        $this->joinWith('Assignment', \Criteria::LEFT_JOIN);
+        $this->joinWith('Course', \Criteria::LEFT_JOIN);
+        $this->joinWith('FeedContent', \Criteria::LEFT_JOIN);
+        $this->joinWith('FeedComment', \Criteria::LEFT_JOIN);
+        $this->joinWith('User', \Criteria::LEFT_JOIN);
 
         return $this;
     }
@@ -48,7 +54,13 @@ class FeedItemQuery extends BaseFeedItemQuery
         }
         $this->addJoin(FeedItemPeer::COURSE_ID, CoursePeer::ID, \Criteria::LEFT_JOIN);
         $this->addAnd(CoursePeer::ID, $course->getId(), \Criteria::EQUAL);
-        $this->addDescendingOrderByColumn('created_at');
+        $this->addDescendingOrderByColumn(FeedItemPeer::ID);
+
+        $this->joinWith('Assignment', \Criteria::LEFT_JOIN);
+        $this->joinWith('Course', \Criteria::LEFT_JOIN);
+        $this->joinWith('FeedContent', \Criteria::LEFT_JOIN);
+        $this->joinWith('FeedComment', \Criteria::LEFT_JOIN);
+        $this->joinWith('User', \Criteria::LEFT_JOIN);
 
         return $this;
     }

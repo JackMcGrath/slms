@@ -11,6 +11,7 @@ class FeedCommentQuery extends BaseFeedCommentQuery
     public function filterByFeedItem($feedItem, $comparison = null)
     {
         $filter = parent::filterByFeedItem($feedItem, $comparison);
+        $filter->joinWith('FeedContent');
         return $filter->orderByCreatedAt();
     }
 
@@ -40,6 +41,7 @@ class FeedCommentQuery extends BaseFeedCommentQuery
             $itemCondition->addAnd($commentCondition);
             $this->addOr($itemCondition);
         }
+        $this->joinWith('FeedContent');
         return $this;
 
     }
