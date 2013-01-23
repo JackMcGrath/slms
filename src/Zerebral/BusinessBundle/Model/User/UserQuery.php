@@ -18,7 +18,7 @@ class UserQuery extends BaseUserQuery
 
         $this->limit(10);
 
-        return $this->find();
+        return $this->getRelatedUsers($user)->find();
     }
 
     public function getRelatedUsers(User $user)
