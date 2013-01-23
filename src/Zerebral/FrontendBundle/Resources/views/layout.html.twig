@@ -27,6 +27,7 @@
         '@ZerebralFrontendBundle/Resources/public/js/plugins/optional-model.js'
         '@ZerebralFrontendBundle/Resources/public/js/plugins/chosen.jquery.js'
         '@ZerebralFrontendBundle/Resources/public/js/plugins/ajax-chosen.js'
+        '@ZerebralFrontendBundle/Resources/public/js/plugins/check-all.js'
         '@ZerebralFrontendBundle/Resources/public/js/bootstrap.js'
         '@ZerebralFrontendBundle/Resources/public/js/plugins/jquery.notifications.js'
         output='js/compiled/layout.js' %}
@@ -130,7 +131,7 @@
                     </li>
                     <li class="{{ target is defined and target == 'messages' ? 'active' : ''}}">
                         <div class="menu-item">
-                            <a href="{{ path("messages_inbox") }}"><i class="icon-big-mail"></i>Messages</a>
+                            <a href="{{ path("messages_inbox") }}"><i class="icon-big-mail">{% if app.user.unreadMessagesCount > 0 %}<small>{{ app.user.unreadMessagesCount }}</small>{% endif %}</i>Messages</a>
                         </div>
                     </li>
                     {#<li class="{{ target is defined and target == 'calendar' ? 'active' : ''}}"><div class="menu-item"><i class="icon-big-calendar"></i>Calendar</div></li>#}
