@@ -45,9 +45,12 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
 
         if ($feedItemForm->isValid()) {
 
+            /** @var FeedItem $feedItem  */
             $feedItem = $feedItemForm->getData();
             $feedItem->setCreatedBy($this->getUser()->getId());
             $feedItem->save();
+
+            $feedItem->setVirtualColumn('commentsCount', 0);
 
             $content = $this->render('ZerebralFrontendBundle:Feed:feedItemBlock.html.twig', array('feedItem' => $feedItem, 'isGlobal' => false))->getContent();
             return new JsonResponse(array('has_errors' => false, 'content' => $content, 'lastItemId' => $feedItem->getId()));
