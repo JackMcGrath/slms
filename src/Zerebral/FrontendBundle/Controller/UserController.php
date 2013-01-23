@@ -19,10 +19,8 @@ class UserController extends \Zerebral\CommonBundle\Component\Controller
      * @Route("/my-profile", name="myprofile")
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @Template()
-     *
-     * TODO: rename to profileAction
      */
-    public function myProfileAction()
+    public function profileAction()
     {
         if ($this->get('security.context')->isGranted('ROLE_TEACHER')) {
             $profileType = new FormType\TeacherProfileType();
