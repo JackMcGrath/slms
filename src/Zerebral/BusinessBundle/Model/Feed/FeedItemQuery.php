@@ -13,28 +13,23 @@ class FeedItemQuery extends BaseFeedItemQuery
 {
     public function getGlobalFeed(\Zerebral\BusinessBundle\Model\User\User $user)
     {
-        if ($user->isStudent()) {
-            $this->addJoin(FeedItemPeer::COURSE_ID, CourseStudentPeer::COURSE_ID, \Criteria::LEFT_JOIN);
-            $this->addAnd(CourseStudentPeer::STUDENT_ID, $user->getStudent()->getId(), \Criteria::EQUAL);
-            $this->addOr(FeedItemPeer::COURSE_ID, null, \Criteria::ISNULL);
-
-            $this->addJoin(FeedItemPeer::ASSIGNMENT_ID, StudentAssignmentPeer::ASSIGNMENT_ID, \Criteria::LEFT_JOIN);
-            $this->addAnd(StudentAssignmentPeer::STUDENT_ID, $user->getStudent()->getId(), \Criteria::EQUAL);
-            $this->addOr(FeedItemPeer::ASSIGNMENT_ID, null, \Criteria::ISNULL);
-        } else {
-            $this->addJoin(FeedItemPeer::COURSE_ID, CourseTeacherPeer::COURSE_ID, \Criteria::LEFT_JOIN);
-            $this->addAnd(CourseTeacherPeer::TEACHER_ID, $user->getTeacher()->getId(), \Criteria::EQUAL);
-            $this->addOr(FeedItemPeer::COURSE_ID, null, \Criteria::ISNULL);
-        }
-
         $relatedUsers = $user->getRelatedUsers();
-        $ids = array();
+        $ids = array($user->getId());
         foreach($relatedUsers as $relatedUser) {
             $ids[] = $relatedUser->getId();
         }
 
         $this->addAnd(FeedItemPeer::CREATED_BY, $ids, \Criteria::IN);
-        $this->addDescendingOrderByColumn('created_at');
+        $this->addDescendingOrderByColumn(FeedItemPeer::ID);
+
+        $this->joinWith('Assignment', \Criteria::LEFT_JOIN);
+        $this->joinWith('Course', \Criteria::LEFT_JOIN);
+        $this->joinWith('FeedContent', \Criteria::LEFT_JOIN);
+        $this->addJoin(FeedItemPeer::ID, FeedCommentPeer::FEED_ITEM_ID, \Criteria::LEFT_JOIN);
+        $this->joinWith('User', \Criteria::LEFT_JOIN);
+
+        $this->addAsColumn('commentsCount', 'COUNT(' . FeedCommentPeer::ID . ')');
+        $this->addGroupByColumn(FeedItemPeer::ID);
 
         return $this;
     }
@@ -48,7 +43,16 @@ class FeedItemQuery extends BaseFeedItemQuery
         }
         $this->addJoin(FeedItemPeer::COURSE_ID, CoursePeer::ID, \Criteria::LEFT_JOIN);
         $this->addAnd(CoursePeer::ID, $course->getId(), \Criteria::EQUAL);
-        $this->addDescendingOrderByColumn('created_at');
+        $this->addDescendingOrderByColumn(FeedItemPeer::ID);
+
+        $this->joinWith('Assignment', \Criteria::LEFT_JOIN);
+        //$this->joinWith('Course', \Criteria::LEFT_JOIN);
+        $this->joinWith('FeedContent', \Criteria::LEFT_JOIN);
+        $this->addJoin(FeedItemPeer::ID, FeedCommentPeer::FEED_ITEM_ID, \Criteria::LEFT_JOIN);
+        $this->joinWith('User', \Criteria::LEFT_JOIN);
+
+        $this->addAsColumn('commentsCount', 'COUNT(' . FeedCommentPeer::ID . ')');
+        $this->addGroupByColumn(FeedItemPeer::ID);
 
         return $this;
     }

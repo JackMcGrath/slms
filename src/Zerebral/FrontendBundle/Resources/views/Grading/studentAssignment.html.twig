@@ -4,7 +4,7 @@
         {% if studentAssignment.assignment.dueAt is not empty %}
             <li><span>Submitted:</span> <span class="date">{{ studentAssignment.createdAt | date('l, M, d Y h:i a') }}</span></li>
         {% endif %}
-        <li><span>Assignment:</span> <span class="label">{{ studentAssignment.assignment.name }}</span></li>
+        <li><span>Assignment:</span> {{ studentAssignment.assignment.name }}</li>
     </ul>
     <img class="rounded" src="{{ user_avatar(studentAssignment.student.user) | imagine_filter('thumbnail') }}"/>
 </div>
@@ -27,18 +27,6 @@
 </div>
 
 <div class="grade-block">
-    {{ form_row(form.grading, {
-        label: "Enter the number grade below",
-        form_type: 'horizontal',
-        attr: {
-            class: 'input-mini'
-        }
-    }) }}
-
-    <div class="clearfix"></div>
-    {{ form_row(form.grading_comment, {
-        label: "Leave feedback below",
-        form_type: 'horizontal'
-    }) }}
+    {{ form_widget(form, {label: 'Enter the number grade below'}) }}
     {{ form_rest(form) }}
 </div>

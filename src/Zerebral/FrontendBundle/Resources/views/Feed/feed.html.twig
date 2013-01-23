@@ -35,11 +35,7 @@
         </form>
     </div>
     {% set comments = feedItem.feedComments %}
-    {% if comments|length > 0 %}
-        {% set lastCommentId = comments.last.id %}
-    {% else %}
-        {% set lastCommentId = 0 %}
-    {% endif %}
+    {% set lastCommentId = (comments|length > 0) ? comments.last.id : 0 %}
     <div class="comments" data-last-comment-id="{{ lastCommentId }}" data-server-time="{{ "now"|date("Y-m-d H:i:s") }}" data-checkout-url="{{ path('ajax_checkout_comments', {feedItemId: feedItem.id}) }}">
         {% for comment in comments %}
             {% include "ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig" with {'feedType': 'assignment'} %}
@@ -55,11 +51,7 @@
 
 {% macro course_details_feed(feedItemForm, feedItems, course = null) %}
     {% import _self as self %}
-    {% if course is null %}
-        {% set isGlobal = true %}
-    {% else %}
-        {% set isGlobal = false %}
-    {% endif %}
+    {% set isGlobal = (course is null) ? true : false %}
     <div class="course-details-feed">
     <div class="feed-item-alert-block alert alert-block alert-error" style="display: none;">
         <button type="button" class="close" data-dismiss="alert">×</button>
@@ -100,16 +92,9 @@
         </form>
     </div>
     <hr />
-    {% if feedItems|length > 0 %}
-        {% set lastItemId = feedItems.first.id %}
-    {% else %}
-        {% set lastItemId = 0 %}
-    {% endif %}
-    {% if course is null %}
-        {% set checkoutUrl = path('ajax_checkout_items') %}
-    {% else %}
-        {% set checkoutUrl = path('ajax_checkout_items', {courseId: course.id}) %}
-    {% endif %}
+    {% set lastItemId = (feedItems|length > 0) ? feedItems.first.id : 0 %}
+    {% set checkoutUrl = (course is null) ? path('ajax_checkout_items') : path('ajax_checkout_items', {courseId: course.id})%}
+
     <div class="feed-items" data-server-time="{{ "now"|date("Y-m-d H:i:s") }}" data-last-item-id="{{ lastItemId }}" data-checkout-url="{{ checkoutUrl }}" >
         {% for feedItem in feedItems %}
         {% include "ZerebralFrontendBundle:Feed:feedItemBlock.html.twig" %}
