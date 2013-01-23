@@ -41,8 +41,17 @@ Controller.prototype = {
             $(e.target).addClass('hover')
                 .html('<a href="" class="" data-toggle="modal">Edit</a>');
         }, function(e) {
-            $(e.target).removeClass('hover')
-                .html($(e.target).attr('value'));
+            var container = $(e.target).removeClass('hover');
+            var value = $(e.target).attr('value');
+            if (container.closest('td').hasClass('pass')) {
+                if (value == 1) {
+                    container.removeClass('hover').html('<i class="icon-new-passed"></i>');
+                } else {
+                    container.removeClass('hover').html('<i class="icon-new-fail"></i>');
+                }
+            } else {
+                container.html(value);
+            }
         });
     }
 };
@@ -60,6 +69,7 @@ GradingPopup.prototype = {
         var self = this;
 
         this.container.table.find('a[data-toggle="modal"]').live('click', $.proxy(this.onShowPopup, this));
+        this.target.find('.grade-pass button').live('click', $.proxy(this.onChangePassValue, this));
         this.container.gradingPopupSelector.find('input.grade-value').live('change', $.proxy(this.onChangeGradeNumber, this));
         this.container.gradingPopupSelector.find('input.grade-value').live('keypress', $.proxy(this.onTypoGradePress, this));
 
@@ -87,8 +97,19 @@ GradingPopup.prototype = {
         this.container.gradingPopupSelector.on('hide', function(e) {
             var grade = self.container.table.find('td[studentAssignment="' + self.studentAssignmentId + '"] .grade-value');
             var value = grade.attr('value');
-            if (value != null && typeof(value) != 'undefined')
-                grade.removeClass('hover').html(value);
+            if (value != null && typeof(value) != 'undefined') {
+                if (grade.closest('td').hasClass('pass')) {
+                    if (value == 1) {
+                        grade.removeClass('hover').html('<i class="icon-new-passed"></i>');
+                    } else {
+                        grade.removeClass('hover').html('<i class="icon-new-fail"></i>');
+                    }
+                } else {
+                    grade.removeClass('hover').html(value);
+                }
+
+            }
+
         });
 
         $('.grading-form').zerebralAjaxForm({
@@ -143,5 +164,10 @@ GradingPopup.prototype = {
     },
 
     onTypoGradeUp: function(e) {
+    },
+
+    onChangePassValue: function(e) {
+        var value = $(e.target).attr('value');
+        this.target.find('.grade-pass-value').val(value);
     }
 };
