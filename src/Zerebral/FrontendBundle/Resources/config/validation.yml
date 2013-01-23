@@ -76,8 +76,7 @@ Zerebral\BusinessBundle\Model\Course\Course:
 
 Zerebral\BusinessBundle\Model\Course\Discipline:
     constraints:
-        - Propel\PropelBundle\Validator\Constraints\UniqueObject:
-            fields: [name, teacher_id]
+        - Zerebral\BusinessBundle\Validator\Constraints\UniqueDiscipline:
             message: Subject area already exists
 
 Zerebral\BusinessBundle\Model\File\File:
@@ -120,8 +119,7 @@ Zerebral\BusinessBundle\Model\Assignment\Assignment:
 
 Zerebral\BusinessBundle\Model\Assignment\AssignmentCategory:
     constraints:
-        - Propel\PropelBundle\Validator\Constraints\UniqueObject:
-            fields: [name, teacher_id]
+        - Zerebral\BusinessBundle\Validator\Constraints\UniqueAssignmentCategory:
             message: Category already exists
 
 Zerebral\BusinessBundle\Model\Assignment\StudentAssignment:
@@ -150,8 +148,7 @@ Zerebral\BusinessBundle\Model\Course\CourseScheduleDay:
 
 Zerebral\BusinessBundle\Model\Material\CourseFolder:
     constraints:
-        - Propel\PropelBundle\Validator\Constraints\UniqueObject:
-            fields: [course_id,name]
+        - Zerebral\BusinessBundle\Validator\Constraints\UniqueCourseFolder:
             message: You already have folder with this name
     getters:
         name:

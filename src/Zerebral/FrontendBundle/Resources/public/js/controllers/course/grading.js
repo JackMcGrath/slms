@@ -50,13 +50,18 @@ Controller.prototype = {
 var GradingPopup = function (container, target) {
     this.container = container;
     this.target = target;
+    this.sliderSelector = '.grade-slider .slider';
+    this.maxGrade = 100;
     this.bind();
 };
 
 GradingPopup.prototype = {
     bind:function () {
         var self = this;
+
         this.container.table.find('a[data-toggle="modal"]').live('click', $.proxy(this.onShowPopup, this));
+        this.container.gradingPopupSelector.find('input.grade-value').live('change', $.proxy(this.onChangeGradeNumber, this));
+        this.container.gradingPopupSelector.find('input.grade-value').live('keypress', $.proxy(this.onTypoGradePress, this));
 
         //this.container.table.find('a[data-toggle="modal"]').live('click', function(e) { alert('click');self.studentAssignment = $(e.target).closest('td').attr('studentAssignment'); console.log($(e.target).closest('td').attr('studentAssignment')); })
 
@@ -74,6 +79,7 @@ GradingPopup.prototype = {
                 success: function(response) {
                     if (!response.has_errors) {
                         modalBody.html(response.content);
+                        self.sliderBind();
                     }
                 }
             });
@@ -105,5 +111,37 @@ GradingPopup.prototype = {
     onShowPopup: function(e) {
         this.studentAssignmentId = $(e.target).closest('td').attr('studentAssignment');
         this.container.gradingPopupSelector.modal('show');
+    },
+
+    sliderBind: function() {
+        var self = this;
+        var gradeValue = $('input.grade-value').val();
+        $(this.sliderSelector).slider({
+            max: self.maxGrade,
+            step: 1,
+            value: gradeValue ? gradeValue : 0,
+            range: "min",
+            change: function(e, ui) {
+                $('input.grade-value').val(ui.value);
+            },
+            slide: function(e, ui) {
+                $('input.grade-value').val(ui.value);
+            }
+        });
+    },
+
+    onChangeGradeNumber: function(e) {
+        $(this.sliderSelector).slider({
+            value: $(e.target).val()
+        })
+    },
+
+    onTypoGradePress: function(e) {
+        var charCode = (e.which) ? e.which : event.keyCode
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+    },
+
+    onTypoGradeUp: function(e) {
     }
 };
