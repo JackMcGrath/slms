@@ -60,7 +60,8 @@ class AssignmentType extends AbstractType
             )
         );
 
-        $builder->add('maxPoints', 'text', array('required' => false));
+        $builder->add('threshold', 'text', array('required' => false, 'max_length' => 3));
+        $builder->add('gradeType', 'choice', array('required' => true, 'choices' => array('numeric' => 'Numeric', 'pass' => 'Pass/Fail')));
 
         $builder->add(
             'dueAt',
@@ -101,6 +102,15 @@ class AssignmentType extends AbstractType
         $resolver->setDefaults(
             array(
                 'data_class' => 'Zerebral\BusinessBundle\Model\Assignment\Assignment',
+                'validation_groups' => function(\Symfony\Component\Form\FormInterface $form) {
+                    /** @var \Zerebral\BusinessBundle\Model\Assignment\Assignment $data */
+                    $data = $form->getData();
+                    if ($data->getGradeType() == \Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer::GRADE_TYPE_NUMERIC) {
+                        return array('numeric');
+                    } else {
+                        return array('pass');
+                    }
+                }
             )
         );
     }

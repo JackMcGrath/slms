@@ -83,11 +83,11 @@ class FileStorageExtension extends \Twig_Extension
         $avatar = $user->getAvatar();
 
         if (empty($avatar)) {
-            return '/img/avatar-placeholder.jpg';
+            return '/img/avatar-placeholder.png';
         }
 
         if (!$avatar->getUrl()) {
-            return '/img/avatar-placeholder.jpg';
+            return '/img/avatar-placeholder.png';
         }
 
         return $avatar->getUrl();
