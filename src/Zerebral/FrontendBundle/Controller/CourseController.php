@@ -86,9 +86,13 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
         $upcomingAssignments = $this->getRoleUser()->getUpcomingAssignments($course);
         $recentMaterials = \Zerebral\BusinessBundle\Model\Material\CourseMaterialQuery::create()->findRecentCourseMaterials($course)->find();
 
+        $feedItems = FeedItemQuery::create()->getCourseFeed($course, $this->getUser())->limit(10)->find();
+        $feedItemsCount = FeedItemQuery::create()->getCourseFeed($course, $this->getUser())->count();
+
         return array(
             'course' => $course,
-            'feedItems' => FeedItemQuery::create()->getCourseFeed($course, $this->getUser())->find(),
+            'feedItems' => $feedItems,
+            'feedItemsCount' => $feedItemsCount,
             'upcomingAssignments' => $upcomingAssignments,
             'recentMaterials' => $recentMaterials,
             'feedItemForm' => $feedItemForm->createView(),

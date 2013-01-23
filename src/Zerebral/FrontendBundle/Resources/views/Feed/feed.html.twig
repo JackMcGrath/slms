@@ -49,7 +49,7 @@
 <!--      CourseDetails   --->
 
 
-{% macro course_details_feed(feedItemForm, feedItems, course = null) %}
+{% macro course_details_feed(feedItemForm, feedItems, feedItemsCount, course = null) %}
     {% import _self as self %}
     {% set isGlobal = (course is null) ? true : false %}
     <div class="course-details-feed">
@@ -101,6 +101,12 @@
         {% else %}
             <div class="empty">No updates yet!</div>
         {% endfor %}
+        {% if feedItemsCount > feedItems|length %}
+            {% set loadMoreItemsPath = (course is null) ? path('ajax_load_more_items') : path('ajax_load_more_items', {courseId: course.id})%}
+            <div class="load-more-items-div">
+                <a class="load-more-items" href="{{ loadMoreItemsPath }}" data-total-count="{{ feedItemsCount }}" data-loaded-count="{{ feedItems|length }}" data-last-item-id="{{ feedItems.last.id }}"><i class="icon-repeat"></i>Show more updates </a>
+            </div>
+        {% endif %}
     </div>
     </div>
 {% endmacro %}

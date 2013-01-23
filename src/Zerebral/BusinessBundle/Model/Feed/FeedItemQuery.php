@@ -13,8 +13,22 @@ class FeedItemQuery extends BaseFeedItemQuery
 {
     public function getGlobalFeed(\Zerebral\BusinessBundle\Model\User\User $user)
     {
+        if ($user->isStudent()) {
+            $this->addJoin(FeedItemPeer::COURSE_ID, CourseStudentPeer::COURSE_ID, \Criteria::LEFT_JOIN);
+            $this->addAnd(CourseStudentPeer::STUDENT_ID, $user->getStudent()->getId(), \Criteria::EQUAL);
+            $this->addOr(FeedItemPeer::COURSE_ID, null, \Criteria::ISNULL);
+
+            $this->addJoin(FeedItemPeer::ASSIGNMENT_ID, StudentAssignmentPeer::ASSIGNMENT_ID, \Criteria::LEFT_JOIN);
+            $this->addAnd(StudentAssignmentPeer::STUDENT_ID, $user->getStudent()->getId(), \Criteria::EQUAL);
+            $this->addOr(FeedItemPeer::ASSIGNMENT_ID, null, \Criteria::ISNULL);
+        } else {
+            $this->addJoin(FeedItemPeer::COURSE_ID, CourseTeacherPeer::COURSE_ID, \Criteria::LEFT_JOIN);
+            $this->addAnd(CourseTeacherPeer::TEACHER_ID, $user->getTeacher()->getId(), \Criteria::EQUAL);
+            $this->addOr(FeedItemPeer::COURSE_ID, null, \Criteria::ISNULL);
+        }
+
         $relatedUsers = $user->getRelatedUsers();
-        $ids = array($user->getId());
+        $ids = array();
         foreach($relatedUsers as $relatedUser) {
             $ids[] = $relatedUser->getId();
         }
@@ -60,5 +74,10 @@ class FeedItemQuery extends BaseFeedItemQuery
     public function filterNewer($lastItemId)
     {
         return $this->clearOrderByColumns()->addDescendingOrderByColumn(FeedItemPeer::ID)->filterById($lastItemId, \Criteria::GREATER_THAN);
+    }
+
+    public function filterOlder($lastItemId)
+    {
+        return $this->clearOrderByColumns()->addDescendingOrderByColumn(FeedItemPeer::ID)->filterById($lastItemId, \Criteria::LESS_THAN);
     }
 }
