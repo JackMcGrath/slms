@@ -26,8 +26,7 @@ $(document).ready(function() {
                 }
             });
         } else {
-            $('i.notifications small').remove();
-            $('.sidebar-nav .menu-item i small').remove();
+            $('.navbar i.notifications small').remove();
             $('.notifications-popup .notifications-popup-list').html('');
         }
     }
