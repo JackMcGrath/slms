@@ -87,8 +87,18 @@
                 <a href="#" data-toggle="modal" data-toggle="modal"><i class="icon-new-plus-add"></i></a>
             </td>
         {% else %}
-            <td class="" studentAssignment="{{ grading[student.id][assignment.id].id }}">
-                <div class="grade-value" value="{{ grading[student.id][assignment.id].grading }}">{{ grading[student.id][assignment.id].grading }}</div>
+            <td class="{{ grading[student.id][assignment.id].assignment.gradeType == 'pass' ? ' pass' : ' numeric' }}" studentAssignment="{{ grading[student.id][assignment.id].id }}">
+                <div class="grade-value" value="{{ grading[student.id][assignment.id].grading }}">
+                    {% if grading[student.id][assignment.id].assignment.gradeType == 'pass' %}
+                        {% if grading[student.id][assignment.id].grading == 1 %}
+                            <i class="icon-new-passed"></i>
+                        {% else %}
+                            <i class="icon-new-fail"></i>
+                        {% endif %}
+                    {% else %}
+                        {{ grading[student.id][assignment.id].grading }}
+                    {% endif %}
+                </div>
             </td>
         {% endif %}
         </td>

@@ -606,6 +606,7 @@
         {% set label = form.grading.name|humanize %}
     {% endif %}
     {% spaceless %}
+        {% if assignment.gradeType == 'numeric' %}
         <div class="control-group{% if errors|length %} error{% endif %}">
             {{ form_label(form.grading, label) }}
             <div class="controls">
@@ -624,6 +625,18 @@
                 </div>
             </div>
         </div>
+        {% else %}
+            <div class="btn-group grade-pass" data-toggle="buttons-radio">
+                <button type="button" class="btn btn-primary{{ form.grading.get('value') == 1 ? ' active' : '' }}" value="1">Pass</button>
+                <button type="button" class="btn btn-primary{{ form.grading.get('value') == 0 ? ' active' : '' }}" value="0">Fail</button>
+            </div>
+            {{ form_widget(form.grading, {
+                type: 'hidden',
+                attr: {
+                    class: 'grade-pass-value'
+                }
+            }) }}
+        {% endif %}
 
         <div class="clearfix"></div>
         {{ form_row(form.grading_comment, {

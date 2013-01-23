@@ -48,7 +48,13 @@ class AssignmentTableMap extends TableMap
         $this->addForeignKey('assignment_category_id', 'AssignmentCategoryId', 'TINYINT', 'assignment_categories', 'id', true, 2, null);
         $this->addColumn('name', 'Name', 'VARCHAR', true, 200, null);
         $this->addColumn('description', 'Description', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('max_points', 'MaxPoints', 'SMALLINT', true, 2, null);
+        $this->addColumn('max_points', 'MaxPoints', 'SMALLINT', false, 3, null);
+        $this->addColumn('grade_type', 'GradeType', 'CHAR', true, null, 'numeric');
+        $this->getColumn('grade_type', false)->setValueSet(array (
+  0 => 'numeric',
+  1 => 'pass',
+));
+        $this->addColumn('threshold', 'Threshold', 'SMALLINT', false, 3, null);
         $this->addColumn('due_at', 'DueAt', 'TIMESTAMP', false, null, null);
         // validators
         $this->addValidator('id', 'required', 'propel.validator.RequiredValidator', '', 'The field id is required.');
