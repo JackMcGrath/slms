@@ -164,13 +164,30 @@
         display: inline-block;
         width: 565px;
 
-        input[type=text], textarea {
+        .chzn-container, input[type=text], textarea {
           width: 100%;
           margin-bottom: 5px;
           border-radius: 2px;
         }
         textarea {
           height: 280px;
+        }
+        .chzn-container {
+          border: 1px solid #ccc;
+          padding: 0 10px;
+
+          ul {
+            border: none;
+
+            li.search-choice {
+              margin: 3px 5px;
+              font-size: 13px;
+              color: #545454;
+              background: #c0c0c0;
+              padding: 6px;
+              border: none;
+            }
+          }
         }
       }
     }

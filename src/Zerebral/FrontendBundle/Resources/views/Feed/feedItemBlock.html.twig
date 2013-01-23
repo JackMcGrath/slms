@@ -22,7 +22,7 @@
     {% import _self as self %}
     {{ self.feed_item_author_block(feedItem, isGlobal) }}
     <div class="text">
-        {{ feedItem.feedContent.text|nl2br }}
+        <span class="text-span">{{ feedItem.feedContent.text|nl2br }}</span>
         <div class="link-content">
             {% if feedItem.feedContent.linkThumbnailUrl is not null %}
                 <div class="thumbnail">
@@ -42,7 +42,7 @@
     {% import _self as self %}
     {{ self.feed_item_author_block(feedItem, isGlobal) }}
     <div class="text">
-        {{ feedItem.feedContent.text|nl2br }}
+        <span class="text-span">{{ feedItem.feedContent.text|nl2br }}</span>
         <div class="link-content">
             {% if feedItem.feedContent.linkThumbnailUrl is not null %}
                 <div class="thumbnail">
@@ -65,7 +65,7 @@
     {% import _self as self %}
     {{ self.feed_item_author_block(feedItem, isGlobal) }}
     <div class="text">
-        {{ feedItem.feedContent.text|nl2br }}
+        <span class="text-span">{{ feedItem.feedContent.text|nl2br }}</span>
         <div class="link-content">
             <a href="{{ feedItem.feedContent.linkUrl }}" target="_blank"><img src="{{ feedItem.feedContent.linkUrl }}" alt="{{ feedItem.feedContent.linkTitle }}" /></a>
         </div>
@@ -86,7 +86,7 @@
     {% import _self as self %}
     {{ self.feed_item_author_block(feedItem, isGlobal) }}
     <div class="text">
-        {{ feedItem.feedContent.text|nl2br }}
+        <span class="text-span">{{ feedItem.feedContent.text|nl2br }}</span>
     </div>
 {% endmacro %}
 
@@ -119,11 +119,7 @@
         {% endif %}
         <i class="icon-comment"></i><a class="show-comment-form-link {% if lastFeedComments|length > 0 %} expanded {% endif %}" data-comments-count="{{ feedItem.feedComments|length }}" href="#">&nbsp;Comments (<span>{{ feedItem.feedComments|length }}</span>)</a>
     </div>
-    {% if lastFeedComments|length > 0 %}
-        {% set lastItemCommentId = lastFeedComments.last.id %}
-    {% else %}
-        {% set lastItemCommentId = 0 %}
-    {% endif %}
+    {% set lastItemCommentId = (lastFeedComments|length > 0) ? lastFeedComments.last.id : 0 %}
     <div class="comments" data-item-id="{{ feedItem.id }}" data-last-item-comment-id="{{ lastItemCommentId }}">
         {% if lastFeedComments|length < feedItem.feedComments|length %}
             <div class="comment load-more">

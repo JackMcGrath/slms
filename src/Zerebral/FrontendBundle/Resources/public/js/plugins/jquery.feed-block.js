@@ -24,6 +24,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
     itemsDiv: undefined,
     feedItemsDiv: undefined,
 
+    urlRegexp: /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig,
 
     timeOffset: null,
 
@@ -120,6 +121,27 @@ ZerebralCourseDetailFeedBlock.prototype = {
         })
     },
 
+    highlightUrls: function() {
+        var self = this;
+
+        var feedItems = self.feedItemsDiv.find('div.text span.text-span').not('.processed');//
+        $.each(feedItems, function(index, value) {
+            var link = self.highlightUrl($(value).html());
+            $(value).html(link).addClass('processed');
+        });
+
+        var feedComments = self.feedItemsDiv.find('.comments div.content span.text-span').not('.processed');//
+        $.each(feedComments, function(index, value) {
+            var link = self.highlightUrl($(value).html());
+            $(value).html(link).addClass('processed');
+        });
+    },
+
+    highlightUrl: function(text) {
+        var self = this;
+        return text.replace(self.urlRegexp, '<a href="$1" target="_blank">$1</a>');
+    },
+
     updateFeed: function() {
         var self = this;
 
@@ -162,6 +184,8 @@ ZerebralCourseDetailFeedBlock.prototype = {
             var humanDate = itemDate.from(currentTime);
             $(value).html(humanDate);
         });
+
+        self.highlightUrls();
     },
 
     loadComments: function(event) {
@@ -415,6 +439,8 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
     ajaxInProgress: false,
     errorHasAppeared: 0,
 
+    urlRegexp: /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig,
+
 
         init: function() {
         var self = this;
@@ -495,6 +521,21 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
         }
     },
 
+    highlightUrls: function() {
+        var self = this;
+
+        var feedComments = self.feedCommentsDiv.find('div.text span.text-span').not('.processed');//
+        $.each(feedComments, function(index, value) {
+            var link = self.highlightUrl($(value).html());
+            $(value).html(link).addClass('processed');
+        });
+    },
+
+    highlightUrl: function(text) {
+        var self = this;
+        return text.replace(self.urlRegexp, '<a href="$1" target="_blank">$1</a>');
+    },
+
     updateFeed: function() {
         var self = this;
         if (!self.ajaxInProgress && self.errorHasAppeared < 2) {
@@ -528,6 +569,8 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
             var humanDate = date.from(currentTime);
             $(value).html(humanDate);
         });
+
+        self.highlightUrls();
     },
 
     resetMainFormType: function(event) {

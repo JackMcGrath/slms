@@ -96,6 +96,10 @@
                         <div class="hidden-avatar-div" style="{{ isValidFile ? '' : 'display:block;' }}">
                             {{ form_widget(form.user.avatar.uploadedFile) }}
                             {{ form_errors(form.user.avatar.uploadedFile) }}
+
+                            {{ form_row(form.user.avatar.name) }}
+                            {{ form_row(form.user.avatar.temporaryFile) }}
+                            {{ form_row(form.user.avatar.mimeType) }}
                         </div>
                     </div>
                 </div>
