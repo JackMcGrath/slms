@@ -1,6 +1,7 @@
 <?php
 
 namespace Zerebral\FrontendBundle\Form\Type;
+use Zerebral\CommonBundle\Form\Type\OptionalModelType;
 
 use Symfony\Component\Form\AbstractType;
 use Zerebral\CommonBundle\File\Form\Type\FileType;
@@ -15,8 +16,15 @@ class MessageType extends AbstractType
     {
         $builder->add('subject', 'text', array('required' => true, 'max_length' => 250));
         $builder->add('body', 'textarea', array('required' => true));
-        $builder->add('toName', 'text', array('required' => false));
-        $builder->add('to_id', 'hidden', array('required' => false));
+        $builder->add('to', 'model', array(
+            'class' => 'Zerebral\BusinessBundle\Model\User\User',
+            'property' => 'full_name',
+            'required' => false,
+            'empty_value' => "To",
+            'empty_data' => 0,
+            'invalid_message' => 'Recipient is required.',
+        ));
+//        $builder->add('toId', 'choice', array('required' => false));
         $builder->add('subject', 'text', array('required' => false));
 
         $builder->add(

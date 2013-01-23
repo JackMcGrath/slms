@@ -212,12 +212,7 @@ Zerebral\BusinessBundle\Model\Message\Message:
             - NotNull:
                 groups: [compose]
                 message: Message subject can not be empty
-        toId:
+        to:
             - NotNull:
                 groups: [compose]
                 message: Recipient can not be empty
-        toName:
-            - NotNull:
-                groups: [compose]
-                message: Recipient can not be empty
-

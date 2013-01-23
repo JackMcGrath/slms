@@ -7,7 +7,6 @@ use Zerebral\BusinessBundle\Model\Message\om\BaseMessage;
 class Message extends BaseMessage
 {
     public $isMarkedAsRead;
-    public $toName;
 
     public function markAsRead()
     {
@@ -54,9 +53,13 @@ class Message extends BaseMessage
         return strip_tags($this->body);
     }
 
-    public function getToName()
+    public function getTo()
     {
-        return $this->toName;
+        return $this->getUserRelatedByToId();
     }
 
+    public function setTo(\Zerebral\BusinessBundle\Model\User\User $user)
+    {
+        $this->setUserRelatedByToId($user);
+    }
 }
