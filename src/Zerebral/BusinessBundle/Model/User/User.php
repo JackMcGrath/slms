@@ -355,6 +355,11 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
         return $this->getNotificationsRelatedByUserId($c);
     }
 
+    public function getUnreadMessagesCount()
+    {
+        return \Zerebral\BusinessBundle\Model\Message\MessageQuery::create()->getUnreadCount($this);
+    }
+
     public function getRelatedUsers()
     {
         if (is_null($this->relatedUsers)) {

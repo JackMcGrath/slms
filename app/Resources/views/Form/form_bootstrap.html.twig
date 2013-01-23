@@ -600,3 +600,35 @@
         </div>
     {% endspaceless %}
 {% endblock custom_file_widget %}
+
+{% block grading_widget %}
+    {% if label is empty %}
+        {% set label = form.grading.name|humanize %}
+    {% endif %}
+    {% spaceless %}
+        <div class="control-group{% if errors|length %} error{% endif %}">
+            {{ form_label(form.grading, label) }}
+            <div class="controls">
+                {{ form_widget(form.grading, {attr: {
+                    class: 'input-small grade-value'
+                }}) }}
+                {{ form_errors(form.grading) }}
+
+                <div class="grade-slider">
+                    <div class="scale">
+                    {% for value in range(0, 100, 10) %}
+                        <span>{{ value }}</span>
+                    {% endfor %}
+                    </div>
+                    <div class="slider"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="clearfix"></div>
+        {{ form_row(form.grading_comment, {
+            label: "Leave feedback below",
+            form_type: 'horizontal'
+        }) }}
+    {% endspaceless %}
+{% endblock grading_widget %}
