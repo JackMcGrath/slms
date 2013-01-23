@@ -77,6 +77,19 @@
 </div>
 {% endmacro %}
 
+{% macro recentMaterials(materials) %}
+    <h4>Recent materials</h4>
+    {% if materials.count > 0 %}
+    <ul>
+        {% for material in materials %}
+            <li><a href="{{ material.file.url }}"><img src="{{ get_file_icon(material.file, 'small') }}"/>{{ material.file.name }}</a></li>
+        {% endfor %}
+    </ul>
+    {% else %}
+        <div class="alert alert-success">There were no new materials published</div>
+    {% endif %}
+{% endmacro %}
+
 {% macro courseSchedule(course) %}
     {% if course.start or course.end or course.getCourseScheduleDays.count %}
         <div class="timetable">

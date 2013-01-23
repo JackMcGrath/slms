@@ -22,7 +22,7 @@
     {% import _self as self %}
     {{ self.feed_item_author_block(feedItem, isGlobal) }}
     <div class="text">
-        {{ feedItem.feedContent.text|nl2br }}
+        <span class="text-span">{{ feedItem.feedContent.text|nl2br }}</span>
         <div class="link-content">
             {% if feedItem.feedContent.linkThumbnailUrl is not null %}
                 <div class="thumbnail">
@@ -42,7 +42,7 @@
     {% import _self as self %}
     {{ self.feed_item_author_block(feedItem, isGlobal) }}
     <div class="text">
-        {{ feedItem.feedContent.text|nl2br }}
+        <span class="text-span">{{ feedItem.feedContent.text|nl2br }}</span>
         <div class="link-content">
             {% if feedItem.feedContent.linkThumbnailUrl is not null %}
                 <div class="thumbnail">
@@ -65,7 +65,7 @@
     {% import _self as self %}
     {{ self.feed_item_author_block(feedItem, isGlobal) }}
     <div class="text">
-        {{ feedItem.feedContent.text|nl2br }}
+        <span class="text-span">{{ feedItem.feedContent.text|nl2br }}</span>
         <div class="link-content">
             <a href="{{ feedItem.feedContent.linkUrl }}" target="_blank"><img src="{{ feedItem.feedContent.linkUrl }}" alt="{{ feedItem.feedContent.linkTitle }}" /></a>
         </div>
@@ -86,7 +86,7 @@
     {% import _self as self %}
     {{ self.feed_item_author_block(feedItem, isGlobal) }}
     <div class="text">
-        {{ feedItem.feedContent.text|nl2br }}
+        <span class="text-span">{{ feedItem.feedContent.text|nl2br }}</span>
     </div>
 {% endmacro %}
 
