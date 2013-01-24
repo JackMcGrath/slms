@@ -45,6 +45,16 @@
                     {% endfor %}
                     <div class="clearfix"></div>
                 {% endif %}
+
+                {% if (not assignments or assignments.count == 0) and (not assignmentsNoDueDate or assignmentsNoDueDate.count == 0) and (not draftAssignment or draftAssignment.count == 0) %}
+                    <div class="empty">
+                        {% if is_granted('ROLE_TEACHER') %}
+                            You have not created any assignments. Click <a href="{{ path('assignment_add', {courseId: course.id}) }}">Create Assignment</a> to add one.
+                        {% else %}
+                            This course does not have any assignments yet. You will be notified when one is added.
+                        {% endif %}
+                    </div>
+                {% endif %}
             </div>
         </div>
 
@@ -65,7 +75,11 @@
 
     </div>
 
-
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('.calendar').calendarSelectable({itemList: '.items-list', calculateAssignmentsCount: true, startDate: "{{ dateFilter.startDate }}", endDate: "{{ dateFilter.endDate }}"});
+        });
+    </script>
 {% endblock %}
 
 {% block assignment %}
@@ -125,9 +139,4 @@
             {% endif %}
         {% endif %}
     </div>
-    <script type="text/javascript">
-        $(document).ready(function(){
-            $('.calendar').calendarSelectable({itemList: '.items-list', calculateAssignmentsCount: true, startDate: "{{ dateFilter.startDate }}", endDate: "{{ dateFilter.endDate }}"});
-        });
-    </script>
 {% endblock %}

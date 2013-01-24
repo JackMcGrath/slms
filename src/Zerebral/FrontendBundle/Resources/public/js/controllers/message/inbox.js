@@ -15,5 +15,5 @@ $(document).ready(function(){
 		}
 	});
 
-	$('input.select-all').checkAll({checkboxClass: 'input.message-check'});
+	$('input.select-all').checkAll({checkboxClass: 'input.message-check', controlButtons: '.group-control-button'});
 });
