@@ -1,3 +1,9 @@
+/*
+ * USING
+ *
+ * $('#checkbox-that-check-all').checkAll('.class-of-checkboxes-need-to-check');
+ */
+
 var checkAll = function(element, options) {
 	this.elementCheckAll = element;
 	this.elementCheckSelector = options.checkboxClass;
