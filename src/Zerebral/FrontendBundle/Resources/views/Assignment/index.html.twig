@@ -20,27 +20,33 @@
 
             <div class="span9 items-list{% if is_granted('ROLE_TEACHER') %} teacher-role{% endif %}">
                 {% if assignments and assignments.count %}
-                    <div class="small-title">Scheduled</div>
-                    {% for assignment in assignments %}
-                        {{ block('assignment') }}
-                    {% endfor %}
+                    <div id="scheduled">
+                        <div class="small-title">Scheduled</div>
+                        {% for assignment in assignments %}
+                            {{ block('assignment') }}
+                        {% endfor %}
+                    </div>
                     <div class="clearfix"></div>
                 {% endif %}
 
                 {% if assignmentsNoDueDate and assignmentsNoDueDate.count %}
-                    <div class="small-title">No due date</div>
-                    {% for assignment in assignmentsNoDueDate %}
-                        {{ block('assignment') }}
-                    {% endfor %}
+                    <div id="no-due-date">
+                        <div class="small-title">No due date</div>
+                        {% for assignment in assignmentsNoDueDate %}
+                            {{ block('assignment') }}
+                        {% endfor %}
+                    </div>
                     <div class="clearfix"></div>
                 {% endif %}
 
                 {% if draftAssignment and draftAssignment.count %}
-                    <div class="small-title">Drafts</div>
-                    {% set type = 'draft' %}
-                    {% for assignment in draftAssignment %}
-                        {{ block('assignment') }}
-                    {% endfor %}
+                    <div id="drafts">
+                        <div class="small-title">Drafts</div>
+                        {% set type = 'draft' %}
+                        {% for assignment in draftAssignment %}
+                            {{ block('assignment') }}
+                        {% endfor %}
+                    </div>
                     <div class="clearfix"></div>
                 {% endif %}
 
@@ -52,6 +58,10 @@
                             You do not have any assignments yet.<br/> You will be notified when one is added.
                         {% endif %}
                     </div>
+                {% else %}
+                     <div class="empty-search-results empty hide">
+                        Search results for the selected interval. No events.
+                     </div>
                 {% endif %}
             </div>
         </div>

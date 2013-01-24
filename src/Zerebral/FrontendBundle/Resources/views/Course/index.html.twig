@@ -59,6 +59,9 @@
                     </div>
                 </div>
             {% endfor %}
+            <div class="empty-search-results empty hide">
+                Search results for the selected interval. No events.
+            </div>
             {% else %}
                 <div class="empty">
                     {% if is_granted('ROLE_TEACHER') %}
@@ -68,6 +71,7 @@
                     {% endif %}
                 </div>
             {% endif %}
+
         </div>
     </div>
 
