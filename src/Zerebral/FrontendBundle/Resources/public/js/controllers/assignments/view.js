@@ -57,24 +57,24 @@ $(document).ready(function(){
 
     $('.solutions-widget i.file-info').tooltip();
 
-    $(document).on('click', '.file .remove-uploaded-file', function(e) {
-        e.preventDefault();
-        var link = $(e.target).attr('href');
-        if (window.confirm('Are you sure to delete this solution?')) {
-            $.ajax({
-                type: 'post',
-                url: link,
-                success: function() {
-                    $(e.target).parent().slideUp(function() {
-                        $(this).remove();
-                    });
-                },
-                error: function(response) {
-                    alert(response.statusText);
-                }
-            })
-        }
-    });
+//    $(document).on('click', '.file .remove-uploaded-file', function(e) {
+//        e.preventDefault();
+//        var link = $(e.target).attr('href');
+//        if (window.confirm('Are you sure to delete this solution?')) {
+//            $.ajax({
+//                type: 'post',
+//                url: link,
+//                success: function() {
+//                    $(e.target).parent().slideUp(function() {
+//                        $(this).remove();
+//                    });
+//                },
+//                error: function(response) {
+//                    alert(response.statusText);
+//                }
+//            })
+//        }
+//    });
 
     $('#ajaxUploadSolutionsForm').zerebralAjaxForm();
 

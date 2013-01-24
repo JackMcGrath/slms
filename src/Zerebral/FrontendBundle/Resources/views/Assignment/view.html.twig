@@ -48,7 +48,7 @@
                     {% for file in assignment.files %}
                         <li class="file">
                             <img class="icon" src="{{ get_file_icon(file) }}" />
-                            <a class="link" target="_blank" href="{{ path('download_file', {id: file.id}) }}">{{ file.name }}</a><br >
+                            <a class="link" href="{{ path('download_file', {id: file.id}) }}">{{ file.name }}</a><br >
                             <span class="size">{{ file.size | bytes_to_human }}</span>
                         </li>
                     {% endfor %}
@@ -79,12 +79,12 @@
                         {% for file in studentAssignment.files %}
                             <li class="file">
                                 <i class="icon-search"></i>
-                                <a class="link" target="_blank" href="{{ path('download_file', {id: file.id}) }}">{{ file.name }}</a>
+                                <a class="link" href="{{ path('download_file', {id: file.id}) }}">{{ file.name }}</a>
                                 {% if file.description %}
                                     <i rel="tooltip" title="{{ file.description }}" class="icon-small-info file-info"></i>
                                 {% endif %}
                                 {% if not studentAssignment.isSubmitted %}
-                                <i class="icon-small-trash-bin"></i><a class="remove-uploaded-file" href="{{ path('student_assignment_solution_remove', {id: studentAssignment.id, fileId: file.id}) }}">Delete</a>
+                                <i class="icon-small-trash-bin"></i><a class="remove-uploaded-file delete-confirm" href="{{ path('student_assignment_solution_remove', {id: studentAssignment.id, fileId: file.id}) }}">Delete</a>
                                 {% endif %}
                             </li>
                         {% else %}
