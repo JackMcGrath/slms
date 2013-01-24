@@ -626,9 +626,14 @@
             </div>
         </div>
         {% else %}
-            <div class="btn-group grade-pass" data-toggle="buttons-radio">
-                <button type="button" class="btn btn-primary{{ form.grading.get('value') == 1 ? ' active' : '' }}" value="1">Pass</button>
-                <button type="button" class="btn btn-primary{{ form.grading.get('value') == 0 ? ' active' : '' }}" value="0">Fail</button>
+            <div class="grade-pass-container">
+                <div class="control-group">
+                <label>Select the grade below</label>
+                <div class="btn-group grade-pass" data-toggle="buttons-radio">
+                    <button type="button" class="btn{{ form.grading.get('value') == 1 ? ' active btn-success' : ' btn-default' }}" value="1">Completed</button>
+                    <button type="button" class="btn{{ form.grading.get('value') == 0 ? ' active btn-danger' : ' btn-default' }}" value="0">Incomplete</button>
+                </div>
+                </div>
             </div>
             {{ form_widget(form.grading, {
                 type: 'hidden',

@@ -71,8 +71,9 @@ StudentsPopup.prototype = {
         var self = this;
 
         this.target.find('.student-list tr').live('click', $.proxy(this.onClickUserRow, this));
-        this.target.find('.toggle_selection input').live('change', $.proxy(this.onSelectUser, this));
+        //this.target.find('.toggle_selection input').live('change', $.proxy(this.onSelectUser, this));
 
+        $('.toggle_selection input').checkAll({checkboxClass: '.student-list input[type="checkbox"]'});
         this.target.on('hidden', function () {
             $('.student_select').removeAttr('disabled').attr('checked', '1');
             var selectedItemsCount = $('.student-list input[type=checkbox]:checked').length;
@@ -80,8 +81,6 @@ StudentsPopup.prototype = {
             $('.student_select').parent().find('a').text(selectedItemsCount + '/' + allItemsCount + " students selected");
         });
     },
-
-
 
     onClickUserRow: function(e) {
         if ($(e.target).prop("tagName") != "INPUT"){
@@ -91,18 +90,6 @@ StudentsPopup.prototype = {
             }else{
                 checkbox.attr('checked', 1);
             }
-        }
-    },
-
-    onSelectUser: function(e) {
-        if($(e.target).is(':checked')){
-            $('.student-list input[type=checkbox]').each(function(index, element){
-                $(element).attr('checked', 1);
-            });
-        }else{
-            $('.student-list input[type=checkbox]').each(function(index, element){
-                $(element).removeAttr('checked');
-            });
         }
     }
 };
