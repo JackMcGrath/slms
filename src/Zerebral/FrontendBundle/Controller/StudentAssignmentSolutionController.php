@@ -65,8 +65,8 @@ class StudentAssignmentSolutionController extends \Zerebral\CommonBundle\Compone
         }
 
         $file->delete();
-
-        return new JsonResponse(array('success' => true));
+        return $this->redirect($this->generateUrl('assignment_view', array('id' => $studentAssignment->getAssignmentId())));
+        //return new JsonResponse(array('success' => true));
     }
 
     /**

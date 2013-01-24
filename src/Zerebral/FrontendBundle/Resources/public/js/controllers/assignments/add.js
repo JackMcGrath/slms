@@ -1,67 +1,101 @@
-$(document).ready(function(){
+function Controller() {
+}
 
-    $('#upload_files_div').collectionFormType({
-        add: '.add_file_link',
-        remove: '.remove-uploaded-file',
-        item: '.file-item',
-        template: '#new_file_form'
-    });
+Controller.prototype = {
+    delayed:false,
+    options:undefined,
+    studentsPopup: undefined,
 
-//    // Dynamic files fields creating
-//    var addAttachmentField = function(e) {
-//        if (e) {
-//            e.preventDefault();
-//        }
-//        var prototype = $('div#attachments_div').attr('data-prototype');
-//        var newForm = $(prototype.replace(/__name__/g, $('div#upload_files_div div').length));
-////        newForm.find('input').attr('name', newForm.find('input').attr('name') + '[uploadedFile]');
-//        $('div#upload_files_div').append(newForm);
-//    }
+    init:function (options) {
+        this.options = options || {};
+        this.studentsPopupSelector = $('#studentsModal');
+        this.studentsPopup = new StudentsPopup(this, this.studentsPopupSelector);
 
-//    $('.add_file_link').on('click', addAttachmentField);
-//
-//
-//    $(document).on('click', '.remove-uploaded-file', function(e) {
-//        e.preventDefault();
-//        if (window.confirm('Are you sure to delete this attachment?')) {
-//            $(e.target).parents('div.file-item').remove();
-//        }
-//    });
+        $('.icon-new-calendar').datepicker();
+        $('.icon-new-clock').timepicker({
+            defaultTime: 'value'
+        });
+        $('textarea').wysihtml5();
+        $('.optional-model').optionalModel();
 
+        this.bind();
+    },
 
-    $('.icon-new-calendar').datepicker();
-    $('.icon-new-clock').timepicker({
-        defaultTime: 'value'
-    });
-    $('textarea').wysihtml5();
+    bind: function() {
+        this.switchThresholdByValue($('.grade-type').val());
 
-    $('#studentsModal').on('hidden', function () {
-        $('.student_select').removeAttr('disabled').attr('checked', '1');
-        var selectedItemsCount = $('.student-list input[type=checkbox]:checked').length;
-        var allItemsCount = $('.student-list input[type=checkbox]').length;
-        $('.student_select').parent().find('a').text(selectedItemsCount + '/' + allItemsCount + " students selected");
-    });
+        this.bindUploadFiles();
+        $('.student_select_all').live('change', $.proxy(this.onSelectAll, this));
+        $('select.grade-type').live('change', $.proxy(this.onChangeGradeType, this))
+    },
 
-    $('.student_select_all').on('change', function(e){
+    onSelectAll: function() {
+        console.log('check');
         $('.student_select').attr('disabled', '1');
         $('.student-list input[type=checkbox]').each(function(index, element){
             $(element).attr('checked', 1);
         });
-    });
+    },
 
-    $('.student-list tr').on('click', function(e){
-        if($(e.target).prop("tagName") != "INPUT"){
-            var checkbox = $(this).find('input');
+    bindUploadFiles: function() {
+        $('#upload_files_div').collectionFormType({
+            add: '.add_file_link',
+            remove: '.remove-uploaded-file',
+            item: '.file-item',
+            template: '#new_file_form'
+        });
+    },
+
+    onChangeGradeType: function(e) {
+        this.switchThresholdByValue($(e.target).val());
+        $(e.target).parents('.form-inline').find('.help-inline').remove();
+    },
+
+    switchThresholdByValue: function(value) {
+        if (value == 'numeric') {
+            $('.threshold').parents('.control-group').show();
+        } else {
+            $('.threshold').parents('.control-group').hide();
+        }
+    }
+};
+
+var StudentsPopup = function (container, target) {
+    this.container = container;
+    this.target = target;
+    this.bind();
+};
+
+StudentsPopup.prototype = {
+    bind:function () {
+        var self = this;
+
+        this.target.find('.student-list tr').live('click', $.proxy(this.onClickUserRow, this));
+        this.target.find('.toggle_selection input').live('change', $.proxy(this.onSelectUser, this));
+
+        this.target.on('hidden', function () {
+            $('.student_select').removeAttr('disabled').attr('checked', '1');
+            var selectedItemsCount = $('.student-list input[type=checkbox]:checked').length;
+            var allItemsCount = $('.student-list input[type=checkbox]').length;
+            $('.student_select').parent().find('a').text(selectedItemsCount + '/' + allItemsCount + " students selected");
+        });
+    },
+
+
+
+    onClickUserRow: function(e) {
+        if ($(e.target).prop("tagName") != "INPUT"){
+            var checkbox = $(e.target).closest('tr').find('input');
             if(checkbox.is(':checked')){
                 checkbox.removeAttr('checked');
             }else{
                 checkbox.attr('checked', 1);
             }
         }
-    });
+    },
 
-    $('.toggle_selection input').on('change', function(e){
-        if($(this).is(':checked')){
+    onSelectUser: function(e) {
+        if($(e.target).is(':checked')){
             $('.student-list input[type=checkbox]').each(function(index, element){
                 $(element).attr('checked', 1);
             });
@@ -70,7 +104,5 @@ $(document).ready(function(){
                 $(element).removeAttr('checked');
             });
         }
-    });
-
-    $('.optional-model').optionalModel();
-});
+    }
+};

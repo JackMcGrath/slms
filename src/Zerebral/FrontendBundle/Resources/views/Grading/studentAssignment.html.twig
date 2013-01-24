@@ -16,7 +16,7 @@
         {% for file in studentAssignment.files %}
             <li class="file">
                 <img class="icon" src="{{ get_file_icon(file) | imagine_filter('file_icon') }}" />
-                <a class="link" target="_blank" href="{{ file.url }}">{{ file.name }}</a><br >
+                <a class="link" href="{{ path('download_file', {id: file.id}) }}">{{ file.name }}</a><br >
                 <span class="size">{{ file.size | bytes_to_human }}</span>
             </li>
         {% endfor %}
@@ -27,6 +27,6 @@
 </div>
 
 <div class="grade-block">
-    {{ form_widget(form, {label: 'Enter the number grade below'}) }}
+    {{ form_widget(form, {label: 'Enter the number grade below', assignment: studentAssignment.assignment }) }}
     {{ form_rest(form) }}
 </div>

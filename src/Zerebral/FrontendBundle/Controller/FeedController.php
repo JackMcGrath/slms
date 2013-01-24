@@ -128,4 +128,35 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
 
         return new JsonResponse(array('success' => true, 'lastItemId' => $lastItemId, 'content' => $content, 'comments' => $sortedByItemComments));
     }
+
+    /**
+     * @Route("/{courseId}", name="ajax_load_more_items", defaults={"courseId" = null})
+     * @param \Zerebral\BusinessBundle\Model\Course\Course $course
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @ParamConverter("course", options={"mapping": {"courseId": "id"}})
+     *
+     * TODO: add is ajax validation
+     */
+    public function indexAction(Course $course = null)
+    {
+        $lastItemId = $this->getRequest()->get('lastItemId', 0);
+        if (is_null($course)) {
+            $query = FeedItemQuery::create()->getGlobalFeed($this->getUser());
+        } else {
+            $query = FeedItemQuery::create()->getCourseFeed($course, $this->getUser());
+        }
+
+        $items = $query->filterOlder($lastItemId)->limit(10)->find();
+
+        $content = '';
+        if (count($items) > 0) {
+            foreach ($items as $item) {
+                $content .= $this->render('ZerebralFrontendBundle:Feed:feedItemBlock.html.twig', array('feedItem' => $item, 'isGlobal' => is_null($course)))->getContent();
+            }
+            $lastItemId = $items->getLast()->getId();
+        }
+
+        return new JsonResponse(array('success' => true, 'lastItemId' => $lastItemId, 'content' => $content, 'loadedCount' => count($items)));
+    }
 }

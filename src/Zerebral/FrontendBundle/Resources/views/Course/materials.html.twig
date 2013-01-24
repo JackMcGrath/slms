@@ -35,7 +35,7 @@
                             </div>
                             <div class="details">
                                 <div class="title">
-                                    <h3><a href="{{ material.file.url }}">{{ material.file.name }}</a></h3>
+                                    <h3><a href="{{ path('download_file', {id: material.file.id}) }}">{{ material.file.name }}</a></h3>
                                 </div>
                                 <div class="description">{{ material.description }}</div>
                                 <div class="info">

@@ -7,6 +7,8 @@ var ZerebralCourseDetailFeedBlock = function(element, options) {
 
     self.feedItemAlertBlock = element.find('.feed-item-alert-block');
 
+    self.loadMoreItemsLink = element.find('a.load-more-items');
+
     self.feedItemsDiv = element.find('.feed-items');
     self.itemsDiv = element.find('.feed-item');
     self.commentsDiv = element.find('.feed-item .comments');
@@ -23,6 +25,8 @@ ZerebralCourseDetailFeedBlock.prototype = {
     commentsDiv: undefined,
     itemsDiv: undefined,
     feedItemsDiv: undefined,
+
+    loadMoreItemsLink: undefined,
 
     urlRegexp: /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig,
 
@@ -46,7 +50,9 @@ ZerebralCourseDetailFeedBlock.prototype = {
         this.feedItemsDiv.on('click', 'a.delete-link.delete-feed-item', $.proxy(self.deleteItemBlock, self));
         this.feedItemsDiv.on('click', 'a.delete-link.delete-comment', $.proxy(self.deleteCommentBlock, self));
 
+
         this.commentsDiv.on('click', 'a.load-more-link', $.proxy(self.loadComments, self));
+        this.loadMoreItemsLink.on('click', $.proxy(self.loadMoreItems, self));
 
         self.timeOffset = moment(this.feedItemsDiv.data('serverTime'), 'YYYY-MM-DD HH:mm:ss').diff(moment(), 'seconds');
         self.updateFeed();
@@ -227,6 +233,57 @@ ZerebralCourseDetailFeedBlock.prototype = {
         }
     },
 
+    loadMoreItems: function(event) {
+        event.preventDefault();
+
+        var self = this;
+        var link = $(event.target);
+        var lastItemId = link.data('lastItemId');
+
+        if (link.hasClass('processing')) {
+            return false;
+        }
+
+        $.ajax({
+            type: 'get',
+            url: link.attr('href'),
+            data: {
+                lastItemId: link.data('lastItemId')
+            },
+            beforeSend: function() {
+                link.addClass('processing').html('Loading...');
+            },
+            success: function(response) {
+                if (response.success) {
+                    var alreadyLoadedCount = link.data('loadedCount');
+                    var oldestLoadedCount = response['loadedCount'];
+                    var totalLoadedCount = (alreadyLoadedCount + oldestLoadedCount);
+                    link.data('lastItemId', response['lastItemId']);
+                    link.data('loadedCount', totalLoadedCount);
+
+                    if (totalLoadedCount >= link.data('totalCount')) {
+                        link.slideUp('fast', function() {
+                            link.parent().remove();
+                        });
+                    } else {
+                        link.removeClass('processing').html('<i class="icon-repeat"></i>SHOW MORE UPDATES');
+                    }
+
+
+                    $.proxy(self.addItemBlock(response['content'], false, link.parent()), self);
+                } else {
+                    this.error(response);
+                }
+            },
+            error: function() {
+                alert('Oops, seems like unknown error has appeared!');
+                link.removeClass('processing').html('<i class="icon-repeat"></i>SHOW MORE UPDATES');
+            },
+            complete: function() {},
+            dataType: 'json'
+        });
+    },
+
     expandFeedItemForm: function() {
         this.feedItemFormTextarea.data('background-image', this.feedItemFormTextarea.css('background-image'));
         this.feedItemFormTextarea.css('background-image', 'none').animate({
@@ -323,37 +380,45 @@ ZerebralCourseDetailFeedBlock.prototype = {
         link.parents('.feed-item').find('.comment.hidden').removeClass('hidden');
         link.addClass('expanded');
     },
-    addItemBlock: function(response, collapseForm) {
+    addItemBlock: function(response, collapseForm, element) {
         var self = this;
         var itemBlock = $(response);
         var form = itemBlock.find('form');
-        itemBlock.find('form').zerebralAjaxForm({
-            beforeSend: function() {
-                form.find('textarea').attr('disabled', true);
-                form.find('input[type="submit"]').attr('disabled', true);
-                form.find('a.cancel-link').hide();
-            },
-            data: { feedType: 'course' },
-            success: function(response) {
-                if (response['has_errors']) {
-                    for (var fieldName in response['errors']) {
-                        var field = form.find('[name^="' + fieldName.replace(/\[/g,'\\[').replace(/\]/g,'\\]') + '"]').last();
-                        field.parents('.control-group').addClass('error');
+        $.each(form, function(index, value) {
+            var currentForm = $(value);
+            currentForm.zerebralAjaxForm({
+                beforeSend: function() {
+                    currentForm.find('textarea').attr('disabled', true);
+                    currentForm.find('input[type="submit"]').attr('disabled', true);
+                    currentForm.find('a.cancel-link').hide();
+                },
+                data: { feedType: 'course' },
+                success: function(response) {
+                    if (response['has_errors']) {
+                        for (var fieldName in response['errors']) {
+                            var field = currentForm.find('[name^="' + fieldName.replace(/\[/g,'\\[').replace(/\]/g,'\\]') + '"]').last();
+                            field.parents('.control-group').addClass('error');
+                        }
+                    } else {
+                        $.proxy(self.addCommentBlock, currentForm, response['content'], response['lastCommentId'])();
                     }
-                } else {
-                    $.proxy(self.addCommentBlock, form, response['content'], response['lastCommentId'])();
-                }
-            },
-            error: function() { alert('Oops, seems like unknown error has appeared!'); },
-            complete: function() {
-                form.find('textarea').attr('disabled', false);
-                form.find('input[type="submit"]').attr('disabled', false);
-                form.find('a.cancel-link').show();
-            },
-            dataType: 'json'
-
+                },
+                error: function() { alert('Oops, seems like unknown error has appeared!'); },
+                complete: function() {
+                    currentForm.find('textarea').attr('disabled', false);
+                    currentForm.find('input[type="submit"]').attr('disabled', false);
+                    currentForm.find('a.cancel-link').show();
+                },
+                dataType: 'json'
+            });
         });
-        this.feedItemsDiv.find('.empty').remove().end().prepend(itemBlock);
+        if (typeof(element) == 'undefined') {
+            this.feedItemsDiv.find('.empty').remove().end().prepend(itemBlock);
+        } else {
+            itemBlock.hide();
+            element.before(itemBlock);
+            itemBlock.slideDown();
+        }
         if (collapseForm) {
             this.collapseFeedItemForm();
         }

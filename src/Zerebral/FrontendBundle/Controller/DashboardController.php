@@ -27,13 +27,15 @@ class DashboardController extends \Zerebral\CommonBundle\Component\Controller
         $feedItemFormType = new FormType\FeedItemType();
         $feedItemForm = $this->createForm($feedItemFormType, null);
 
-        $feeds = FeedItemQuery::create()->getGlobalFeed($this->getUser())->limit(10)->find();
+        $feedItems = FeedItemQuery::create()->getGlobalFeed($this->getUser())->limit(10)->find();
+        $feedItemsCount = FeedItemQuery::create()->getGlobalFeed($this->getUser())->count();
 
 
         return array(
             'target' => 'home',
             'feedItemForm' => $feedItemForm->createView(),
-            'feedItems' => $feeds
+            'feedItems' => $feedItems,
+            'feedItemsCount' => $feedItemsCount
         );
     }
 }

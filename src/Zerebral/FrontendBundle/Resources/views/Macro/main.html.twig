@@ -82,11 +82,11 @@
     {% if materials.count > 0 %}
     <ul>
         {% for material in materials %}
-            <li><a href="{{ material.file.url }}"><img src="{{ get_file_icon(material.file, 'small') }}"/>{{ material.file.name }}</a></li>
+            <li><a href="{{ path('download_file', {id: material.file.id}) }}"><img src="{{ get_file_icon(material.file, 'small') }}"/>{{ material.file.name }}</a></li>
         {% endfor %}
     </ul>
     {% else %}
-        <div class="alert alert-success">There were no new materials published</div>
+        <div class="alert alert-success">There were no materials published</div>
     {% endif %}
 {% endmacro %}
 
