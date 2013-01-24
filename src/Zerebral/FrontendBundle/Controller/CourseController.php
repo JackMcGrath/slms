@@ -31,6 +31,9 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function indexAction()
     {
+        $session = $this->getRequest()->getSession();
+        $dateFilter = $session->get('assigmentDateFilter', array());
+
         $provider = new CourseAssignmentEventsProvider($assignments = $this->getRoleUser()->getAssignmentsDueDate(false));
         $currentMonth = new Calendar(time(), $provider);
         $nextMonth = new Calendar(strtotime("+1 month"), $provider);
@@ -43,7 +46,8 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
             'upcomingAssignments' => $upcomingAssignments,
             'courses' => \Zerebral\BusinessBundle\Model\Course\CourseQuery::create()->findByRoleUser($this->getRoleUser()),
             'target' => 'courses',
-            'courseJoinForm' => $this->createForm(new FormType\CourseJoinType())->createView()
+            'courseJoinForm' => $this->createForm(new FormType\CourseJoinType())->createView(),
+            'dateFilter' => array('startDate' => $dateFilter ? $dateFilter['startDate'] : null, 'endDate' => $dateFilter ? $dateFilter['endDate'] : null),
         );
     }
 
@@ -160,6 +164,9 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function assignmentsAction(Model\Course\Course $course)
     {
+        $session = $this->getRequest()->getSession();
+        $dateFilter = $session->get('assigmentDateFilter', array());
+
         $assignments = $this->getRoleUser()->getCourseAssignmentsDueDate($course, false);
         $assignmentsNoDueDate = $this->getRoleUser()->getCourseAssignmentsDueDate($course, true);
         $draftAssignment = $this->getUser()->isTeacher() ? $this->getRoleUser()->getCourseAssignmentsDraft($course) : null;
@@ -175,7 +182,8 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
             'assignmentsNoDueDate' => $assignmentsNoDueDate,
             'draftAssignment' => $draftAssignment,
             'course' => $course,
-            'target' => 'courses'
+            'target' => 'courses',
+            'dateFilter' => array('startDate' => $dateFilter ? $dateFilter['startDate'] : null, 'endDate' => $dateFilter ? $dateFilter['endDate'] : null),
         );
     }
 

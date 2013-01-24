@@ -8,6 +8,8 @@ $(document).ready(function(){
     $('.calendar-widget a[rel="tooltip"]').tooltip({html: true});
 
     $('.invite-form').zerebralAjaxForm();
+
+//	$('.calendar').calendarSelectable({itemList: '.items-list', calculateAssignmentsCount: true});
 });
 
 var addError = function(controlGroup, errorMessage){

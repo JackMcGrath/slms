@@ -21,7 +21,7 @@
         <div class="span9 items-list{% if is_granted('ROLE_TEACHER') %} teacher-role{% endif %}">
             {{ flashMessages.show('delete_course_success', 'success') }}
             {% for course in courses %}
-                <div class="list-item span12{{ loop.last ? ' last' : '' }}">
+                <div class="list-item span12{{ loop.last ? ' last' : '' }}" {% if course.assignmentsDueDates %}due-date="{{ course.assignmentsDueDates | join(',') }}"{% endif %}>
                     <div class="symbol pull-left">
                         {% if is_granted('ROLE_STUDENT') %}
                             <img class="rounded" src="{{ user_avatar(course.teacher) | imagine_filter('thumbnail') }}"/>
@@ -42,9 +42,9 @@
                         <div class="stat">
                             {% if is_granted('ROLE_STUDENT') %}
                                 <div class="instructor-name">Instructor <b>{{ course.teacher.fullName }}</b></div>
-                                <div><span class="badge badge-important">{{ app.user.student.courseAssignments(course).count }}</span><a href="{{ path('course_assignments', {id: course.id}) }}">Assignments</a></div>
+                                <div><span class="badge badge-important assignments-count" default-count="{{ app.user.student.courseAssignments(course).count }}">{{ app.user.student.courseAssignments(course).count }}</span><a href="{{ path('course_assignments', {id: course.id}) }}">Assignments</a></div>
                             {% else %}
-                                <div><span class="badge badge-important">{{ course.assignments.count }}</span><a href="{{ path('course_assignments', {id: course.id}) }}">Assignments</a></div>
+                                <div><span class="badge badge-important assignments-count" default-count="{{ course.assignments.count }}">{{ course.assignments.count }}</span><a href="{{ path('course_assignments', {id: course.id}) }}">Assignments</a></div>
                             {% endif %}
 
                             <div><span class="badge badge-inverse"></span><a href="#">Comments</a></span></div>
@@ -75,6 +75,7 @@
         <div class="calendar">
             {{ mainPartials.month(currentMonth) }}
             {{ mainPartials.month(nextMonth) }}
+            <p class="reset"><a href="#" class="btn btn-small">Reset filter</a></p>
         </div>
     </div>
 
@@ -105,4 +106,9 @@
         </form>
     </div>
 {% endif %}
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('.calendar').calendarSelectable({itemList: '.items-list', calculateAssignmentsCount: true, startDate: "{{ dateFilter.startDate }}", endDate: "{{ dateFilter.endDate }}"});
+        });
+    </script>
 {% endblock %}
