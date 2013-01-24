@@ -20,7 +20,7 @@ class StudentAssignmentQuery extends BaseStudentAssignmentQuery
         return $this;
     }
 
-    public function findByAssignment($student, $assignment)
+    public function filterByAssignmentAndStudent($student, $assignment)
     {
         $this->filterByStudent($student);
         $this->filterByAssignment($assignment);

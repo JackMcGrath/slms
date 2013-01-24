@@ -18,17 +18,16 @@ use Zerebral\BusinessBundle\Model as Model;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery;
 use Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentQuery;
 
-// TODO: rename to AssignmentSolutionController
-class SolutionController extends \Zerebral\CommonBundle\Component\Controller
+class AssignmentSolutionController extends \Zerebral\CommonBundle\Component\Controller
 {
     /**
      * @Route("/files", name="assignment_solutions")
      * @Route("/files/course/{courseId}", name="course_assignment_solutions")
      * @ParamConverter("course", options={"mapping": {"courseId": "id"}})
      * @PreAuthorize("hasRole('ROLE_TEACHER')")
+     * @SecureParam(name="course", permissions="VIEW")
      * @Template()
      *
-     * TODO: verify that teacher has access to course
      */
     public function indexAction(Model\Course\Course $course = null)
     {
@@ -60,9 +59,9 @@ class SolutionController extends \Zerebral\CommonBundle\Component\Controller
      * @Route("/files/users/{assignmentId}", name="assignment_solutions_students")
      * @ParamConverter("assignment", options={"mapping": {"assignmentId": "id"}})
      * @PreAuthorize("hasRole('ROLE_TEACHER')")
+     * @SecureParam(name="assignment", permissions="VIEW")
      * @Template()
      *
-     * TODO: verify that teacher has access to assignment
      */
     public function studentsAction(Model\Assignment\Assignment $assignment)
     {
@@ -94,13 +93,12 @@ class SolutionController extends \Zerebral\CommonBundle\Component\Controller
      * @ParamConverter("assignment", options={"mapping": {"assignmentId": "id"}})
      * @ParamConverter("student", options={"mapping": {"studentId": "id"}})
      * @PreAuthorize("hasRole('ROLE_TEACHER')")
+     * @SecureParam(name="assignment", permissions="VIEW")
      *
-     * TODO: verify that teacher has access to this assignment
      */
     public function downloadZipAction(Model\Assignment\Assignment $assignment, Model\User\Student $student = null)
     {
         // TODO: we definitely should have separate class for archive building
-
         $zip = new \ZipArchive();
 
         $filename = preg_replace(array("[\s]", "/[^a-z0-9_]/i"), array("_", ""), ($assignment ? $assignment->getName() : '') . ($student ? '_' . $student->getFullName() : ''));
@@ -111,17 +109,19 @@ class SolutionController extends \Zerebral\CommonBundle\Component\Controller
         }
 
         if ($student && $assignment) {
-            $assignments = StudentAssignmentQuery::create()->findByAssignment($student, $assignment)->find();
+            $studentAssignments = StudentAssignmentQuery::create()->filterByAssignmentAndStudent($student, $assignment)->find();
         } else {
-            $assignments = $assignment->getStudentAssignments();
+            $studentAssignments = $assignment->getStudentAssignments();
         }
 
-        if ($assignments) {
-            foreach ($assignments as $solutions) {
-                foreach ($solutions->getFiles() as $file) {
-                    $folder = $student ? '' : $solutions->getStudent()->getFullName() . '/';
+        if ($studentAssignments) {
+            $folderCountFiles = array();
+            foreach ($studentAssignments as $studentAssignment) {
+                foreach ($studentAssignment->getFiles() as $file) {
+                    $folder = $student ? '' : $studentAssignment->getStudent()->getFullName() . '/';
+                    isset($folderCountFiles[$folder]) ? $folderCountFiles[$folder] ++ : $folderCountFiles[$folder] = 1;
                     if (is_file($file->getAbsolutePath()))
-                        $zip->addFile($file->getAbsolutePath(), $folder . $file->getName());
+                        $zip->addFile($file->getAbsolutePath(), $folder . sprintf("%02d", $folderCountFiles[$folder]) . ' - ' . $file->getName());
                     else
                         throw new \Exception('One or more files can not be added because not exists.');
                 }

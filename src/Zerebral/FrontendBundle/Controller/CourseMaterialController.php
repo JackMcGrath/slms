@@ -62,8 +62,8 @@ class CourseMaterialController extends \Zerebral\CommonBundle\Component\Controll
      * @Route("/materials/delete/{id}", name="course_material_delete")
      * @ParamConverter("material")
      * @PreAuthorize("hasRole('ROLE_TEACHER')")
+     * @SecureParam(name="material", permissions="DELETE")
      *
-     * TODO: make sure user can delete material!!!
      */
     public function deleteAction(Model\Material\CourseMaterial $material)
     {
