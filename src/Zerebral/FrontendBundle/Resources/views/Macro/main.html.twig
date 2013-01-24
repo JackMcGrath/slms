@@ -111,7 +111,21 @@
 {% endmacro %}
 
 {% macro grade(studentAssignment, assignment) %}
-    <h4>Grading: {{ studentAssignment.grading }}</h4> <span class="label label-important">Failed</span>
+    {% if assignment.gradeType == 'numeric' %}
+        <h4>Grading: {{ studentAssignment.grading }}</h4>
+        {% if assignment.threshold < studentAssignment.grading %}
+            <span class="label label-success">Completed</span>
+        {% else %}
+            <span class="label label-important">Incomplete</span>
+        {% endif %}
+    {% else %}
+        {% if studentAssignment.grading == 1 %}
+            <span class="label label-success">Pass</span>
+        {% else %}
+            <span class="label label-important">Fail</span>
+        {% endif %}
+    {% endif %}
+
     {% if studentAssignment.gradingComment %}
     <a href="#" rel="tooltip" title="{{ studentAssignment.gradingComment }}"><i class="info-icon icon-small-info"></i></a>
     {% endif %}

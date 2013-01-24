@@ -109,9 +109,9 @@
         </div>
         {% if is_granted('ROLE_STUDENT') %}
             {% set studentAssignment = assignment.studentAssignmentByStudent(app.user.student) %}
-            {% if studentAssignment.grading %}
+            {% if studentAssignment.grading is not null%}
             <div class="grade pull-right text-center">
-                {{ mainPartials.grade(studentAssignment) }}
+                {{ mainPartials.grade(studentAssignment, assignment) }}
             </div>
             {% endif %}
         {% endif %}
