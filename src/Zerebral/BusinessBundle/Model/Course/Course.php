@@ -67,13 +67,13 @@ class Course extends BaseCourse
         return false;
     }
 
-    public function getAssigmentsDueDates()
+    public function getAssignmentsDueDates()
     {
         $dates = array();
 
-        foreach ($this->getAssignments() as $assigment) {
-            if ($assigment->getDueAt()) {
-                $dates[] = $assigment->getDueAt('Y-m-d');
+        foreach ($this->getAssignments() as $assignment) {
+            if ($assignment->getDueAt()) {
+                $dates[] = $assignment->getDueAt('Y-m-d');
             }
         }
 

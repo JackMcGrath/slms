@@ -34,6 +34,9 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function indexAction()
     {
+        $session = $this->getRequest()->getSession();
+        $dateFilter = $session->get('assigmentDateFilter', array());
+
         $assignments = $this->getRoleUser()->getAssignmentsDueDate(false);
         $assignmentsNoDueDate = $this->getRoleUser()->getAssignmentsDueDate(true);
         $draftAssignment = $this->getUser()->isTeacher() ? $this->getRoleUser()->getAssignmentsDraft() : null;
@@ -46,10 +49,26 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
             'currentMonth' => $currentMonth,
             'nextMonth' => $nextMonth,
             'assignments' => $assignments,
+            'dateFilter' => array('startDate' => $dateFilter ? $dateFilter['startDate'] : null, 'endDate' => $dateFilter ? $dateFilter['endDate'] : null),
             'assignmentsNoDueDate' => $assignmentsNoDueDate,
             'draftAssignment' => $draftAssignment,
             'target' => 'assignments'
         );
+    }
+
+    /**
+     * @Route("/date-filter/set", name="assignments_date_filter")
+     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @Template()
+     */
+    public function dateFilterAction()
+    {
+        $session = $this->getRequest()->getSession();
+        $startDate = $this->getRequest()->get('start_date', null);
+        $endDate = $this->getRequest()->get('end_date', null);
+        $session->set('assigmentDateFilter', array('startDate' => $startDate, 'endDate' => $endDate));
+
+        return new JsonResponse(array('success' => true));
     }
 
     /**

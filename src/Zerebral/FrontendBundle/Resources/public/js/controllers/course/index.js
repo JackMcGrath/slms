@@ -9,7 +9,7 @@ $(document).ready(function(){
 
     $('.invite-form').zerebralAjaxForm();
 
-	$('.calendar').calendarSelectable({itemList: '.items-list', calculateAssigmentsCount: true});
+//	$('.calendar').calendarSelectable({itemList: '.items-list', calculateAssignmentsCount: true});
 });
 
 var addError = function(controlGroup, errorMessage){

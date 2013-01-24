@@ -2,7 +2,10 @@ var calendarSelectable = function(element, options) {
 	this.calendar = element;
 
 	this.itemList = options.itemList;
-	this.calculateAssigmentsCount = options.calculateAssigmentsCount ? options.calculateAssigmentsCount : false;
+	this.calculateAssignmentsCount = options.calculateAssignmentsCount ? options.calculateAssignmentsCount : false;
+
+	this.startDate = options.startDate ? options.startDate : undefined;
+	this.endDate = options.endDate ? options.endDate : undefined;
 }
 
 calendarSelectable.prototype = {
@@ -10,13 +13,14 @@ calendarSelectable.prototype = {
 	startDate: undefined,
 	endDate: undefined,
 	itemList: undefined,
-	calculateAssigmentsCount: false,
+	calculateAssignmentsCount: false,
 
 	init: function() {
 		this.bind();
 
 		if (this.startDate && this.endDate) {
 			this.mark();
+			this.apply();
 		}
 	},
 
@@ -31,6 +35,7 @@ calendarSelectable.prototype = {
 				self.rightInterval();
 				self.mark();
 				self.apply();
+				self.saveToSession();
 			} else {
 				// select new interval. set startDate
 				self.endDate = undefined;
@@ -45,6 +50,7 @@ calendarSelectable.prototype = {
 			self.endDate = undefined;
 			self.unmark();
 			self.apply();
+			self.saveToSession();
 		})
 	},
 
@@ -55,13 +61,13 @@ calendarSelectable.prototype = {
 			items.hide();
 			$.each(items, function(i, item) {
 				if ($(item).attr('due-date') !== undefined) {
-					var assigmentDates = $(item).attr('due-date').split(',');
-					var assigmentsCount = 0;
-					$.each(assigmentDates, function(i,date) {
+					var assignmentDates = $(item).attr('due-date').split(',');
+					var assignmentsCount = 0;
+					$.each(assignmentDates, function(i,date) {
 						if (date >= self.startDate && date <= self.endDate) {
-							if (self.calculateAssigmentsCount) {
-								assigmentsCount++;
-								$(item).find('.stat .assigments-count').html(assigmentsCount);
+							if (self.calculateAssignmentsCount) {
+								assignmentsCount++;
+								$(item).find('.stat .assignments-count').html(assignmentsCount);
 							}
 							$(item).show();
 						}
@@ -72,14 +78,28 @@ calendarSelectable.prototype = {
 
 		} else {
 			$(this.itemList).find('.list-item ').show();
-			if (self.calculateAssigmentsCount) {
-				var badges = $(this.itemList).find('.list-item ').find('.stat .assigments-count');
+			if (self.calculateAssignmentsCount) {
+				var badges = $(this.itemList).find('.list-item ').find('.stat .assignments-count');
 				$.each(badges, function(i, badge) {
 					$(badge).html($(badge).attr('default-count'));
 				});
 			}
 
 		}
+	},
+
+	saveToSession: function() {
+		var self = this;
+		$.ajax({
+			url: '/assignments/date-filter/set',
+			dataType: 'json',
+			data: {
+				start_date: self.startDate,
+				end_date: self.endDate
+			},
+			type: 'GET',
+			success: function() {}
+		});
 	},
 
 	unmark: function() {

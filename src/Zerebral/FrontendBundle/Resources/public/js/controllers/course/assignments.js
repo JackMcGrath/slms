@@ -7,5 +7,5 @@ $(document).ready(function(){
 
     $('.calendar-widget a[rel="tooltip"]').tooltip({html: true});
 
-	$('.calendar').calendarSelectable({itemList: '.items-list'});
+//	$('.calendar').calendarSelectable({itemList: '.items-list'});
 });

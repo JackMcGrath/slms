@@ -125,4 +125,9 @@
             {% endif %}
         {% endif %}
     </div>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('.calendar').calendarSelectable({itemList: '.items-list', calculateAssignmentsCount: true, startDate: "{{ dateFilter.startDate }}", endDate: "{{ dateFilter.endDate }}"});
+        });
+    </script>
 {% endblock %}
