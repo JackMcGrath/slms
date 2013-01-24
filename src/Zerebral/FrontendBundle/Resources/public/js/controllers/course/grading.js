@@ -167,7 +167,12 @@ GradingPopup.prototype = {
     },
 
     onChangePassValue: function(e) {
-        var value = $(e.target).attr('value');
+        var button = $(e.target);
+        var value = button.attr('value');
+
+        button.parents('.grade-pass').find('button').removeClass('btn-danger').removeClass('btn-success');
+        button.addClass(value == 1 ? 'btn-success' : 'btn-danger');
+
         this.target.find('.grade-pass-value').val(value);
     }
 };
