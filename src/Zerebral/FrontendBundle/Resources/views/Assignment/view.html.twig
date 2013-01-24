@@ -63,9 +63,9 @@
         <div class="right-navbar pull-left">
             {% if app.user.isStudent %}
             {% set studentAssignment = assignment.studentAssignmentByStudent(app.user.student) %}
-            {% if studentAssignment.grading %}
+                {% if studentAssignment.grading is not null%}
                 <div class="grading">
-                    {{ mainPartials.grade(studentAssignment) }}
+                    {{ mainPartials.grade(studentAssignment, assignment) }}
                 </div>
             {% endif %}
             {% endif %}
