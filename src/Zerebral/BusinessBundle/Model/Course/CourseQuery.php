@@ -24,17 +24,17 @@ class CourseQuery extends BaseCourseQuery
      */
     public function findByRoleUser($roleUser)
     {
-        $c = new \Criteria();
+        $c = new self();
         $c->addJoin(CoursePeer::ID, FeedItemPeer::COURSE_ID, \Criteria::LEFT_JOIN);
         $c->addJoin(FeedItemPeer::ID, FeedCommentPeer::FEED_ITEM_ID, \Criteria::LEFT_JOIN);
 
-        $c->addGroupByColumn(FeedCommentPeer::ID);
+        $c->addGroupByColumn(CoursePeer::ID);
 
-        $c->addAsColumn('commentsCount', 'COUNT('.\Zerebral\BusinessBundle\Model\Feed\FeedCommentPeer::ID.')');
+        $c->withColumn('COUNT('.\Zerebral\BusinessBundle\Model\Feed\FeedCommentPeer::ID.')', 'commentsCount');
 //        $c->addSelectColumn('COUNT('.FeedCommentPeer::ID.') as commentsCount');
 //        $c->addSelectModifier()
 
-        return $roleUser->getCourses();
+        return $roleUser->getCourses($c);
 
     }
 }
