@@ -2,6 +2,7 @@ var calendarSelectable = function(element, options) {
 	this.calendar = element;
 
 	this.itemList = options.itemList;
+	this.calculateAssigmentsCount = options.calculateAssigmentsCount ? options.calculateAssigmentsCount : false;
 }
 
 calendarSelectable.prototype = {
@@ -9,6 +10,7 @@ calendarSelectable.prototype = {
 	startDate: undefined,
 	endDate: undefined,
 	itemList: undefined,
+	calculateAssigmentsCount: false,
 
 	init: function() {
 		this.bind();
@@ -53,14 +55,30 @@ calendarSelectable.prototype = {
 			items.hide();
 			$.each(items, function(i, item) {
 				if ($(item).attr('due-date') !== undefined) {
-					if ($(item).attr('due-date') >= self.startDate && $(item).attr('due-date') <= self.endDate) {
-						$(item).show();
-					}
+					var assigmentDates = $(item).attr('due-date').split(',');
+					var assigmentsCount = 0;
+					$.each(assigmentDates, function(i,date) {
+						if (date >= self.startDate && date <= self.endDate) {
+							if (self.calculateAssigmentsCount) {
+								assigmentsCount++;
+								$(item).find('.stat .assigments-count').html(assigmentsCount);
+							}
+							$(item).show();
+						}
+					});
+
 				}
 			});
 
 		} else {
 			$(this.itemList).find('.list-item ').show();
+			if (self.calculateAssigmentsCount) {
+				var badges = $(this.itemList).find('.list-item ').find('.stat .assigments-count');
+				$.each(badges, function(i, badge) {
+					$(badge).html($(badge).attr('default-count'));
+				});
+			}
+
 		}
 	},
 
