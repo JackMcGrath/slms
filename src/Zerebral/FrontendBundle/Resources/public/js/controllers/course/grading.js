@@ -72,6 +72,7 @@ GradingPopup.prototype = {
         this.target.find('.grade-pass button').live('click', $.proxy(this.onChangePassValue, this));
         this.container.gradingPopupSelector.find('input.grade-value').live('change', $.proxy(this.onChangeGradeNumber, this));
         this.container.gradingPopupSelector.find('input.grade-value').live('keypress', $.proxy(this.onTypoGradePress, this));
+//        this.container.gradingPopupSelector.find('input.grade-value').live('keyup', $.proxy(this.onTypoGradeUp, this));
 
         //this.container.table.find('a[data-toggle="modal"]').live('click', function(e) { alert('click');self.studentAssignment = $(e.target).closest('td').attr('studentAssignment'); console.log($(e.target).closest('td').attr('studentAssignment')); })
 
@@ -152,8 +153,12 @@ GradingPopup.prototype = {
     },
 
     onChangeGradeNumber: function(e) {
+        this.changeGradeNumber($(e.target).val());
+    },
+
+    changeGradeNumber: function(value) {
         $(this.sliderSelector).slider({
-            value: $(e.target).val()
+            value: value
         })
     },
 
@@ -161,9 +166,6 @@ GradingPopup.prototype = {
         var charCode = (e.which) ? e.which : event.keyCode
         if (charCode > 31 && (charCode < 48 || charCode > 57))
             return false;
-    },
-
-    onTypoGradeUp: function(e) {
     },
 
     onChangePassValue: function(e) {
