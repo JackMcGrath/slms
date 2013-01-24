@@ -42,15 +42,21 @@ checkAll.prototype = {
 	checkAllToggle: function(element) {
 		if (element.checked) {
 			this.checkAll();
-			$(this.controlButtons).enable();
+			if (this.controlButtons) {
+				$(this.controlButtons).enable();
+			}
 		} else {
 			if ($(this.elementCheckSelector + ':checked').length > 0 && this.elementCheck.length > $(this.elementCheckSelector + ':checked').length) {
 				this.checkAll();
 				this.elementCheckAll.prop('checked', true);
-				$(this.controlButtons).enable();
+				if (this.controlButtons) {
+					$(this.controlButtons).enable();
+				}
 			} else {
 				this.uncheckAll();
-				$(this.controlButtons).prop('disabled', 'disabled');
+				if (this.controlButtons) {
+					$(this.controlButtons).prop('disabled', 'disabled');
+				}
 			}
 		}
 		this.elementCheckAll.css('opacity', 1);
@@ -69,7 +75,9 @@ checkAll.prototype = {
 		} else {
 			this.elementCheckAll.prop('checked', false);
 			this.elementCheckAll.css('opacity', 1);
-			$(this.controlButtons).prop('disabled', 'disabled');
+			if (this.controlButtons) {
+				$(this.controlButtons).prop('disabled', 'disabled');
+			}
 		}
 	}
 }
