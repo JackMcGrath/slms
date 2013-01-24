@@ -4,4 +4,6 @@ $(document).ready(function() {
     },function(e) {
         $(e.target).closest('.list-item').find('.manage-buttons').css('visibility', 'hidden').prev().show();
     });
+
+	$('.calendar').calendarSelectable();
 });
