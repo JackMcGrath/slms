@@ -44,7 +44,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
             'currentMonth' => $currentMonth,
             'nextMonth' => $nextMonth,
             'upcomingAssignments' => $upcomingAssignments,
-            'courses' => $this->getRoleUser()->getCourses(),
+            'courses' => \Zerebral\BusinessBundle\Model\Course\CourseQuery::create()->findByRoleUser($this->getRoleUser()),
             'target' => 'courses',
             'courseJoinForm' => $this->createForm(new FormType\CourseJoinType())->createView(),
             'dateFilter' => array('startDate' => $dateFilter ? $dateFilter['startDate'] : null, 'endDate' => $dateFilter ? $dateFilter['endDate'] : null),

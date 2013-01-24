@@ -52,41 +52,6 @@
         <column name="grade_type" phpName="GradeType" type="CHAR" valueSet="numeric,pass" sqlType="enum('numeric','pass')" required="true" defaultValue="numeric"/>
         <column name="threshold" phpName="Threshold" type="SMALLINT" size="3" sqlType="smallint(3) unsigned" required="false"/>
         <column name="due_at" phpName="DueAt" type="TIMESTAMP" required="false"/>
-        <validator column="id">
-            <rule name="required" message="The field id is required."/>
-            <rule name="maxValue" value="REPLACEME" message="The field id must be not greater than REPLACEME."/>
-            <rule name="type" value="int" message="The column id must be an int value."/>
-        </validator>
-        <validator column="teacher_id">
-            <rule name="required" message="The field teacher_id is required."/>
-            <rule name="maxValue" value="REPLACEME" message="The field teacher_id must be not greater than REPLACEME."/>
-            <rule name="type" value="int" message="The column teacher_id must be an int value."/>
-        </validator>
-        <validator column="course_id">
-            <rule name="required" message="The field course_id is required."/>
-            <rule name="maxValue" value="REPLACEME" message="The field course_id must be not greater than REPLACEME."/>
-            <rule name="type" value="int" message="The column course_id must be an int value."/>
-        </validator>
-        <validator column="assignment_category_id">
-            <rule name="required" message="The field assignment_category_id is required."/>
-            <rule name="maxValue" value="REPLACEME" message="The field assignment_category_id must be not greater than REPLACEME."/>
-            <rule name="type" value="int" message="The column assignment_category_id must be an int value."/>
-        </validator>
-        <validator column="name">
-            <rule name="required" message="The field name is required."/>
-            <rule name="type" value="string" message="The column name must be an string value."/>
-        </validator>
-        <validator column="description">
-            <rule name="type" value="string" message="The column description must be an string value."/>
-        </validator>
-        <validator column="max_points">
-            <rule name="required" message="The field max_points is required."/>
-            <rule name="maxValue" value="REPLACEME" message="The field max_points must be not greater than REPLACEME."/>
-            <rule name="type" value="int" message="The column max_points must be an int value."/>
-        </validator>
-        <validator column="due_at">
-            <rule name="type" value="string" message="The column due_at must be an string value."/>
-        </validator>
         <foreign-key foreignTable="teachers" name="assignments_teachers" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="teacher_id" foreign="id"/>
         </foreign-key>
@@ -105,6 +70,11 @@
         <index name="assignments_assignment_categories">
             <index-column name="assignment_category_id"/>
         </index>
+        <behavior name="aggregate_column">
+            <parameter name="name" value="commentsCount" />
+            <parameter name="foreign_table" value="feed_items" />
+            <parameter name="expression" value="COUNT(id)" />
+        </behavior>
     </table>
 
     <table name="assignment_files" phpName="AssignmentFile" isCrossRef="true">
