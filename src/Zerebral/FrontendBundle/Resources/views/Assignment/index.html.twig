@@ -72,7 +72,7 @@
             {% set badgeClass = 'success' %}
         {% endif %}
         {% endif %}
-    <div class="list-item span12{{ loop.last ? ' last' : '' }}">
+    <div class="list-item span12{{ loop.last ? ' last' : '' }}" {% if assignment.dueAt %}due-date="{{ assignment.dueAt | date('Y-m-d') }}"{% endif %}>
         <div class="symbol pull-left">
             {% if is_granted('ROLE_STUDENT') %}
                 <img class="rounded" src="{{ user_avatar(assignment.teacher) | imagine_filter('thumbnail') }}"/>

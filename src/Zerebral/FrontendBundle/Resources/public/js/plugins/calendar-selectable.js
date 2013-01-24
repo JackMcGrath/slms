@@ -1,20 +1,17 @@
-/*
- * @todo set real start/end date
- */
-
 var calendarSelectable = function(element, options) {
 	this.calendar = element;
+
+	this.itemList = options.itemList;
 }
 
 calendarSelectable.prototype = {
 	calendar: undefined,
 	startDate: undefined,
 	endDate: undefined,
+	itemList: undefined,
 
 	init: function() {
 		this.bind();
-		this.startDate = '2013-01-20';
-		this.endDate = '2013-02-20';
 
 		if (this.startDate && this.endDate) {
 			this.mark();
@@ -29,8 +26,9 @@ calendarSelectable.prototype = {
 			if (self.startDate && !self.endDate) {
 				// select endDate
 				self.endDate = $(this).attr('date');
+				self.rightInterval();
 				self.mark();
-				// @todo save;
+				self.apply();
 			} else {
 				// select new interval. set startDate
 				self.endDate = undefined;
@@ -41,9 +39,29 @@ calendarSelectable.prototype = {
 
 		this.calendar.find('p.reset a').click(function(e){
 			e.preventDefault();
+			self.startDate = undefined;
+			self.endDate = undefined;
 			self.unmark();
-			// @todo save;
+			self.apply();
 		})
+	},
+
+	apply: function() {
+		var self = this;
+		if (self.startDate && self.endDate) {
+			var items = $(this.itemList).find('.list-item ');
+			items.hide();
+			$.each(items, function(i, item) {
+				if ($(item).attr('due-date') !== undefined) {
+					if ($(item).attr('due-date') >= self.startDate && $(item).attr('due-date') <= self.endDate) {
+						$(item).show();
+					}
+				}
+			});
+
+		} else {
+			$(this.itemList).find('.list-item ').show();
+		}
 	},
 
 	unmark: function() {
@@ -55,12 +73,7 @@ calendarSelectable.prototype = {
 
 	mark: function() {
 		this.unmark();
-
-		if (this.startDate > this.endDate) {
-			var startDate = this.endDate;
-			this.endDate = this.startDate;
-			this.startDate = startDate;
-		}
+		this.rightInterval();
 
 		if (this.startDate == this.endDate) {
 			this.markSingleDay();
@@ -83,6 +96,14 @@ calendarSelectable.prototype = {
 				$(day).addClass('selected-interval');
 			}
 		});
+	},
+
+	rightInterval: function() {
+		if (this.startDate > this.endDate) {
+			var startDate = this.endDate;
+			this.endDate = this.startDate;
+			this.startDate = startDate;
+		}
 	}
 }
 

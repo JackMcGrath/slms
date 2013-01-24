@@ -5,5 +5,5 @@ $(document).ready(function() {
         $(e.target).closest('.list-item').find('.manage-buttons').css('visibility', 'hidden').prev().show();
     });
 
-	$('.calendar').calendarSelectable();
+	$('.calendar').calendarSelectable({itemList: '.items-list'});
 });
