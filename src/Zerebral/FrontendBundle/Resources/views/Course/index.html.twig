@@ -47,7 +47,7 @@
                                 <div><span class="badge badge-important assignments-count" default-count="{{ course.assignments.count }}">{{ course.assignments.count }}</span><a href="{{ path('course_assignments', {id: course.id}) }}">Assignments</a></div>
                             {% endif %}
 
-                            <div><span class="badge badge-inverse"></span><a href="#">Comments</a></span></div>
+                            <div><span class="badge badge-inverse">{{ course.getVirtualColumn('commentsCount') }}</span><a href="#">Comments</a></span></div>
                             {% if is_granted('ROLE_STUDENT') %}
                                 <div><span class="badge badge-info">-</span><a href="">New materials</a></div>
                             {% endif %}
