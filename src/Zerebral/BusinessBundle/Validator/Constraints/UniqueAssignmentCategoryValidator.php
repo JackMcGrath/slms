@@ -20,7 +20,7 @@ class UniqueAssignmentCategoryValidator extends ConstraintValidator
     {
         $existCategory = AssignmentCategoryQuery::create()
                 ->where('TRIM(LOWER(' . AssignmentCategoryPeer::NAME . ')) = ?', trim(strtolower($category->getName())))
-                ->where('(' . AssignmentCategoryPeer::TEACHER_ID . ' = ? OR ' . AssignmentCategoryPeer::TEACHER_ID . ' IS NULL)', $category->getTeacherId())
+                ->where('(' . AssignmentCategoryPeer::TEACHER_ID . ' = ? OR ' . AssignmentCategoryPeer::TEACHER_ID . ' IS NULL)', $category->getTeacherId() ?: '')
                 ->findOne();
 
         if (!empty($existCategory) && $existCategory->getId() != $category->getId()) {
