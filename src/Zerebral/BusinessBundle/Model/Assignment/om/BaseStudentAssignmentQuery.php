@@ -29,6 +29,7 @@ use Zerebral\BusinessBundle\Model\User\Student;
  * @method StudentAssignmentQuery orderByIsSubmitted($order = Criteria::ASC) Order by the is_submitted column
  * @method StudentAssignmentQuery orderByGrading($order = Criteria::ASC) Order by the grading column
  * @method StudentAssignmentQuery orderByGradingComment($order = Criteria::ASC) Order by the grading_comment column
+ * @method StudentAssignmentQuery orderBySubmittedAt($order = Criteria::ASC) Order by the submitted_at column
  * @method StudentAssignmentQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  *
  * @method StudentAssignmentQuery groupById() Group by the id column
@@ -37,6 +38,7 @@ use Zerebral\BusinessBundle\Model\User\Student;
  * @method StudentAssignmentQuery groupByIsSubmitted() Group by the is_submitted column
  * @method StudentAssignmentQuery groupByGrading() Group by the grading column
  * @method StudentAssignmentQuery groupByGradingComment() Group by the grading_comment column
+ * @method StudentAssignmentQuery groupBySubmittedAt() Group by the submitted_at column
  * @method StudentAssignmentQuery groupByCreatedAt() Group by the created_at column
  *
  * @method StudentAssignmentQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
@@ -63,6 +65,7 @@ use Zerebral\BusinessBundle\Model\User\Student;
  * @method StudentAssignment findOneByIsSubmitted(boolean $is_submitted) Return the first StudentAssignment filtered by the is_submitted column
  * @method StudentAssignment findOneByGrading(string $grading) Return the first StudentAssignment filtered by the grading column
  * @method StudentAssignment findOneByGradingComment(string $grading_comment) Return the first StudentAssignment filtered by the grading_comment column
+ * @method StudentAssignment findOneBySubmittedAt(string $submitted_at) Return the first StudentAssignment filtered by the submitted_at column
  * @method StudentAssignment findOneByCreatedAt(string $created_at) Return the first StudentAssignment filtered by the created_at column
  *
  * @method array findById(int $id) Return StudentAssignment objects filtered by the id column
@@ -71,6 +74,7 @@ use Zerebral\BusinessBundle\Model\User\Student;
  * @method array findByIsSubmitted(boolean $is_submitted) Return StudentAssignment objects filtered by the is_submitted column
  * @method array findByGrading(string $grading) Return StudentAssignment objects filtered by the grading column
  * @method array findByGradingComment(string $grading_comment) Return StudentAssignment objects filtered by the grading_comment column
+ * @method array findBySubmittedAt(string $submitted_at) Return StudentAssignment objects filtered by the submitted_at column
  * @method array findByCreatedAt(string $created_at) Return StudentAssignment objects filtered by the created_at column
  */
 abstract class BaseStudentAssignmentQuery extends ModelCriteria
@@ -174,7 +178,7 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `student_id`, `assignment_id`, `is_submitted`, `grading`, `grading_comment`, `created_at` FROM `student_assignments` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `student_id`, `assignment_id`, `is_submitted`, `grading`, `grading_comment`, `submitted_at`, `created_at` FROM `student_assignments` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -459,6 +463,49 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(StudentAssignmentPeer::GRADING_COMMENT, $gradingComment, $comparison);
+    }
+
+    /**
+     * Filter the query on the submitted_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterBySubmittedAt('2011-03-14'); // WHERE submitted_at = '2011-03-14'
+     * $query->filterBySubmittedAt('now'); // WHERE submitted_at = '2011-03-14'
+     * $query->filterBySubmittedAt(array('max' => 'yesterday')); // WHERE submitted_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $submittedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return StudentAssignmentQuery The current query, for fluid interface
+     */
+    public function filterBySubmittedAt($submittedAt = null, $comparison = null)
+    {
+        if (is_array($submittedAt)) {
+            $useMinMax = false;
+            if (isset($submittedAt['min'])) {
+                $this->addUsingAlias(StudentAssignmentPeer::SUBMITTED_AT, $submittedAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($submittedAt['max'])) {
+                $this->addUsingAlias(StudentAssignmentPeer::SUBMITTED_AT, $submittedAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(StudentAssignmentPeer::SUBMITTED_AT, $submittedAt, $comparison);
     }
 
     /**

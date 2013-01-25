@@ -88,6 +88,12 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
     protected $grading_comment;
 
     /**
+     * The value for the submitted_at field.
+     * @var        string
+     */
+    protected $submitted_at;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -226,6 +232,46 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
     public function getGradingComment()
     {
         return $this->grading_comment;
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [submitted_at] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null, and 0 if column value is 0000-00-00 00:00:00
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getSubmittedAt($format = null)
+    {
+        if ($this->submitted_at === null) {
+            return null;
+        }
+
+        if ($this->submitted_at === '0000-00-00 00:00:00') {
+            // while technically this is not a default value of null,
+            // this seems to be closest in meaning.
+            return null;
+        }
+
+        try {
+            $dt = new DateTime($this->submitted_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->submitted_at, true), $x);
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -411,6 +457,29 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
     } // setGradingComment()
 
     /**
+     * Sets the value of [submitted_at] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return StudentAssignment The current object (for fluent API support)
+     */
+    public function setSubmittedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->submitted_at !== null || $dt !== null) {
+            $currentDateAsString = ($this->submitted_at !== null && $tmpDt = new DateTime($this->submitted_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->submitted_at = $newDateAsString;
+                $this->modifiedColumns[] = StudentAssignmentPeer::SUBMITTED_AT;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setSubmittedAt()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param mixed $v string, integer (timestamp), or DateTime value.
@@ -475,7 +544,8 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
             $this->is_submitted = ($row[$startcol + 3] !== null) ? (boolean) $row[$startcol + 3] : null;
             $this->grading = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
             $this->grading_comment = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-            $this->created_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+            $this->submitted_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+            $this->created_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -484,7 +554,7 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 7; // 7 = StudentAssignmentPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 8; // 8 = StudentAssignmentPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating StudentAssignment object", $e);
@@ -811,6 +881,9 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
         if ($this->isColumnModified(StudentAssignmentPeer::GRADING_COMMENT)) {
             $modifiedColumns[':p' . $index++]  = '`grading_comment`';
         }
+        if ($this->isColumnModified(StudentAssignmentPeer::SUBMITTED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '`submitted_at`';
+        }
         if ($this->isColumnModified(StudentAssignmentPeer::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`created_at`';
         }
@@ -842,6 +915,9 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
                         break;
                     case '`grading_comment`':
                         $stmt->bindValue($identifier, $this->grading_comment, PDO::PARAM_STR);
+                        break;
+                    case '`submitted_at`':
+                        $stmt->bindValue($identifier, $this->submitted_at, PDO::PARAM_STR);
                         break;
                     case '`created_at`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
@@ -1025,6 +1101,9 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
                 return $this->getGradingComment();
                 break;
             case 6:
+                return $this->getSubmittedAt();
+                break;
+            case 7:
                 return $this->getCreatedAt();
                 break;
             default:
@@ -1062,7 +1141,8 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
             $keys[3] => $this->getIsSubmitted(),
             $keys[4] => $this->getGrading(),
             $keys[5] => $this->getGradingComment(),
-            $keys[6] => $this->getCreatedAt(),
+            $keys[6] => $this->getSubmittedAt(),
+            $keys[7] => $this->getCreatedAt(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aStudent) {
@@ -1127,6 +1207,9 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
                 $this->setGradingComment($value);
                 break;
             case 6:
+                $this->setSubmittedAt($value);
+                break;
+            case 7:
                 $this->setCreatedAt($value);
                 break;
         } // switch()
@@ -1159,7 +1242,8 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
         if (array_key_exists($keys[3], $arr)) $this->setIsSubmitted($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setGrading($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setGradingComment($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
+        if (array_key_exists($keys[6], $arr)) $this->setSubmittedAt($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setCreatedAt($arr[$keys[7]]);
     }
 
     /**
@@ -1177,6 +1261,7 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
         if ($this->isColumnModified(StudentAssignmentPeer::IS_SUBMITTED)) $criteria->add(StudentAssignmentPeer::IS_SUBMITTED, $this->is_submitted);
         if ($this->isColumnModified(StudentAssignmentPeer::GRADING)) $criteria->add(StudentAssignmentPeer::GRADING, $this->grading);
         if ($this->isColumnModified(StudentAssignmentPeer::GRADING_COMMENT)) $criteria->add(StudentAssignmentPeer::GRADING_COMMENT, $this->grading_comment);
+        if ($this->isColumnModified(StudentAssignmentPeer::SUBMITTED_AT)) $criteria->add(StudentAssignmentPeer::SUBMITTED_AT, $this->submitted_at);
         if ($this->isColumnModified(StudentAssignmentPeer::CREATED_AT)) $criteria->add(StudentAssignmentPeer::CREATED_AT, $this->created_at);
 
         return $criteria;
@@ -1246,6 +1331,7 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
         $copyObj->setIsSubmitted($this->getIsSubmitted());
         $copyObj->setGrading($this->getGrading());
         $copyObj->setGradingComment($this->getGradingComment());
+        $copyObj->setSubmittedAt($this->getSubmittedAt());
         $copyObj->setCreatedAt($this->getCreatedAt());
 
         if ($deepCopy && !$this->startCopy) {
@@ -1862,6 +1948,7 @@ abstract class BaseStudentAssignment extends BaseObject implements Persistent
         $this->is_submitted = null;
         $this->grading = null;
         $this->grading_comment = null;
+        $this->submitted_at = null;
         $this->created_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;

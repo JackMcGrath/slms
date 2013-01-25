@@ -96,6 +96,7 @@
         <column name="is_submitted" phpName="IsSubmitted" type="BOOLEAN" size="1" sqlType="tinyint(1) unsigned" required="true" defaultValue="false"/>
         <column name="grading" phpName="Grading" type="VARCHAR" size="10" required="false"/>
         <column name="grading_comment" phpName="GradingComment" type="LONGVARCHAR" required="false"/>
+        <column name="submitted_at" phpName="SubmittedAt" type="TIMESTAMP" required="false"/>
         <column name="created_at" phpName="CreatedAt" type="TIMESTAMP" required="true"/>
         <foreign-key foreignTable="students" name="student_assignments_student" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="student_id" foreign="id"/>

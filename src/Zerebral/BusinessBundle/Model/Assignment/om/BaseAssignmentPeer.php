@@ -1796,27 +1796,6 @@ abstract class BaseAssignmentPeer
             }
         } else {
 
-        if ($obj->isNew() || $obj->isColumnModified(AssignmentPeer::TEACHER_ID))
-            $columns[AssignmentPeer::TEACHER_ID] = $obj->getTeacherId();
-
-        if ($obj->isNew() || $obj->isColumnModified(AssignmentPeer::COURSE_ID))
-            $columns[AssignmentPeer::COURSE_ID] = $obj->getCourseId();
-
-        if ($obj->isNew() || $obj->isColumnModified(AssignmentPeer::ASSIGNMENT_CATEGORY_ID))
-            $columns[AssignmentPeer::ASSIGNMENT_CATEGORY_ID] = $obj->getAssignmentCategoryId();
-
-        if ($obj->isNew() || $obj->isColumnModified(AssignmentPeer::NAME))
-            $columns[AssignmentPeer::NAME] = $obj->getName();
-
-        if ($obj->isNew() || $obj->isColumnModified(AssignmentPeer::DESCRIPTION))
-            $columns[AssignmentPeer::DESCRIPTION] = $obj->getDescription();
-
-        if ($obj->isNew() || $obj->isColumnModified(AssignmentPeer::MAX_POINTS))
-            $columns[AssignmentPeer::MAX_POINTS] = $obj->getMaxPoints();
-
-        if ($obj->isNew() || $obj->isColumnModified(AssignmentPeer::DUE_AT))
-            $columns[AssignmentPeer::DUE_AT] = $obj->getDueAt();
-
         }
 
         return BasePeer::doValidate(AssignmentPeer::DATABASE_NAME, AssignmentPeer::TABLE_NAME, $columns);

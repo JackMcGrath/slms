@@ -59,7 +59,6 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
     /**
      * @Route("/date-filter/set", name="assignments_date_filter")
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
-     * @Template()
      */
     public function dateFilterAction()
     {
@@ -117,6 +116,7 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
     public function submitSolutionsAction(Model\Assignment\StudentAssignment $studentAssignment)
     {
         $studentAssignment->setIsSubmitted(1);
+        $studentAssignment->setSubmittedAt(time());
         $studentAssignment->save();
         $this->setFlash(
             'student_assignment_solutions_submit',

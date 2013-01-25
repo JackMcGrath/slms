@@ -57,25 +57,6 @@ class AssignmentTableMap extends TableMap
         $this->addColumn('threshold', 'Threshold', 'SMALLINT', false, 3, null);
         $this->addColumn('due_at', 'DueAt', 'TIMESTAMP', false, null, null);
         // validators
-        $this->addValidator('id', 'required', 'propel.validator.RequiredValidator', '', 'The field id is required.');
-        $this->addValidator('id', 'maxValue', 'propel.validator.MaxValueValidator', 'REPLACEME', 'The field id must be not greater than REPLACEME.');
-        $this->addValidator('id', 'type', 'propel.validator.TypeValidator', 'int', 'The column id must be an int value.');
-        $this->addValidator('teacher_id', 'required', 'propel.validator.RequiredValidator', '', 'The field teacher_id is required.');
-        $this->addValidator('teacher_id', 'maxValue', 'propel.validator.MaxValueValidator', 'REPLACEME', 'The field teacher_id must be not greater than REPLACEME.');
-        $this->addValidator('teacher_id', 'type', 'propel.validator.TypeValidator', 'int', 'The column teacher_id must be an int value.');
-        $this->addValidator('course_id', 'required', 'propel.validator.RequiredValidator', '', 'The field course_id is required.');
-        $this->addValidator('course_id', 'maxValue', 'propel.validator.MaxValueValidator', 'REPLACEME', 'The field course_id must be not greater than REPLACEME.');
-        $this->addValidator('course_id', 'type', 'propel.validator.TypeValidator', 'int', 'The column course_id must be an int value.');
-        $this->addValidator('assignment_category_id', 'required', 'propel.validator.RequiredValidator', '', 'The field assignment_category_id is required.');
-        $this->addValidator('assignment_category_id', 'maxValue', 'propel.validator.MaxValueValidator', 'REPLACEME', 'The field assignment_category_id must be not greater than REPLACEME.');
-        $this->addValidator('assignment_category_id', 'type', 'propel.validator.TypeValidator', 'int', 'The column assignment_category_id must be an int value.');
-        $this->addValidator('name', 'required', 'propel.validator.RequiredValidator', '', 'The field name is required.');
-        $this->addValidator('name', 'type', 'propel.validator.TypeValidator', 'string', 'The column name must be an string value.');
-        $this->addValidator('description', 'type', 'propel.validator.TypeValidator', 'string', 'The column description must be an string value.');
-        $this->addValidator('max_points', 'required', 'propel.validator.RequiredValidator', '', 'The field max_points is required.');
-        $this->addValidator('max_points', 'maxValue', 'propel.validator.MaxValueValidator', 'REPLACEME', 'The field max_points must be not greater than REPLACEME.');
-        $this->addValidator('max_points', 'type', 'propel.validator.TypeValidator', 'int', 'The column max_points must be an int value.');
-        $this->addValidator('due_at', 'type', 'propel.validator.TypeValidator', 'string', 'The column due_at must be an string value.');
     } // initialize()
 
     /**

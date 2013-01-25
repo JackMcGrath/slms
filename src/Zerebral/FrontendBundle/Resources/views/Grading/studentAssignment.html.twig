@@ -1,8 +1,8 @@
 <div class="info assignment-info">
     <ul>
         <li><span>Student:</span> {{ studentAssignment.student.fullName }}</li>
-        {% if studentAssignment.assignment.dueAt is not empty %}
-            <li><span>Submitted:</span> <span class="date">{{ studentAssignment.createdAt | date('l, M, d Y h:i a') }}</span></li>
+        {% if studentAssignment.submittedAt is not empty %}
+            <li><span>Submitted:</span> <span class="date">{{ studentAssignment.submittedAt | date('l, M, d Y h:i a') }}</span></li>
         {% endif %}
         <li><span>Assignment:</span> {{ studentAssignment.assignment.name }}</li>
     </ul>
