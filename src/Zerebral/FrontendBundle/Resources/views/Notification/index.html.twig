@@ -13,11 +13,15 @@
             <hr/>
 
             <div class="span9 items-list{% if is_granted('ROLE_TEACHER') %} teacher-role{% endif %}">
-                {% for notification in notifications %}
-                    <div class="list-item span12{{ loop.last ? ' last' : '' }} {{ notification.type }}">
-                        {{ notificationPartial.mainBlock(notification) }}
-                    </div>
-                {% endfor %}
+                {% if notifications | length %}
+                    {% for notification in notifications %}
+                        <div class="list-item span12{{ loop.last ? ' last' : '' }} {{ notification.type }}">
+                            {{ notificationPartial.mainBlock(notification) }}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty">You have no new notifications. You will receive notifications when your courses are updated.</div>
+                {% endif %}
             </div>
         </div>
 

@@ -18,22 +18,26 @@
             </div>
             <hr/>
             <form method="post" action="{{ path('message_edit') }}">
-                <div class="messages-head">
-                    <div class="pull-right">
-                        <input type="submit" value="Delete" class="btn btn-danger" name="delete" />
-                        <input type="submit" value="Mark as Read" class="btn" name="mark-as-read" />
-                        <input type="submit" value="Mark as Unread" class="btn" name="mark-as-unread" />
+                {% if messages and messages.count %}
+                    <div class="messages-head">
+                        <div class="pull-right">
+                            <input type="submit" value="Delete" class="btn btn-danger group-control-button" name="delete" disabled="disabled" />
+                            <input type="submit" value="Mark as Read" class="btn group-control-button" name="mark-as-read" disabled="disabled" />
+                            <input type="submit" value="Mark as Unread" class="btn group-control-button" name="mark-as-unread" disabled="disabled" />
+                        </div>
+                        <label><input type="checkbox" class="select-all" /> Select / deselect all</label>
                     </div>
-                    <label><input type="checkbox" class="select-all" /> Select / deselect all</label>
-                </div>
-                <div class="messages messageslist">
-                    {% if messages and messages.count %}
+                    <div class="messages messageslist">
                         {% for message in messages %}
                             {{ block('message') }}
                         {% endfor %}
                         <div class="clearfix"></div>
-                    {% endif %}
-                </div>
+                    </div>
+                {% else %}
+                    <div class="messages messageslist empty-messageslist">
+                        <div class="empty">There are no messages in your folder</div>
+                    </div>
+                {% endif %}
             </form>
             <div class="pull-right">
                 {% set path = folder == 'inbox' ? 'messages_inbox' : 'messages_sent' %}
@@ -64,7 +68,7 @@
             <p>{{ message.getLastMessageDate | date('M d \\a\\t g:i a') }}</p>
         </div>
         <div class="message-content">
-            <a href="{{ path('message_reply', {id: message.threadId}) }}">{{ message.subject }}{% if message.getUnreadCount > 0 %} ({{ message.getUnreadCount }}){% endif %}</a>
+            <a href="{{ path('message_reply', {threadId: message.threadId}) }}">{{ message.subject }}{% if message.getUnreadCount > 0 %} ({{ message.getUnreadCount }}){% endif %}</a>
             <p>{{ message.shortBody | slice(0, 70) }}</p>
         </div>
 

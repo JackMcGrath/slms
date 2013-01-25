@@ -20,31 +20,49 @@
 
             <div class="span9 items-list{% if is_granted('ROLE_TEACHER') %} teacher-role{% endif %}">
                 {% if assignments and assignments.count %}
-                    <div class="small-title">Scheduled</div>
-                    {% for assignment in assignments %}
-                        {{ block('assignment') }}
-                    {% endfor %}
+                    <div id="scheduled">
+                        <div class="small-title">Scheduled</div>
+                        {% for assignment in assignments %}
+                            {{ block('assignment') }}
+                        {% endfor %}
+                    </div>
                     <div class="clearfix"></div>
                 {% endif %}
 
                 {% if assignmentsNoDueDate and assignmentsNoDueDate.count %}
-                    <div class="small-title">No due date</div>
-                    {% for assignment in assignmentsNoDueDate %}
-                        {{ block('assignment') }}
-                    {% endfor %}
+                    <div id="no-due-date">
+                        <div class="small-title">No due date</div>
+                        {% for assignment in assignmentsNoDueDate %}
+                            {{ block('assignment') }}
+                        {% endfor %}
+                    </div>
                     <div class="clearfix"></div>
                 {% endif %}
 
                 {% if draftAssignment and draftAssignment.count %}
-                    <div class="small-title">Drafts</div>
-                    {% set type = 'draft' %}
-                    {% for assignment in draftAssignment %}
-                        {{ block('assignment') }}
-                    {% endfor %}
+                    <div id="drafts">
+                        <div class="small-title">Drafts</div>
+                        {% set type = 'draft' %}
+                        {% for assignment in draftAssignment %}
+                            {{ block('assignment') }}
+                        {% endfor %}
+                    </div>
                     <div class="clearfix"></div>
                 {% endif %}
 
-
+                {% if (not assignments or assignments.count == 0) and (not assignmentsNoDueDate or assignmentsNoDueDate.count == 0) and (not draftAssignment or draftAssignment.count == 0) %}
+                    <div class="empty">
+                        {% if is_granted('ROLE_TEACHER') %}
+                            You have not created any assignments.<br/> You should first open course page and add new assignment there.
+                        {% else %}
+                            You do not have any assignments yet.<br/> You will be notified when one is added.
+                        {% endif %}
+                    </div>
+                {% else %}
+                     <div class="empty-search-results empty hide">
+                        Search results for the selected interval. No events.
+                     </div>
+                {% endif %}
             </div>
         </div>
 
@@ -58,7 +76,11 @@
 
     </div>
 
-
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('.calendar').calendarSelectable({itemList: '.items-list', startDate: "{{ dateFilter.startDate }}", endDate: "{{ dateFilter.endDate }}"});
+        });
+    </script>
 {% endblock %}
 
 {% block assignment %}
@@ -117,9 +139,4 @@
             {% endif %}
         {% endif %}
     </div>
-    <script type="text/javascript">
-        $(document).ready(function(){
-            $('.calendar').calendarSelectable({itemList: '.items-list', startDate: "{{ dateFilter.startDate }}", endDate: "{{ dateFilter.endDate }}"});
-        });
-    </script>
 {% endblock %}

@@ -7,12 +7,14 @@
 var checkAll = function(element, options) {
 	this.elementCheckAll = element;
 	this.elementCheckSelector = options.checkboxClass;
+	this.controlButtons = options.controlButtons;
 }
 
 checkAll.prototype = {
 	elementCheckAll: undefined,
 	elementCheck: undefined,
 	elementCheckSelector: undefined,
+	controlButtons: undefined,
 
 	init: function() {
 		var self = this;
@@ -40,12 +42,21 @@ checkAll.prototype = {
 	checkAllToggle: function(element) {
 		if (element.checked) {
 			this.checkAll();
+			if (this.controlButtons) {
+				$(this.controlButtons).enable();
+			}
 		} else {
 			if ($(this.elementCheckSelector + ':checked').length > 0 && this.elementCheck.length > $(this.elementCheckSelector + ':checked').length) {
 				this.checkAll();
 				this.elementCheckAll.prop('checked', true);
+				if (this.controlButtons) {
+					$(this.controlButtons).enable();
+				}
 			} else {
 				this.uncheckAll();
+				if (this.controlButtons) {
+					$(this.controlButtons).prop('disabled', 'disabled');
+				}
 			}
 		}
 		this.elementCheckAll.css('opacity', 1);
@@ -54,6 +65,7 @@ checkAll.prototype = {
 	checkToggle: function() {
 		if ($(this.elementCheckSelector + ':checked').length > 0) {
 			this.elementCheckAll.prop('checked', true);
+			$(this.controlButtons).enable();
 
 			if ($(this.elementCheckSelector + ':checked').length == this.elementCheck.length) {
 				this.elementCheckAll.css('opacity', 1);
@@ -63,6 +75,9 @@ checkAll.prototype = {
 		} else {
 			this.elementCheckAll.prop('checked', false);
 			this.elementCheckAll.css('opacity', 1);
+			if (this.controlButtons) {
+				$(this.controlButtons).prop('disabled', 'disabled');
+			}
 		}
 	}
 }

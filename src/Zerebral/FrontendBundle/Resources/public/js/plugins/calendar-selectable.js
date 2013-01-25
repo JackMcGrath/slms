@@ -59,6 +59,10 @@ calendarSelectable.prototype = {
 		if (self.startDate && self.endDate) {
 			var items = $(this.itemList).find('.list-item ');
 			items.hide();
+			$('#scheduled').hide();
+			$('#no-due-date').hide();
+			$('#drafts').hide();
+			$('.empty-search-results').show();
 			$.each(items, function(i, item) {
 				if ($(item).attr('due-date') !== undefined) {
 					var assignmentDates = $(item).attr('due-date').split(',');
@@ -70,6 +74,8 @@ calendarSelectable.prototype = {
 								$(item).find('.stat .assignments-count').html(assignmentsCount);
 							}
 							$(item).show();
+							$(item).parent().show();
+							$('.empty-search-results').hide();
 						}
 					});
 
@@ -78,6 +84,10 @@ calendarSelectable.prototype = {
 
 		} else {
 			$(this.itemList).find('.list-item ').show();
+			$('#scheduled').show();
+			$('#no-due-date').show();
+			$('#drafts').show();
+			$('.empty-search-results').hide();
 			if (self.calculateAssignmentsCount) {
 				var badges = $(this.itemList).find('.list-item ').find('.stat .assignments-count');
 				$.each(badges, function(i, badge) {

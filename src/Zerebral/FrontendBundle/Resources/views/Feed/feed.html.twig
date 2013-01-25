@@ -99,7 +99,7 @@
         {% for feedItem in feedItems %}
         {% include "ZerebralFrontendBundle:Feed:feedItemBlock.html.twig" %}
         {% else %}
-            <div class="empty">No updates yet!</div>
+            <div class="empty">There are no posts to show right now</div>
         {% endfor %}
         {% if feedItemsCount > feedItems|length %}
             {% set loadMoreItemsPath = (course is null) ? path('ajax_load_more_items') : path('ajax_load_more_items', {courseId: course.id})%}

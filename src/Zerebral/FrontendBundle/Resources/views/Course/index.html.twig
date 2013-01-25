@@ -20,6 +20,7 @@
 
         <div class="span9 items-list{% if is_granted('ROLE_TEACHER') %} teacher-role{% endif %}">
             {{ flashMessages.show('delete_course_success', 'success') }}
+            {% if courses | length %}
             {% for course in courses %}
                 <div class="list-item span12{{ loop.last ? ' last' : '' }}" {% if course.assignmentsDueDates %}due-date="{{ course.assignmentsDueDates | join(',') }}"{% endif %}>
                     <div class="symbol pull-left">
@@ -58,6 +59,19 @@
                     </div>
                 </div>
             {% endfor %}
+            <div class="empty-search-results empty hide">
+                Search results for the selected interval. No events.
+            </div>
+            {% else %}
+                <div class="empty">
+                    {% if is_granted('ROLE_TEACHER') %}
+                        No courses have been created. Click <a href="{{ path('course_add') }}">Create Course</a> to add one.
+                    {% else %}
+                        You are not enrolled in any courses. Click <a href="#inviteModal" class="use-access-code" data-toggle="modal" data-target="#inviteModal">Use Access Code</a> to join one.
+                    {% endif %}
+                </div>
+            {% endif %}
+
         </div>
     </div>
 
