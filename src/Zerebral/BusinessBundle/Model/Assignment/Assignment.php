@@ -6,6 +6,7 @@ use Zerebral\BusinessBundle\Model\Assignment\om\BaseAssignment;
 
 class Assignment extends BaseAssignment
 {
+    private $gradeTypeIsModified = false;
 
     public function __construct()
     {
@@ -20,6 +21,20 @@ class Assignment extends BaseAssignment
             $file->delete();
         }
         return parent::preDelete($con);
+    }
+
+    public function preSave(\PropelPDO $con = null)
+    {
+        $this->gradeTypeIsModified = true;
+        return parent::preSave($con);
+    }
+
+    public function postSave(\PropelPDO $con = null)
+    {
+        if ($this->gradeTypeIsModified) {
+            StudentAssignmentQuery::create()->filterByAssignmentId($this->getId())->update(array('Grading' => null));
+        }
+        return parent::postSave($con);
     }
 
     /** @return \Zerebral\BusinessBundle\Model\Feed\FeedItem */
