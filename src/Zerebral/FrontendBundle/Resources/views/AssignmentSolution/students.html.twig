@@ -29,7 +29,6 @@
                             <i class="icon-blue-folder"></i>
                         </div>
                         <div class="details pull-left">
-
                             <h4><a href="">{{ solution.student.fullName }}</a></h4>
                             <div class="stat">
                                 {% if solution.isSubmitted and solution.submittedAt is not null %}<div class="due-at"><i class="icon-small-clock"></i> Submitted on <small>{{ solution.submittedAt | date('D, M d h:i a') }}</small></div>{% endif %}

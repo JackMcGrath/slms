@@ -20,7 +20,8 @@ use Zerebral\BusinessBundle\Model as Model;
 use \Criteria;
 
 use Zerebral\CommonBundle\Component\Calendar\Calendar;
-use \Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentQuery;
+use Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentQuery;
+use Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery;
 
 /**
  * @Route("/assignments")
@@ -37,9 +38,9 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
         $session = $this->getRequest()->getSession();
         $dateFilter = $session->get('assigmentDateFilter', array());
 
-        $assignments = $this->getRoleUser()->getAssignmentsDueDate(false);
-        $assignmentsNoDueDate = $this->getRoleUser()->getAssignmentsDueDate(true);
-        $draftAssignment = $this->getUser()->isTeacher() ? $this->getRoleUser()->getAssignmentsDraft() : null;
+        $assignments = AssignmentQuery::create()->filterByUserAndDueDate($this->getUser(), null, false)->find();
+        $assignmentsNoDueDate = AssignmentQuery::create()->filterByUserAndDueDate($this->getUser(), null, true)->find();
+        $draftAssignment = $this->getUser()->isTeacher() ? AssignmentQuery::create()->findDraftByTeacher($this->getRoleUser()) : null;
 
         $provider = new CourseAssignmentEventsProvider($assignments);
         $currentMonth = new Calendar(time(), $provider);

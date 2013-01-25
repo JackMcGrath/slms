@@ -29,23 +29,6 @@ class Teacher extends BaseTeacher
         return $course->getAssignments();
     }
 
-    /**
-     * @param \Zerebral\BusinessBundle\Model\Course\Course $course
-     * @param null $ongoing if null - get all, false - only with due_at, true - only without due at
-     * @return \PropelObjectCollection
-     */
-    public function getCourseAssignmentsDueDate(\Zerebral\BusinessBundle\Model\Course\Course $course, $ongoing = null)
-    {
-        $assignments = \Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery::create()->getCourseAssignmentsDueDate($course, $ongoing);
-        if ($ongoing == true) {
-            $assignments->addDescendingOrderByColumn('remainingCount');
-        } else {
-            $assignments->addDescendingOrderByColumn('assignments.due_at');
-        }
-
-        return $assignments->find();
-    }
-
     public function getCourseAssignmentsDraft(\Zerebral\BusinessBundle\Model\Course\Course $course)
     {
         $c = new \Criteria();
@@ -54,27 +37,6 @@ class Teacher extends BaseTeacher
         $c->addDescendingOrderByColumn('due_at');
 
         return $course->getAssignments($c);
-    }
-
-    public function getAssignmentsDueDate($ongoing = null)
-    {
-        $assignments = \Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery::create()->getCourseAssignmentsDueDate(null, $ongoing, $this);
-        if ($ongoing == true) {
-            $assignments->addDescendingOrderByColumn('remainingCount');
-        } else {
-            $assignments->addDescendingOrderByColumn('assignments.due_at');
-        }
-        return $assignments->find();
-    }
-
-    public function getAssignmentsDraft()
-    {
-        $c = new \Criteria();
-        $c->addJoin(\Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer::ID, \Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentPeer::ASSIGNMENT_ID, \Criteria::LEFT_JOIN);
-        $c->add('student_assignments.id', null, \Criteria::ISNULL);
-        $c->addDescendingOrderByColumn('due_at');
-
-        return $this->getAssignments($c);
     }
 
     public function hasCourse(\Zerebral\BusinessBundle\Model\Course\Course $course)

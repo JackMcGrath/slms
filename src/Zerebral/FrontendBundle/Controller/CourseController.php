@@ -18,6 +18,7 @@ use Zerebral\BusinessBundle\Calendar\EventProviders\CourseAssignmentEventsProvid
 use Zerebral\CommonBundle\Component\Calendar\Calendar;
 use Zerebral\BusinessBundle\Model\User\StudentQuery;
 use Zerebral\BusinessBundle\Model\Feed\FeedItemQuery;
+use Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery;
 
 /**
  * @Route("/courses")
@@ -167,9 +168,9 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
         $session = $this->getRequest()->getSession();
         $dateFilter = $session->get('assigmentDateFilter', array());
 
-        $assignments = $this->getRoleUser()->getCourseAssignmentsDueDate($course, false);
-        $assignmentsNoDueDate = $this->getRoleUser()->getCourseAssignmentsDueDate($course, true);
-        $draftAssignment = $this->getUser()->isTeacher() ? $this->getRoleUser()->getCourseAssignmentsDraft($course) : null;
+        $assignments = AssignmentQuery::create()->filterByUserAndDueDate($this->getUser(), $course, false)->find();
+        $assignmentsNoDueDate = AssignmentQuery::create()->filterByUserAndDueDate($this->getUser(), $course, true)->find();
+        $draftAssignment = $this->getUser()->isTeacher() ? AssignmentQuery::create()->findDraftByTeacher($this->getRoleUser(), $course) : null;
 
         $provider = new AssignmentEventsProvider($assignments);
         $currentMonth = new \Zerebral\CommonBundle\Component\Calendar\Calendar(time(), $provider);

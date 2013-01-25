@@ -36,7 +36,7 @@ class AssignmentSolutionController extends \Zerebral\CommonBundle\Component\Cont
         $fileGroupingType = $this->getRequest()->get('SolutionFileGrouping') ?: ($session->has('SolutionFileGrouping') ? $session->get('SolutionFileGrouping') : 'date');
         $session->set('SolutionFileGrouping', $fileGroupingType);
 
-        $assignments = AssignmentQuery::create()->getCourseAssignmentsDueDate($course, null, $this->getRoleUser());
+        $assignments = AssignmentQuery::create()->filterByUserAndDueDate($this->getUser(), $course, null);
         switch ($fileGroupingType) {
             case "date": $assignments->orderBy('due_at', \Criteria::DESC); break;
             case "assignment": $assignments->addAscendingOrderByColumn("LOWER(assignments.name)"); break;
