@@ -71,15 +71,15 @@ StudentsPopup.prototype = {
         var self = this;
 
         this.target.find('.student-list tr').live('click', $.proxy(this.onClickUserRow, this));
+        this.target.find('.save-assign').live('click', $.proxy(this.onSavePopup, this));
         //this.target.find('.toggle_selection input').live('change', $.proxy(this.onSelectUser, this));
 
         $('.toggle_selection input').checkAll({checkboxClass: '.student-list input[type="checkbox"]'});
-        this.target.on('hidden', function () {
-            $('.student_select').removeAttr('disabled').attr('checked', '1');
-            var selectedItemsCount = $('.student-list input[type=checkbox]:checked').length;
-            var allItemsCount = $('.student-list input[type=checkbox]').length;
-            $('.student_select').parent().find('a').text(selectedItemsCount + '/' + allItemsCount + " students selected");
-        });
+
+        this.target.on('hide', function() {
+            self.resetFormManual();
+            console.log('close');
+        })
     },
 
     onClickUserRow: function(e) {
@@ -91,5 +91,35 @@ StudentsPopup.prototype = {
                 checkbox.attr('checked', 1);
             }
         }
+    },
+
+    onSavePopup: function(e) {
+        e.preventDefault();
+        $('.student_select').removeAttr('disabled').attr('checked', '1');
+        var selectedItemsCount = $('.student-list input[type=checkbox]:checked').length;
+        var allItemsCount = $('.student-list input[type=checkbox]').length;
+        $('.student_select').parent().find('a').text(selectedItemsCount + '/' + allItemsCount + " students selected");
+
+        $.each(this.target.find('.student-list').find('input'), function(index, el) {
+            var $el = $(el);
+            if ($el.attr('checked') == 'checked') {
+                $el.addClass('checked');
+            } else {
+                $el.removeClass('checked');
+            }
+        });
+
+        this.target.modal('hide');
+    },
+
+    resetFormManual: function() {
+        $.each(this.target.find('.student-list').find('input'), function(index, el) {
+            var $el = $(el);
+            if ($el.hasClass('checked')) {
+                $el.attr('checked', 'checked');
+            } else {
+                $el.removeAttr('checked');
+            }
+        });
     }
 };
