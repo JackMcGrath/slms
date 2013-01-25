@@ -35,7 +35,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
         $session = $this->getRequest()->getSession();
         $dateFilter = $session->get('assigmentDateFilter', array());
 
-        $provider = new CourseAssignmentEventsProvider($assignments = $this->getRoleUser()->getAssignmentsDueDate(false));
+        $provider = new CourseAssignmentEventsProvider($assignments = AssignmentQuery::create()->filterByUserAndDueDate($this->getUser(), null, false)->find());
         $currentMonth = new Calendar(time(), $provider);
         $nextMonth = new Calendar(strtotime("+1 month"), $provider);
 
