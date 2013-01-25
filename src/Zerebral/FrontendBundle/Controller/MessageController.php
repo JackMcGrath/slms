@@ -73,13 +73,17 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
     }
 
     /**
-     * @Route("/reply/{id}", name="message_reply")
+     * @Route("/reply/{threadId}", name="message_reply")
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @Template()
      */
-    public function replyAction($id)
+    public function replyAction($threadId)
     {
-        $thread = MessageQuery::create()->findThreadForUser($id, $this->getUser());
+        $thread = MessageQuery::create()->findThreadForUser($threadId, $this->getUser());
+
+        if (count($thread) == 0) {
+            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException('You have not permissions to read this message.');
+        }
 
         $newMessage = new Model\Message\Message();
         $newMessageType = new FormType\MessageType();

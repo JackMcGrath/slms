@@ -68,7 +68,7 @@
             <p>{{ message.getLastMessageDate | date('M d \\a\\t g:i a') }}</p>
         </div>
         <div class="message-content">
-            <a href="{{ path('message_reply', {id: message.threadId}) }}">{{ message.subject }}{% if message.getUnreadCount > 0 %} ({{ message.getUnreadCount }}){% endif %}</a>
+            <a href="{{ path('message_reply', {threadId: message.threadId}) }}">{{ message.subject }}{% if message.getUnreadCount > 0 %} ({{ message.getUnreadCount }}){% endif %}</a>
             <p>{{ message.shortBody | slice(0, 70) }}</p>
         </div>
 
