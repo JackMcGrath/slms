@@ -96,12 +96,10 @@ Zerebral\BusinessBundle\Model\Assignment\Assignment:
         name:
             - NotBlank:
                 message: Enter your assignment name. You can change it later.
-                groups: [numeric, pass]
             - MaxLength: 200
         description:
             - NotBlank:
                 message: Enter assignment description. Any useful information from the student point of view.
-                groups: [numeric, pass]
 #        maxPoints:
 #            - NotBlank:
 #                message: Max points is required.
@@ -119,13 +117,11 @@ Zerebral\BusinessBundle\Model\Assignment\Assignment:
         assignmentCategory:
             - NotNull:
                 message: Category is required
-                groups: [numeric, pass]
             - Valid: ~
         files:
             - Valid: ~
         gradeType:
-            - NotBlank:
-                groups: [numeric, pass]
+            - NotBlank: ~
         threshold:
             - NotBlank:
                 groups: [numeric]

@@ -50,7 +50,7 @@ class OptionalModelType extends AbstractType
                 'choice_list' => $choiceList,
                 'empty_value' => $options['empty_value'],
                 'empty_data' => '',
-                'invalid_message' => $options['invalid_message'],
+                'invalid_message' => $options['invalid_message']
             )
         );
 

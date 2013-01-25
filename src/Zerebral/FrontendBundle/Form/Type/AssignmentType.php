@@ -106,9 +106,9 @@ class AssignmentType extends AbstractType
                     /** @var \Zerebral\BusinessBundle\Model\Assignment\Assignment $data */
                     $data = $form->getData();
                     if ($data->getGradeType() == \Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer::GRADE_TYPE_NUMERIC) {
-                        return array('numeric');
+                        return array('Default', 'numeric');
                     } else {
-                        return array('pass');
+                        return array('Default', 'pass');
                     }
                 }
             )

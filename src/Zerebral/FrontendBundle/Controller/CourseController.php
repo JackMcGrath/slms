@@ -336,14 +336,11 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
         }
         $students = StudentQuery::create()->findByCourse($course)->find();
 
-        $studentAssignment = \Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentQuery::create()->findPk(448);
-
         return array(
             'grading' => $grading,
             'students' => $students,
             'course' => $course,
             'assignments' => $assignments,
-            'studentAssignment' => $studentAssignment,
             'target' => 'course'
         );
     }
