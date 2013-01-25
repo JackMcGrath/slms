@@ -70,11 +70,6 @@
         <index name="assignments_assignment_categories">
             <index-column name="assignment_category_id"/>
         </index>
-        <behavior name="aggregate_column">
-            <parameter name="name" value="commentsCount" />
-            <parameter name="foreign_table" value="feed_items" />
-            <parameter name="expression" value="COUNT(id)" />
-        </behavior>
     </table>
 
     <table name="assignment_files" phpName="AssignmentFile" isCrossRef="true">

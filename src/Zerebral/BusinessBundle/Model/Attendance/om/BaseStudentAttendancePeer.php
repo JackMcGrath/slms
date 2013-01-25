@@ -57,6 +57,7 @@ abstract class BaseStudentAttendancePeer
     const STATUS_PRESENT = 'present';
     const STATUS_TARDY = 'tardy';
     const STATUS_EXCUSED = 'excused';
+    const STATUS_ABSENT = 'absent';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -106,6 +107,7 @@ abstract class BaseStudentAttendancePeer
             StudentAttendancePeer::STATUS_PRESENT,
             StudentAttendancePeer::STATUS_TARDY,
             StudentAttendancePeer::STATUS_EXCUSED,
+            StudentAttendancePeer::STATUS_ABSENT,
         ),
     );
 

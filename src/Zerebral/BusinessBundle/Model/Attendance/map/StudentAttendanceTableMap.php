@@ -49,6 +49,7 @@ class StudentAttendanceTableMap extends TableMap
   0 => 'present',
   1 => 'tardy',
   2 => 'excused',
+  3 => 'absent',
 ));
         $this->addColumn('comment', 'Comment', 'VARCHAR', false, 200, null);
         // validators

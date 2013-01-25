@@ -38,6 +38,7 @@
                     <tr>
                         <th class="name">Student name</th>
                         <th class="status" statusName="present"><label><input type="radio" value="present"/> Present</label></th>
+                        <th class="status" statusName="absent"><label><input type="radio" value="absent"/> Absent</label></th>
                         <th class="status" statusName="tardy"><label><input type="radio" value="tardy"/> Tardy</label></th>
                         <th class="status" statusName="excused"><label><input type="radio" value="excused"/> Excused</label></th>
                         <th>Comments</th>
@@ -52,6 +53,9 @@
                             <td>{{ student.formattedName }}</td>
                             <td class="status" statusName="present">
                                 <input type="radio" name="attendance[studentAttendances][{{ index }}][status]" value="present" {{ studentAttendance.vars.data.status == 'present' or studentAttendance.vars.data.status is empty ? 'checked' : '' }}/>
+                            </td>
+                            <td class="status" statusName="absent">
+                                <input type="radio" name="attendance[studentAttendances][{{ index }}][status]" value="absent" {{ studentAttendance.vars.data.status == 'absent' ? 'checked' : '' }}/>
                             </td>
                             <td class="status" statusName="tardy">
                                 <input type="radio" name="attendance[studentAttendances][{{ index }}][status]" value="tardy" {{ studentAttendance.vars.data.status == 'tardy' ? 'checked' : '' }}/>

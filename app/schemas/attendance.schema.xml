@@ -23,7 +23,7 @@
     <table name="student_attendance" phpName="StudentAttendance" idMethod="native">
         <column name="attendance_id" phpName="AttendanceId" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" required="true"/>
         <column name="student_id" phpName="StudentId" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" required="true"/>
-        <column name="status" phpName="Status" type="CHAR" valueSet="present,tardy,excused" sqlType="enum('present','tardy','excused')" required="true" defaultValue="present"/>
+        <column name="status" phpName="Status" type="CHAR" valueSet="present,tardy,excused,absent" sqlType="enum('present','tardy','excused','absent')" required="true" defaultValue="present"/>
         <column name="comment" phpName="Comment" type="VARCHAR" size="200" required="false"/>
         <foreign-key foreignTable="attendance" name="student_attendance_attendance" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="attendance_id" foreign="id"/>
