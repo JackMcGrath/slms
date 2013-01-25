@@ -13,4 +13,9 @@ class StudentAssignment extends BaseStudentAssignment
         $this->setCreatedAt(date("Y-m-d H:i:s", time()));
         return parent::preInsert($con);
     }
+
+    public function isReadyForGrading()
+    {
+        return $this->getAssignment()->getDueAt('Y-m-d H:i:s') < date('Y-m-d H:i:s');
+    }
 }

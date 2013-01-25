@@ -78,7 +78,7 @@
 
 {% block grading_value %}
     {% if grading[student.id][assignment.id] is defined %}
-        {% if grading[student.id][assignment.id].isSubmitted == 0 %}
+        {% if grading[student.id][assignment.id].isSubmitted == 0 and grading[student.id][assignment.id].isReadyForGrading() is sameas(false) %}
             <td class="">
                 <i class="icon-new-lock-transparent"></i>
             </td>
@@ -87,7 +87,7 @@
                 <a href="#" data-toggle="modal" data-toggle="modal"><i class="icon-new-plus-add"></i></a>
             </td>
         {% else %}
-            <td class="{{ grading[student.id][assignment.id].assignment.gradeType == 'pass' ? ' pass' : ' numeric' }}" studentAssignment="{{ grading[student.id][assignment.id].id }}">
+            <td class="{{ grading[student.id][assignment.id].assignment.gradeType == 'pass' ? 'pass' : 'numeric'}}" studentAssignment="{{ grading[student.id][assignment.id].id }}">
                 <div class="grade-value" value="{{ grading[student.id][assignment.id].grading }}">
                     {% if grading[student.id][assignment.id].assignment.gradeType == 'pass' %}
                         {% if grading[student.id][assignment.id].grading == 1 %}
