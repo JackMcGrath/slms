@@ -51,7 +51,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
         this.feedItemsDiv.on('click', 'a.delete-link.delete-comment', $.proxy(self.deleteCommentBlock, self));
 
 
-        this.commentsDiv.on('click', 'a.load-more-link', $.proxy(self.loadComments, self));
+        this.feedItemsDiv.on('click', 'a.load-more-link', $.proxy(self.loadComments, self));
         this.loadMoreItemsLink.on('click', $.proxy(self.loadMoreItems, self));
 
         self.timeOffset = moment(this.feedItemsDiv.data('serverTime'), 'YYYY-MM-DD HH:mm:ss').diff(moment(), 'seconds');
