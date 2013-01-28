@@ -75,6 +75,7 @@
             }
             .content {
                 margin-left: 70px;
+                padding-bottom: 20px;
                 .author {
                     font-weight: bold;
                     .gray {
@@ -108,13 +109,21 @@
                     .link-content {
                         margin-top: 10px;
                         .thumbnail {
+                            position: relative;
                             width: 95px;
                             height: 60px;
                             padding: 0;
                             float: left;
                             margin-right: 10px;
                         // margin-top: 4px;
-                            img {
+                            img.overlay {
+                                position: absolute;
+                                top: 30px;
+                                left: 5px;
+                                width: 35 !important;
+                                height: 26 !important;
+                            }
+                            img.img {
                                 width: 95px;
                                 height: 60px;
                             }
@@ -398,13 +407,21 @@
                         .link-content {
                             margin-top: 10px;
                             .thumbnail {
+                                position: relative;
                                 width: 95px;
                                 height: 60px;
                                 padding: 0;
                                 float: left;
                                 margin-right: 10px;
                             // margin-top: 4px;
-                                img {
+                                img.overlay {
+                                    position: absolute;
+                                    top: 30px;
+                                    left: 5px;
+                                    width: 35 !important;
+                                    height: 26 !important;
+                                }
+                                img.img {
                                     width: 95px;
                                     height: 60px;
                                 }

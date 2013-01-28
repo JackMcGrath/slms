@@ -238,6 +238,11 @@ ZerebralCourseDetailFeedBlock.prototype = {
 
         var self = this;
         var link = $(event.target);
+
+        if (typeof(link.attr('href')) == 'undefined') {
+            link = link.parent();
+        }
+
         var lastItemId = link.data('lastItemId');
 
         if (link.hasClass('processing')) {
@@ -633,14 +638,16 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
                 success: function(response) {
                     if (response.success) {
                         self.feedCommentsDiv.data('lastCommentId', response['lastCommentId']);
-                        var commentBlock = $(response['content']);
-                        commentBlock.css('display', 'none');
-                        if (self.feedCommentsDiv.find('.comment:last').length > 0) {
-                            self.feedCommentsDiv.find('.comment:last').after(commentBlock);
-                        } else {
-                            self.feedCommentsDiv.find('.empty').remove().end().append(commentBlock);
+                        if (response['content'] != '') {
+                            var commentBlock = $(response['content']);
+                            commentBlock.css('display', 'none');
+                            if (self.feedCommentsDiv.find('.comment:last').length > 0) {
+                                self.feedCommentsDiv.find('.comment:last').after(commentBlock);
+                            } else {
+                                self.feedCommentsDiv.find('.empty').remove().end().append(commentBlock);
+                            }
+                            commentBlock.slideDown();
                         }
-                        commentBlock.slideDown();
                     }
                 },
                 error: function() { self.errorHasAppeared++; }
