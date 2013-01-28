@@ -8,7 +8,7 @@
         <span class="text-span">{{ comment.feedContent.text|nl2br }}</span><br />
         {% if comment.feedContent.linkThumbnailUrl is not null %}
             <div class="thumbnail">
-                <a href="{{ comment.feedContent.linkUrl }}" target="_blank"><img width="95" height="60" src="{{ comment.feedContent.linkThumbnailUrl }}" alt="{{ comment.feedContent.linkTitle }}" /></a>
+                <a href="{{ comment.feedContent.linkUrl }}" target="_blank"><img class="img" width="95" height="60" src="{{ comment.feedContent.linkThumbnailUrl }}" alt="{{ comment.feedContent.linkTitle }}" /></a>
             </div>
         {% endif %}
         <div class="info">
@@ -25,7 +25,10 @@
         <span class="text-span">{{ comment.feedContent.text|nl2br }}</span><br />
         {% if comment.feedContent.linkThumbnailUrl is not null %}
             <div class="thumbnail">
-                <a href="{{ comment.feedContent.linkUrl }}" target="_blank"><img width="95" height="60" src="{{ comment.feedContent.linkThumbnailUrl }}" alt="{{ comment.feedContent.linkTitle }}" /></a>
+                <a href="{{ comment.feedContent.linkUrl }}" target="_blank">
+                    <img class="img" width="95" height="60" src="{{ comment.feedContent.linkThumbnailUrl }}" alt="{{ comment.feedContent.linkTitle }}" />
+                    <img class="overlay" width="35" height="26" src="{{ asset('img/icons/video-overlay-icon.png') }}" alt="" />
+                </a>
             </div>
         {% endif %}
         <div class="info">
@@ -90,7 +93,7 @@
         <div class="link-content">
             {% if comment.feedContent.linkThumbnailUrl is not null %}
                 <div class="thumbnail">
-                    <a href="{{ comment.feedContent.linkUrl }}" target="_blank"><img width="95" height="60" src="{{ comment.feedContent.linkThumbnailUrl }}" alt="{{ comment.feedContent.linkTitle }}" /></a>
+                    <a href="{{ comment.feedContent.linkUrl }}" target="_blank"><img class="img" width="95" height="60" src="{{ comment.feedContent.linkThumbnailUrl }}" alt="{{ comment.feedContent.linkTitle }}" /></a>
                 </div>
             {% endif %}
             <div class="info">
@@ -112,7 +115,10 @@
         <div class="link-content">
             {% if comment.feedContent.linkThumbnailUrl is not null %}
                 <div class="thumbnail">
-                    <a href="{{ comment.feedContent.linkUrl }}" target="_blank"><img width="95" height="60" src="{{ comment.feedContent.linkThumbnailUrl }}" alt="{{ comment.feedContent.linkTitle }}" /></a>
+                    <a href="{{ comment.feedContent.linkUrl }}" target="_blank">
+                        <img class="img" width="95" height="60" src="{{ comment.feedContent.linkThumbnailUrl }}" alt="{{ comment.feedContent.linkTitle }}" />
+                        <img class="overlay" width="35" height="26" src="{{ asset('img/icons/video-overlay-icon.png') }}" alt="" />
+                    </a>
                 </div>
             {% endif %}
             <div class="info">
