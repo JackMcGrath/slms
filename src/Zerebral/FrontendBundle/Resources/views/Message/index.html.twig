@@ -13,7 +13,7 @@
         <div class="span6 main-list-block">
             <div class="row-fluid">
                 <h2 class="pull-left form-title">
-                    Messages {% if unreadCount > 0 %}<small>{{ unreadCount }} unread</small>{% endif %}
+                    Messages {% if unreadCount > 0 %}<small>{{ unreadCount }} unread</small>{% else %} <small>{{ folder == 'inbox' ? 'Inbox' : 'Sent' }}</small> {% endif %}
                 </h2>
             </div>
             <hr/>
