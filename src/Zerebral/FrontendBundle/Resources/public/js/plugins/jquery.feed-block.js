@@ -151,7 +151,8 @@ ZerebralCourseDetailFeedBlock.prototype = {
     updateFeed: function() {
         var self = this;
 
-        if (!self.ajaxInProgress && self.errorHasAppeared < 2) {
+//        if (!self.ajaxInProgress && self.errorHasAppeared < 2) {
+        if (self.errorHasAppeared < 2) {
 
             var lastIds = {};
             var items = self.feedItemsDiv.find('.comments');
