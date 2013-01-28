@@ -44,18 +44,9 @@
                     {{ assignment.description | raw }}
                 </div>
                 <div class="files assignment-files">
-                    <ul>
-                    {% for file in assignment.files %}
-                        <li class="file">
-                            <img class="icon" src="{{ get_file_icon(file) }}" />
-                            <a class="link" href="{{ path('download_file', {id: file.id}) }}">{{ file.name }}</a><br >
-                            <span class="size">{{ file.size | bytes_to_human }}</span>
-                        </li>
-                    {% endfor %}
-                    </ul>
+                    {{ mainPartials.filesList(assignment.files) }}
                 </div>
             </div>
-
 
             {{ feed.assignment_details_feed(feedCommentForm, assignment.feedItem) }}
         </div>

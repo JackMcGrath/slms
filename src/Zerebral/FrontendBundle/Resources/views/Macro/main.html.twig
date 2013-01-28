@@ -131,3 +131,15 @@
     <a href="#" rel="tooltip" title="{{ studentAssignment.gradingComment }}"><i class="info-icon icon-small-info"></i></a>
     {% endif %}
 {% endmacro %}
+
+{% macro filesList(files) %}
+    <ul>
+    {% for file in files %}
+        <li class="file">
+            <img class="icon" src="{{ get_file_icon(file) }}" />
+            <a class="link" href="{{ path('download_file', {id: file.id}) }}">{{ file.name }}</a><br >
+            <span class="size">{{ file.size | bytes_to_human }}</span>
+        </li>
+    {% endfor %}
+    </ul>
+{% endmacro %}

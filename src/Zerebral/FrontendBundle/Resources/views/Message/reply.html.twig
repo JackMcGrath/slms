@@ -84,7 +84,7 @@
             <div class="block">
                 <div class="user-info">
                     {% set collocutor = thread.getFirst().toId == thread.getFirst().userId ? thread.getFirst().userRelatedByFromId : thread.getFirst().userRelatedByToId %}
-                    <img src="{{ user_avatar(collocutor) | imagine_filter('thumbnail') }}" width="42" height="42" />
+                    <img class="rounded" src="{{ user_avatar(collocutor) | imagine_filter('thumbnail') }}" width="42" height="42" />
                     <a href="#">{{ collocutor.getFullName() }}</a>
                 </div>
             </div>
@@ -94,7 +94,7 @@
                     <p>Attachments</p>
                     {% for key,message in thread %}
                         {% for file in message.getFiles %}
-                            <div><i class="icon-search"></i> <a class="link" href="{{ path('download_file', {id: file.id}) }}">{{ file.name }}</a></div>
+                            <div><a class="link" href="{{ path('download_file', {id: file.id}) }}">{{ file.name }}</a></div>
                         {% endfor %}
                     {% endfor %}
                     <p class="grey">Showing the last 20 links and attachments</p>
@@ -113,11 +113,9 @@
         </div>
         {{ message.body | raw }}
         {% if message.getFiles | length %}
-            <div class="attached-files">
+            <div class="attached-files files-list-widget">
                 <strong>Attached files:</strong>
-                {% for file in message.getFiles %}
-                    <div><i class="icon-search"></i> <a class="link" href="{{ path('download_file', {id: file.id}) }}">{{ file.name }}</a></div>
-                {% endfor %}
+                {{ mainPartials.filesList(message.files) }}
             </div>
         {% endif %}
     </div>
