@@ -12,4 +12,13 @@ $(document).ready(function() {
     });
 
     $('a[rel="tooltip"]').tooltip({html: true});
+
+    $.ajaxSetup({
+        complete: function(response) {
+            //@TODO: TBD about better way to determine AJAX redirect
+            if (response.responseText.substr(0, 15) == '<!DOCTYPE html>') {
+                window.location = '/';
+            }
+        }
+    });
 });
