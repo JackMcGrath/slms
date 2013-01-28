@@ -76,9 +76,9 @@
     {% import _self as self %}
     {{ self.feed_item_author_block(feedItem, isGlobal) }}
     <div class="text">
-        {% autoescape 'html' %}
-        {{ feedItem.assignment.description|striptags|slice(0, 100) }}
-        {% endautoescape %}
+
+        {{ feedItem.assignment.description|striptags|slice(0, 100)|raw }}
+
     </div>
 {% endmacro %}
 

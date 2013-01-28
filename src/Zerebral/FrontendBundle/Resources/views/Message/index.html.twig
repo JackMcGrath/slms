@@ -69,7 +69,7 @@
         </div>
         <div class="message-content">
             <a href="{{ path('message_reply', {threadId: message.threadId}) }}">{{ message.subject }}{% if message.getUnreadCount > 0 %} ({{ message.getUnreadCount }}){% endif %}</a>
-            <p>{{ message.shortBody | slice(0, 70) }}</p>
+            <p>{{ message.shortBody |striptags| slice(0, 70) | raw }}</p>
         </div>
 
     </div>
