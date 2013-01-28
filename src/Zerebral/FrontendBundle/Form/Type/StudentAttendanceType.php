@@ -10,7 +10,7 @@ class StudentAttendanceType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('status', 'choice', array(
-            'choices' => array('present' => 'present', 'tardy' => 'tardy', 'excused' => 'excused')
+            'choices' => array('present' => 'present', 'tardy' => 'tardy', 'excused' => 'excused', 'absent' => 'absent')
         ));
         $builder->add('comment', 'text', array('max_length' => 200));
         $builder->add('studentId', 'hidden');

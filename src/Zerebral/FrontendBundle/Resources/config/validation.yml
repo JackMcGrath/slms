@@ -194,7 +194,7 @@ Zerebral\BusinessBundle\Model\Attendance\StudentAttendance:
     getters:
         status:
             - Choice:
-                choices: [present, tardy, excused]
+                choices: [present, tardy, excused, absent]
                 message:  Incorrect value.
         comment:
             - MaxLength: 200
