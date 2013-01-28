@@ -22,8 +22,10 @@
                     <div class="messages-head">
                         <div class="pull-right">
                             <input type="submit" value="Delete" class="btn btn-danger group-control-button" name="delete" disabled="disabled" />
+                            {% if folder == 'inbox' %}
                             <input type="submit" value="Mark as Read" class="btn group-control-button" name="mark-as-read" disabled="disabled" />
                             <input type="submit" value="Mark as Unread" class="btn group-control-button" name="mark-as-unread" disabled="disabled" />
+                            {% endif %}
                         </div>
                         <label><input type="checkbox" class="select-all" /> Select / deselect all</label>
                     </div>

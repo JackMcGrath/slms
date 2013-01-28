@@ -14,8 +14,6 @@ Controller.prototype = {
         this.gradingPopup = new GradingPopup(this, this.gradingPopupSelector);
 
         this.bindScrolledTable();
-
-        this.bindHover();
     },
 
     bindScrolledTable: function() {
