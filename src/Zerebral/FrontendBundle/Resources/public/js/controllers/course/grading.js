@@ -34,25 +34,6 @@ Controller.prototype = {
             "sLeftWidth": 'relative',
             "iLeftWidth": 20
         });
-    },
-
-    bindHover: function() {
-        $('.grade-value').hover(function(e) {
-            $(e.target).addClass('hover')
-                .html('<a href="" class="" data-toggle="modal">Edit</a>');
-        }, function(e) {
-            var container = $(e.target).removeClass('hover');
-            var value = $(e.target).attr('value');
-            if (container.closest('td').hasClass('pass')) {
-                if (value == 1) {
-                    container.removeClass('hover').html('<i class="icon-new-passed"></i>');
-                } else {
-                    container.removeClass('hover').html('<i class="icon-new-fail"></i>');
-                }
-            } else {
-                container.html(value);
-            }
-        });
     }
 };
 
@@ -120,11 +101,10 @@ GradingPopup.prototype = {
                     if (response.content.Grading == null) {
                         assignmentTd.addClass('new').html('<a href="#" data-toggle="modal" data-toggle="modal"><i class="icon-new-plus-add"></i></a>');
                     } else if (!assignmentTd.find('.grade-level').length) {
-                        assignmentTd.html('<div class="grade-value"></div>');
+                        assignmentTd.html('<div class="grade-value"></div><div class="edit hide"><a href="" class="" data-toggle="modal">Edit</a></div>');
                     }
                     assignmentTd.find('.grade-value').attr('value', response.content.Grading);
                     self.container.gradingPopupSelector.modal('hide');
-                    self.container.bindHover();
                 }
             }
         });

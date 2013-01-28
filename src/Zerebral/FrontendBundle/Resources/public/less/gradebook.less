@@ -22,17 +22,29 @@
                 text-align: center;
                 line-height: 34px;
 
-                a {
-                    color: @white;
-                    text-decoration: underline;
-                    .icon-new-pencil-green;
-                    height: auto;
-                    width: auto;
-                    background-repeat: no-repeat;
-                    padding-left: 15px;
-                }
                 &.hover {
+
+                }
+            }
+            &:hover {
+                .grade-value {
+                    display: none;
+                }
+                div.edit {
+                    margin: -8px;
+                    text-align: center;
+                    line-height: 34px;
+                    display: block;
                     background: #a09b9b;
+                    a {
+                        color: @white;
+                        text-decoration: underline;
+                        .icon-new-pencil-green;
+                        height: auto;
+                        width: auto;
+                        background-repeat: no-repeat;
+                        padding-left: 15px;
+                    }
                 }
             }
         }

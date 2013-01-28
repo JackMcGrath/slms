@@ -13,7 +13,7 @@
         <div class="span6 main-list-block">
             <div class="row-fluid">
                 <h2 class="pull-left form-title">
-                    Messages {% if unreadCount > 0 %}<small>{{ unreadCount }} unread</small>{% endif %}
+                    Messages {% if unreadCount > 0 %}<small>{{ unreadCount }} unread</small>{% else %} <small>{{ folder == 'inbox' ? 'Inbox' : 'Sent' }}</small> {% endif %}
                 </h2>
             </div>
             <hr/>
@@ -69,7 +69,7 @@
         </div>
         <div class="message-content">
             <a href="{{ path('message_reply', {threadId: message.threadId}) }}">{{ message.subject }}{% if message.getUnreadCount > 0 %} ({{ message.getUnreadCount }}){% endif %}</a>
-            <p>{{ message.shortBody | slice(0, 70) }}</p>
+            <p>{{ message.shortBody |striptags| slice(0, 70) | raw }}</p>
         </div>
 
     </div>
