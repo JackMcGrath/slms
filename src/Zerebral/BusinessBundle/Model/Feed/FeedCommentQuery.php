@@ -31,6 +31,9 @@ class FeedCommentQuery extends BaseFeedCommentQuery
 
     public function getNewComments($parameters)
     {
+        if (count($parameters) == 0) {
+            return array();
+        }
         $this->clearOrderByColumns()->addAscendingOrderByColumn(FeedCommentPeer::ID);
         $criteria = new \Criteria();
         foreach($parameters as $feedItemId => $feedCommentId) {
