@@ -30,14 +30,17 @@ class FeedCommentController extends \Zerebral\CommonBundle\Component\Controller
     /**
      * @Route("/save/{feedItemId}", name="ajax_feed_add_comment")
      * @param \Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @return \Symfony\Component\HttpFoundation\Response|\Zerebral\CommonBundle\HttpFoundation\FormJsonResponse
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @ParamConverter("feedItem", options={"mapping": {"feedItemId": "id"}})
-     *
-     * TODO: add is ajax validation
      */
     public function saveAction(\Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem)
     {
+        if (!$this->isAjaxRequest()) {
+            throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, 'Direct calls are not allowed');
+        }
+
         $feedCommentFormType = new FormType\FeedCommentType();
         $feedCommentForm = $this->createForm($feedCommentFormType, null);
 
@@ -62,14 +65,17 @@ class FeedCommentController extends \Zerebral\CommonBundle\Component\Controller
     /**
      * @Route("/remove/{feedCommentId}", name="ajax_feed_remove_comment")
      * @param \Zerebral\BusinessBundle\Model\Feed\FeedComment $feedComment
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @ParamConverter("feedComment", options={"mapping": {"feedCommentId": "id"}})
-     *
-     * TODO: add is ajax validation
      */
     public function removeAction(\Zerebral\BusinessBundle\Model\Feed\FeedComment $feedComment)
     {
+        if (!$this->isAjaxRequest()) {
+            throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, 'Direct calls are not allowed');
+        }
+
         if ($this->getUser()->getId() == $feedComment->getCreatedBy()) {
             $feedComment->delete();
             return new JsonResponse(array());
@@ -82,14 +88,18 @@ class FeedCommentController extends \Zerebral\CommonBundle\Component\Controller
     /**
      * @Route("/{feedItemId}", name="ajax_load_more_comments")
      * @param \Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @ParamConverter("feedItem", options={"mapping": {"feedItemId": "id"}})
-     *
-     * TODO: add is ajax validation
      */
     public function indexAction(\Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem)
     {
+
+        if (!$this->isAjaxRequest()) {
+            throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, 'Direct calls are not allowed');
+        }
+
         $page = 1;
         $lastCommentId = $this->getRequest()->get('lastCommentId', 0);
 
@@ -108,14 +118,17 @@ class FeedCommentController extends \Zerebral\CommonBundle\Component\Controller
     /**
      * @Route("/checkout/{feedItemId}", name="ajax_checkout_comments")
      * @param \Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
      * @ParamConverter("feedItem", options={"mapping": {"feedItemId": "id"}})
-     *
-     * TODO: add is ajax validation
      */
     public function checkoutAction(\Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem)
     {
+        if (!$this->isAjaxRequest()) {
+            throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, 'Direct calls are not allowed');
+        }
+
         $lastCommentId = $this->getRequest()->get('lastCommentId', 0);
         $comments = FeedCommentQuery::create()->filterNewer($feedItem, $lastCommentId)->find();
         $content = '';

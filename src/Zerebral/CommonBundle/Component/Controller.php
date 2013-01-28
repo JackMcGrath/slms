@@ -8,6 +8,16 @@ use Zerebral\BusinessBundle\Model\User\Student;
 
 class Controller extends BaseController
 {
+
+    /**
+     * Check is request was made via XmlHttpRequest
+     * @return bool
+     */
+    protected function isAjaxRequest()
+    {
+        return $this->getRequest()->isXmlHttpRequest();
+    }
+
     /**
      * @return null|Student|Teacher
      */
