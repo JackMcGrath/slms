@@ -18,6 +18,7 @@ use Zerebral\BusinessBundle\Model as Model;
 use \Criteria;
 
 use \Zerebral\BusinessBundle\Model\Message\MessageQuery;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * @Route("/messages")
@@ -182,20 +183,34 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function editAction()
     {
+        /** @var \Zerebral\BusinessBundle\Model\User\User $user */
+        $user = $this->getUser();
         $threads = $this->getRequest()->get('Collection', array());
         if ($threads) {
             $messages = \Zerebral\BusinessBundle\Model\Message\MessageQuery::create()->filterByUserId($this->getUser()->getId())->filterByThreadId($threads)->find();
             if ($this->getRequest()->get('delete', false)) {
+                /** @var \Zerebral\BusinessBundle\Model\Message\Message $message */
                 foreach ($messages as $message) {
+                    if ($message->getUserId() != $user->getId()) {
+                        throw new AccessDeniedHttpException('You have not permissions to delete this message.');
+                    }
                     $message->delete();
+                    return $this->redirect($this->getRequest()->headers->get('referer'));
+
                 }
             } else if ($this->getRequest()->get('mark-as-read', false)) {
                 foreach ($messages as $message) {
+                    if ($message->getUserId() != $user->getId()) {
+                        throw new AccessDeniedHttpException('You have not permissions to edit this message.');
+                    }
                     $message->setIsRead(true);
                     $message->save();
                 }
             } else if ($this->getRequest()->get('mark-as-unread', false)) {
                 foreach ($messages as $message) {
+                    if ($message->getUserId() != $user->getId()) {
+                        throw new AccessDeniedHttpException('You have not permissions to edit this message.');
+                    }
                     $message->setIsRead(false);
                     $message->save();
                 }
