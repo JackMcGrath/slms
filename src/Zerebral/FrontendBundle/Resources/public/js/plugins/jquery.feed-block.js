@@ -169,7 +169,9 @@ ZerebralCourseDetailFeedBlock.prototype = {
                 },
                 success: function(response) {
                     if (response.success) {
-                        self.feedItemsDiv.data('lastItemId', response['lastItemId']);
+                        if (self.feedItemsDiv.data('lastItemId') < response['lastItemId']) {
+                            self.feedItemsDiv.data('lastItemId', response['lastItemId']);
+                        }
                         $.proxy(self.addItemBlock(response['content'], false), self);
 
 
@@ -461,7 +463,9 @@ ZerebralCourseDetailFeedBlock.prototype = {
     addCommentBlock: function(response, lastCommentId, collapseForm) {
         collapseForm = (typeof(collapseForm) == 'undefined') ? true : collapseForm;
 
-        $(this).parents('.comments').data('lastItemCommentId', lastCommentId);
+        if ($(this).parents('.comments').data('lastItemCommentId') < lastCommentId) {
+            $(this).parents('.comments').data('lastItemCommentId', lastCommentId);
+        }
         $(this).parents('.comment').before(response);
         var commentsCount = $(this).parents('.feed-item').find('.show-comment-form-link').data('commentsCount');
         $(this).parents('.feed-item').find('.show-comment-form-link span').html((commentsCount + 1));
