@@ -238,6 +238,11 @@ ZerebralCourseDetailFeedBlock.prototype = {
 
         var self = this;
         var link = $(event.target);
+
+        if (typeof(link.attr('href')) == 'undefined') {
+            link = link.parent();
+        }
+
         var lastItemId = link.data('lastItemId');
 
         if (link.hasClass('processing')) {
