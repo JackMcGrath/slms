@@ -51,7 +51,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
         this.feedItemsDiv.on('click', 'a.delete-link.delete-comment', $.proxy(self.deleteCommentBlock, self));
 
 
-        this.commentsDiv.on('click', 'a.load-more-link', $.proxy(self.loadComments, self));
+        this.feedItemsDiv.on('click', 'a.load-more-link', $.proxy(self.loadComments, self));
         this.loadMoreItemsLink.on('click', $.proxy(self.loadMoreItems, self));
 
         self.timeOffset = moment(this.feedItemsDiv.data('serverTime'), 'YYYY-MM-DD HH:mm:ss').diff(moment(), 'seconds');
@@ -174,7 +174,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
 
                         $.each(response['comments'], function(index, value) {
                             var form = self.feedItemsDiv.find('#feedItem' + index).find('form');
-                            $.proxy(self.addCommentBlock, form, value['content'], value['lastCommentId'])();
+                            $.proxy(self.addCommentBlock, form, value['content'], value['lastCommentId'], false)();
                         });
 
                     }
@@ -457,13 +457,18 @@ ZerebralCourseDetailFeedBlock.prototype = {
             }
         }
     },
-    addCommentBlock: function(response, lastCommentId) {
+    addCommentBlock: function(response, lastCommentId, collapseForm) {
+        collapseForm = (typeof(collapseForm) == 'undefined') ? true : collapseForm;
+
         $(this).parents('.comments').data('lastItemCommentId', lastCommentId);
         $(this).parents('.comment').before(response);
         var commentsCount = $(this).parents('.feed-item').find('.show-comment-form-link').data('commentsCount');
         $(this).parents('.feed-item').find('.show-comment-form-link span').html((commentsCount + 1));
         $(this).parents('.feed-item').find('.show-comment-form-link').data('commentsCount', commentsCount + 1)
-        $(this).find('.cancel-link').click();
+
+        if (collapseForm) {
+            $(this).find('.cancel-link').click();
+        }
 
     },
     deleteCommentBlock: function(event) {

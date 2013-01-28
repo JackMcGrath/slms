@@ -125,7 +125,7 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
             if (!isset($sortedByItemComments[$comment->getFeedItemId()])) {
                 $sortedByItemComments[$comment->getFeedItemId()] = array('lastCommentId' => 0, 'comments' => array());
             }
-            $sortedByItemComments[$comment->getFeedItemId()]['comments'] = $comment;
+            $sortedByItemComments[$comment->getFeedItemId()]['comments'][] = $comment;
             if ($sortedByItemComments[$comment->getFeedItemId()]['lastCommentId'] < $comment->getId()) {
                 $sortedByItemComments[$comment->getFeedItemId()]['lastCommentId'] = $comment->getId();
             }
