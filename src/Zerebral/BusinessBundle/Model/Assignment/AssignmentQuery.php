@@ -35,8 +35,8 @@ class AssignmentQuery extends BaseAssignmentQuery
     {
         $this->leftJoinStudentAssignment();
         $this->where("DATE_FORMAT(due_at, '%Y-%m-%d %H:%i')>='" . date('Y-m-d H:i', strtotime('-1 hour')) . "'");
-        $this->where("StudentAssignment.is_submitted=1");
         $this->groupBy('assignments.id');
+        $this->having('count(IF(student_assignments.is_submitted=0, student_assignments.id, null))=0');
         return $this;
     }
 
