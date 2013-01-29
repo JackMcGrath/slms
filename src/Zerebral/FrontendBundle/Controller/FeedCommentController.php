@@ -55,8 +55,20 @@ class FeedCommentController extends \Zerebral\CommonBundle\Component\Controller
             $feedItem->save();
 
             $feedType = $this->getRequest()->get('feedType', 'assignment');
-            $content = $this->render('ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig', array('feedType' => $feedType, 'comment' => $feedComment))->getContent();
-            return new JsonResponse(array('has_errors' => false, 'content' => $content, 'lastCommentId' => $feedComment->getId()));
+//            $content = $this->render('ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig', array('feedType' => $feedType, 'comment' => $feedComment))->getContent();
+//            return new JsonResponse(array('has_errors' => false, 'content' => $content, 'lastCommentId' => $feedComment->getId()));
+            $lastCommentId = $this->getRequest()->get('lastCommentId', 0);
+            $comments = FeedCommentQuery::create()->filterNewer($feedItem, $lastCommentId)->find();
+            $content = '<hr />start save. Showing comments from ' . $lastCommentId . ' ASC<br />';
+            if (count($comments) > 0) {
+                foreach ($comments as $comment) {
+                    $content .= $this->render('ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig', array('feedType' => $feedType, 'comment' => $comment))->getContent();
+                }
+                $lastCommentId = $comments->getLast()->getId();
+            }
+            $content .= 'end save<hr />';
+
+            return new JsonResponse(array('has_errors' => false, 'lastCommentId' => $lastCommentId, 'content' => $content));
         }
 
         return new FormJsonResponse($feedCommentForm);

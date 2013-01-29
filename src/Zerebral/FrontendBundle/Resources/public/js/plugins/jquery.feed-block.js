@@ -60,6 +60,9 @@ ZerebralCourseDetailFeedBlock.prototype = {
 
         this.feedItemForm.zerebralAjaxForm({
             dataType: 'json',
+            beforeSerialize: function(form, options) {
+                options.data = {lastItemId: self.feedItemsDiv.data('lastItemId') };
+            },
             beforeSend: function() {
                 self.ajaxInProgress = true;
                 self.feedItemForm.find('.control-group').removeClass('error');
@@ -100,7 +103,11 @@ ZerebralCourseDetailFeedBlock.prototype = {
         $.each(this.commentsDiv.find('form'), function(index, value) {
             var form = $(this);
             $(this).zerebralAjaxForm({
+                beforeSerialize: function(form, options) {
+                    options.data = { lastCommentId: form.parents('.comments').data('lastItemCommentId'), feedType: 'course' };
+                },
                 beforeSend: function() {
+                    self.ajaxInProgress = true;
                     form.find('textarea').attr('disabled', true);
                     form.find('input[type="submit"]').attr('disabled', true);
                     form.find('a.cancel-link').hide();
@@ -121,6 +128,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
                     form.find('textarea').attr('disabled', false);
                     form.find('input[type="submit"]').attr('disabled', false);
                     form.find('a.cancel-link').show();
+                    self.ajaxInProgress = false;
                 },
                 dataType: 'json'
             });
@@ -151,8 +159,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
     updateFeed: function() {
         var self = this;
 
-//        if (!self.ajaxInProgress && self.errorHasAppeared < 2) {
-        if (self.errorHasAppeared < 2) {
+        if (!self.ajaxInProgress && self.errorHasAppeared < 2) {
 
             var lastIds = {};
             var items = self.feedItemsDiv.find('.comments');
@@ -395,7 +402,11 @@ ZerebralCourseDetailFeedBlock.prototype = {
         $.each(form, function(index, value) {
             var currentForm = $(value);
             currentForm.zerebralAjaxForm({
+                beforeSerialize: function(form, options) {
+                    options.data = { lastCommentId: form.parents('.comments').data('lastItemCommentId'), feedType: 'course' };
+                },
                 beforeSend: function() {
+                    self.ajaxInProgress = true;
                     currentForm.find('textarea').attr('disabled', true);
                     currentForm.find('input[type="submit"]').attr('disabled', true);
                     currentForm.find('a.cancel-link').hide();
@@ -416,6 +427,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
                     currentForm.find('textarea').attr('disabled', false);
                     currentForm.find('input[type="submit"]').attr('disabled', false);
                     currentForm.find('a.cancel-link').show();
+                    self.ajaxInProgress = true;
                 },
                 dataType: 'json'
             });
@@ -542,7 +554,7 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
     urlRegexp: /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig,
 
 
-        init: function() {
+    init: function() {
         var self = this;
         this.feedCommentFormDiv.find('.attach-link').click($.proxy(self.setFeedItemFormType, self));
         this.feedCommentFormDiv.find('.attached-link-delete a').click($.proxy(self.resetMainFormType, self));
@@ -556,6 +568,9 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
 
         this.feedCommentForm.zerebralAjaxForm({
             data: { feedType: 'assignment' },
+            beforeSerialize: function(form, options) {
+                options.data['lastCommentId'] = self.feedCommentsDiv.data('lastCommentId');
+            },
             beforeSend: function() {
                 self.ajaxInProgress = true;
                 self.feedCommentForm.find('.control-group').removeClass('error');
@@ -568,7 +583,6 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
                 });
             },
             success: function(response) {
-                //$.proxy(self.addCommentBlock, this),
                 if (response['has_errors']) {
                     self.feedCommentAlertBlock.slideDown();
                     var ul = self.feedCommentAlertBlock.find('ul');
