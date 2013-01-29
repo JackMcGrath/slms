@@ -53,10 +53,29 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
             $feedItem->setCreatedBy($this->getUser()->getId());
             $feedItem->save();
 
-            $feedItem->setVirtualColumn('commentsCount', 0);
+            $lastItemId = $this->getRequest()->get('lastItemId', 0);
 
-            $content = $this->render('ZerebralFrontendBundle:Feed:feedItemBlock.html.twig', array('feedItem' => $feedItem, 'isGlobal' => false))->getContent();
-            return new JsonResponse(array('has_errors' => false, 'content' => $content, 'lastItemId' => $feedItem->getId()));
+            $course = $feedItem->getCourse();
+            if (is_null($course)) {
+                $query = FeedItemQuery::create()->getGlobalFeed($this->getUser());
+            } else {
+                $query = FeedItemQuery::create()->getCourseFeed($course, $this->getUser());
+            }
+
+            $items = $query->filterNewer($lastItemId)->find();
+
+            $content = '';
+            if (count($items) > 0) {
+                foreach ($items as $item) {
+                    $content .= $this->render('ZerebralFrontendBundle:Feed:feedItemBlock.html.twig', array('feedItem' => $item, 'isGlobal' => is_null($course)))->getContent();
+                }
+                $lastItemId = $items->getFirst()->getId();
+            }
+
+            //$feedItem->setVirtualColumn('commentsCount', 0);
+
+            //$content = $this->render('ZerebralFrontendBundle:Feed:feedItemBlock.html.twig', array('feedItem' => $feedItem, 'isGlobal' => false))->getContent();
+            return new JsonResponse(array('has_errors' => false, 'content' => $content, 'lastItemId' => $lastItemId));
         }
 
         return new FormJsonResponse($feedItemForm);
