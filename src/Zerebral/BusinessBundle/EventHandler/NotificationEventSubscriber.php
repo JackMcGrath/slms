@@ -9,6 +9,7 @@ use Zerebral\BusinessBundle\Model\Notification\NotificationPeer;
 
 class NotificationEventSubscriber implements \Symfony\Component\EventDispatcher\EventSubscriberInterface
 {
+    private $courseEventAlreadyHandled = false;
     /**
      * {@inheritDoc}
      */
@@ -18,6 +19,7 @@ class NotificationEventSubscriber implements \Symfony\Component\EventDispatcher\
             'assignments.insert.post' => 'createAssignment',
             'assignments.update.post' => 'updateAssignment',
             'courses.update.post' => 'updateCourse',
+            'course_schedule_days.save.post' => 'updateCourseSchedule',
             'course_materials.insert.post' => 'createMaterial',
             'assignment_files.insert.post' => 'createFile', //New Assignment File,
             'attendance.save.post' => 'updateAttendance',
@@ -61,9 +63,23 @@ class NotificationEventSubscriber implements \Symfony\Component\EventDispatcher\
     {
         /** @var $course \Zerebral\BusinessBundle\Model\Course\Course */
         $course = $event->getModel();
-//
-//        var_dump($course->isModified(), $course->getModifiedColumns());
-//        die;
+
+        if ($this->courseEventAlreadyHandled == false) {
+            $this->saveCourseNotifications($course);
+        }
+        $this->courseEventAlreadyHandled = true;
+    }
+
+    public function updateCourseSchedule(ModelEvent $event)
+    {
+        if ($this->courseEventAlreadyHandled == false) {
+            $this->saveCourseNotifications($event->getModel()->getCourse());
+        }
+        $this->courseEventAlreadyHandled = true;
+    }
+
+    private function saveCourseNotifications($course)
+    {
         foreach ($course->getCourseStudents() as $student) {
             $notification = new Notification();
             $notification->setUserId($student->getStudent()->getUserId());
