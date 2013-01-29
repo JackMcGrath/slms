@@ -28,7 +28,7 @@ class MessageType extends AbstractType
                     'property' => 'full_name',
                     'required' => false,
                     'empty_value' => "To",
-                    'empty_data' => '',
+                    'empty_data' => 0,
                     'invalid_message' => 'Recipient is required.'
                 ));
 
