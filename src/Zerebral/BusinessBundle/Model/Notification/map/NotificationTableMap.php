@@ -61,6 +61,7 @@ class NotificationTableMap extends TableMap
   10 => 'assignment_due_multiple_teacher',
   11 => 'assignment_complete',
   12 => 'assignment_incomplete',
+  13 => 'grading',
 ));
         $this->addColumn('params', 'Params', 'VARCHAR', false, 100, null);
         $this->addColumn('is_read', 'IsRead', 'BOOLEAN', true, 1, false);

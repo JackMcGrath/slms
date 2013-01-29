@@ -54,6 +54,10 @@
     <a href="{{ path('assignment_view', {id: notification.assignment.id}) }}">{{ notification.assignment.name }}</a> is incomplete. Assignment is missing {{ notification.getParam('missedSubmissionsCount') }} submissions
 {% endmacro %}
 
+{% macro assignmentGrade(notification) %}
+    <a href="#">{{ notification.userRelatedByCreatedBy ? notification.userRelatedByCreatedBy.fullName : '' }}</a> has posted a grade for <a href="{{ path('assignment_view', {id: notification.assignment.id}) }}">{{ notification.assignment.name }}</a> in <a href="{{ path('course_view', {id: notification.course.id}) }}">{{ notification.course.name }}</a>
+{% endmacro %}
+
 
 {% macro title(notification) %}
     {% set type = notification.type %}
@@ -84,6 +88,8 @@
         Assignment complete
     {% elseif type == 'assignment_incomplete' %}
         Assignment incomplete
+    {% elseif type == 'grading' %}
+        Assignment Grade
     {% endif %}
     </h3>
 {% endmacro %}
@@ -117,6 +123,8 @@
         {{ _self.assignmentComplete(notification) }}
     {% elseif type == 'assignment_incomplete' %}
         {{ _self.assignmentInComplete(notification) }}
+    {% elseif type == 'grading' %}
+        {{ _self.assignmentGrade(notification) }}
     {% endif %}
     </p>
 {% endmacro %}
