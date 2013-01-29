@@ -1,5 +1,6 @@
 {% extends 'ZerebralFrontendBundle::layout.html.twig' %}
 {% import "ZerebralFrontendBundle:Macro:main.html.twig" as mainPartials %}
+{% import "ZerebralFrontendBundle:Macro:flashMessages.html.twig" as flashMessages %}
 
 {% block content %}
     {% javascripts
@@ -17,7 +18,10 @@
                 </h2>
             </div>
             <hr/>
+
             <form method="post" action="{{ path('message_edit') }}">
+                {{ flashMessages.show('message_compose_success', 'success') }}
+                {{ flashMessages.show('message_reply_success', 'success') }}
                 {% if messages and messages.count %}
                     <div class="messages-head">
                         <div class="pull-right">

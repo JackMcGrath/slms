@@ -89,24 +89,28 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
         $newMessage = new Model\Message\Message();
         $newMessageType = new FormType\MessageType();
 
+
+        /** @var \Zerebral\BusinessBundle\Model\Message\Message $firstMessage */
+        $firstMessage = $thread->getFirst();
+        $receiver = $firstMessage->getToId() == $this->getUser()->getId() ? $firstMessage->getUserRelatedByFromId() : $firstMessage->getTo();
+        $newMessage->setTo($receiver);
+
         $form = $this->createForm($newMessageType, $newMessage, array('validation_groups' => array('Default', 'reply')));
         if ($this->getRequest()->isMethod('POST')) {
 
             $form->bind($this->getRequest());
+//            var_dump($form->getData());
             if ($form->isValid()) {
-                $firstMessage = $thread->getFirst();
-
-                $receiverId = $firstMessage->getToId() == $this->getUser()->getId() ? $firstMessage->getFromId() : $firstMessage->getToId();
-
                 $newMessage = $form->getData();
                 $newMessage->setFromId($this->getUser()->getId());
-                $newMessage->setToId($receiverId);
-                $newMessage->setUserId($receiverId);
+
+                $newMessage->setUserId($receiver->getId());
                 $newMessage->setThreadId($firstMessage->getThreadId());
                 $newMessage->setSubject($firstMessage->getSubject());
 
                 $newMessage->save();
 
+                $this->setFlash('message_reply_success', 'Message has been successfully sent.');
                 return $this->redirect($this->generateUrl('messages_inbox'));
             }
         }
@@ -160,6 +164,7 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
 
                 $newMessage->save();
 
+                $this->setFlash('message_compose_success', 'Message has been successfully sent.');
                 return $this->redirect($this->generateUrl('messages_inbox'));
             }
         }

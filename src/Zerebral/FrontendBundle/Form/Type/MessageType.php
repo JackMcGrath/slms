@@ -1,13 +1,13 @@
 <?php
 
 namespace Zerebral\FrontendBundle\Form\Type;
-use Zerebral\CommonBundle\Form\Type\OptionalModelType;
 
 use Symfony\Component\Form\AbstractType;
 use Zerebral\CommonBundle\File\Form\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Validator\Constraints\Collection;
+
+use Zerebral\BusinessBundle\Model\Message\Message;
 
 class MessageType extends AbstractType
 {
@@ -16,15 +16,26 @@ class MessageType extends AbstractType
     {
         $builder->add('subject', 'text', array('required' => false, 'max_length' => 250));
         $builder->add('body', 'textarea', array('required' => false));
-        $builder->add('to', 'model', array(
-            'class' => 'Zerebral\BusinessBundle\Model\User\User',
-            'property' => 'full_name',
-            'required' => false,
-            'empty_value' => "To",
-            'empty_data' => 0,
-            'invalid_message' => 'Recipient is required.',
-        ));
-//        $builder->add('toId', 'choice', array('required' => false));
+
+
+        $formFactory = $builder->getFormFactory();
+        $builder->addEventListener(\Symfony\Component\Form\FormEvents::PRE_SET_DATA, function(\Symfony\Component\Form\FormEvent $event) use ($formFactory) {
+            /** @var $message Message */
+            $message = $event->getData();
+            if (!$message->getTo()) {
+                $field = $formFactory->createNamed('to','model', $message->getTo(), array(
+                    'class' => 'Zerebral\BusinessBundle\Model\User\User',
+                    'property' => 'full_name',
+                    'required' => false,
+                    'empty_value' => "To",
+                    'empty_data' => '',
+                    'invalid_message' => 'Recipient is required.'
+                ));
+
+                $event->getForm()->add($field);
+            }
+        });
+
         $builder->add('subject', 'text', array('required' => false));
 
         $builder->add(
