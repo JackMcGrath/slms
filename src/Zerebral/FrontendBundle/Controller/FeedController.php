@@ -53,28 +53,20 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
             $feedItem->setCreatedBy($this->getUser()->getId());
             $feedItem->save();
 
+            $course = $feedItem->getCourse();
             $lastItemId = $this->getRequest()->get('lastItemId', 0);
 
-            $course = $feedItem->getCourse();
-            if (is_null($course)) {
-                $query = FeedItemQuery::create()->getGlobalFeed($this->getUser());
-            } else {
-                $query = FeedItemQuery::create()->getCourseFeed($course, $this->getUser());
-            }
-
-            $items = $query->filterNewer($lastItemId)->find();
+            $query = FeedItemQuery::create();
+            $query = (is_null($course)) ? $query->getGlobalFeed($this->getUser()) : $query->getCourseFeed($course, $this->getUser());
+            $feedItems = $query->getFeedItemsAfter($lastItemId)->find();
 
             $content = '';
-            if (count($items) > 0) {
-                foreach ($items as $item) {
+            if (count($feedItems) > 0) {
+                foreach ($feedItems as $item) {
                     $content .= $this->render('ZerebralFrontendBundle:Feed:feedItemBlock.html.twig', array('feedItem' => $item, 'isGlobal' => is_null($course)))->getContent();
                 }
-                $lastItemId = $items->getFirst()->getId();
+                $lastItemId = $feedItems->getFirst()->getId();
             }
-
-            //$feedItem->setVirtualColumn('commentsCount', 0);
-
-            //$content = $this->render('ZerebralFrontendBundle:Feed:feedItemBlock.html.twig', array('feedItem' => $feedItem, 'isGlobal' => false))->getContent();
             return new JsonResponse(array('has_errors' => false, 'content' => $content, 'lastItemId' => $lastItemId));
         }
 
@@ -105,6 +97,8 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
     }
 
     /**
+     * Realtime update handler
+     *
      * @Route("/checkout/{courseId}", name="ajax_checkout_items", defaults={"courseId" = null})
      * @param \Zerebral\BusinessBundle\Model\Course\Course $course
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
@@ -115,30 +109,27 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
     public function checkoutAction(Course $course = null)
     {
 
-        if (!$this->isAjaxRequest()) {
-            throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, 'Direct calls are not allowed');
-        }
+//        if (!$this->isAjaxRequest()) {
+//            throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, 'Direct calls are not allowed');
+//        }
 
         $lastItemId = $this->getRequest()->get('lastItemId', 0);
-        if (is_null($course)) {
-            $query = FeedItemQuery::create()->getGlobalFeed($this->getUser());
-        } else {
-            $query = FeedItemQuery::create()->getCourseFeed($course, $this->getUser());
-        }
 
-        $items = $query->filterNewer($lastItemId)->find();
+        $query = FeedItemQuery::create();
+        $query = (is_null($course)) ? $query->getGlobalFeed($this->getUser()) : $query->getCourseFeed($course, $this->getUser());
+        $feedItems = $query->getFeedItemsAfter($lastItemId)->find();
 
         $content = '';
-        if (count($items) > 0) {
-            foreach ($items as $item) {
+        if (count($feedItems) > 0) {
+            foreach ($feedItems as $item) {
                 $content .= $this->render('ZerebralFrontendBundle:Feed:feedItemBlock.html.twig', array('feedItem' => $item, 'isGlobal' => is_null($course)))->getContent();
             }
-            $lastItemId = $items->getFirst()->getId();
+            $lastItemId = $feedItems->getFirst()->getId();
         }
 
 
-        $lastIds = $this->getRequest()->get('lastIds', array());
-        $comments = FeedCommentQuery::create()->getNewComments($lastIds)->find();
+        $lastCommentsIds = $this->getRequest()->get('lastIds', array());
+        $comments = FeedCommentQuery::create()->getCommentsTreeAfter($lastCommentsIds)->find();
         $sortedByItemComments = array();
         foreach($comments as $comment) {
             if (!isset($sortedByItemComments[$comment->getFeedItemId()])) {
@@ -151,14 +142,21 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
         }
 
         foreach ($sortedByItemComments as $feedItemId => $item) {
-            $sortedByItemComments[$feedItemId]['content'] = $this->render('ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig', array('feedType' => 'course', 'comment' => $item['comments']))->getContent();
+            $commentsContent = '';
+            foreach ($item['comments'] as $comment) {
+                $commentsContent .= $this->render('ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig', array('feedType' => 'course', 'comment' => $comment))->getContent();
+            }
+            $sortedByItemComments[$feedItemId]['content'] = $commentsContent;
+            $sortedByItemComments[$feedItemId]['count'] = count($item['comments']);
             unset($sortedByItemComments[$feedItemId]['comments']);
         }
 
-        return new JsonResponse(array('success' => true, 'lastItemId' => $lastItemId, 'content' => $content, 'comments' => $sortedByItemComments));
+        return new JsonResponse(array('success' => true, 'lastIds' => $lastCommentsIds, 'lastItemId' => $lastItemId, 'content' => $content, 'comments' => $sortedByItemComments));
     }
 
     /**
+     * Show more updates link handler
+     *
      * @Route("/{courseId}", name="ajax_load_more_items", defaults={"courseId" = null})
      * @param \Zerebral\BusinessBundle\Model\Course\Course $course
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
@@ -173,22 +171,19 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
         }
 
         $lastItemId = $this->getRequest()->get('lastItemId', 0);
-        if (is_null($course)) {
-            $query = FeedItemQuery::create()->getGlobalFeed($this->getUser());
-        } else {
-            $query = FeedItemQuery::create()->getCourseFeed($course, $this->getUser());
-        }
 
-        $items = $query->filterOlder($lastItemId)->limit(10)->find();
+        $query = FeedItemQuery::create();
+        $query = (is_null($course)) ? $query->getGlobalFeed($this->getUser()) : $query->getCourseFeed($course, $this->getUser());
+        $feedItems = $query->getFeedItemsBefore($lastItemId)->limit(10)->find();
 
         $content = '';
-        if (count($items) > 0) {
-            foreach ($items as $item) {
+        if (count($feedItems) > 0) {
+            foreach ($feedItems as $item) {
                 $content .= $this->render('ZerebralFrontendBundle:Feed:feedItemBlock.html.twig', array('feedItem' => $item, 'isGlobal' => is_null($course)))->getContent();
             }
-            $lastItemId = $items->getLast()->getId();
+            $lastItemId = $feedItems->getLast()->getId();
         }
 
-        return new JsonResponse(array('success' => true, 'lastItemId' => $lastItemId, 'content' => $content, 'loadedCount' => count($items)));
+        return new JsonResponse(array('success' => true, 'lastItemId' => $lastItemId, 'content' => $content, 'loadedCount' => count($feedItems)));
     }
 }

@@ -55,10 +55,8 @@ class FeedCommentController extends \Zerebral\CommonBundle\Component\Controller
             $feedItem->save();
 
             $feedType = $this->getRequest()->get('feedType', 'assignment');
-//            $content = $this->render('ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig', array('feedType' => $feedType, 'comment' => $feedComment))->getContent();
-//            return new JsonResponse(array('has_errors' => false, 'content' => $content, 'lastCommentId' => $feedComment->getId()));
             $lastCommentId = $this->getRequest()->get('lastCommentId', 0);
-            $comments = FeedCommentQuery::create()->filterNewer($feedItem, $lastCommentId)->find();
+            $comments = FeedCommentQuery::create()->getCommentsAfter($feedItem, $lastCommentId)->find();
             $content = '';
             if (count($comments) > 0) {
                 foreach ($comments as $comment) {
@@ -67,7 +65,7 @@ class FeedCommentController extends \Zerebral\CommonBundle\Component\Controller
                 $lastCommentId = $comments->getLast()->getId();
             }
 
-            return new JsonResponse(array('has_errors' => false, 'lastCommentId' => $lastCommentId, 'content' => $content));
+            return new JsonResponse(array('has_errors' => false, 'lastCommentId' => $lastCommentId, 'count' => count($comments), 'content' => $content));
         }
 
         return new FormJsonResponse($feedCommentForm);
@@ -97,6 +95,8 @@ class FeedCommentController extends \Zerebral\CommonBundle\Component\Controller
 
 
     /**
+     * Show more comments handler
+     *
      * @Route("/{feedItemId}", name="ajax_load_more_comments")
      * @param \Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
@@ -107,26 +107,40 @@ class FeedCommentController extends \Zerebral\CommonBundle\Component\Controller
     public function indexAction(\Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem)
     {
 
-        if (!$this->isAjaxRequest()) {
-            throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, 'Direct calls are not allowed');
-        }
+//        if (!$this->isAjaxRequest()) {
+//            throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, 'Direct calls are not allowed');
+//        }
 
         $page = 1;
         $lastCommentId = $this->getRequest()->get('lastCommentId', 0);
 
         /** @var $commentsQuery \Zerebral\BusinessBundle\Model\Feed\FeedCommentQuery */
-        $commentsQuery = FeedCommentQuery::create()->filterOlder($feedItem, $lastCommentId);
+        $commentsQuery = FeedCommentQuery::create()->getCommentsBefore($feedItem, $lastCommentId);
 
         /** @var $commentsPaginator \PropelModelPager */
         $commentsPaginator = $commentsQuery->paginate($page, 10);
 
         $comments = $commentsPaginator->getResults();
+        $lastCommentId = $comments->getLast()->getId();
+
+
+        $commentsArray = array();
+        foreach ($comments as $comment) {
+            $commentsArray[] = $comment;
+        }
+        $comments = array_reverse($commentsArray);
+
         $feedType = $this->getRequest()->get('feedType', 'course');
-        $content = $this->render('ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig', array('feedType' => $feedType, 'comment' => $comments))->getContent();
-        return new JsonResponse(array('success' => true, 'lastCommentId' => $comments->getLast()->getId(), 'loadedCount' => count($comments), 'content' => $content));
+        $content = '';
+        foreach ($comments as $comment) {
+            $content .= $this->render('ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig', array('feedType' => $feedType, 'comment' => $comment))->getContent();
+        }
+        return new JsonResponse(array('success' => true, 'lastCommentId' => $lastCommentId, 'loadedCount' => count($comments), 'content' => $content));
     }
 
     /**
+     * Realtime update hanlder
+     *
      * @Route("/checkout/{feedItemId}", name="ajax_checkout_comments")
      * @param \Zerebral\BusinessBundle\Model\Feed\FeedItem $feedItem
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
@@ -141,7 +155,7 @@ class FeedCommentController extends \Zerebral\CommonBundle\Component\Controller
         }
 
         $lastCommentId = $this->getRequest()->get('lastCommentId', 0);
-        $comments = FeedCommentQuery::create()->filterNewer($feedItem, $lastCommentId)->find();
+        $comments = FeedCommentQuery::create()->getCommentsAfter($feedItem, $lastCommentId)->find();
         $content = '';
         if (count($comments) > 0) {
             foreach ($comments as $comment) {

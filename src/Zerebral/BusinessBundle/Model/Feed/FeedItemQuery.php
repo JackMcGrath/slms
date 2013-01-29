@@ -71,12 +71,12 @@ class FeedItemQuery extends BaseFeedItemQuery
         return $this;
     }
 
-    public function filterNewer($lastItemId)
+    public function getFeedItemsAfter($lastItemId)
     {
         return $this->clearOrderByColumns()->addDescendingOrderByColumn(FeedItemPeer::ID)->filterById($lastItemId, \Criteria::GREATER_THAN);
     }
 
-    public function filterOlder($lastItemId)
+    public function getFeedItemsBefore($lastItemId)
     {
         return $this->clearOrderByColumns()->addDescendingOrderByColumn(FeedItemPeer::ID)->filterById($lastItemId, \Criteria::LESS_THAN);
     }

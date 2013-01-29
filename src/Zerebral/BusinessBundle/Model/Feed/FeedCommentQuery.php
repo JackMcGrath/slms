@@ -15,26 +15,26 @@ class FeedCommentQuery extends BaseFeedCommentQuery
         return $filter->orderById();
     }
 
-    public function filterOlder($feedItem, $lastCommentId)
+    public function getCommentsBefore($feedItem, $lastCommentId)
     {
         return $this->filterByFeedItem($feedItem)
             ->filterById($lastCommentId, \Criteria::LESS_THAN)
             ->clearOrderByColumns()->addDescendingOrderByColumn(FeedCommentPeer::ID);
     }
 
-    public function filterNewer($feedItem, $lastCommentId)
+    public function getCommentsAfter($feedItem, $lastCommentId)
     {
         return $this->filterByFeedItem($feedItem)
             ->filterById($lastCommentId, \Criteria::GREATER_THAN)
             ->clearOrderByColumns()->addAscendingOrderByColumn(FeedCommentPeer::ID);
     }
 
-    public function getNewComments($parameters)
+    public function getCommentsTreeAfter($parameters)
     {
         if (count($parameters) == 0) {
             return array();
         }
-        $this->clearOrderByColumns()->addDescendingOrderByColumn(FeedCommentPeer::ID);
+        $this->clearOrderByColumns()->addAscendingOrderByColumn(FeedCommentPeer::ID);
         $criteria = new \Criteria();
         foreach($parameters as $feedItemId => $feedCommentId) {
             $itemCondition = $criteria->getNewCriterion(FeedCommentPeer::FEED_ITEM_ID, $feedItemId, \Criteria::EQUAL);

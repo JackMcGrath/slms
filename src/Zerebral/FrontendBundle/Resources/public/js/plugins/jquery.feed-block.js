@@ -120,7 +120,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
                             field.parents('.control-group').addClass('error');
                         }
                     } else {
-                        $.proxy(self.addCommentBlock, form, response['content'], response['lastCommentId'])();
+                        $.proxy(self.addCommentBlock, form, response['content'], response['lastCommentId'], response['count'])();
                     }
                 },
                 error: function() { alert('Oops, seems like unknown error has appeared!'); },
@@ -184,7 +184,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
 
                         $.each(response['comments'], function(index, value) {
                             var form = self.feedItemsDiv.find('#feedItem' + index).find('form');
-                            $.proxy(self.addCommentBlock, form, value['content'], value['lastCommentId'], false)();
+                            $.proxy(self.addCommentBlock, form, value['content'], value['lastCommentId'], value['count'], false)();
                         });
 
                     }
@@ -419,7 +419,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
                             field.parents('.control-group').addClass('error');
                         }
                     } else {
-                        $.proxy(self.addCommentBlock, currentForm, response['content'], response['lastCommentId'])();
+                        $.proxy(self.addCommentBlock, currentForm, response['content'], response['lastCommentId'], response['count'])();
                     }
                 },
                 error: function() { alert('Oops, seems like unknown error has appeared!'); },
@@ -472,7 +472,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
             }
         }
     },
-    addCommentBlock: function(response, lastCommentId, collapseForm) {
+    addCommentBlock: function(response, lastCommentId, newCommentsCount, collapseForm) {
         collapseForm = (typeof(collapseForm) == 'undefined') ? true : collapseForm;
 
         if ($(this).parents('.comments').data('lastItemCommentId') < lastCommentId) {
@@ -480,8 +480,8 @@ ZerebralCourseDetailFeedBlock.prototype = {
         }
         $(this).parents('.comment').before(response);
         var commentsCount = $(this).parents('.feed-item').find('.show-comment-form-link').data('commentsCount');
-        $(this).parents('.feed-item').find('.show-comment-form-link span').html((commentsCount + 1));
-        $(this).parents('.feed-item').find('.show-comment-form-link').data('commentsCount', commentsCount + 1)
+        $(this).parents('.feed-item').find('.show-comment-form-link span').html((commentsCount + newCommentsCount));
+        $(this).parents('.feed-item').find('.show-comment-form-link').data('commentsCount', commentsCount + newCommentsCount);
 
         if (collapseForm) {
             $(this).find('.cancel-link').click();

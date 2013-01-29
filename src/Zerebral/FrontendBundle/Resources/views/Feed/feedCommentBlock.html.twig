@@ -164,11 +164,7 @@
 
 {% import _self as self %}
 {% if feedType == 'course' %}
-    {% for com in comment|reverse %}
-        {{ self.course_details_comment_block(com) }}
-    {% else %}
-        {{ self.course_details_comment_block(comment) }}
-    {% endfor %}
+    {{ self.course_details_comment_block(comment) }}
 {% else %}
     {{ self.assignment_details_comment_block(comment) }}
 {% endif %}
