@@ -34,7 +34,7 @@ class FeedCommentQuery extends BaseFeedCommentQuery
         if (count($parameters) == 0) {
             return array();
         }
-        $this->clearOrderByColumns()->addDescendingOrderByColumn(FeedCommentPeer::ID);
+        $this->clearOrderByColumns()->addAscendingOrderByColumn(FeedCommentPeer::ID);
         $criteria = new \Criteria();
         foreach($parameters as $feedItemId => $feedCommentId) {
             $itemCondition = $criteria->getNewCriterion(FeedCommentPeer::FEED_ITEM_ID, $feedItemId, \Criteria::EQUAL);
