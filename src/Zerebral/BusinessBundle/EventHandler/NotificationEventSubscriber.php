@@ -23,7 +23,9 @@ class NotificationEventSubscriber implements \Symfony\Component\EventDispatcher\
             'course_materials.insert.post' => 'createMaterial',
             'assignment_files.insert.post' => 'createFile', //New Assignment File,
             'attendance.save.post' => 'updateAttendance',
-            'feed_items.insert.post' => 'createFeed'
+            'feed_items.insert.post' => 'createFeed',
+            'feed_items.insert.post' => 'createFeed',
+            'student_assignments.update.post' => 'createGrade'
         );
     }
 
@@ -160,5 +162,21 @@ class NotificationEventSubscriber implements \Symfony\Component\EventDispatcher\
                 }
             }
         }
+    }
+
+    public function createGrade(ModelEvent $event)
+    {
+        /** @var $studentAssignment \Zerebral\BusinessBundle\Model\Assignment\StudentAssignment */
+        $studentAssignment = $event->getModel();
+
+        $assignment = $studentAssignment->getAssignment();
+
+        $notification = new Notification();
+        $notification->setUserId($studentAssignment->getStudent()->getUserId());
+        $notification->setType(NotificationPeer::TYPE_GRADING);
+        $notification->setCourse($assignment->getCourse());
+        $notification->setAssignment($assignment);
+        $notification->setCreatedBy($assignment->getTeacher()->getUserId());
+        $notification->save();
     }
 }

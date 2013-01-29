@@ -83,6 +83,7 @@ abstract class BaseNotificationPeer
     const TYPE_ASSIGNMENT_DUE_MULTIPLE_TEACHER = 'assignment_due_multiple_teacher';
     const TYPE_ASSIGNMENT_COMPLETE = 'assignment_complete';
     const TYPE_ASSIGNMENT_INCOMPLETE = 'assignment_incomplete';
+    const TYPE_GRADING = 'grading';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -142,6 +143,7 @@ abstract class BaseNotificationPeer
             NotificationPeer::TYPE_ASSIGNMENT_DUE_MULTIPLE_TEACHER,
             NotificationPeer::TYPE_ASSIGNMENT_COMPLETE,
             NotificationPeer::TYPE_ASSIGNMENT_INCOMPLETE,
+            NotificationPeer::TYPE_GRADING,
         ),
     );
 

@@ -128,7 +128,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
                 $course->setCreatedBy($this->getRoleUser()->getId());
                 $course->addTeacher($this->getRoleUser());
                 $course->save();
-               
+
                 return $this->redirect($this->generateUrl('course_view', array('id' => $course->getId())));
             }
         }
