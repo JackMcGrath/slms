@@ -58,6 +58,7 @@ class AssignmentQuery extends BaseAssignmentQuery
         $this->leftJoinFeedItem();
 
         $this->leftJoinFeedItem();
+        $this->leftJoin('FeedItem.FeedComment FeedComments');
         $this->leftJoin('StudentAssignment.StudentAssignmentFile StudentAssignmentFile');
         $this->add('student_assignments.id', null, \Criteria::ISNOTNULL);
 
@@ -66,7 +67,7 @@ class AssignmentQuery extends BaseAssignmentQuery
         $this->withColumn('COUNT(DISTINCT IF(student_assignments.is_submitted = 1, `StudentAssignmentFile`.file_id , null))', 'filesCount');
         $this->withColumn('COUNT(DISTINCT student_assignments.id)', 'studentsCount');
 
-        $this->withColumn('COUNT(`feed_items`.id)', 'commentsCount');
+        $this->withColumn('COUNT(DISTINCT `FeedComments`.id)', 'commentsCount');
 
         $this->addGroupByColumn('assignments.id');
 
