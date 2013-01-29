@@ -40,6 +40,7 @@ var GradingPopup = function (container, target) {
     this.target = target;
     this.sliderSelector = '.grade-slider .slider';
     this.maxGrade = 100;
+    this.assignment = undefined;
     this.bind();
 };
 
@@ -69,6 +70,7 @@ GradingPopup.prototype = {
                 success: function(response) {
                     if (!response.has_errors) {
                         modalBody.html(response.content);
+                        self.assignment = response.assignment;
                         self.sliderBind();
                     }
                 }
@@ -77,6 +79,7 @@ GradingPopup.prototype = {
         this.container.gradingPopupSelector.on('hide', function(e) {
             var grade = self.container.table.find('td[studentAssignment="' + self.studentAssignmentId + '"] .grade-value');
             var value = grade.attr('value');
+            this.assignment = undefined;
             if (value != null && typeof(value) != 'undefined') {
                 if (grade.closest('td').hasClass('pass')) {
                     if (value == 1) {
@@ -116,6 +119,7 @@ GradingPopup.prototype = {
     sliderBind: function() {
         var self = this;
         var gradeValue = $('input.grade-value').val();
+
         $(this.sliderSelector).slider({
             max: self.maxGrade,
             step: 1,
@@ -125,13 +129,25 @@ GradingPopup.prototype = {
                 $('input.grade-value').val(ui.value);
             },
             slide: function(e, ui) {
+                self.changeSliderColor(ui.value);
                 $('input.grade-value').val(ui.value);
             }
         });
+        self.changeSliderColor(gradeValue); //event start in ui-slider do not have initial value
+    },
+
+    changeSliderColor: function(value) {
+        if (this.assignment.Threshold <= value) {
+            this.target.find('.slider .ui-slider-range').css('background-color', 'green');
+        } else {
+            this.target.find('.slider .ui-slider-range').css('background-color', 'red');
+        }
     },
 
     onChangeGradeNumber: function(e) {
-        this.changeGradeNumber($(e.target).val());
+        var value = $(e.target).val();
+        this.changeGradeNumber(value);
+        this.changeSliderColor(value)
     },
 
     changeGradeNumber: function(value) {
