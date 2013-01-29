@@ -113,7 +113,8 @@ ZerebralCourseDetailFeedBlock.prototype = {
                             field.parents('.control-group').addClass('error');
                         }
                     } else {
-                        $.proxy(self.addCommentBlock, form, response['content'], response['lastCommentId'])();
+                        //$.proxy(self.addCommentBlock, form, response['content'], response['lastCommentId'])();
+                        self.updateFeed();
                     }
                 },
                 error: function() { alert('Oops, seems like unknown error has appeared!'); },
@@ -408,7 +409,8 @@ ZerebralCourseDetailFeedBlock.prototype = {
                             field.parents('.control-group').addClass('error');
                         }
                     } else {
-                        $.proxy(self.addCommentBlock, currentForm, response['content'], response['lastCommentId'])();
+                        //$.proxy(self.addCommentBlock, currentForm, response['content'], response['lastCommentId'])();
+                        self.updateFeed();
                     }
                 },
                 error: function() { alert('Oops, seems like unknown error has appeared!'); },
