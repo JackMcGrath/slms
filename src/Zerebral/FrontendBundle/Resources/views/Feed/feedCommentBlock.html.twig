@@ -1,5 +1,5 @@
 {% macro course_feed_comment_text_block(comment) %}
-    <b>{{ comment.user.fullName }}</b>&nbsp;<span class="text-span">{{ comment.feedContent.text|nl2br }}</span>
+    <b>#{{ comment.id }} - {{ comment.user.fullName }}</b>&nbsp;<span class="text-span">{{ comment.feedContent.text|nl2br }}</span>
 {% endmacro %}
 
 {% macro course_feed_comment_website_block(comment) %}
