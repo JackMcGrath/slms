@@ -41,7 +41,6 @@
                     </div>
                     <div class="reply">
                         <form method="post"{{ form_enctype(form) }} novalidate>
-                            {{ form_widget(form._token) }}
                             {{ form_row(form.body, {
                                 label: 'Reply',
                                 form_type: 'horizontal',
@@ -50,7 +49,7 @@
                                     rows: 6
                                 }
                             }) }}
-
+                            {{ form_widget(form._token) }}
                             <script type="text/template" id="new_file_form">
                                 {{ form_widget(form.files.vars.prototype)|raw }}
                             </script>
