@@ -427,7 +427,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
                     currentForm.find('textarea').attr('disabled', false);
                     currentForm.find('input[type="submit"]').attr('disabled', false);
                     currentForm.find('a.cancel-link').show();
-                    self.ajaxInProgress = true;
+                    self.ajaxInProgress = false;
                 },
                 dataType: 'json'
             });
