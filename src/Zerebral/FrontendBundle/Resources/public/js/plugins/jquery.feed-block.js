@@ -559,7 +559,7 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
         this.feedCommentForm.zerebralAjaxForm({
             data: { feedType: 'assignment' },
             beforeSend: function() {
-                self.ajaxInProgress = true;
+                //self.ajaxInProgress = true;
                 self.feedCommentForm.find('.control-group').removeClass('error');
                 self.feedCommentForm.find('textarea').attr('disabled', true);
                 self.feedCommentForm.find('.attached-link-field').attr('disabled', true);
@@ -580,8 +580,9 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
                         ul.append($('<li>' + response['errors'][fieldName][0] + '</li>'));
                     }
                 } else {
-                    self.addCommentBlock(response['content']);
-                    self.feedCommentsDiv.data('lastCommentId', response['lastCommentId']);
+//                    self.addCommentBlock(response['content']);
+//                    self.feedCommentsDiv.data('lastCommentId', response['lastCommentId']);
+                    self.updateFeed();
                 }
             },
             error: function() { alert('Oops, seems like unknown error has appeared!'); },
@@ -590,7 +591,7 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
                 self.feedCommentForm.find('.attached-link-field').attr('disabled', false);
                 self.feedCommentForm.find('input[type="submit"]').attr('disabled', false).val('Post message');
                 self.feedCommentForm.find('.attached-link-delete').show();
-                self.ajaxInProgress = false;
+                //self.ajaxInProgress = false;
             },
             dataType: 'json'
         });
