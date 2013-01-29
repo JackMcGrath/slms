@@ -14,8 +14,8 @@ class MessageType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('subject', 'text', array('required' => true, 'max_length' => 250));
-        $builder->add('body', 'textarea', array('required' => true));
+        $builder->add('subject', 'text', array('required' => false, 'max_length' => 250));
+        $builder->add('body', 'textarea', array('required' => false));
         $builder->add('to', 'model', array(
             'class' => 'Zerebral\BusinessBundle\Model\User\User',
             'property' => 'full_name',
