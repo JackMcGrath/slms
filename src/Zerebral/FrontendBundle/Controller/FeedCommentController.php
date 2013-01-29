@@ -59,13 +59,14 @@ class FeedCommentController extends \Zerebral\CommonBundle\Component\Controller
 //            return new JsonResponse(array('has_errors' => false, 'content' => $content, 'lastCommentId' => $feedComment->getId()));
             $lastCommentId = $this->getRequest()->get('lastCommentId', 0);
             $comments = FeedCommentQuery::create()->filterNewer($feedItem, $lastCommentId)->find();
-            $content = '';
+            $content = '<hr />start save<br />';
             if (count($comments) > 0) {
                 foreach ($comments as $comment) {
                     $content .= $this->render('ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig', array('feedType' => $feedType, 'comment' => $comment))->getContent();
                 }
                 $lastCommentId = $comments->getLast()->getId();
             }
+            $content .= 'end save<hr />';
 
             return new JsonResponse(array('has_errors' => false, 'lastCommentId' => $lastCommentId, 'content' => $content));
         }

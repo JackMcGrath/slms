@@ -151,7 +151,7 @@ class FeedController extends \Zerebral\CommonBundle\Component\Controller
         }
 
         foreach ($sortedByItemComments as $feedItemId => $item) {
-            $sortedByItemComments[$feedItemId]['content'] = $this->render('ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig', array('feedType' => 'course', 'comment' => $item['comments']))->getContent();
+            $sortedByItemComments[$feedItemId]['content'] = '<hr />start update<br />' . $this->render('ZerebralFrontendBundle:Feed:feedCommentBlock.html.twig', array('feedType' => 'course', 'comment' => $item['comments']))->getContent() . 'end update<hr />';
             unset($sortedByItemComments[$feedItemId]['comments']);
         }
 
