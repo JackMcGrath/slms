@@ -477,16 +477,16 @@ ZerebralCourseDetailFeedBlock.prototype = {
 
         if ($(this).parents('.comments').data('lastItemCommentId') < lastCommentId) {
             $(this).parents('.comments').data('lastItemCommentId', lastCommentId);
-        }
-        $(this).parents('.comment').before(response);
-        var commentsCount = $(this).parents('.feed-item').find('.show-comment-form-link').data('commentsCount');
-        $(this).parents('.feed-item').find('.show-comment-form-link span').html((commentsCount + newCommentsCount));
-        $(this).parents('.feed-item').find('.show-comment-form-link').data('commentsCount', commentsCount + newCommentsCount);
 
-        if (collapseForm) {
-            $(this).find('.cancel-link').click();
-        }
+            $(this).parents('.comment').before(response);
+            var commentsCount = $(this).parents('.feed-item').find('.show-comment-form-link').data('commentsCount');
+            $(this).parents('.feed-item').find('.show-comment-form-link span').html((commentsCount + newCommentsCount));
+            $(this).parents('.feed-item').find('.show-comment-form-link').data('commentsCount', commentsCount + newCommentsCount);
 
+            if (collapseForm) {
+                $(this).find('.cancel-link').click();
+            }
+        }
     },
     deleteCommentBlock: function(event) {
         event.preventDefault();
