@@ -52,18 +52,21 @@ class AssignmentQuery extends BaseAssignmentQuery
 
     public function buildForList()
     {
-        $this->leftJoinStudentAssignment();
+//        $this->leftJoinStudentAssignment();
+        $this->joinWith('StudentAssignment', \Criteria::LEFT_JOIN);
         $this->leftJoinCourse();
         $this->leftJoinFeedItem();
 
-        $this->leftJoin('FeedItem.FeedComment FeedComments');
+        $this->leftJoinFeedItem();
         $this->leftJoin('StudentAssignment.StudentAssignmentFile StudentAssignmentFile');
         $this->add('student_assignments.id', null, \Criteria::ISNOTNULL);
 
         $this->withColumn('COUNT(DISTINCT IF(student_assignments.is_submitted = 1, student_assignments.id, null))', 'completedCount');
         $this->withColumn('COUNT(DISTINCT student_assignments.id) - COUNT(DISTINCT IF(student_assignments.is_submitted = 1, student_assignments.id, null))', 'remainingCount');
         $this->withColumn('COUNT(DISTINCT IF(student_assignments.is_submitted = 1, `StudentAssignmentFile`.file_id , null))', 'filesCount');
-        $this->withColumn('COUNT(`FeedComments`.id)', 'commentsCount');
+        $this->withColumn('COUNT(DISTINCT student_assignments.id)', 'studentsCount');
+
+        $this->withColumn('COUNT(`feed_items`.id)', 'commentsCount');
 
         $this->addGroupByColumn('assignments.id');
 
@@ -81,8 +84,10 @@ class AssignmentQuery extends BaseAssignmentQuery
         $assignments = AssignmentQuery::create()->buildForList();
         if ($user->isTeacher())
             $assignments->filterByTeacher($user->getTeacher());
-        else
+        else {
             $assignments->filterByStudent($user->getStudent());
+            $assignments->add("student_assignments.student_id", $user->getStudent()->getId(), \Criteria::EQUAL);
+        }
 
         if ($ongoing === false) {
             $assignments->add('assignments.due_at', null, \Criteria::ISNOTNULL);
