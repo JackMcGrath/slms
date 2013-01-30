@@ -72,9 +72,9 @@ ZerebralCourseDetailFeedBlock.prototype = {
                 self.feedItemForm.find('a.cancel-link').hide();
                 self.feedItemForm.find('.attached-link-delete').hide();
                 console.log('block slide up');
-                self.feedItemAlertBlock.slideUp('fast', function() {
+                //self.feedItemAlertBlock.slideUp('fast', function() {
                     self.feedItemAlertBlock.find('ul > li').remove();
-                });
+                //});
             },
             success: function(response) {
                 if (response['has_errors']) {
