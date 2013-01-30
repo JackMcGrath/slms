@@ -587,19 +587,18 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
                 self.feedCommentForm.find('.attached-link-field').attr('disabled', true);
                 self.feedCommentForm.find('input[type="submit"]').attr('disabled', true).val('   Posting...    ');
                 self.feedCommentForm.find('.attached-link-delete').hide();
-                self.feedCommentAlertBlock.slideUp('fast', function() {
-                    self.feedCommentAlertBlock.find('ul > li').remove();
-                });
+                self.feedCommentAlertBlock.slideUp('fast');
             },
             success: function(response) {
+                self.feedCommentAlertBlock.find('ul > li').remove();
                 if (response['has_errors']) {
-                    self.feedCommentAlertBlock.slideDown();
                     var ul = self.feedCommentAlertBlock.find('ul');
                     for (var fieldName in response['errors']) {
                         var field = self.feedCommentForm.find('[name^="' + fieldName.replace(/\[/g,'\\[').replace(/\]/g,'\\]') + '"]').last();
                         field.parents('.control-group').addClass('error');
                         ul.append($('<li>' + response['errors'][fieldName][0] + '</li>'));
                     }
+                    self.feedCommentAlertBlock.slideDown();
                 } else {
                     self.addCommentBlock(response['content']);
                     self.feedCommentsDiv.data('lastCommentId', response['lastCommentId']);
