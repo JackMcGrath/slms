@@ -82,7 +82,9 @@ ZerebralCourseDetailFeedBlock.prototype = {
                         var field = self.feedItemForm.find('[name^="' + fieldName.replace(/\[/g,'\\[').replace(/\]/g,'\\]') + '"]').last();
                         field.parents('.control-group').addClass('error');
                         for (var i = 0; i < response['errors'][fieldName].length; i++) {
-                            ul.append($('<li>' + response['errors'][fieldName][i] + '</li>'));
+                            var li =  $('<li>' + response['errors'][fieldName][i] + '</li>');
+                            console.log(li);
+                            ul.append(li);
                         }
                     }
                     self.feedItemAlertBlock.slideDown();
