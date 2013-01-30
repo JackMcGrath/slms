@@ -21,4 +21,7 @@ $(document).ready(function() {
             }
         }
     });
+
+    $('#composeMessageModal').privateMessages(); //popup
+    $('div.message-form').privateMessages(); //compose
 });

@@ -90,9 +90,7 @@ GradingPopup.prototype = {
                 } else {
                     grade.removeClass('hover').html(value);
                 }
-
             }
-
         });
 
         $('.grading-form').zerebralAjaxForm({

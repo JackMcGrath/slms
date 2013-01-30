@@ -22,7 +22,7 @@ class MessageType extends AbstractType
         $builder->addEventListener(\Symfony\Component\Form\FormEvents::PRE_SET_DATA, function(\Symfony\Component\Form\FormEvent $event) use ($formFactory) {
             /** @var $message Message */
             $message = $event->getData();
-            if (!$message->getTo()) {
+            if (!$message->getThreadId()) {
                 $field = $formFactory->createNamed('to','model', $message->getTo(), array(
                     'class' => 'Zerebral\BusinessBundle\Model\User\User',
                     'property' => 'full_name',

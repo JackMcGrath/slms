@@ -1,0 +1,17 @@
+<div class="modal hide message-popup" id="composeMessageModal" role="dialog" aria-hidden="true">
+    <form action="{{ path('ajax_compose') }}" enctype="multipart/form-data" method="POST" class="message-form">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h3>Compose Message</h3>
+        </div>
+        <div class="modal-body">
+
+        </div>
+
+        <div class="modal-footer">
+            <button type="submit" class="btn-custom btn-danger">Submit</button>
+            {#<a href="#" class="btn btn-danger">Submit & Continue</a>#}
+            <a href="#" class="btn-custom" data-dismiss="modal">Cancel</a>
+        </div>
+    </form>
+</div>

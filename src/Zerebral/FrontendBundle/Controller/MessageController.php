@@ -94,6 +94,7 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
         $firstMessage = $thread->getFirst();
         $receiver = $firstMessage->getToId() == $this->getUser()->getId() ? $firstMessage->getUserRelatedByFromId() : $firstMessage->getTo();
         $newMessage->setTo($receiver);
+        $newMessage->setThreadId($firstMessage->getThreadId());
 
         $form = $this->createForm($newMessageType, $newMessage, array('validation_groups' => array('Default', 'reply')));
         if ($this->getRequest()->isMethod('POST')) {
@@ -103,9 +104,7 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
             if ($form->isValid()) {
                 $newMessage = $form->getData();
                 $newMessage->setFromId($this->getUser()->getId());
-
                 $newMessage->setUserId($receiver->getId());
-                $newMessage->setThreadId($firstMessage->getThreadId());
                 $newMessage->setSubject($firstMessage->getSubject());
 
                 $newMessage->save();
@@ -223,5 +222,71 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
         }
 
         return $this->redirect($this->generateUrl('messages_inbox'));
+    }
+
+    /**
+     * @Route("/compose-form/{id}", name="ajax_compose_form")
+     * @ParamConverter("user")
+     * @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_STUDENT')")
+     */
+    public function ajaxComposeFormAction(Model\User\User $user)
+    {
+        $newMessage = new Model\Message\Message();
+        $newMessage->setTo($user);
+        $newMessageType = new FormType\MessageType();
+
+        $form = $this->createForm($newMessageType, $newMessage, array('validation_groups' => array('Default', 'compose')));
+
+        $content = $this->render('ZerebralFrontendBundle:Message:form.html.twig',
+            array(
+                'form' => $form->createView())
+        )->getContent();
+
+        return new JsonResponse(array('has_errors' => false, 'content' => $content));
+
+//        if ($this->getRequest()->isMethod('POST')) {
+//            $form->bind($this->getRequest());
+//            if ($form->isValid()) {
+//                $newMessage = $form->getData();
+//                $newMessage->setFromId($this->getUser()->getId());
+//                $newMessage->setUserId($newMessage->getToId());
+//
+//                $newMessage->save();
+//
+//
+//
+//            }
+//        }
+    }
+
+    /**
+     * @Route("/compose-popup", name="ajax_compose")
+     * @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_STUDENT')")
+     */
+    public function ajaxComposeAction()
+    {
+        $newMessage = new Model\Message\Message();
+        $newMessageType = new FormType\MessageType();
+
+        $form = $this->createForm($newMessageType, $newMessage, array('validation_groups' => array('Default', 'compose')));
+
+        if ($this->getRequest()->isMethod('POST')) {
+            $form->bind($this->getRequest());
+            if ($form->isValid()) {
+                $newMessage = $form->getData();
+                $newMessage->setFromId($this->getUser()->getId());
+                $newMessage->setUserId($newMessage->getToId());
+
+                $newMessage->save();
+
+                return new JsonResponse(array(
+                    'success' => true,
+                    'content' => array()
+                ));
+
+            }
+        }
+
+        return new FormJsonResponse($form);
     }
 }

@@ -55,10 +55,12 @@
             <div class="clearfix"></div>
         </li>
         <li>
-            <a href="#" class="btn">Send message</a>
+            <a href="#" class="btn" userId="{{ teacher.getUser.id }}" rel="message-popup">Send message</a>
         </li>
     </ul>
 </div>
+
+{% include "ZerebralFrontendBundle:Message:composePopup.html.twig" %}
 {% endmacro %}
 
 {% macro upcomingAssignments(assignments) %}
