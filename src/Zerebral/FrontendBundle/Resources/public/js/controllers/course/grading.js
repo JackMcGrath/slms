@@ -138,9 +138,9 @@ GradingPopup.prototype = {
 
     changeSliderColor: function(value) {
         if (this.assignment.Threshold <= value) {
-            this.target.find('.slider .ui-slider-range').css('background-color', 'green');
+            this.target.find('.slider .ui-slider-range').css('background-color', '#dff0d8');
         } else {
-            this.target.find('.slider .ui-slider-range').css('background-color', 'red');
+            this.target.find('.slider .ui-slider-range').css('background-color', '#f2dede');
         }
     },
 
