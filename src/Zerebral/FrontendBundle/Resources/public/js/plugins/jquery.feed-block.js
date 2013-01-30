@@ -71,24 +71,32 @@ ZerebralCourseDetailFeedBlock.prototype = {
                 self.feedItemForm.find('input[type="submit"]').attr('disabled', true).val('   Posting...    ');
                 self.feedItemForm.find('a.cancel-link').hide();
                 self.feedItemForm.find('.attached-link-delete').hide();
+                console.log('block slide up');
                 self.feedItemAlertBlock.slideUp('fast', function() {
                     self.feedItemAlertBlock.find('ul > li').remove();
                 });
             },
             success: function(response) {
                 if (response['has_errors']) {
+                    console.log('------------------');
                     var ul = self.feedItemAlertBlock.find('ul');
+                    console.log('ul hiding');
+                    ul.hide();
+                    console.log('Starting creating li');
                     for (var fieldName in response['errors']) {
                         var field = self.feedItemForm.find('[name^="' + fieldName.replace(/\[/g,'\\[').replace(/\]/g,'\\]') + '"]').last();
                         field.parents('.control-group').addClass('error');
-                        console.log(ul);
                         for (var i = 0; i < response['errors'][fieldName].length; i++) {
                             var li =  $('<li>' + response['errors'][fieldName][i] + '</li>');
-                            console.log(li);
+                            console.log('li created');
                             ul.append(li);
+                            console.log('li appended');
                         }
                     }
-                    self.feedItemAlertBlock.show();
+                    console.log('Ul showing');
+                    ul.show();
+                    console.log('block slide down');
+                    self.feedItemAlertBlock.slideDown();
                 } else {
                     self.feedItemsDiv.data('lastItemId', response['lastItemId']);
                     self.addItemBlock(response['content'], true);
