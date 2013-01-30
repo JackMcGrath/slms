@@ -446,6 +446,9 @@ ZerebralCourseDetailFeedBlock.prototype = {
     deleteItemBlock: function(event) {
         event.preventDefault();
         var link = $(event.target);
+        if (typeof(link.attr('href')) == 'undefined') {
+            link = link.parent();
+        }
         if (!link.hasClass('processing')) {
             if (window.confirm('Are you sure to delete post?')) {
                 var url = link.attr('href');
@@ -491,6 +494,11 @@ ZerebralCourseDetailFeedBlock.prototype = {
     deleteCommentBlock: function(event) {
         event.preventDefault();
         var link = $(event.target);
+
+        if (typeof(link.attr('href')) == 'undefined') {
+            link = link.parent();
+        }
+
         if (!link.hasClass('processing')) {
             if (window.confirm('Are you sure to delete comment?')) {
                 var url = link.attr('href');
@@ -716,6 +724,9 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
     deleteCommentBlock: function(event) {
         event.preventDefault();
         var link = $(event.target);
+        if (typeof(link.attr('href')) == 'undefined') {
+            link = link.parent();
+        }
         if (!link.hasClass('processing')) {
             if (window.confirm('Are you sure to delete comment?')) {
                 var url = link.attr('href');
