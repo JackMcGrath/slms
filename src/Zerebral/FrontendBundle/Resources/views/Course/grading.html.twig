@@ -67,9 +67,9 @@
 
             </div>
             <div class="modal-footer">
-                <button type="submit" class="btn btn-danger">Submit</button>
+                <button type="submit" class="btn-custom btn-danger">Submit</button>
                 {#<a href="#" class="btn btn-danger">Submit & Continue</a>#}
-                <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+                <a href="#" class="btn-custom" data-dismiss="modal">Cancel</a>
             </div>
         </form>
     </div>
@@ -83,7 +83,7 @@
                 <i class="icon-new-lock-transparent"></i>
             </td>
         {% elseif grading[student.id][assignment.id].grading is null %}
-            <td class="new" studentAssignment="{{ grading[student.id][assignment.id].id }}">
+            <td class="new{{ grading[student.id][assignment.id].assignment.gradeType == 'pass' ? ' pass' : ' numeric'}}"" studentAssignment="{{ grading[student.id][assignment.id].id }}">
                 <a href="#" data-toggle="modal" data-toggle="modal"><i class="icon-new-plus-add"></i></a>
             </td>
         {% else %}

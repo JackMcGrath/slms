@@ -11,7 +11,7 @@ $(document).ready(function() {
         return confirm(message);
     });
 
-    $('a[rel="tooltip"]').tooltip({html: true});
+    $('[rel="tooltip"]').tooltip({html: true});
 
     $.ajaxSetup({
         complete: function(response) {

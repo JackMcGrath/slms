@@ -28,8 +28,13 @@ class GradingController extends \Zerebral\CommonBundle\Component\Controller
     public function studentAction(Model\Assignment\StudentAssignment $studentAssignment)
     {
         $form = $this->initGradingForm($studentAssignment);
-        $content = $this->render('ZerebralFrontendBundle:Grading:studentAssignment.html.twig', array('studentAssignment' => $studentAssignment, 'form' => $form->createView()))->getContent();
-        return new JsonResponse(array('has_errors' => false, 'content' => $content));
+        $content = $this->render('ZerebralFrontendBundle:Grading:studentAssignment.html.twig',
+            array(
+                'studentAssignment' => $studentAssignment,
+                'form' => $form->createView())
+        )->getContent();
+
+        return new JsonResponse(array('has_errors' => false, 'content' => $content, 'assignment' => $studentAssignment->getAssignment()->toArray()));
     }
 
     protected function initGradingForm($studentAssignment = null)

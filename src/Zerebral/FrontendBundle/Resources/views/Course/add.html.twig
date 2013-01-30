@@ -118,8 +118,8 @@
                 {{ form_rest(form) }}
 
                 <div class="form-actions">
-                    <input type="submit" class="btn btn-danger" value="{% if form.vars.value.id is defined and form.vars.value.id > 0 %}Update{% else %}Create{% endif %}" />
-                    <input type="reset" class="btn" value="Cancel" />
+                    <input type="submit" class="btn-custom btn-danger" value="{% if form.vars.value.id is defined and form.vars.value.id > 0 %}Update{% else %}Create{% endif %}" />
+                    <input type="reset" class="btn-custom" value="Cancel" />
                 </div>
 
             </form>
