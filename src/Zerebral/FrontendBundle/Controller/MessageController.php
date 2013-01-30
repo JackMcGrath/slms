@@ -231,6 +231,7 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function ajaxComposeFormAction(Model\User\User $user)
     {
+        //validate user
         $newMessage = new Model\Message\Message();
         $newMessage->setTo($user);
         $newMessageType = new FormType\MessageType();
@@ -243,20 +244,6 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
         )->getContent();
 
         return new JsonResponse(array('has_errors' => false, 'content' => $content));
-
-//        if ($this->getRequest()->isMethod('POST')) {
-//            $form->bind($this->getRequest());
-//            if ($form->isValid()) {
-//                $newMessage = $form->getData();
-//                $newMessage->setFromId($this->getUser()->getId());
-//                $newMessage->setUserId($newMessage->getToId());
-//
-//                $newMessage->save();
-//
-//
-//
-//            }
-//        }
     }
 
     /**
@@ -283,7 +270,6 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
                     'success' => true,
                     'content' => array()
                 ));
-
             }
         }
 
