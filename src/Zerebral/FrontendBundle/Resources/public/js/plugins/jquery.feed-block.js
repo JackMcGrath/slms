@@ -88,7 +88,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
                             ul.append(li);
                         }
                     }
-                    self.feedItemAlertBlock.slideDown();
+                    self.feedItemAlertBlock.show();
                 } else {
                     self.feedItemsDiv.data('lastItemId', response['lastItemId']);
                     self.addItemBlock(response['content'], true);
