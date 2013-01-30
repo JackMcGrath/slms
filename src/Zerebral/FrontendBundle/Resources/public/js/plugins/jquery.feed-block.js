@@ -81,6 +81,7 @@ ZerebralCourseDetailFeedBlock.prototype = {
                     for (var fieldName in response['errors']) {
                         var field = self.feedItemForm.find('[name^="' + fieldName.replace(/\[/g,'\\[').replace(/\]/g,'\\]') + '"]').last();
                         field.parents('.control-group').addClass('error');
+                        console.log(ul);
                         for (var i = 0; i < response['errors'][fieldName].length; i++) {
                             var li =  $('<li>' + response['errors'][fieldName][i] + '</li>');
                             console.log(li);
