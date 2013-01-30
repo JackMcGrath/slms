@@ -71,19 +71,20 @@ ZerebralCourseDetailFeedBlock.prototype = {
                 self.feedItemForm.find('input[type="submit"]').attr('disabled', true).val('   Posting...    ');
                 self.feedItemForm.find('a.cancel-link').hide();
                 self.feedItemForm.find('.attached-link-delete').hide();
-                self.feedItemAlertBlock.slideUp('fast', function() {
-                    self.feedItemAlertBlock.find('ul > li').remove();
-                });
+                self.feedItemAlertBlock.slideUp('fast');
             },
             success: function(response) {
+                self.feedItemAlertBlock.find('ul > li').remove();
                 if (response['has_errors']) {
-                    self.feedItemAlertBlock.slideDown();
                     var ul = self.feedItemAlertBlock.find('ul');
                     for (var fieldName in response['errors']) {
                         var field = self.feedItemForm.find('[name^="' + fieldName.replace(/\[/g,'\\[').replace(/\]/g,'\\]') + '"]').last();
                         field.parents('.control-group').addClass('error');
-                        ul.append($('<li>' + response['errors'][fieldName][0] + '</li>'));
+                        for (var i = 0; i < response['errors'][fieldName].length; i++) {
+                            ul.append($('<li>' + response['errors'][fieldName][i] + '</li>'));
+                        }
                     }
+                    self.feedItemAlertBlock.slideDown();
                 } else {
                     self.feedItemsDiv.data('lastItemId', response['lastItemId']);
                     self.addItemBlock(response['content'], true);
@@ -446,6 +447,9 @@ ZerebralCourseDetailFeedBlock.prototype = {
     deleteItemBlock: function(event) {
         event.preventDefault();
         var link = $(event.target);
+        if (typeof(link.attr('href')) == 'undefined') {
+            link = link.parent();
+        }
         if (!link.hasClass('processing')) {
             if (window.confirm('Are you sure to delete post?')) {
                 var url = link.attr('href');
@@ -491,6 +495,11 @@ ZerebralCourseDetailFeedBlock.prototype = {
     deleteCommentBlock: function(event) {
         event.preventDefault();
         var link = $(event.target);
+
+        if (typeof(link.attr('href')) == 'undefined') {
+            link = link.parent();
+        }
+
         if (!link.hasClass('processing')) {
             if (window.confirm('Are you sure to delete comment?')) {
                 var url = link.attr('href');
@@ -578,19 +587,18 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
                 self.feedCommentForm.find('.attached-link-field').attr('disabled', true);
                 self.feedCommentForm.find('input[type="submit"]').attr('disabled', true).val('   Posting...    ');
                 self.feedCommentForm.find('.attached-link-delete').hide();
-                self.feedCommentAlertBlock.slideUp('fast', function() {
-                    self.feedCommentAlertBlock.find('ul > li').remove();
-                });
+                self.feedCommentAlertBlock.slideUp('fast');
             },
             success: function(response) {
+                self.feedCommentAlertBlock.find('ul > li').remove();
                 if (response['has_errors']) {
-                    self.feedCommentAlertBlock.slideDown();
                     var ul = self.feedCommentAlertBlock.find('ul');
                     for (var fieldName in response['errors']) {
                         var field = self.feedCommentForm.find('[name^="' + fieldName.replace(/\[/g,'\\[').replace(/\]/g,'\\]') + '"]').last();
                         field.parents('.control-group').addClass('error');
                         ul.append($('<li>' + response['errors'][fieldName][0] + '</li>'));
                     }
+                    self.feedCommentAlertBlock.slideDown();
                 } else {
                     self.addCommentBlock(response['content']);
                     self.feedCommentsDiv.data('lastCommentId', response['lastCommentId']);
@@ -661,16 +669,18 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
                 },
                 success: function(response) {
                     if (response.success) {
-                        self.feedCommentsDiv.data('lastCommentId', response['lastCommentId']);
-                        if (response['content'] != '') {
-                            var commentBlock = $(response['content']);
-                            commentBlock.css('display', 'none');
-                            if (self.feedCommentsDiv.find('.comment:last').length > 0) {
-                                self.feedCommentsDiv.find('.comment:last').after(commentBlock);
-                            } else {
-                                self.feedCommentsDiv.find('.empty').remove().end().append(commentBlock);
+                        if (self.feedCommentsDiv.data('lastCommentId') < response['lastCommentId']) {
+                            self.feedCommentsDiv.data('lastCommentId', response['lastCommentId']);
+                            if (response['content'] != '') {
+                                var commentBlock = $(response['content']);
+                                commentBlock.css('display', 'none');
+                                if (self.feedCommentsDiv.find('.comment:last').length > 0) {
+                                    self.feedCommentsDiv.find('.comment:last').after(commentBlock);
+                                } else {
+                                    self.feedCommentsDiv.find('.empty').remove().end().append(commentBlock);
+                                }
+                                commentBlock.slideDown();
                             }
-                            commentBlock.slideDown();
                         }
                     }
                 },
@@ -714,6 +724,9 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
     deleteCommentBlock: function(event) {
         event.preventDefault();
         var link = $(event.target);
+        if (typeof(link.attr('href')) == 'undefined') {
+            link = link.parent();
+        }
         if (!link.hasClass('processing')) {
             if (window.confirm('Are you sure to delete comment?')) {
                 var url = link.attr('href');
