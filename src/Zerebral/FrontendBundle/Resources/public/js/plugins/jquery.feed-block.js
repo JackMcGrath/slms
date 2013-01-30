@@ -77,16 +77,15 @@ ZerebralCourseDetailFeedBlock.prototype = {
             },
             success: function(response) {
                 if (response['has_errors']) {
-                    self.feedItemAlertBlock.slideDown();
                     var ul = self.feedItemAlertBlock.find('ul');
                     for (var fieldName in response['errors']) {
-                        console.log(response['errors'][fieldName]);
                         var field = self.feedItemForm.find('[name^="' + fieldName.replace(/\[/g,'\\[').replace(/\]/g,'\\]') + '"]').last();
                         field.parents('.control-group').addClass('error');
                         for (var i = 0; i < response['errors'][fieldName].length; i++) {
                             ul.append($('<li>' + response['errors'][fieldName][i] + '</li>'));
                         }
                     }
+                    self.feedItemAlertBlock.slideDown();
                 } else {
                     self.feedItemsDiv.data('lastItemId', response['lastItemId']);
                     self.addItemBlock(response['content'], true);
