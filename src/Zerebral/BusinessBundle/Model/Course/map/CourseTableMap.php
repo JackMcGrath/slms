@@ -54,18 +54,6 @@ class CourseTableMap extends TableMap
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', true, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
-        $this->addValidator('id', 'required', 'propel.validator.RequiredValidator', '', 'The field id is required.');
-        $this->addValidator('id', 'maxValue', 'propel.validator.MaxValueValidator', 'REPLACEME', 'The field id must be not greater than REPLACEME.');
-        $this->addValidator('id', 'type', 'propel.validator.TypeValidator', 'int', 'The column id must be an int value.');
-        $this->addValidator('discipline_id', 'required', 'propel.validator.RequiredValidator', '', 'The field discipline_id is required.');
-        $this->addValidator('discipline_id', 'type', 'propel.validator.TypeValidator', 'int', 'The column discipline_id must be an int value.');
-        $this->addValidator('grade_level_id', 'required', 'propel.validator.RequiredValidator', '', 'The field grade_level_id is required.');
-        $this->addValidator('grade_level_id', 'type', 'propel.validator.TypeValidator', 'int', 'The column grade_level_id must be an int value.');
-        $this->addValidator('name', 'required', 'propel.validator.RequiredValidator', '', 'The field name is required.');
-        $this->addValidator('name', 'type', 'propel.validator.TypeValidator', 'string', 'The column name must be an string value.');
-        $this->addValidator('description', 'type', 'propel.validator.TypeValidator', 'string', 'The column description must be an string value.');
-        $this->addValidator('created_by', 'required', 'propel.validator.RequiredValidator', '', 'The field created_by is required.');
-        $this->addValidator('created_by', 'type', 'propel.validator.TypeValidator', 'int', 'The column created_by must be an int value.');
     } // initialize()
 
     /**

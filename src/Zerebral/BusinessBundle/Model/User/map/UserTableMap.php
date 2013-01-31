@@ -67,22 +67,6 @@ class UserTableMap extends TableMap
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', true, null, null);
         // validators
-        $this->addValidator('id', 'required', 'propel.validator.RequiredValidator', '', 'The field id is required.');
-        $this->addValidator('id', 'maxValue', 'propel.validator.MaxValueValidator', 'REPLACEME', 'The field id must be not greater than REPLACEME.');
-        $this->addValidator('id', 'type', 'propel.validator.TypeValidator', 'int', 'The column id must be an int value.');
-        $this->addValidator('first_name', 'required', 'propel.validator.RequiredValidator', '', 'The field first_name is required.');
-        $this->addValidator('first_name', 'type', 'propel.validator.TypeValidator', 'string', 'The column first_name must be an string value.');
-        $this->addValidator('last_name', 'required', 'propel.validator.RequiredValidator', '', 'The field last_name is required.');
-        $this->addValidator('last_name', 'type', 'propel.validator.TypeValidator', 'string', 'The column last_name must be an string value.');
-        $this->addValidator('salutation', 'type', 'propel.validator.TypeValidator', 'string', 'The column salutation must be an string value.');
-        $this->addValidator('birthday', 'type', 'propel.validator.TypeValidator', 'string', 'The column birthday must be an string value.');
-        $this->addValidator('gender', 'type', 'propel.validator.TypeValidator', 'string', 'The column gender must be an string value.');
-        $this->addValidator('email', 'required', 'propel.validator.RequiredValidator', '', 'The field email is required.');
-        $this->addValidator('email', 'type', 'propel.validator.TypeValidator', 'string', 'The column email must be an string value.');
-        $this->addValidator('salt', 'required', 'propel.validator.RequiredValidator', '', 'The field salt is required.');
-        $this->addValidator('salt', 'type', 'propel.validator.TypeValidator', 'string', 'The column salt must be an string value.');
-        $this->addValidator('is_active', 'required', 'propel.validator.RequiredValidator', '', 'The field is_active is required.');
-        $this->addValidator('is_active', 'type', 'propel.validator.TypeValidator', 'boolean', 'The column is_active must be an boolean value.');
     } // initialize()
 
     /**

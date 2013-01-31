@@ -1356,18 +1356,6 @@ abstract class BaseAssignmentCategoryPeer
             }
         } else {
 
-        if ($obj->isNew() || $obj->isColumnModified(AssignmentCategoryPeer::COURSE_ID))
-            $columns[AssignmentCategoryPeer::COURSE_ID] = $obj->getCourseId();
-
-        if ($obj->isNew() || $obj->isColumnModified(AssignmentCategoryPeer::TEACHER_ID))
-            $columns[AssignmentCategoryPeer::TEACHER_ID] = $obj->getTeacherId();
-
-        if ($obj->isNew() || $obj->isColumnModified(AssignmentCategoryPeer::NAME))
-            $columns[AssignmentCategoryPeer::NAME] = $obj->getName();
-
-        if ($obj->isNew() || $obj->isColumnModified(AssignmentCategoryPeer::CREATED_AT))
-            $columns[AssignmentCategoryPeer::CREATED_AT] = $obj->getCreatedAt();
-
         }
 
         return BasePeer::doValidate(AssignmentCategoryPeer::DATABASE_NAME, AssignmentCategoryPeer::TABLE_NAME, $columns);

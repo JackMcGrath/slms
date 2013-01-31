@@ -48,9 +48,6 @@ class StudentTableMap extends TableMap
         $this->addColumn('activities', 'Activities', 'LONGVARCHAR', false, null, null);
         $this->addColumn('interests', 'Interests', 'LONGVARCHAR', false, null, null);
         // validators
-        $this->addValidator('bio', 'type', 'propel.validator.TypeValidator', 'string', 'The column bio must be an string value.');
-        $this->addValidator('activities', 'type', 'propel.validator.TypeValidator', 'string', 'The column activities must be an string value.');
-        $this->addValidator('interests', 'type', 'propel.validator.TypeValidator', 'string', 'The column interests must be an string value.');
     } // initialize()
 
     /**

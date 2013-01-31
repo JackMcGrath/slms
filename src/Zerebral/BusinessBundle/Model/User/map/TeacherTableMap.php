@@ -48,9 +48,6 @@ class TeacherTableMap extends TableMap
         $this->addColumn('subjects', 'Subjects', 'LONGVARCHAR', false, null, null);
         $this->addColumn('grades', 'Grades', 'LONGVARCHAR', false, null, null);
         // validators
-        $this->addValidator('bio', 'type', 'propel.validator.TypeValidator', 'string', 'The column bio must be an string value.');
-        $this->addValidator('subjects', 'type', 'propel.validator.TypeValidator', 'string', 'The column subjects must be an string value.');
-        $this->addValidator('grades', 'type', 'propel.validator.TypeValidator', 'string', 'The column grades must be an string value.');
     } // initialize()
 
     /**

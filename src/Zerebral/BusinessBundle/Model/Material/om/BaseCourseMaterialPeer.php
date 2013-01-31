@@ -2108,24 +2108,6 @@ abstract class BaseCourseMaterialPeer
             }
         } else {
 
-        if ($obj->isNew() || $obj->isColumnModified(CourseMaterialPeer::COURSE_ID))
-            $columns[CourseMaterialPeer::COURSE_ID] = $obj->getCourseId();
-
-        if ($obj->isNew() || $obj->isColumnModified(CourseMaterialPeer::FOLDER_ID))
-            $columns[CourseMaterialPeer::FOLDER_ID] = $obj->getFolderId();
-
-        if ($obj->isNew() || $obj->isColumnModified(CourseMaterialPeer::DESCRIPTION))
-            $columns[CourseMaterialPeer::DESCRIPTION] = $obj->getDescription();
-
-        if ($obj->isNew() || $obj->isColumnModified(CourseMaterialPeer::FILE_ID))
-            $columns[CourseMaterialPeer::FILE_ID] = $obj->getFileId();
-
-        if ($obj->isNew() || $obj->isColumnModified(CourseMaterialPeer::CREATED_BY))
-            $columns[CourseMaterialPeer::CREATED_BY] = $obj->getCreatedBy();
-
-        if ($obj->isNew() || $obj->isColumnModified(CourseMaterialPeer::CREATED_AT))
-            $columns[CourseMaterialPeer::CREATED_AT] = $obj->getCreatedAt();
-
         }
 
         return BasePeer::doValidate(CourseMaterialPeer::DATABASE_NAME, CourseMaterialPeer::TABLE_NAME, $columns);

@@ -970,15 +970,6 @@ abstract class BaseStudentPeer
             }
         } else {
 
-        if ($obj->isNew() || $obj->isColumnModified(StudentPeer::BIO))
-            $columns[StudentPeer::BIO] = $obj->getBio();
-
-        if ($obj->isNew() || $obj->isColumnModified(StudentPeer::ACTIVITIES))
-            $columns[StudentPeer::ACTIVITIES] = $obj->getActivities();
-
-        if ($obj->isNew() || $obj->isColumnModified(StudentPeer::INTERESTS))
-            $columns[StudentPeer::INTERESTS] = $obj->getInterests();
-
         }
 
         return BasePeer::doValidate(StudentPeer::DATABASE_NAME, StudentPeer::TABLE_NAME, $columns);

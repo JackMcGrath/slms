@@ -793,21 +793,6 @@ abstract class BaseDocumentPeer
             }
         } else {
 
-        if ($obj->isNew() || $obj->isColumnModified(DocumentPeer::REFERENCE_ID))
-            $columns[DocumentPeer::REFERENCE_ID] = $obj->getReferenceId();
-
-        if ($obj->isNew() || $obj->isColumnModified(DocumentPeer::TYPE))
-            $columns[DocumentPeer::TYPE] = $obj->getType();
-
-        if ($obj->isNew() || $obj->isColumnModified(DocumentPeer::STORAGE))
-            $columns[DocumentPeer::STORAGE] = $obj->getStorage();
-
-        if ($obj->isNew() || $obj->isColumnModified(DocumentPeer::PATH))
-            $columns[DocumentPeer::PATH] = $obj->getPath();
-
-        if ($obj->isNew() || $obj->isColumnModified(DocumentPeer::CREATED_AT))
-            $columns[DocumentPeer::CREATED_AT] = $obj->getCreatedAt();
-
         }
 
         return BasePeer::doValidate(DocumentPeer::DATABASE_NAME, DocumentPeer::TABLE_NAME, $columns);
