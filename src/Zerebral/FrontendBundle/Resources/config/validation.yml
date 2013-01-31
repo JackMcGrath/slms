@@ -146,7 +146,7 @@ Zerebral\BusinessBundle\Model\Assignment\AssignmentCategory:
             message: Category already exists
     getters:
         name:
-            - MaxLength: 250
+            - MaxLength: 50
 
 
 Zerebral\BusinessBundle\Model\Assignment\StudentAssignment:
