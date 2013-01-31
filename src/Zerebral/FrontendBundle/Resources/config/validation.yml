@@ -144,6 +144,10 @@ Zerebral\BusinessBundle\Model\Assignment\AssignmentCategory:
     constraints:
         - Zerebral\BusinessBundle\Validator\Constraints\UniqueAssignmentCategory:
             message: Category already exists
+    getters:
+        name:
+            - MaxLength: 50
+
 
 Zerebral\BusinessBundle\Model\Assignment\StudentAssignment:
     getters:
