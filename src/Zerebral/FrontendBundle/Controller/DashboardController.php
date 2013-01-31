@@ -20,7 +20,7 @@ class DashboardController extends \Zerebral\CommonBundle\Component\Controller
     public function indexAction()
     {
         if ($this->getUser()->isGuardian()) {
-            return $this->redirect($this->generateUrl('myprofile'));
+            return $this->redirect($this->generateUrl('guardian_summary'));
         }
 
         $feedItemFormType = new FormType\FeedItemType();

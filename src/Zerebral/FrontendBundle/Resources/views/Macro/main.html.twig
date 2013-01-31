@@ -44,6 +44,16 @@
     </ul>
 {% endmacro %}
 
+{% macro guardianTopMenu(selected) %}
+    <ul>
+        <li{{ selected == 'summary' ? ' class="active"' : '' }}><a href="{{ path('guardian_summary') }}">Summary</a></li>
+        <li{{ selected == 'grades' ? ' class="active"' : '' }}><a href="#">Grades</a></li>
+        <li{{ selected == 'attendance' ? ' class="active"' : '' }}><a href="{{ path('guardian_attendance') }}">Attendance</a></li>
+        <li{{ selected == 'assignments' ? ' class="active"' : '' }}><a href="{{ path('guardian_assignments') }}">Assignments</a></li>
+        <li{{ selected == 'guardians' ? ' class="active"' : '' }}><a href="#">Parents</a></li>
+    </ul>
+{% endmacro %}
+
 {% macro teacherShortInfo(teacher) %}
 <div class="teacher-profile-widget">
     <h4>Teacher profile</h4>
