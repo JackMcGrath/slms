@@ -1,31 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <database name="default" defaultIdMethod="native" package="document" namespace="Zerebral\BusinessBundle\Model\Document" defaultPhpNamingMethod="phpname">
+
     <table name="documents" phpName="Document" idMethod="native">
         <column name="reference_id" phpName="ReferenceId" type="INTEGER" sqlType="int(11) unsigned" required="true" primaryKey="true"/>
         <column name="type" phpName="Type" type="VARCHAR" valueSet="assignment,student_assignment" sqlType="enum('assignment','student_assignment')" required="true" primaryKey="true"/>
         <column name="storage" phpName="Storage" type="VARCHAR" valueSet="local" sqlType="enum('local')" required="true"/>
         <column name="path" phpName="Path" type="VARCHAR" size="200" required="true"/>
         <column name="created_at" phpName="CreatedAt" type="TIMESTAMP" required="true"/>
-        <validator column="reference_id">
-            <rule name="required" message="The field reference_id is required."/>
-            <rule name="maxValue" value="REPLACEME" message="The field reference_id must be not greater than REPLACEME."/>
-            <rule name="type" value="int" message="The column reference_id must be an int value."/>
-        </validator>
-        <validator column="type">
-            <rule name="required" message="The field type is required."/>
-            <rule name="type" value="string" message="The column type must be an string value."/>
-        </validator>
-        <validator column="storage">
-            <rule name="required" message="The field storage is required."/>
-            <rule name="type" value="string" message="The column storage must be an string value."/>
-        </validator>
-        <validator column="path">
-            <rule name="required" message="The field path is required."/>
-            <rule name="type" value="string" message="The column path must be an string value."/>
-        </validator>
-        <validator column="created_at">
-            <rule name="required" message="The field created_at is required."/>
-            <rule name="type" value="string" message="The column created_at must be an string value."/>
-        </validator>
     </table>
+
 </database>

@@ -1,39 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <database name="default" defaultIdMethod="native" package="assignment" namespace="Zerebral\BusinessBundle\Model\Assignment" defaultPhpNamingMethod="phpname">
+
     <table name="assignment_categories" phpName="AssignmentCategory" idMethod="native">
         <column name="id" phpName="Id" type="TINYINT" size="2" sqlType="tinyint(2) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="course_id" phpName="CourseId" type="INTEGER" sqlType="int(11) unsigned" required="false"/>
         <column name="teacher_id" phpName="TeacherId" type="INTEGER" sqlType="int(11) unsigned" required="false"/>
         <column name="name" phpName="Name" type="VARCHAR" size="50" required="true"/>
         <column name="created_at" phpName="CreatedAt" type="TIMESTAMP" required="true"/>
-        <validator column="id">
-            <rule name="required" message="The field id is required."/>
-            <rule name="maxValue" value="REPLACEME" message="The field id must be not greater than REPLACEME."/>
-            <rule name="type" value="int" message="The column id must be an int value."/>
-        </validator>
-        <validator column="course_id">
-            <rule name="maxValue" value="REPLACEME" message="The field course_id must be not greater than REPLACEME."/>
-            <rule name="type" value="int" message="The column course_id must be an int value."/>
-        </validator>
-        <validator column="teacher_id">
-            <rule name="required" message="The field teacher_id is required."/>
-            <rule name="maxValue" value="REPLACEME" message="The field teacher_id must be not greater than REPLACEME."/>
-            <rule name="type" value="int" message="The column teacher_id must be an int value."/>
-        </validator>
-        <validator column="name">
-            <rule name="required" message="The field name is required."/>
-            <rule name="type" value="string" message="The column name must be an string value."/>
-        </validator>
-        <validator column="created_at">
-            <rule name="required" message="The field created_at is required."/>
-            <rule name="type" value="string" message="The column created_at must be an string value."/>
-        </validator>
+
         <foreign-key foreignTable="courses" name="assignment_categories_courses" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="course_id" foreign="id"/>
         </foreign-key>
         <foreign-key foreignTable="teachers" name="assignment_categories_teachers" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="teacher_id" foreign="id"/>
         </foreign-key>
+
         <index name="assignment_categories_courses">
             <index-column name="course_id"/>
         </index>
@@ -41,6 +22,7 @@
             <index-column name="teacher_id"/>
         </index>
     </table>
+
     <table name="assignments" phpName="Assignment" idMethod="native">
         <column name="id" phpName="Id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="teacher_id" phpName="TeacherId" type="INTEGER" sqlType="int(11) unsigned" required="true"/>
@@ -52,6 +34,7 @@
         <column name="grade_type" phpName="GradeType" type="CHAR" valueSet="numeric,pass" sqlType="enum('numeric','pass')" required="true" defaultValue="numeric"/>
         <column name="threshold" phpName="Threshold" type="SMALLINT" size="3" sqlType="smallint(3) unsigned" required="false"/>
         <column name="due_at" phpName="DueAt" type="TIMESTAMP" required="false"/>
+
         <foreign-key foreignTable="teachers" name="assignments_teachers" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="teacher_id" foreign="id"/>
         </foreign-key>
@@ -61,6 +44,7 @@
         <foreign-key foreignTable="assignment_categories" name="assignments_assignment_categories" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="assignment_category_id" foreign="id"/>
         </foreign-key>
+
         <index name="assignments_teachers">
             <index-column name="teacher_id"/>
         </index>
@@ -93,12 +77,14 @@
         <column name="grading_comment" phpName="GradingComment" type="LONGVARCHAR" required="false"/>
         <column name="submitted_at" phpName="SubmittedAt" type="TIMESTAMP" required="false"/>
         <column name="created_at" phpName="CreatedAt" type="TIMESTAMP" required="true"/>
+
         <foreign-key foreignTable="students" name="student_assignments_student" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="student_id" foreign="id"/>
         </foreign-key>
         <foreign-key foreignTable="assignments" name="student_assignments_assignments" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="assignment_id" foreign="id"/>
         </foreign-key>
+
         <index name="student_assignments_student">
             <index-column name="student_id"/>
         </index>
@@ -118,4 +104,5 @@
             <reference local="student_assignment_id" foreign="id"/>
         </foreign-key>
     </table>
+
 </database>

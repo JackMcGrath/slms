@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <database name="default" defaultIdMethod="native" package="user" namespace="Zerebral\BusinessBundle\Model\File" defaultPhpNamingMethod="phpname">
+
     <table name="files" phpName="File" idMethod="native">
         <column name="id" phpName="Id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="path" phpName="Path" type="VARCHAR" size="50" required="true"/>
@@ -10,4 +11,5 @@
         <column name="storage" phpName="Storage" type="CHAR" valueSet="local,dropbox,s3" sqlType="enum('local','dropbox','s3')" required="true" defaultValue="local"/>
         <column name="created_at" phpName="CreatedAt" type="TIMESTAMP" required="true"/>
     </table>
+
 </database>
