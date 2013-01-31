@@ -28,12 +28,11 @@ ZerebralAjaxForm.prototype = {
         var form = $(this.element);
         form.find('.control-group').removeClass('error');
         form.find('.control-group .help-inline').remove();
-console.log(response.errors);
+
         if (response.has_errors) {
             $.each(response.errors, function(elementName, errors) {
                 var errorHtml = '<span class="help-inline">' + errors.join('<br>') + '</span>';
                 var element = form.find('[name^="' + elementName.replace(/\[/g,'\\[').replace(/\]/g,'\\]') + '"]').last();
-                console.log('[name^="' + elementName.replace(/\[/g,'\\[').replace(/\]/g,'\\]') + '"]');
                 element.parents('.control-group').addClass('error');
                 var control = element.parents('.controls');
                 if (control.length) {
