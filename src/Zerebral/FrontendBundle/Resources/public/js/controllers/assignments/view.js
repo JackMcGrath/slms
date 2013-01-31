@@ -24,4 +24,8 @@ $(document).ready(function(){
     $('#ajaxUploadSolutionsForm').zerebralAjaxForm();
 
     $('.assignment-details-feed').zerebralAssignmentDetailFeedBlock();
+
+    if (window.location.hash == '#assignmentFeed') {
+        $(document).scrollTo('#assignmentFeed', {offset:{top:-50}});
+    }
 });
