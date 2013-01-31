@@ -36,8 +36,10 @@ class GuardianController extends \Zerebral\CommonBundle\Component\Controller
      * @Secure(roles="ROLE_GUARDIAN")
      * @Template
      */
-    public function assignementsAction()
+    public function assignmentsAction()
     {
-        return array();
+        return array(
+            'guardian' => $this->getRoleUser()
+        );
     }
 }

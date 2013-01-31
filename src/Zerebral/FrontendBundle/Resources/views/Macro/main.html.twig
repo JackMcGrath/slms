@@ -1,5 +1,5 @@
 {% macro month(calendar) %}
-    <div class="calendar-widget">
+    <div class="calendar-widget" xmlns="http://www.w3.org/1999/html">
         <h4>{{ calendar.currentMonth.format('F') }}</h4>
         <table class="">
             <tr class="day-name">
@@ -25,6 +25,20 @@
 
         </table>
     </div>
+{% endmacro %}
+
+{% macro guardianChildrenSelect(guardian) %}
+    {% set children = guardian.students %}
+    {% if children|length > 1 %}
+        <div class="pull-right"><small>Child: </small>
+        <select style="position: relative; top: 5px;">
+            {% for child in children %}
+                <option value="{{ child.id }}">{{ child.fullName }}</option>
+            {% endfor %}
+        </select>
+        </small></div>
+    {% endif %}
+
 {% endmacro %}
 
 

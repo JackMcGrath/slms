@@ -1,0 +1,38 @@
+{% extends 'ZerebralFrontendBundle::layout.html.twig' %}
+{% import "ZerebralFrontendBundle:Macro:main.html.twig" as mainPartials %}
+
+{% block content %}
+    {% javascripts '@ZerebralFrontendBundle/Resources/public/js/controllers/guardian/index.js' output='js/compiled/guardian_index.js' %}
+    <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+
+    <div class="top-second-navbar">
+        {{ mainPartials.guardianTopMenu('assignments') }}
+    </div>
+
+    <div class="row-fluid courses-list course-details">
+        <div class="span6 main-list-block">
+            <div class="row-fluid manage">
+                <h2 class="pull-left form-title" style="width: 675px;">
+                    Assignments
+                    {#<select class="pull-right" style="margin-bottom: 0; position: relative; top: 5px;">#}
+                        {#<option>1</option>#}
+                        {#<option>2</option>#}
+                    {#</select>#}
+                    {{ mainPartials.guardianChildrenSelect(guardian) }}
+                </h2>
+            </div>
+
+            <hr/>
+
+
+
+            <div class="description">
+                There will be statistics about children
+            </div>
+        </div>
+        <div class="right-navbar pull-left">
+
+        </div>
+    </div>
+{% endblock %}
