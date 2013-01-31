@@ -9,6 +9,8 @@ use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\SecureParam;
 use JMS\SecurityExtraBundle\Annotation\PreAuthorize;
 
+use Zerebral\BusinessBundle\Model\User\User;
+
 use Zerebral\FrontendBundle\Form\Type as FormType;
 use Zerebral\BusinessBundle\Model as Model;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,15 +19,24 @@ class UserController extends \Zerebral\CommonBundle\Component\Controller
 {
     /**
      * @Route("/my-profile", name="myprofile")
-     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @PreAuthorize("hasRole('ROLE_USER')")
      * @Template()
      */
     public function profileAction()
     {
-        if ($this->get('security.context')->isGranted('ROLE_TEACHER')) {
-            $profileType = new FormType\TeacherProfileType();
-        } else {
-            $profileType = new FormType\StudentProfileType();
+        $profileType = null;
+
+        $userRole = $this->getUser()->getRole();
+        switch ($userRole) {
+            case (User::ROLE_TEACHER):
+                $profileType = new FormType\TeacherProfileType();
+                break;
+            case (User::ROLE_STUDENT):
+                $profileType = new FormType\StudentProfileType();
+                break;
+            case (User::ROLE_GUARDIAN):
+                $profileType = new FormType\GuardianProfileType();
+                break;
         }
 
 
