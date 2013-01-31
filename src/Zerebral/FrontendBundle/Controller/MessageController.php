@@ -161,14 +161,8 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
             if ($form->isValid()) {
                 /** @var $newMessage Model\Message\Message */
                 $newMessage = $form->getData();
-
-                foreach ($newMessage->getRecipients() as $recipient) {
-                    $recipientMessage = clone $newMessage;
-                    $recipientMessage->setTo($recipient);
-                    $recipientMessage->setFromId($this->getUser()->getId());
-                    $recipientMessage->setUserId($recipient->getId());
-                    $recipientMessage->save();
-                }
+                $newMessage->getMessage()->setFromId($this->getUser()->getId());
+                $newMessage->save();
 
                 $this->setFlash('message_compose_success', 'Message has been successfully sent.');
                 return $this->redirect($this->generateUrl('messages_inbox'));
@@ -270,14 +264,8 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
             if ($form->isValid()) {
                 /** @var $newMessage Model\Message\Message */
                 $newMessage = $form->getData();
-
-                foreach ($newMessage->getRecipients() as $recipient) {
-                    $recipientMessage = clone $newMessage;
-                    $recipientMessage->setTo($recipient);
-                    $recipientMessage->setFromId($this->getUser()->getId());
-                    $recipientMessage->setUserId($recipient->getId());
-                    $recipientMessage->save();
-                }
+                $newMessage->getMessage()->setFromId($this->getUser()->getId());
+                $newMessage->save();
 
                 return new JsonResponse(array(
                     'success' => true,

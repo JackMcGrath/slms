@@ -45,6 +45,7 @@ class MessageType extends AbstractType
         $resolver->setDefaults(
             array(
                 'data_class' => 'Zerebral\BusinessBundle\Model\Message\Message',
+
             )
         );
     }

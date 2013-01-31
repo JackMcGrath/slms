@@ -63,14 +63,4 @@ class Message extends BaseMessage
     {
         $this->setUserRelatedByToId($user);
     }
-
-    public function getRecipients()
-    {
-        return $this->recipients;
-    }
-
-    public function setRecipients($recipients)
-    {
-        $this->recipients = $recipients;
-    }
 }

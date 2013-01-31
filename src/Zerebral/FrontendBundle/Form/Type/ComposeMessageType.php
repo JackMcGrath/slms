@@ -17,28 +17,16 @@ class ComposeMessageType extends AbstractType
         $builder->add('message', new MessageType());
         $builder->add('recipients', 'collection', array(
             'type' => 'model',
-            'by_reference' => false,
+            'by_reference' => true,
             'allow_add' => true,
             'allow_delete' => true,
-            'cascade_validation' => true,
+            'cascade_validation' => false,
             'error_bubbling' => false,
             'options' => array(
                 'class' => 'Zerebral\BusinessBundle\Model\User\User',
                 'required' => true
             )
         ));
-
-
-
-//                $field = $formFactory->createNamed('to', 'model', $message->getTo(), array(
-//                    'class' => 'Zerebral\BusinessBundle\Model\User\User',
-//                    'property' => 'full_name',
-//                    'required' => false,
-//                    'empty_value' => "To",
-//                    'empty_data' => 0,
-//                    'invalid_message' => 'Recipient is required.'
-//                ));
-
     }
 
     public function getName()
@@ -52,7 +40,6 @@ class ComposeMessageType extends AbstractType
             array(
                 'data_class' => 'Zerebral\BusinessBundle\Model\Message\ComposeMessage',
                 'cascade_validation' => true,
-
             )
         );
     }
