@@ -68,4 +68,16 @@
         </behavior>
     </table>
 
+    <table name="student_guardians" phpName="StudentGuardian" isCrossRef="true">
+        <column name="student_id" phpName="studentId" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" required="true"/>
+        <column name="guardian_id" phpName="guardianId" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" required="true"/>
+
+        <foreign-key foreignTable="students" name="student_guardians_students" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="student_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="guardians" name="student_guardians_guardians" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="guardian_id" foreign="id"/>
+        </foreign-key>
+    </table>
+
 </database>

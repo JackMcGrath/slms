@@ -7,7 +7,7 @@ use \TableMap;
 
 
 /**
- * This class defines the structure of the 'guardians' table.
+ * This class defines the structure of the 'student_guardians' table.
  *
  *
  *
@@ -18,13 +18,13 @@ use \TableMap;
  *
  * @package    propel.generator.Zerebral.BusinessBundle.Model.User.map
  */
-class GuardianTableMap extends TableMap
+class StudentGuardianTableMap extends TableMap
 {
 
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Zerebral.BusinessBundle.Model.User.map.GuardianTableMap';
+    const CLASS_NAME = 'Zerebral.BusinessBundle.Model.User.map.StudentGuardianTableMap';
 
     /**
      * Initialize the table attributes, columns and validators
@@ -36,15 +36,15 @@ class GuardianTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('guardians');
-        $this->setPhpName('Guardian');
-        $this->setClassname('Zerebral\\BusinessBundle\\Model\\User\\Guardian');
+        $this->setName('student_guardians');
+        $this->setPhpName('StudentGuardian');
+        $this->setClassname('Zerebral\\BusinessBundle\\Model\\User\\StudentGuardian');
         $this->setPackage('Zerebral.BusinessBundle.Model.User');
-        $this->setUseIdGenerator(true);
+        $this->setUseIdGenerator(false);
+        $this->setIsCrossRef(true);
         // columns
-        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignKey('user_id', 'UserId', 'INTEGER', 'users', 'id', true, null, null);
-        $this->addColumn('notes', 'Notes', 'LONGVARCHAR', false, null, null);
+        $this->addForeignPrimaryKey('student_id', 'studentId', 'INTEGER' , 'students', 'id', true, null, null);
+        $this->addForeignPrimaryKey('guardian_id', 'guardianId', 'INTEGER' , 'guardians', 'id', true, null, null);
         // validators
     } // initialize()
 
@@ -53,9 +53,8 @@ class GuardianTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('User', 'Zerebral\\BusinessBundle\\Model\\User\\User', RelationMap::MANY_TO_ONE, array('user_id' => 'id', ), null, null);
-        $this->addRelation('StudentGuardian', 'Zerebral\\BusinessBundle\\Model\\User\\StudentGuardian', RelationMap::ONE_TO_MANY, array('id' => 'guardian_id', ), 'CASCADE', 'CASCADE', 'StudentGuardians');
-        $this->addRelation('Student', 'Zerebral\\BusinessBundle\\Model\\User\\Student', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'CASCADE', 'Students');
+        $this->addRelation('Student', 'Zerebral\\BusinessBundle\\Model\\User\\Student', RelationMap::MANY_TO_ONE, array('student_id' => 'id', ), 'CASCADE', 'CASCADE');
+        $this->addRelation('Guardian', 'Zerebral\\BusinessBundle\\Model\\User\\Guardian', RelationMap::MANY_TO_ONE, array('guardian_id' => 'id', ), 'CASCADE', 'CASCADE');
     } // buildRelations()
 
     /**
@@ -67,12 +66,9 @@ class GuardianTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'delegate' =>  array (
-  'to' => 'users',
-),
             'event' =>  array (
 ),
         );
     } // getBehaviors()
 
-} // GuardianTableMap
+} // StudentGuardianTableMap

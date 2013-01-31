@@ -15,72 +15,68 @@ use \PropelPDO;
 use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\QueryEvent;
 use Zerebral\BusinessBundle\Model\User\Guardian;
-use Zerebral\BusinessBundle\Model\User\GuardianPeer;
-use Zerebral\BusinessBundle\Model\User\GuardianQuery;
 use Zerebral\BusinessBundle\Model\User\Student;
 use Zerebral\BusinessBundle\Model\User\StudentGuardian;
-use Zerebral\BusinessBundle\Model\User\User;
+use Zerebral\BusinessBundle\Model\User\StudentGuardianPeer;
+use Zerebral\BusinessBundle\Model\User\StudentGuardianQuery;
 
 /**
- * @method GuardianQuery orderById($order = Criteria::ASC) Order by the id column
- * @method GuardianQuery orderByUserId($order = Criteria::ASC) Order by the user_id column
- * @method GuardianQuery orderByNotes($order = Criteria::ASC) Order by the notes column
+ * @method StudentGuardianQuery orderBystudentId($order = Criteria::ASC) Order by the student_id column
+ * @method StudentGuardianQuery orderByguardianId($order = Criteria::ASC) Order by the guardian_id column
  *
- * @method GuardianQuery groupById() Group by the id column
- * @method GuardianQuery groupByUserId() Group by the user_id column
- * @method GuardianQuery groupByNotes() Group by the notes column
+ * @method StudentGuardianQuery groupBystudentId() Group by the student_id column
+ * @method StudentGuardianQuery groupByguardianId() Group by the guardian_id column
  *
- * @method GuardianQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
- * @method GuardianQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
- * @method GuardianQuery innerJoin($relation) Adds a INNER JOIN clause to the query
+ * @method StudentGuardianQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
+ * @method StudentGuardianQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
+ * @method StudentGuardianQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method GuardianQuery leftJoinUser($relationAlias = null) Adds a LEFT JOIN clause to the query using the User relation
- * @method GuardianQuery rightJoinUser($relationAlias = null) Adds a RIGHT JOIN clause to the query using the User relation
- * @method GuardianQuery innerJoinUser($relationAlias = null) Adds a INNER JOIN clause to the query using the User relation
+ * @method StudentGuardianQuery leftJoinStudent($relationAlias = null) Adds a LEFT JOIN clause to the query using the Student relation
+ * @method StudentGuardianQuery rightJoinStudent($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Student relation
+ * @method StudentGuardianQuery innerJoinStudent($relationAlias = null) Adds a INNER JOIN clause to the query using the Student relation
  *
- * @method GuardianQuery leftJoinStudentGuardian($relationAlias = null) Adds a LEFT JOIN clause to the query using the StudentGuardian relation
- * @method GuardianQuery rightJoinStudentGuardian($relationAlias = null) Adds a RIGHT JOIN clause to the query using the StudentGuardian relation
- * @method GuardianQuery innerJoinStudentGuardian($relationAlias = null) Adds a INNER JOIN clause to the query using the StudentGuardian relation
+ * @method StudentGuardianQuery leftJoinGuardian($relationAlias = null) Adds a LEFT JOIN clause to the query using the Guardian relation
+ * @method StudentGuardianQuery rightJoinGuardian($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Guardian relation
+ * @method StudentGuardianQuery innerJoinGuardian($relationAlias = null) Adds a INNER JOIN clause to the query using the Guardian relation
  *
- * @method Guardian findOne(PropelPDO $con = null) Return the first Guardian matching the query
- * @method Guardian findOneOrCreate(PropelPDO $con = null) Return the first Guardian matching the query, or a new Guardian object populated from the query conditions when no match is found
+ * @method StudentGuardian findOne(PropelPDO $con = null) Return the first StudentGuardian matching the query
+ * @method StudentGuardian findOneOrCreate(PropelPDO $con = null) Return the first StudentGuardian matching the query, or a new StudentGuardian object populated from the query conditions when no match is found
  *
- * @method Guardian findOneByUserId(int $user_id) Return the first Guardian filtered by the user_id column
- * @method Guardian findOneByNotes(string $notes) Return the first Guardian filtered by the notes column
+ * @method StudentGuardian findOneBystudentId(int $student_id) Return the first StudentGuardian filtered by the student_id column
+ * @method StudentGuardian findOneByguardianId(int $guardian_id) Return the first StudentGuardian filtered by the guardian_id column
  *
- * @method array findById(int $id) Return Guardian objects filtered by the id column
- * @method array findByUserId(int $user_id) Return Guardian objects filtered by the user_id column
- * @method array findByNotes(string $notes) Return Guardian objects filtered by the notes column
+ * @method array findBystudentId(int $student_id) Return StudentGuardian objects filtered by the student_id column
+ * @method array findByguardianId(int $guardian_id) Return StudentGuardian objects filtered by the guardian_id column
  */
-abstract class BaseGuardianQuery extends ModelCriteria
+abstract class BaseStudentGuardianQuery extends ModelCriteria
 {
     /**
-     * Initializes internal state of BaseGuardianQuery object.
+     * Initializes internal state of BaseStudentGuardianQuery object.
      *
      * @param     string $dbName The dabase name
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'default', $modelName = 'Zerebral\\BusinessBundle\\Model\\User\\Guardian', $modelAlias = null)
+    public function __construct($dbName = 'default', $modelName = 'Zerebral\\BusinessBundle\\Model\\User\\StudentGuardian', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
         EventDispatcherProxy::trigger(array('construct','query.construct'), new QueryEvent($this));
 }
 
     /**
-     * Returns a new GuardianQuery object.
+     * Returns a new StudentGuardianQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     GuardianQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param     StudentGuardianQuery|Criteria $criteria Optional Criteria to build the query from
      *
-     * @return GuardianQuery
+     * @return StudentGuardianQuery
      */
     public static function create($modelAlias = null, $criteria = null)
     {
-        if ($criteria instanceof GuardianQuery) {
+        if ($criteria instanceof StudentGuardianQuery) {
             return $criteria;
         }
-        $query = new GuardianQuery();
+        $query = new StudentGuardianQuery();
         if (null !== $modelAlias) {
             $query->setModelAlias($modelAlias);
         }
@@ -97,25 +93,26 @@ abstract class BaseGuardianQuery extends ModelCriteria
      * Go fast if the query is untouched.
      *
      * <code>
-     * $obj  = $c->findPk(12, $con);
+     * $obj = $c->findPk(array(12, 34), $con);
      * </code>
      *
-     * @param mixed $key Primary key to use for the query
+     * @param array $key Primary key to use for the query
+                         A Primary key composition: [$student_id, $guardian_id]
      * @param     PropelPDO $con an optional connection object
      *
-     * @return   Guardian|Guardian[]|mixed the result, formatted by the current formatter
+     * @return   StudentGuardian|StudentGuardian[]|mixed the result, formatted by the current formatter
      */
     public function findPk($key, $con = null)
     {
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = GuardianPeer::getInstanceFromPool((string) $key))) && !$this->formatter) {
+        if ((null !== ($obj = StudentGuardianPeer::getInstanceFromPool(serialize(array((string) $key[0], (string) $key[1]))))) && !$this->formatter) {
             // the object is alredy in the instance pool
             return $obj;
         }
         if ($con === null) {
-            $con = Propel::getConnection(GuardianPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(StudentGuardianPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
         $this->basePreSelect($con);
         if ($this->formatter || $this->modelAlias || $this->with || $this->select
@@ -128,35 +125,22 @@ abstract class BaseGuardianQuery extends ModelCriteria
     }
 
     /**
-     * Alias of findPk to use instance pooling
-     *
-     * @param     mixed $key Primary key to use for the query
-     * @param     PropelPDO $con A connection object
-     *
-     * @return   Guardian A model object, or null if the key is not found
-     * @throws   PropelException
-     */
-     public function findOneById($key, $con = null)
-     {
-        return $this->findPk($key, $con);
-     }
-
-    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Guardian A model object, or null if the key is not found
+     * @return   StudentGuardian A model object, or null if the key is not found
      * @throws   PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `user_id`, `notes` FROM `guardians` WHERE `id` = :p0';
+        $sql = 'SELECT `student_id`, `guardian_id` FROM `student_guardians` WHERE `student_id` = :p0 AND `guardian_id` = :p1';
         try {
             $stmt = $con->prepare($sql);
-            $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
+            $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
+            $stmt->bindValue(':p1', $key[1], PDO::PARAM_INT);
             $stmt->execute();
         } catch (Exception $e) {
             Propel::log($e->getMessage(), Propel::LOG_ERR);
@@ -164,9 +148,9 @@ abstract class BaseGuardianQuery extends ModelCriteria
         }
         $obj = null;
         if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $obj = new Guardian();
+            $obj = new StudentGuardian();
             $obj->hydrate($row);
-            GuardianPeer::addInstanceToPool($obj, (string) $key);
+            StudentGuardianPeer::addInstanceToPool($obj, serialize(array((string) $key[0], (string) $key[1])));
         }
         $stmt->closeCursor();
 
@@ -179,7 +163,7 @@ abstract class BaseGuardianQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return Guardian|Guardian[]|mixed the result, formatted by the current formatter
+     * @return StudentGuardian|StudentGuardian[]|mixed the result, formatted by the current formatter
      */
     protected function findPkComplex($key, $con)
     {
@@ -195,12 +179,12 @@ abstract class BaseGuardianQuery extends ModelCriteria
     /**
      * Find objects by primary key
      * <code>
-     * $objs = $c->findPks(array(12, 56, 832), $con);
+     * $objs = $c->findPks(array(array(12, 56), array(832, 123), array(123, 456)), $con);
      * </code>
      * @param     array $keys Primary keys to use for the query
      * @param     PropelPDO $con an optional connection object
      *
-     * @return PropelObjectCollection|Guardian[]|mixed the list of results, formatted by the current formatter
+     * @return PropelObjectCollection|StudentGuardian[]|mixed the list of results, formatted by the current formatter
      */
     public function findPks($keys, $con = null)
     {
@@ -221,12 +205,14 @@ abstract class BaseGuardianQuery extends ModelCriteria
      *
      * @param     mixed $key Primary key to use for the query
      *
-     * @return GuardianQuery The current query, for fluid interface
+     * @return StudentGuardianQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
+        $this->addUsingAlias(StudentGuardianPeer::STUDENT_ID, $key[0], Criteria::EQUAL);
+        $this->addUsingAlias(StudentGuardianPeer::GUARDIAN_ID, $key[1], Criteria::EQUAL);
 
-        return $this->addUsingAlias(GuardianPeer::ID, $key, Criteria::EQUAL);
+        return $this;
     }
 
     /**
@@ -234,291 +220,246 @@ abstract class BaseGuardianQuery extends ModelCriteria
      *
      * @param     array $keys The list of primary key to use for the query
      *
-     * @return GuardianQuery The current query, for fluid interface
+     * @return StudentGuardianQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
+        if (empty($keys)) {
+            return $this->add(null, '1<>1', Criteria::CUSTOM);
+        }
+        foreach ($keys as $key) {
+            $cton0 = $this->getNewCriterion(StudentGuardianPeer::STUDENT_ID, $key[0], Criteria::EQUAL);
+            $cton1 = $this->getNewCriterion(StudentGuardianPeer::GUARDIAN_ID, $key[1], Criteria::EQUAL);
+            $cton0->addAnd($cton1);
+            $this->addOr($cton0);
+        }
 
-        return $this->addUsingAlias(GuardianPeer::ID, $keys, Criteria::IN);
+        return $this;
     }
 
     /**
-     * Filter the query on the id column
+     * Filter the query on the student_id column
      *
      * Example usage:
      * <code>
-     * $query->filterById(1234); // WHERE id = 1234
-     * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterBystudentId(1234); // WHERE student_id = 1234
+     * $query->filterBystudentId(array(12, 34)); // WHERE student_id IN (12, 34)
+     * $query->filterBystudentId(array('min' => 12)); // WHERE student_id > 12
      * </code>
      *
-     * @param     mixed $id The value to use as filter.
+     * @see       filterByStudent()
+     *
+     * @param     mixed $studentId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return GuardianQuery The current query, for fluid interface
+     * @return StudentGuardianQuery The current query, for fluid interface
      */
-    public function filterById($id = null, $comparison = null)
+    public function filterBystudentId($studentId = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
+        if (is_array($studentId) && null === $comparison) {
             $comparison = Criteria::IN;
         }
 
-        return $this->addUsingAlias(GuardianPeer::ID, $id, $comparison);
+        return $this->addUsingAlias(StudentGuardianPeer::STUDENT_ID, $studentId, $comparison);
     }
 
     /**
-     * Filter the query on the user_id column
+     * Filter the query on the guardian_id column
      *
      * Example usage:
      * <code>
-     * $query->filterByUserId(1234); // WHERE user_id = 1234
-     * $query->filterByUserId(array(12, 34)); // WHERE user_id IN (12, 34)
-     * $query->filterByUserId(array('min' => 12)); // WHERE user_id > 12
+     * $query->filterByguardianId(1234); // WHERE guardian_id = 1234
+     * $query->filterByguardianId(array(12, 34)); // WHERE guardian_id IN (12, 34)
+     * $query->filterByguardianId(array('min' => 12)); // WHERE guardian_id > 12
      * </code>
      *
-     * @see       filterByUser()
+     * @see       filterByGuardian()
      *
-     * @param     mixed $userId The value to use as filter.
+     * @param     mixed $guardianId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return GuardianQuery The current query, for fluid interface
+     * @return StudentGuardianQuery The current query, for fluid interface
      */
-    public function filterByUserId($userId = null, $comparison = null)
+    public function filterByguardianId($guardianId = null, $comparison = null)
     {
-        if (is_array($userId)) {
-            $useMinMax = false;
-            if (isset($userId['min'])) {
-                $this->addUsingAlias(GuardianPeer::USER_ID, $userId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($userId['max'])) {
-                $this->addUsingAlias(GuardianPeer::USER_ID, $userId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
+        if (is_array($guardianId) && null === $comparison) {
+            $comparison = Criteria::IN;
         }
 
-        return $this->addUsingAlias(GuardianPeer::USER_ID, $userId, $comparison);
-    }
-
-    /**
-     * Filter the query on the notes column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByNotes('fooValue');   // WHERE notes = 'fooValue'
-     * $query->filterByNotes('%fooValue%'); // WHERE notes LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $notes The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return GuardianQuery The current query, for fluid interface
-     */
-    public function filterByNotes($notes = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($notes)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $notes)) {
-                $notes = str_replace('*', '%', $notes);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(GuardianPeer::NOTES, $notes, $comparison);
-    }
-
-    /**
-     * Filter the query by a related User object
-     *
-     * @param   User|PropelObjectCollection $user The related object(s) to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   GuardianQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByUser($user, $comparison = null)
-    {
-        if ($user instanceof User) {
-            return $this
-                ->addUsingAlias(GuardianPeer::USER_ID, $user->getId(), $comparison);
-        } elseif ($user instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
-            return $this
-                ->addUsingAlias(GuardianPeer::USER_ID, $user->toKeyValue('PrimaryKey', 'Id'), $comparison);
-        } else {
-            throw new PropelException('filterByUser() only accepts arguments of type User or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the User relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return GuardianQuery The current query, for fluid interface
-     */
-    public function joinUser($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('User');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'User');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the User relation User object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Zerebral\BusinessBundle\Model\User\UserQuery A secondary query class using the current class as primary query
-     */
-    public function useUserQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinUser($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'User', '\Zerebral\BusinessBundle\Model\User\UserQuery');
-    }
-
-    /**
-     * Filter the query by a related StudentGuardian object
-     *
-     * @param   StudentGuardian|PropelObjectCollection $studentGuardian  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   GuardianQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByStudentGuardian($studentGuardian, $comparison = null)
-    {
-        if ($studentGuardian instanceof StudentGuardian) {
-            return $this
-                ->addUsingAlias(GuardianPeer::ID, $studentGuardian->getguardianId(), $comparison);
-        } elseif ($studentGuardian instanceof PropelObjectCollection) {
-            return $this
-                ->useStudentGuardianQuery()
-                ->filterByPrimaryKeys($studentGuardian->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByStudentGuardian() only accepts arguments of type StudentGuardian or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the StudentGuardian relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return GuardianQuery The current query, for fluid interface
-     */
-    public function joinStudentGuardian($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('StudentGuardian');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'StudentGuardian');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the StudentGuardian relation StudentGuardian object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Zerebral\BusinessBundle\Model\User\StudentGuardianQuery A secondary query class using the current class as primary query
-     */
-    public function useStudentGuardianQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinStudentGuardian($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'StudentGuardian', '\Zerebral\BusinessBundle\Model\User\StudentGuardianQuery');
+        return $this->addUsingAlias(StudentGuardianPeer::GUARDIAN_ID, $guardianId, $comparison);
     }
 
     /**
      * Filter the query by a related Student object
-     * using the student_guardians table as cross reference
      *
-     * @param   Student $student the related object to use as filter
+     * @param   Student|PropelObjectCollection $student The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   GuardianQuery The current query, for fluid interface
+     * @return   StudentGuardianQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
      */
-    public function filterByStudent($student, $comparison = Criteria::EQUAL)
+    public function filterByStudent($student, $comparison = null)
+    {
+        if ($student instanceof Student) {
+            return $this
+                ->addUsingAlias(StudentGuardianPeer::STUDENT_ID, $student->getId(), $comparison);
+        } elseif ($student instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(StudentGuardianPeer::STUDENT_ID, $student->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByStudent() only accepts arguments of type Student or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Student relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return StudentGuardianQuery The current query, for fluid interface
+     */
+    public function joinStudent($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Student');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Student');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Student relation Student object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Zerebral\BusinessBundle\Model\User\StudentQuery A secondary query class using the current class as primary query
+     */
+    public function useStudentQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->useStudentGuardianQuery()
-            ->filterByStudent($student, $comparison)
-            ->endUse();
+            ->joinStudent($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Student', '\Zerebral\BusinessBundle\Model\User\StudentQuery');
+    }
+
+    /**
+     * Filter the query by a related Guardian object
+     *
+     * @param   Guardian|PropelObjectCollection $guardian The related object(s) to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   StudentGuardianQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByGuardian($guardian, $comparison = null)
+    {
+        if ($guardian instanceof Guardian) {
+            return $this
+                ->addUsingAlias(StudentGuardianPeer::GUARDIAN_ID, $guardian->getId(), $comparison);
+        } elseif ($guardian instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(StudentGuardianPeer::GUARDIAN_ID, $guardian->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByGuardian() only accepts arguments of type Guardian or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Guardian relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return StudentGuardianQuery The current query, for fluid interface
+     */
+    public function joinGuardian($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Guardian');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Guardian');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Guardian relation Guardian object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Zerebral\BusinessBundle\Model\User\GuardianQuery A secondary query class using the current class as primary query
+     */
+    public function useGuardianQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinGuardian($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Guardian', '\Zerebral\BusinessBundle\Model\User\GuardianQuery');
     }
 
     /**
      * Exclude object from result
      *
-     * @param   Guardian $guardian Object to remove from the list of results
+     * @param   StudentGuardian $studentGuardian Object to remove from the list of results
      *
-     * @return GuardianQuery The current query, for fluid interface
+     * @return StudentGuardianQuery The current query, for fluid interface
      */
-    public function prune($guardian = null)
+    public function prune($studentGuardian = null)
     {
-        if ($guardian) {
-            $this->addUsingAlias(GuardianPeer::ID, $guardian->getId(), Criteria::NOT_EQUAL);
+        if ($studentGuardian) {
+            $this->addCond('pruneCond0', $this->getAliasedColName(StudentGuardianPeer::STUDENT_ID), $studentGuardian->getstudentId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond1', $this->getAliasedColName(StudentGuardianPeer::GUARDIAN_ID), $studentGuardian->getguardianId(), Criteria::NOT_EQUAL);
+            $this->combine(array('pruneCond0', 'pruneCond1'), Criteria::LOGICAL_OR);
         }
 
         return $this;

@@ -13,6 +13,7 @@ use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\PeerEvent;
 use Zerebral\BusinessBundle\Model\User\Guardian;
 use Zerebral\BusinessBundle\Model\User\GuardianPeer;
+use Zerebral\BusinessBundle\Model\User\StudentGuardianPeer;
 use Zerebral\BusinessBundle\Model\User\UserPeer;
 use Zerebral\BusinessBundle\Model\User\map\GuardianTableMap;
 
@@ -375,6 +376,9 @@ abstract class BaseGuardianPeer
      */
     public static function clearRelatedInstancePool()
     {
+        // Invalidate objects in StudentGuardianPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        StudentGuardianPeer::clearInstancePool();
     }
 
     /**

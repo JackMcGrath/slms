@@ -15,6 +15,7 @@ use Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentPeer;
 use Zerebral\BusinessBundle\Model\Attendance\StudentAttendancePeer;
 use Zerebral\BusinessBundle\Model\Course\CourseStudentPeer;
 use Zerebral\BusinessBundle\Model\User\Student;
+use Zerebral\BusinessBundle\Model\User\StudentGuardianPeer;
 use Zerebral\BusinessBundle\Model\User\StudentPeer;
 use Zerebral\BusinessBundle\Model\User\UserPeer;
 use Zerebral\BusinessBundle\Model\User\map\StudentTableMap;
@@ -397,6 +398,9 @@ abstract class BaseStudentPeer
         // Invalidate objects in CourseStudentPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         CourseStudentPeer::clearInstancePool();
+        // Invalidate objects in StudentGuardianPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        StudentGuardianPeer::clearInstancePool();
     }
 
     /**

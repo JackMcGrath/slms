@@ -9,13 +9,19 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
+use \PropelCollection;
 use \PropelException;
+use \PropelObjectCollection;
 use \PropelPDO;
 use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\ModelEvent;
 use Zerebral\BusinessBundle\Model\User\Guardian;
 use Zerebral\BusinessBundle\Model\User\GuardianPeer;
 use Zerebral\BusinessBundle\Model\User\GuardianQuery;
+use Zerebral\BusinessBundle\Model\User\Student;
+use Zerebral\BusinessBundle\Model\User\StudentGuardian;
+use Zerebral\BusinessBundle\Model\User\StudentGuardianQuery;
+use Zerebral\BusinessBundle\Model\User\StudentQuery;
 use Zerebral\BusinessBundle\Model\User\User;
 use Zerebral\BusinessBundle\Model\User\UserQuery;
 
@@ -64,6 +70,17 @@ abstract class BaseGuardian extends BaseObject implements Persistent
     protected $aUser;
 
     /**
+     * @var        PropelObjectCollection|StudentGuardian[] Collection to store aggregation of StudentGuardian objects.
+     */
+    protected $collStudentGuardians;
+    protected $collStudentGuardiansPartial;
+
+    /**
+     * @var        PropelObjectCollection|Student[] Collection to store aggregation of Student objects.
+     */
+    protected $collStudents;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      * @var        boolean
@@ -82,6 +99,18 @@ abstract class BaseGuardian extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $studentsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $studentGuardiansScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -289,6 +318,9 @@ abstract class BaseGuardian extends BaseObject implements Persistent
         if ($deep) {  // also de-associate any related objects?
 
             $this->aUser = null;
+            $this->collStudentGuardians = null;
+
+            $this->collStudents = null;
         } // if (deep)
     }
 
@@ -432,6 +464,49 @@ abstract class BaseGuardian extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->studentsScheduledForDeletion !== null) {
+                if (!$this->studentsScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk = $this->getPrimaryKey();
+                    foreach ($this->studentsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($remotePk, $pk);
+                    }
+                    StudentGuardianQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->studentsScheduledForDeletion = null;
+                }
+
+                foreach ($this->getStudents() as $student) {
+                    if ($student->isModified()) {
+                        $student->save($con);
+                    }
+                }
+            } elseif ($this->collStudents) {
+                foreach ($this->collStudents as $student) {
+                    if ($student->isModified()) {
+                        $student->save($con);
+                    }
+                }
+            }
+
+            if ($this->studentGuardiansScheduledForDeletion !== null) {
+                if (!$this->studentGuardiansScheduledForDeletion->isEmpty()) {
+                    StudentGuardianQuery::create()
+                        ->filterByPrimaryKeys($this->studentGuardiansScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->studentGuardiansScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collStudentGuardians !== null) {
+                foreach ($this->collStudentGuardians as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             $this->alreadyInSave = false;
@@ -615,6 +690,14 @@ abstract class BaseGuardian extends BaseObject implements Persistent
             }
 
 
+                if ($this->collStudentGuardians !== null) {
+                    foreach ($this->collStudentGuardians as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
 
             $this->alreadyInValidation = false;
         }
@@ -695,6 +778,9 @@ abstract class BaseGuardian extends BaseObject implements Persistent
         if ($includeForeignObjects) {
             if (null !== $this->aUser) {
                 $result['User'] = $this->aUser->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->collStudentGuardians) {
+                $result['StudentGuardians'] = $this->collStudentGuardians->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -853,6 +939,12 @@ abstract class BaseGuardian extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
+            foreach ($this->getStudentGuardians() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addStudentGuardian($relObj->copy($deepCopy));
+                }
+            }
+
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -955,6 +1047,442 @@ abstract class BaseGuardian extends BaseObject implements Persistent
         return $this->aUser;
     }
 
+
+    /**
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
+     *
+     * @param string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('StudentGuardian' == $relationName) {
+            $this->initStudentGuardians();
+        }
+    }
+
+    /**
+     * Clears out the collStudentGuardians collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Guardian The current object (for fluent API support)
+     * @see        addStudentGuardians()
+     */
+    public function clearStudentGuardians()
+    {
+        $this->collStudentGuardians = null; // important to set this to null since that means it is uninitialized
+        $this->collStudentGuardiansPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collStudentGuardians collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialStudentGuardians($v = true)
+    {
+        $this->collStudentGuardiansPartial = $v;
+    }
+
+    /**
+     * Initializes the collStudentGuardians collection.
+     *
+     * By default this just sets the collStudentGuardians collection to an empty array (like clearcollStudentGuardians());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initStudentGuardians($overrideExisting = true)
+    {
+        if (null !== $this->collStudentGuardians && !$overrideExisting) {
+            return;
+        }
+        $this->collStudentGuardians = new PropelObjectCollection();
+        $this->collStudentGuardians->setModel('StudentGuardian');
+    }
+
+    /**
+     * Gets an array of StudentGuardian objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Guardian is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|StudentGuardian[] List of StudentGuardian objects
+     * @throws PropelException
+     */
+    public function getStudentGuardians($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collStudentGuardiansPartial && !$this->isNew();
+        if (null === $this->collStudentGuardians || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collStudentGuardians) {
+                // return empty collection
+                $this->initStudentGuardians();
+            } else {
+                $collStudentGuardians = StudentGuardianQuery::create(null, $criteria)
+                    ->filterByGuardian($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collStudentGuardiansPartial && count($collStudentGuardians)) {
+                      $this->initStudentGuardians(false);
+
+                      foreach($collStudentGuardians as $obj) {
+                        if (false == $this->collStudentGuardians->contains($obj)) {
+                          $this->collStudentGuardians->append($obj);
+                        }
+                      }
+
+                      $this->collStudentGuardiansPartial = true;
+                    }
+
+                    $collStudentGuardians->getInternalIterator()->rewind();
+                    return $collStudentGuardians;
+                }
+
+                if($partial && $this->collStudentGuardians) {
+                    foreach($this->collStudentGuardians as $obj) {
+                        if($obj->isNew()) {
+                            $collStudentGuardians[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collStudentGuardians = $collStudentGuardians;
+                $this->collStudentGuardiansPartial = false;
+            }
+        }
+
+        return $this->collStudentGuardians;
+    }
+
+    /**
+     * Sets a collection of StudentGuardian objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $studentGuardians A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Guardian The current object (for fluent API support)
+     */
+    public function setStudentGuardians(PropelCollection $studentGuardians, PropelPDO $con = null)
+    {
+        $studentGuardiansToDelete = $this->getStudentGuardians(new Criteria(), $con)->diff($studentGuardians);
+
+        $this->studentGuardiansScheduledForDeletion = unserialize(serialize($studentGuardiansToDelete));
+
+        foreach ($studentGuardiansToDelete as $studentGuardianRemoved) {
+            $studentGuardianRemoved->setGuardian(null);
+        }
+
+        $this->collStudentGuardians = null;
+        foreach ($studentGuardians as $studentGuardian) {
+            $this->addStudentGuardian($studentGuardian);
+        }
+
+        $this->collStudentGuardians = $studentGuardians;
+        $this->collStudentGuardiansPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related StudentGuardian objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related StudentGuardian objects.
+     * @throws PropelException
+     */
+    public function countStudentGuardians(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collStudentGuardiansPartial && !$this->isNew();
+        if (null === $this->collStudentGuardians || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collStudentGuardians) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getStudentGuardians());
+            }
+            $query = StudentGuardianQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByGuardian($this)
+                ->count($con);
+        }
+
+        return count($this->collStudentGuardians);
+    }
+
+    /**
+     * Method called to associate a StudentGuardian object to this object
+     * through the StudentGuardian foreign key attribute.
+     *
+     * @param    StudentGuardian $l StudentGuardian
+     * @return Guardian The current object (for fluent API support)
+     */
+    public function addStudentGuardian(StudentGuardian $l)
+    {
+        if ($this->collStudentGuardians === null) {
+            $this->initStudentGuardians();
+            $this->collStudentGuardiansPartial = true;
+        }
+        if (!in_array($l, $this->collStudentGuardians->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddStudentGuardian($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	StudentGuardian $studentGuardian The studentGuardian object to add.
+     */
+    protected function doAddStudentGuardian($studentGuardian)
+    {
+        $this->collStudentGuardians[]= $studentGuardian;
+        $studentGuardian->setGuardian($this);
+    }
+
+    /**
+     * @param	StudentGuardian $studentGuardian The studentGuardian object to remove.
+     * @return Guardian The current object (for fluent API support)
+     */
+    public function removeStudentGuardian($studentGuardian)
+    {
+        if ($this->getStudentGuardians()->contains($studentGuardian)) {
+            $this->collStudentGuardians->remove($this->collStudentGuardians->search($studentGuardian));
+            if (null === $this->studentGuardiansScheduledForDeletion) {
+                $this->studentGuardiansScheduledForDeletion = clone $this->collStudentGuardians;
+                $this->studentGuardiansScheduledForDeletion->clear();
+            }
+            $this->studentGuardiansScheduledForDeletion[]= clone $studentGuardian;
+            $studentGuardian->setGuardian(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Guardian is new, it will return
+     * an empty collection; or if this Guardian has previously
+     * been saved, it will retrieve related StudentGuardians from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Guardian.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|StudentGuardian[] List of StudentGuardian objects
+     */
+    public function getStudentGuardiansJoinStudent($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = StudentGuardianQuery::create(null, $criteria);
+        $query->joinWith('Student', $join_behavior);
+
+        return $this->getStudentGuardians($query, $con);
+    }
+
+    /**
+     * Clears out the collStudents collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Guardian The current object (for fluent API support)
+     * @see        addStudents()
+     */
+    public function clearStudents()
+    {
+        $this->collStudents = null; // important to set this to null since that means it is uninitialized
+        $this->collStudentsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * Initializes the collStudents collection.
+     *
+     * By default this just sets the collStudents collection to an empty collection (like clearStudents());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initStudents()
+    {
+        $this->collStudents = new PropelObjectCollection();
+        $this->collStudents->setModel('Student');
+    }
+
+    /**
+     * Gets a collection of Student objects related by a many-to-many relationship
+     * to the current object by way of the student_guardians cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Guardian is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return PropelObjectCollection|Student[] List of Student objects
+     */
+    public function getStudents($criteria = null, PropelPDO $con = null)
+    {
+        if (null === $this->collStudents || null !== $criteria) {
+            if ($this->isNew() && null === $this->collStudents) {
+                // return empty collection
+                $this->initStudents();
+            } else {
+                $collStudents = StudentQuery::create(null, $criteria)
+                    ->filterByGuardian($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collStudents;
+                }
+                $this->collStudents = $collStudents;
+            }
+        }
+
+        return $this->collStudents;
+    }
+
+    /**
+     * Sets a collection of Student objects related by a many-to-many relationship
+     * to the current object by way of the student_guardians cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $students A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Guardian The current object (for fluent API support)
+     */
+    public function setStudents(PropelCollection $students, PropelPDO $con = null)
+    {
+        $this->clearStudents();
+        $currentStudents = $this->getStudents();
+
+        $this->studentsScheduledForDeletion = $currentStudents->diff($students);
+
+        foreach ($students as $student) {
+            if (!$currentStudents->contains($student)) {
+                $this->doAddStudent($student);
+            }
+        }
+
+        $this->collStudents = $students;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of Student objects related by a many-to-many relationship
+     * to the current object by way of the student_guardians cross-reference table.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param boolean $distinct Set to true to force count distinct
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return int the number of related Student objects
+     */
+    public function countStudents($criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        if (null === $this->collStudents || null !== $criteria) {
+            if ($this->isNew() && null === $this->collStudents) {
+                return 0;
+            } else {
+                $query = StudentQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByGuardian($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collStudents);
+        }
+    }
+
+    /**
+     * Associate a Student object to this object
+     * through the student_guardians cross reference table.
+     *
+     * @param  Student $student The StudentGuardian object to relate
+     * @return Guardian The current object (for fluent API support)
+     */
+    public function addStudent(Student $student)
+    {
+        if ($this->collStudents === null) {
+            $this->initStudents();
+        }
+        if (!$this->collStudents->contains($student)) { // only add it if the **same** object is not already associated
+            $this->doAddStudent($student);
+
+            $this->collStudents[]= $student;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Student $student The student object to add.
+     */
+    protected function doAddStudent($student)
+    {
+        $studentGuardian = new StudentGuardian();
+        $studentGuardian->setStudent($student);
+        $this->addStudentGuardian($studentGuardian);
+    }
+
+    /**
+     * Remove a Student object to this object
+     * through the student_guardians cross reference table.
+     *
+     * @param Student $student The StudentGuardian object to relate
+     * @return Guardian The current object (for fluent API support)
+     */
+    public function removeStudent(Student $student)
+    {
+        if ($this->getStudents()->contains($student)) {
+            $this->collStudents->remove($this->collStudents->search($student));
+            if (null === $this->studentsScheduledForDeletion) {
+                $this->studentsScheduledForDeletion = clone $this->collStudents;
+                $this->studentsScheduledForDeletion->clear();
+            }
+            $this->studentsScheduledForDeletion[]= $student;
+        }
+
+        return $this;
+    }
+
     /**
      * Clears the current object and sets all attributes to their default values
      */
@@ -985,6 +1513,16 @@ abstract class BaseGuardian extends BaseObject implements Persistent
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->collStudentGuardians) {
+                foreach ($this->collStudentGuardians as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collStudents) {
+                foreach ($this->collStudents as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->aUser instanceof Persistent) {
               $this->aUser->clearAllReferences($deep);
             }
@@ -992,6 +1530,14 @@ abstract class BaseGuardian extends BaseObject implements Persistent
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
+        if ($this->collStudentGuardians instanceof PropelCollection) {
+            $this->collStudentGuardians->clearIterator();
+        }
+        $this->collStudentGuardians = null;
+        if ($this->collStudents instanceof PropelCollection) {
+            $this->collStudents->clearIterator();
+        }
+        $this->collStudents = null;
         $this->aUser = null;
     }
 
