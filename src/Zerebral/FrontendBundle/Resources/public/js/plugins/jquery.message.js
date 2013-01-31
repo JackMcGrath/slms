@@ -71,19 +71,20 @@ PrivateMessages.prototype = {
         var select = $('#message_to');
 
         if (select.find('option').length && !select.val()) {
-            select.empty();
+
         } else if (select.val()) {
-            $.each(select.find('option'), function(i, option){
-                if ($(option).attr('value') != $('#message_to').val()) {
-                    $(option).remove();
-                }
-            });
+//            $.each(select.find('option'), function(i, option){
+//                if ($(option).attr('value') != $('#message_to').val()) {
+//                    $(option).remove();
+//                }
+//            });
         }
 
         select.ajaxChosen({
             type: 'GET',
             url: '/user/suggest',
-            dataType: 'json'
+            dataType: 'json',
+            multiple: true
         }, function (data) {
             var results = [];
 

@@ -51,7 +51,6 @@ class FormJsonResponse extends JsonResponse
 
     private function setForm(Form $form)
     {
-
         $data = array();
         $data['is_empty'] = $form->isEmpty();
         $data['errors'] = array();

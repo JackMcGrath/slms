@@ -232,7 +232,16 @@ Zerebral\BusinessBundle\Model\Message\Message:
             - NotNull:
                 groups: [compose]
                 message: Message subject can not be empty
-        to:
-            - NotNull:
+
+
+
+Zerebral\BusinessBundle\Model\Message\ComposeMessage:
+    getters:
+        message:
+            - Valid: ~
+
+        recipients:
+            - Count:
+                min: 1
                 groups: [compose]
-                message: Recipient can not be empty
+                minMessage: Recipient can not be empty

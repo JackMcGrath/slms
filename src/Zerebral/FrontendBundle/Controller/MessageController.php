@@ -149,19 +149,26 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function composeAction()
     {
-        $newMessage = new Model\Message\Message();
-        $newMessageType = new FormType\MessageType();
+//        var_dump($_POST);
+//        die;
+        $newMessage = new Model\Message\ComposeMessage();
+        $newMessageType = new FormType\ComposeMessageType();
 
         $form = $this->createForm($newMessageType, $newMessage, array('validation_groups' => array('Default', 'compose')));
         if ($this->getRequest()->isMethod('POST')) {
 
             $form->bind($this->getRequest());
             if ($form->isValid()) {
+                /** @var $newMessage Model\Message\Message */
                 $newMessage = $form->getData();
-                $newMessage->setFromId($this->getUser()->getId());
-                $newMessage->setUserId($newMessage->getToId());
 
-                $newMessage->save();
+                foreach ($newMessage->getRecipients() as $recipient) {
+                    $recipientMessage = clone $newMessage;
+                    $recipientMessage->setTo($recipient);
+                    $recipientMessage->setFromId($this->getUser()->getId());
+                    $recipientMessage->setUserId($recipient->getId());
+                    $recipientMessage->save();
+                }
 
                 $this->setFlash('message_compose_success', 'Message has been successfully sent.');
                 return $this->redirect($this->generateUrl('messages_inbox'));
@@ -232,9 +239,9 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
     public function ajaxComposeFormAction(Model\User\User $user)
     {
         //validate user
-        $newMessage = new Model\Message\Message();
-        $newMessage->setTo($user);
-        $newMessageType = new FormType\MessageType();
+        $newMessage = new Model\Message\ComposeMessage();
+        $newMessage->setRecipients(array($user));
+        $newMessageType = new FormType\ComposeMessageType();
 
         $form = $this->createForm($newMessageType, $newMessage, array('validation_groups' => array('Default', 'compose')));
 
@@ -252,19 +259,25 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function ajaxComposeAction()
     {
-        $newMessage = new Model\Message\Message();
-        $newMessageType = new FormType\MessageType();
+        $newMessage = new Model\Message\ComposeMessage();
+        $newMessageType = new FormType\ComposeMessageType();
 
         $form = $this->createForm($newMessageType, $newMessage, array('validation_groups' => array('Default', 'compose')));
 
         if ($this->getRequest()->isMethod('POST')) {
             $form->bind($this->getRequest());
-            if ($form->isValid()) {
-                $newMessage = $form->getData();
-                $newMessage->setFromId($this->getUser()->getId());
-                $newMessage->setUserId($newMessage->getToId());
 
-                $newMessage->save();
+            if ($form->isValid()) {
+                /** @var $newMessage Model\Message\Message */
+                $newMessage = $form->getData();
+
+                foreach ($newMessage->getRecipients() as $recipient) {
+                    $recipientMessage = clone $newMessage;
+                    $recipientMessage->setTo($recipient);
+                    $recipientMessage->setFromId($this->getUser()->getId());
+                    $recipientMessage->setUserId($recipient->getId());
+                    $recipientMessage->save();
+                }
 
                 return new JsonResponse(array(
                     'success' => true,
