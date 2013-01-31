@@ -13,6 +13,7 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
 {
     const ROLE_STUDENT = 'student';
     const ROLE_TEACHER = 'teacher';
+    const ROLE_GUARDIAN = 'guardian';
 
     /**
      * Plain password
@@ -51,6 +52,9 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
         }
         if ($this->getRole() == self::ROLE_STUDENT) {
             $roles[] = 'ROLE_STUDENT';
+        }
+        if ($this->getRole() == self::ROLE_GUARDIAN) {
+            $roles[] = 'ROLE_GUARDIAN';
         }
         return $roles;
     }
@@ -223,6 +227,14 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
     }
 
     /**
+     * @return Guardian
+     */
+    public function getGuardian()
+    {
+        return $this->getGuardians()->getFirst();
+    }
+
+    /**
      * Transit user to role-specific model like Teacher or Student
      *
      * @return null|Student|Teacher
@@ -236,6 +248,9 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
                 break;
             case self::ROLE_STUDENT:
                 $model = new Student();
+                break;
+            case self::ROLE_GUARDIAN:
+                $model = new Guardian();
                 break;
         }
 
@@ -258,6 +273,9 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
                 break;
             case self::ROLE_STUDENT:
                 return $this->getStudent();
+                break;
+            case self::ROLE_GUARDIAN:
+                return $this->getGuardian();
                 break;
         }
 
@@ -346,6 +364,11 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
     public function isTeacher()
     {
         return $this->getRole() == self::ROLE_TEACHER;
+    }
+
+    public function isGuardian()
+    {
+        return $this->getRole() == self::ROLE_GUARDIAN;
     }
 
     public function getUnreadNotifications()

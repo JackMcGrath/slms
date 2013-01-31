@@ -41,7 +41,7 @@ Zerebral\BusinessBundle\Model\User\User:
         role:
             - Choice:
                 groups: [signup]
-                choices: [teacher, student]
+                choices: [teacher, student, guardian]
 
 Zerebral\BusinessBundle\Model\Course\Course:
     constraints:
