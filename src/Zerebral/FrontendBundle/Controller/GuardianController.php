@@ -18,7 +18,7 @@ class GuardianController extends \Zerebral\CommonBundle\Component\Controller
 {
     /**
      * @Route("/", name="guardian_summary")
-     * @Secure(roles="ROLE_GUARDIAN")
+     * @PreAuthorize("hasRole('ROLE_GUARDIAN')")
      * @Template
      */
     public function indexAction()
@@ -30,7 +30,7 @@ class GuardianController extends \Zerebral\CommonBundle\Component\Controller
 
     /**
      * @Route("/set-child/{childId}", name="guardian_set_child")
-     * @Secure(roles="ROLE_GUARDIAN")
+     * @PreAuthorize("hasRole('ROLE_GUARDIAN')")
      * @param \Zerebral\BusinessBundle\Model\User\Student $student
      * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
@@ -50,7 +50,7 @@ class GuardianController extends \Zerebral\CommonBundle\Component\Controller
 
     /**
      * @Route("/attendace", name="guardian_attendance")
-     * @Secure(roles="ROLE_GUARDIAN")
+     * @PreAuthorize("hasRole('ROLE_GUARDIAN')")
      * @Template
      */
     public function attendaceAction()
@@ -60,18 +60,18 @@ class GuardianController extends \Zerebral\CommonBundle\Component\Controller
 
     /**
      * @Route("/assignments", name="guardian_assignments")
-     * @Secure(roles="ROLE_GUARDIAN")
+     * @PreAuthorize("hasRole('ROLE_GUARDIAN')")
      * @Template
      */
     public function assignmentsAction()
     {
         /** @var \Zerebral\BusinessBundle\Model\User\Guardian $guardian  */
         $guardian = $this->getRoleUser();
-        $child = $guardian->getSelectedChild($this->get('session')->get('selectedChildId'));
+        $selectedChild = $guardian->getSelectedChild($this->get('session')->get('selectedChildId'));
         return array(
             'target' => 'home',
             'guardian' => $guardian,
-            'child' => $child
+            'selectedChild' => $selectedChild
         );
     }
 }
