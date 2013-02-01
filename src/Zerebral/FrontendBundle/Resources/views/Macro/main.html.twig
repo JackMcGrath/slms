@@ -193,7 +193,7 @@
                 {% if is_granted('ROLE_STUDENT') %}
                     <div class="instructor-name">Instructor <b>{{ assignment.teacher.fullName }}</b></div>
                     {% if assignment.dueAt %}<div class="due-at"><i class="icon-small-clock"></i> Due <small>{{ assignment.dueAt | date('Hi') == '0000' ? assignment.dueAt | date('D, M d') : assignment.dueAt | date('D, M d h:i a') }}</small></div>{% endif %}
-                    <div><span class="badge">{{ assignment.hasVirtualColumn('commentsCount') ? assignment.getVirtualColumn('commentsCount') : '-' }}</span><a href="{{ path('assignment_view', {id: assignment.id}) }}#assignmentFeed">Comments</a></span></div>
+                    <div><span class="badge">{{ assignment.hasVirtualColumn('commentsCount') ? assignment.getVirtualColumn('commentsCount') : '-' }}</span><a href="{{ path('assignment_view', {id: assignment.id}) }}#assignmentFeedContainer">Comments</a></span></div>
                 {% else %}
                     {% if assignment.dueAt %}<div class="due-at"><i class="icon-small-clock"></i> Due <small>{{ assignment.dueAt | date('Hi') == '0000' ? assignment.dueAt | date('D, M d') : assignment.dueAt | date('D, M d h:i a') }}</small></div>{% endif %}
                     {#<div><span class="badge">{{ assignment.students.count }}</span><a href="">Assignments</a></div>#}
