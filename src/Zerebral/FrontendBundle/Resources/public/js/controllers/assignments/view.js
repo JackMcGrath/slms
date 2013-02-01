@@ -26,7 +26,7 @@ $(document).ready(function(){
     $('.assignment-details-feed').zerebralAssignmentDetailFeedBlock();
 
 
-    if (location.hash == '#assignmentFeedContainer') {
-        $.scrollTo('#assignmentFeedContainer', 100, {offset:{top:-50}});
+    if (location.hash == '#assignmentFeed') {
+        $.scrollTo('#assignmentFeed', 100, {offset:{top:-50}});
     }
 });
