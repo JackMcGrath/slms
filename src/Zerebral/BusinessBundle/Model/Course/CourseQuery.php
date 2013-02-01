@@ -40,11 +40,12 @@ class CourseQuery extends BaseCourseQuery
             $this->filterByStudent($roleUser);
             $this->leftJoin('Assignment.StudentAssignment StudentAssignments');
             $this->addJoinCondition('StudentAssignments', '`StudentAssignments`.student_id='.$roleUser->getId());
+            $this->withColumn('COUNT(DISTINCT `StudentAssignments`.id)', 'studentAssignmentsCount');
         }
 
         $this->withColumn('COUNT(`FeedComments`.id)', 'commentsCount');
         $this->withColumn('COUNT(DISTINCT assignments.id)', 'assignmentsCount');
-        $this->withColumn('COUNT(DISTINCT `StudentAssignments`.id)', 'studentAssignmentsCount');
+
         $this->withColumn('GROUP_CONCAT(DISTINCT DATE(assignments.due_at) SEPARATOR ",")', 'dueDates');
 
 
