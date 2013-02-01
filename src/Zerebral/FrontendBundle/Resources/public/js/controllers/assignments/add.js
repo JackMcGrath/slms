@@ -30,7 +30,6 @@ Controller.prototype = {
     },
 
     onSelectAll: function() {
-        console.log('check');
         $('.student_select').attr('disabled', '1');
         $('.student-list input[type=checkbox]').each(function(index, element){
             $(element).attr('checked', 1);
@@ -78,7 +77,6 @@ StudentsPopup.prototype = {
 
         this.target.on('hide', function() {
             self.resetFormManual();
-            console.log('close');
         })
     },
 

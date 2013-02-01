@@ -112,7 +112,6 @@ class InviteController extends \Zerebral\CommonBundle\Component\Controller
         $form->bind($this->getRequest());
 
         if ($form->isValid()) {
-
             $emails = $form['emails']->getData();
 
             foreach ($emails as $email) {

@@ -71,11 +71,21 @@ class Course extends BaseCourse
     {
         $dates = array();
 
-        foreach ($this->getAssignments() as $assignment) {
-            if ($assignment->getDueAt()) {
-                $dates[] = $assignment->getDueAt('Y-m-d');
+        if ($this->hasVirtualColumn('dueDates')) {
+            $dueDates = explode(',', $this->getVirtualColumn('dueDates'));
+            foreach ($dueDates as $formatedDate) {
+                $date = explode('_', $formatedDate);
+                if (isset($date[1]))
+                    $dates[] = $date[1];
             }
+
         }
+
+//        foreach ($this->getAssignments() as $assignment) {
+//            if ($assignment->getDueAt()) {
+//                $dates[] = $assignment->getDueAt('Y-m-d');
+//            }
+//        }
 
         return $dates;
     }

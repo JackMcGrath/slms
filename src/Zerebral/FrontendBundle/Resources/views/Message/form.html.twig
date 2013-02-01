@@ -1,41 +1,55 @@
 
     {{ form_widget(form._token) }}
-    {{ form_row(form.to, {
-    label: 'To',
-    form_type: 'horizontal',
-    attr: {
-    class: '',
-    'multiple': true,
-    autocomplete: 'off',
-    'data-no_results_text': 'No such name'
-    }
-    })
-    }}
-    {{ form_row(form.subject, {
-    form_type: 'horizontal',
-    attr: {
-    class: 'input-xlarge'
-    }
+    <div class="control-group {{ (form.recipients.vars.errors|length > 0 ? 'error' : '') }}">
+        <label>To</label>
+
+
+        <div class="controls">
+            <select name="message_compose[recipients][]" id="message_to" multiple="multiple">
+                {% for recipient in form.vars.value.recipients %}
+                    <option value="{{ recipient.id }}" selected="selcted">{{ recipient.fullName }}</option>
+                {% endfor %}
+            </select>
+            {{ form_errors(form.recipients) }}
+        </div>
+    </div>
+
+    {#{{ form_row(form.recipients, {#}
+        {#label: 'To',#}
+        {#form_type: 'horizontal',#}
+        {#attr: {#}
+            {#class: '',#}
+            {#'multiple': true,#}
+            {#autocomplete: 'off',#}
+            {#'data-no_results_text': 'No such name'#}
+        {#}#}
+    {#})#}
+    {#}}#}
+    {{ form_row(form.message.subject, {
+        form_type: 'horizontal',
+        attr: {
+            class: 'input-xlarge'
+        }
     }) }}
-    {{ form_row(form.body, {
-    label: 'Message',
-    form_type: 'horizontal',
-    attr: {
-    class: '',
-    rows: 6
-    }
+    {{ form_row(form.message.body, {
+        label: 'Message',
+        form_type: 'horizontal',
+        attr: {
+            class: '',
+            rows: 6
+        }
     }) }}
 
     <script type="text/template" id="new_file_form">
-        {{ form_widget(form.files.vars.prototype)|raw }}
+        {{ form_widget(form.message.files.vars.prototype)|raw }}
     </script>
 
     <div class="control-group radio-control-group">
         <label class="control-label"></label>
 
         <div id="attachments_div" class="controls">
-            <div id="upload_files_div" data-last-index="{{ form.files.vars.data|max_key }}">
-                {{ form_widget(form.files) }}
+            <div id="upload_files_div" data-last-index="{{ form.message.files.vars.data|max_key }}">
+                {{ form_widget(form.message.files) }}
             </div>
             <a href="#" class="add_file_link">Add another file</a> <span class="gray"></span>
         </div>

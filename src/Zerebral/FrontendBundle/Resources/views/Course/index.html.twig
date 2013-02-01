@@ -22,7 +22,7 @@
             {{ flashMessages.show('delete_course_success', 'success') }}
             {% if courses | length %}
             {% for course in courses %}
-                <div class="list-item span12{{ loop.last ? ' last' : '' }}" {% if course.assignmentsDueDates %}due-date="{{ course.assignmentsDueDates | join(',') }}"{% endif %}>
+                <div class="list-item span12{{ loop.last ? ' last' : '' }}" {% if course.hasVirtualColumn('dueDates') %}due-date="{{ course.getAssignmentsDueDates() | join(',') }}"{% endif %}>
                     <div class="symbol pull-left">
                         {% if is_granted('ROLE_STUDENT') %}
                             <img class="rounded" src="{{ user_avatar(course.teacher) | imagine_filter('thumbnail') }}"/>
@@ -43,9 +43,9 @@
                         <div class="stat">
                             {% if is_granted('ROLE_STUDENT') %}
                                 <div class="instructor-name">Instructor <b>{{ course.teacher.fullName }}</b></div>
-                                <div><span class="badge badge-important assignments-count" default-count="{{ app.user.student.courseAssignments(course).count }}">{{ app.user.student.courseAssignments(course).count }}</span><a href="{{ path('course_assignments', {id: course.id}) }}">Assignments</a></div>
+                                <div><span class="badge badge-important assignments-count" default-count="{{ course.getVirtualColumn('studentAssignmentsCount') }}">{{ course.getVirtualColumn('studentAssignmentsCount') }}</span><a href="{{ path('course_assignments', {id: course.id}) }}">Assignments</a></div>
                             {% else %}
-                                <div><span class="badge badge-important assignments-count" default-count="{{ course.assignments.count }}">{{ course.assignments.count }}</span><a href="{{ path('course_assignments', {id: course.id}) }}">Assignments</a></div>
+                                <div><span class="badge badge-important assignments-count" default-count="{{ course.getVirtualColumn('assignmentsCount') }}">{{ course.getVirtualColumn('assignmentsCount') }}</span><a href="{{ path('course_assignments', {id: course.id}) }}">Assignments</a></div>
                             {% endif %}
 
                             {#<div><span class="badge badge-inverse">{{ course.getVirtualColumn('commentsCount') }}</span><a href="#">Comments</a></span></div>#}

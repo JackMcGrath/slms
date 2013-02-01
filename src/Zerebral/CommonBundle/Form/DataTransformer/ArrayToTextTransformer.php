@@ -27,7 +27,7 @@ class ArrayToTextTransformer implements DataTransformerInterface
 
     public function reverseTransform($text)
     {
-        $lines = explode($this->getDelimiter(), $text);
+        $lines = explode($this->getDelimiter(), str_replace(" ", "\n", $text));
         $list = array();
         foreach ($lines as $line) {
             $line = trim($line);

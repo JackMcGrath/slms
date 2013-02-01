@@ -8,18 +8,19 @@ class MessageQuery extends BaseMessageQuery
 {
     public function filterInboxByUser(\Zerebral\BusinessBundle\Model\User\User $user)
     {
-        $this->filterByUserId($user->getId());
+        //$this->filterByUserId($user->getId());
 //        $this->filterByToId($user->getId());
 
-        $this->groupByThreadId();
+        $lastMessages = MessageQuery::create()->filterByUserId($user->getId())->addDescendingOrderByColumn('created_at');
+        $this->addSelectQuery($lastMessages);
 
-        $this->addDescendingOrderByColumn('MAX(IF(`to_id` = ' . $user->getId() . ', `created_at`, 0))');
+        $this->groupByThreadId();
+        $this->addDescendingOrderByColumn('IF(`to_id` = ' . $user->getId() . ', `created_at`, 0)');
 
         $this->withColumn('MAX(`created_at`)', 'lastMessageDate');
         $this->withColumn('SUM(IF(`is_read` = 0, 1, 0))', 'unreadCount');
 
         $this->having('SUM(IF(`to_id` = ' . $user->getId() . ', 1, 0)) > 0');
-
         return $this;
     }
 

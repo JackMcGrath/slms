@@ -7,6 +7,7 @@ use Zerebral\BusinessBundle\Model\Message\om\BaseMessage;
 class Message extends BaseMessage
 {
     public $isMarkedAsRead;
+    public $recipients;
 
     public function markAsRead()
     {
@@ -31,7 +32,7 @@ class Message extends BaseMessage
     public function preInsert(\PropelPDO $con = null)
     {
         if (!$this->getThreadId()) {
-            $this->setThreadId($this->getFromId() . time());
+            $this->setThreadId($this->getToId() . time());
         }
         // @todo use listener?
         $this->setCreatedAt(date('Y-m-d H:i:s'));

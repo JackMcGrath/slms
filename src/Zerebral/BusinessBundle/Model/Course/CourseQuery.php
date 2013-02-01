@@ -22,19 +22,31 @@ class CourseQuery extends BaseCourseQuery
     /**
      * @param \Zerebral\BusinessBundle\Model\User\Student $roleUser
      */
-    public function findByRoleUser($roleUser)
+    public function filterByRoleUser($roleUser)
     {
-        $c = new self();
-        $c->addJoin(CoursePeer::ID, FeedItemPeer::COURSE_ID, \Criteria::LEFT_JOIN);
-        $c->addJoin(FeedItemPeer::ID, FeedCommentPeer::FEED_ITEM_ID, \Criteria::LEFT_JOIN);
+        $this->joinWith('Assignment', \Criteria::LEFT_JOIN);
+        $this->joinWith('CourseTeacher', \Criteria::LEFT_JOIN);
+        $this->leftJoinCourseStudent();
 
-        $c->addGroupByColumn(CoursePeer::ID);
 
-        $c->withColumn('COUNT('.\Zerebral\BusinessBundle\Model\Feed\FeedCommentPeer::ID.')', 'commentsCount');
-//        $c->addSelectColumn('COUNT('.FeedCommentPeer::ID.') as commentsCount');
-//        $c->addSelectModifier()
 
-        return $roleUser->getCourses($c);
+        if ($roleUser->getUser()->isTeacher()) {
+            $this->filterByTeacher($roleUser);
+            $this->addJoinCondition('Assignment', 'Assignment.teacher_id='.$roleUser->getId());
+            $this->addGroupByColumn(CourseTeacherPeer::COURSE_ID);
+        } else {
+            $this->filterByStudent($roleUser);
+            $this->leftJoin('Assignment.StudentAssignment StudentAssignments');
+            $this->addJoinCondition('StudentAssignments', '`StudentAssignments`.student_id='.$roleUser->getId());
+            $this->withColumn('COUNT(DISTINCT `StudentAssignments`.id)', 'studentAssignmentsCount');
+            $this->addGroupByColumn(CourseStudentPeer::COURSE_ID);
+        }
+
+        $this->withColumn('COUNT(DISTINCT assignments.id)', 'assignmentsCount');
+        $this->withColumn('GROUP_CONCAT(distinct IF(assignments.due_at is not null,CONCAT_WS("_",assignments.id, DATE(assignments.due_at)), null) SEPARATOR ",")', 'dueDates');
+
+
+        return $this;
 
     }
 }
