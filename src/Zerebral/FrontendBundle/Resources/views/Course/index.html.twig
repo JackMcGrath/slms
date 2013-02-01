@@ -22,7 +22,7 @@
             {{ flashMessages.show('delete_course_success', 'success') }}
             {% if courses | length %}
             {% for course in courses %}
-                <div class="list-item span12{{ loop.last ? ' last' : '' }}" {% if course.hasVirtualColumn('dueDates') %}due-date="{{ course.getVirtualColumn('dueDates') }}"{% endif %}>
+                <div class="list-item span12{{ loop.last ? ' last' : '' }}" {% if course.hasVirtualColumn('dueDates') %}due-date="{{ course.getAssignmentsDueDates() | join(',') }}"{% endif %}>
                     <div class="symbol pull-left">
                         {% if is_granted('ROLE_STUDENT') %}
                             <img class="rounded" src="{{ user_avatar(course.teacher) | imagine_filter('thumbnail') }}"/>

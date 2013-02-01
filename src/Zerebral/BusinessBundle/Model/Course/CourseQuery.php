@@ -24,29 +24,26 @@ class CourseQuery extends BaseCourseQuery
      */
     public function filterByRoleUser($roleUser)
     {
-        $this->leftJoinFeedItem();
-        $this->leftJoin('FeedItem.FeedComment FeedComments');
-
         $this->joinWith('Assignment', \Criteria::LEFT_JOIN);
         $this->joinWith('CourseTeacher', \Criteria::LEFT_JOIN);
+        $this->leftJoinCourseStudent();
 
-        $this->addGroupByColumn(CoursePeer::ID);
 
 
         if ($roleUser->getUser()->isTeacher()) {
             $this->filterByTeacher($roleUser);
             $this->addJoinCondition('Assignment', 'Assignment.teacher_id='.$roleUser->getId());
+            $this->addGroupByColumn(CourseTeacherPeer::COURSE_ID);
         } else {
             $this->filterByStudent($roleUser);
             $this->leftJoin('Assignment.StudentAssignment StudentAssignments');
             $this->addJoinCondition('StudentAssignments', '`StudentAssignments`.student_id='.$roleUser->getId());
             $this->withColumn('COUNT(DISTINCT `StudentAssignments`.id)', 'studentAssignmentsCount');
+            $this->addGroupByColumn(CourseStudentPeer::COURSE_ID);
         }
 
-        $this->withColumn('COUNT(`FeedComments`.id)', 'commentsCount');
         $this->withColumn('COUNT(DISTINCT assignments.id)', 'assignmentsCount');
-
-        $this->withColumn('GROUP_CONCAT(DISTINCT DATE(assignments.due_at) SEPARATOR ",")', 'dueDates');
+        $this->withColumn('GROUP_CONCAT(distinct IF(assignments.due_at is not null,CONCAT_WS("_",assignments.id, DATE(assignments.due_at)), null) SEPARATOR ",")', 'dueDates');
 
 
         return $this;
