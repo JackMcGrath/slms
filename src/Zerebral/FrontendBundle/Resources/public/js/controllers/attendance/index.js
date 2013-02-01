@@ -14,10 +14,9 @@ $(document).ready(function(){
     $('td.status input[type="radio"]').change(function(e) {
         var statusName = $(e.target).parents('td').attr('statusName');
         var studentsCount = $('table tr.student').length;
+        $('th input[type="radio"]').removeAttr('checked');
         if ($('td[statusName="' + statusName + '"] input:checked').length == studentsCount) {
             $('th[statusName="' + statusName + '"] input[type="radio"]').attr('checked', 'checked');
-        } else {
-            $('th input[type="radio"]').removeAttr('checked');
         }
     });
 
