@@ -708,9 +708,6 @@ abstract class BaseGradeLevelPeer
             }
         } else {
 
-        if ($obj->isNew() || $obj->isColumnModified(GradeLevelPeer::NAME))
-            $columns[GradeLevelPeer::NAME] = $obj->getName();
-
         }
 
         return BasePeer::doValidate(GradeLevelPeer::DATABASE_NAME, GradeLevelPeer::TABLE_NAME, $columns);

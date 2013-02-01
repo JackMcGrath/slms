@@ -46,13 +46,6 @@ class CourseFolderTableMap extends TableMap
         $this->addForeignKey('course_id', 'CourseId', 'INTEGER', 'courses', 'id', true, null, null);
         $this->addColumn('name', 'Name', 'VARCHAR', false, 255, null);
         // validators
-        $this->addValidator('id', 'required', 'propel.validator.RequiredValidator', '', 'The field id is required.');
-        $this->addValidator('id', 'maxValue', 'propel.validator.MaxValueValidator', 'REPLACEME', 'The field id must be not greater than REPLACEME.');
-        $this->addValidator('id', 'type', 'propel.validator.TypeValidator', 'int', 'The column id must be an int value.');
-        $this->addValidator('course_id', 'required', 'propel.validator.RequiredValidator', '', 'The field course_id is required.');
-        $this->addValidator('course_id', 'maxValue', 'propel.validator.MaxValueValidator', 'REPLACEME', 'The field course_id must be not greater than REPLACEME.');
-        $this->addValidator('course_id', 'type', 'propel.validator.TypeValidator', 'int', 'The column course_id must be an int value.');
-        $this->addValidator('name', 'type', 'propel.validator.TypeValidator', 'string', 'The column name must be an string value.');
     } // initialize()
 
     /**

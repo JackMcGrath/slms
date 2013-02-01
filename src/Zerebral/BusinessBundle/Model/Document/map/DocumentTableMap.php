@@ -55,17 +55,6 @@ class DocumentTableMap extends TableMap
         $this->addColumn('path', 'Path', 'VARCHAR', true, 200, null);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', true, null, null);
         // validators
-        $this->addValidator('reference_id', 'required', 'propel.validator.RequiredValidator', '', 'The field reference_id is required.');
-        $this->addValidator('reference_id', 'maxValue', 'propel.validator.MaxValueValidator', 'REPLACEME', 'The field reference_id must be not greater than REPLACEME.');
-        $this->addValidator('reference_id', 'type', 'propel.validator.TypeValidator', 'int', 'The column reference_id must be an int value.');
-        $this->addValidator('type', 'required', 'propel.validator.RequiredValidator', '', 'The field type is required.');
-        $this->addValidator('type', 'type', 'propel.validator.TypeValidator', 'string', 'The column type must be an string value.');
-        $this->addValidator('storage', 'required', 'propel.validator.RequiredValidator', '', 'The field storage is required.');
-        $this->addValidator('storage', 'type', 'propel.validator.TypeValidator', 'string', 'The column storage must be an string value.');
-        $this->addValidator('path', 'required', 'propel.validator.RequiredValidator', '', 'The field path is required.');
-        $this->addValidator('path', 'type', 'propel.validator.TypeValidator', 'string', 'The column path must be an string value.');
-        $this->addValidator('created_at', 'required', 'propel.validator.RequiredValidator', '', 'The field created_at is required.');
-        $this->addValidator('created_at', 'type', 'propel.validator.TypeValidator', 'string', 'The column created_at must be an string value.');
     } // initialize()
 
     /**

@@ -20,15 +20,17 @@
             {{ flashMessages.show('profile_save_success', 'success') }}
             <form method="post" {{ form_enctype(form) }} novalidate  class="form-horizontal create-form no-left-margin">
                 <div class="span8">
-                    {{ form_row(form.bio, {
-                        label: 'Bio',
-                        form_type: 'horizontal',
-                        attr: {
-                            class: 'input-block-level',
-                            rows: 6,
-                            help_block: 'About you in <b>160</b> characters',
-                        }
-                    }) }}
+                    {% if not is_granted('ROLE_GUARDIAN') %}
+                        {{ form_row(form.bio, {
+                            label: 'Bio',
+                            form_type: 'horizontal',
+                            attr: {
+                                class: 'input-block-level',
+                                rows: 6,
+                                help_block: 'About you in <b>160</b> characters',
+                            }
+                        }) }}
+                    {% endif %}
 
                     {{ form_row(form.user.birthday, {
                         label: 'Birthday',
@@ -64,7 +66,9 @@
                             rows: 6
                         }
                         }) }}
-                    {% else %}
+                    {% endif %}
+
+                    {% if is_granted('ROLE_STUDENT') %}
                         {{ form_row(form.activities, {
                         label: 'Activities',
                         form_type: 'horizontal',
@@ -80,6 +84,17 @@
                         attr: {
                             class: 'input-block-level',
                             rows: 6
+                        }
+                        }) }}
+                    {% endif %}
+
+                    {% if is_granted('ROLE_GUARDIAN') %}
+                        {{ form_row(form.notes, {
+                        label: 'Notes',
+                        form_type: 'horizontal',
+                        attr: {
+                        class: 'input-block-level',
+                        rows: 6
                         }
                         }) }}
                     {% endif %}

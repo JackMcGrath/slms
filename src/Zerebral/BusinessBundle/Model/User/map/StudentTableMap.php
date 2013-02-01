@@ -48,9 +48,6 @@ class StudentTableMap extends TableMap
         $this->addColumn('activities', 'Activities', 'LONGVARCHAR', false, null, null);
         $this->addColumn('interests', 'Interests', 'LONGVARCHAR', false, null, null);
         // validators
-        $this->addValidator('bio', 'type', 'propel.validator.TypeValidator', 'string', 'The column bio must be an string value.');
-        $this->addValidator('activities', 'type', 'propel.validator.TypeValidator', 'string', 'The column activities must be an string value.');
-        $this->addValidator('interests', 'type', 'propel.validator.TypeValidator', 'string', 'The column interests must be an string value.');
     } // initialize()
 
     /**
@@ -62,8 +59,10 @@ class StudentTableMap extends TableMap
         $this->addRelation('StudentAssignment', 'Zerebral\\BusinessBundle\\Model\\Assignment\\StudentAssignment', RelationMap::ONE_TO_MANY, array('id' => 'student_id', ), 'CASCADE', 'CASCADE', 'StudentAssignments');
         $this->addRelation('StudentAttendance', 'Zerebral\\BusinessBundle\\Model\\Attendance\\StudentAttendance', RelationMap::ONE_TO_MANY, array('id' => 'student_id', ), 'CASCADE', 'CASCADE', 'StudentAttendances');
         $this->addRelation('CourseStudent', 'Zerebral\\BusinessBundle\\Model\\Course\\CourseStudent', RelationMap::ONE_TO_MANY, array('id' => 'student_id', ), 'CASCADE', 'CASCADE', 'CourseStudents');
+        $this->addRelation('StudentGuardian', 'Zerebral\\BusinessBundle\\Model\\User\\StudentGuardian', RelationMap::ONE_TO_MANY, array('id' => 'student_id', ), 'CASCADE', 'CASCADE', 'StudentGuardians');
         $this->addRelation('Assignment', 'Zerebral\\BusinessBundle\\Model\\Assignment\\Assignment', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'CASCADE', 'Assignments');
         $this->addRelation('Course', 'Zerebral\\BusinessBundle\\Model\\Course\\Course', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'CASCADE', 'Courses');
+        $this->addRelation('Guardian', 'Zerebral\\BusinessBundle\\Model\\User\\Guardian', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'CASCADE', 'Guardians');
     } // buildRelations()
 
     /**

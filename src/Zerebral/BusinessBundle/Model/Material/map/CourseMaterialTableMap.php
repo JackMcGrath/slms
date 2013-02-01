@@ -50,23 +50,6 @@ class CourseMaterialTableMap extends TableMap
         $this->addForeignKey('created_by', 'CreatedBy', 'INTEGER', 'teachers', 'id', true, null, null);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', true, null, null);
         // validators
-        $this->addValidator('id', 'required', 'propel.validator.RequiredValidator', '', 'The field id is required.');
-        $this->addValidator('id', 'maxValue', 'propel.validator.MaxValueValidator', 'REPLACEME', 'The field id must be not greater than REPLACEME.');
-        $this->addValidator('id', 'type', 'propel.validator.TypeValidator', 'int', 'The column id must be an int value.');
-        $this->addValidator('course_id', 'required', 'propel.validator.RequiredValidator', '', 'The field course_id is required.');
-        $this->addValidator('course_id', 'maxValue', 'propel.validator.MaxValueValidator', 'REPLACEME', 'The field course_id must be not greater than REPLACEME.');
-        $this->addValidator('course_id', 'type', 'propel.validator.TypeValidator', 'int', 'The column course_id must be an int value.');
-        $this->addValidator('folder_id', 'maxValue', 'propel.validator.MaxValueValidator', 'REPLACEME', 'The field folder_id must be not greater than REPLACEME.');
-        $this->addValidator('folder_id', 'type', 'propel.validator.TypeValidator', 'int', 'The column folder_id must be an int value.');
-        $this->addValidator('description', 'type', 'propel.validator.TypeValidator', 'string', 'The column description must be an string value.');
-        $this->addValidator('file_id', 'required', 'propel.validator.RequiredValidator', '', 'The field file_id is required.');
-        $this->addValidator('file_id', 'maxValue', 'propel.validator.MaxValueValidator', 'REPLACEME', 'The field file_id must be not greater than REPLACEME.');
-        $this->addValidator('file_id', 'type', 'propel.validator.TypeValidator', 'int', 'The column file_id must be an int value.');
-        $this->addValidator('created_by', 'required', 'propel.validator.RequiredValidator', '', 'The field created_by is required.');
-        $this->addValidator('created_by', 'maxValue', 'propel.validator.MaxValueValidator', 'REPLACEME', 'The field created_by must be not greater than REPLACEME.');
-        $this->addValidator('created_by', 'type', 'propel.validator.TypeValidator', 'int', 'The column created_by must be an int value.');
-        $this->addValidator('created_at', 'required', 'propel.validator.RequiredValidator', '', 'The field created_at is required.');
-        $this->addValidator('created_at', 'type', 'propel.validator.TypeValidator', 'string', 'The column created_at must be an string value.');
     } // initialize()
 
     /**

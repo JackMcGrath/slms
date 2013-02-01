@@ -952,12 +952,6 @@ abstract class BaseCourseFolderPeer
             }
         } else {
 
-        if ($obj->isNew() || $obj->isColumnModified(CourseFolderPeer::COURSE_ID))
-            $columns[CourseFolderPeer::COURSE_ID] = $obj->getCourseId();
-
-        if ($obj->isNew() || $obj->isColumnModified(CourseFolderPeer::NAME))
-            $columns[CourseFolderPeer::NAME] = $obj->getName();
-
         }
 
         return BasePeer::doValidate(CourseFolderPeer::DATABASE_NAME, CourseFolderPeer::TABLE_NAME, $columns);

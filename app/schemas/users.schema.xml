@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <database name="default" defaultIdMethod="native" package="user" namespace="Zerebral\BusinessBundle\Model\User" defaultPhpNamingMethod="phpname">
-	<table name="users" phpName="User" idMethod="native">
-		<column name="id" phpName="Id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
-		<column name="role" phpName="Role" type="VARCHAR" valueSet="director,parent,teacher,student" sqlType="enum('director','parent','teacher','student')" required="true">
-			<!--inheritance="single">-->
-			<!--<inheritance key="director" class="Director" extends="User"/>-->
-			<!--<inheritance key="parent" class="StudentParent" extends="User"/>-->
-			<!--<inheritance key="teacher" class="Teacher" extends="User"/>-->
-			<!--<inheritance key="student" class="Student" extends="User"/>-->
-		</column>
+
+    <table name="users" phpName="User" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="role" phpName="Role" type="VARCHAR" valueSet="director,parent,teacher,student" sqlType="enum('director','gaurdian','teacher','student')" required="true" />
         <column name="first_name" phpName="FirstName" type="VARCHAR" size="100" required="true"/>
         <column name="last_name" phpName="LastName" type="VARCHAR" size="100" required="true"/>
         <column name="salutation" phpName="Salutation" type="VARCHAR" size="5" required="false"/>
@@ -21,90 +16,68 @@
         <column name="is_active" phpName="IsActive" type="BOOLEAN" size="1" sqlType="tinyint(1) unsigned" required="true" defaultValue="true"/>
         <column name="created_at" phpName="CreatedAt" type="TIMESTAMP" required="false"/>
         <column name="updated_at" phpName="UpdatedAt" type="TIMESTAMP" required="true"/>
+
         <foreign-key foreignTable="files" name="user_avatar" phpName="Avatar" onDelete="SET NULL" onUpdate="CASCADE">
             <reference local="avatar_id" foreign="id" />
         </foreign-key>
-        <validator column="id">
-            <rule name="required" message="The field id is required."/>
-            <rule name="maxValue" value="REPLACEME" message="The field id must be not greater than REPLACEME."/>
-            <rule name="type" value="int" message="The column id must be an int value."/>
-        </validator>
-        <validator column="first_name">
-            <rule name="required" message="The field first_name is required."/>
-            <rule name="type" value="string" message="The column first_name must be an string value."/>
-        </validator>
-        <validator column="last_name">
-            <rule name="required" message="The field last_name is required."/>
-            <rule name="type" value="string" message="The column last_name must be an string value."/>
-        </validator>
-        <validator column="salutation">
-            <rule name="type" value="string" message="The column salutation must be an string value."/>
-        </validator>
-        <validator column="birthday">
-            <rule name="type" value="string" message="The column birthday must be an string value."/>
-        </validator>
-        <validator column="gender">
-            <rule name="type" value="string" message="The column gender must be an string value."/>
-        </validator>
-        <validator column="email">
-            <rule name="required" message="The field email is required."/>
-            <rule name="type" value="string" message="The column email must be an string value."/>
-        </validator>
-        <validator column="salt">
-            <rule name="required" message="The field salt is required."/>
-            <rule name="type" value="string" message="The column salt must be an string value."/>
-        </validator>
-        <validator column="is_active">
-            <rule name="required" message="The field is_active is required."/>
-            <rule name="type" value="boolean" message="The column is_active must be an boolean value."/>
-        </validator>
-	</table>
-	<table name="students" phpName="Student" idMethod="native">
-		<column name="id" phpName="Id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
-		<column name="user_id" phpName="UserId" type="INTEGER" sqlType="int(11) unsigned" required="true"/>
+    </table>
+
+    <table name="students" phpName="Student" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="user_id" phpName="UserId" type="INTEGER" sqlType="int(11) unsigned" required="true"/>
         <column name="bio" phpName="Bio" type="VARCHAR" size="160" required="false"/>
         <column name="activities" phpName="Activities" type="LONGVARCHAR" required="false"/>
         <column name="interests" phpName="Interests" type="LONGVARCHAR" required="false"/>
 
-		<foreign-key foreignTable="users">
-			<reference local="user_id" foreign="id"/>
-		</foreign-key>
-		<behavior name="delegate">
-			<parameter name="to" value="users"/>
-		</behavior>
+        <foreign-key foreignTable="users">
+            <reference local="user_id" foreign="id"/>
+        </foreign-key>
 
-        <validator column="bio">
-            <rule name="type" value="string" message="The column bio must be an string value."/>
-        </validator>
-        <validator column="activities">
-            <rule name="type" value="string" message="The column activities must be an string value."/>
-        </validator>
-        <validator column="interests">
-            <rule name="type" value="string" message="The column interests must be an string value."/>
-        </validator>
-	</table>
-	<table name="teachers" phpName="Teacher" idMethod="native">
-		<column name="id" phpName="Id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
-		<column name="user_id" phpName="UserId" type="INTEGER" sqlType="int(11) unsigned" required="true"/>
+        <behavior name="delegate">
+            <parameter name="to" value="users"/>
+        </behavior>
+    </table>
+
+    <table name="teachers" phpName="Teacher" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="user_id" phpName="UserId" type="INTEGER" sqlType="int(11) unsigned" required="true"/>
         <column name="bio" phpName="Bio" type="VARCHAR" size="160" required="false"/>
         <column name="subjects" phpName="Subjects" type="LONGVARCHAR" required="false"/>
         <column name="grades" phpName="Grades" type="LONGVARCHAR" required="false"/>
 
-        <validator column="bio">
-            <rule name="type" value="string" message="The column bio must be an string value."/>
-        </validator>
-        <validator column="subjects">
-            <rule name="type" value="string" message="The column subjects must be an string value."/>
-        </validator>
-        <validator column="grades">
-            <rule name="type" value="string" message="The column grades must be an string value."/>
-        </validator>
+        <foreign-key foreignTable="users">
+            <reference local="user_id" foreign="id"/>
+        </foreign-key>
 
-		<foreign-key foreignTable="users">
-			<reference local="user_id" foreign="id"/>
-		</foreign-key>
-		<behavior name="delegate">
-			<parameter name="to" value="users"/>
-		</behavior>
-	</table>
+        <behavior name="delegate">
+            <parameter name="to" value="users"/>
+        </behavior>
+    </table>
+
+    <table name="guardians" phpName="Guardian" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="user_id" phpName="UserId" type="INTEGER" sqlType="int(11) unsigned" required="true"/>
+        <column name="notes" phpName="Notes" type="LONGVARCHAR" required="false"/>
+
+        <foreign-key foreignTable="users">
+            <reference local="user_id" foreign="id"/>
+        </foreign-key>
+
+        <behavior name="delegate">
+            <parameter name="to" value="users"/>
+        </behavior>
+    </table>
+
+    <table name="student_guardians" phpName="StudentGuardian" isCrossRef="true">
+        <column name="student_id" phpName="studentId" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" required="true"/>
+        <column name="guardian_id" phpName="guardianId" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" required="true"/>
+
+        <foreign-key foreignTable="students" name="student_guardians_students" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="student_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="guardians" name="student_guardians_guardians" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="guardian_id" foreign="id"/>
+        </foreign-key>
+    </table>
+
 </database>

@@ -25,7 +25,7 @@ class UserSignupType extends AbstractType
             'choices' => array(
                 User::ROLE_TEACHER => 'Teacher',
                 User::ROLE_STUDENT => 'Student',
-                'parent' => 'Parent',
+                User::ROLE_GUARDIAN => 'Parent',
             ),
             'expanded' => true,
             'multiple' => false,

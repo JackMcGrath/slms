@@ -1354,15 +1354,6 @@ abstract class BaseCourseStudentPeer
             }
         } else {
 
-        if ($obj->isNew() || $obj->isColumnModified(CourseStudentPeer::COURSE_ID))
-            $columns[CourseStudentPeer::COURSE_ID] = $obj->getCourseId();
-
-        if ($obj->isNew() || $obj->isColumnModified(CourseStudentPeer::STUDENT_ID))
-            $columns[CourseStudentPeer::STUDENT_ID] = $obj->getStudentId();
-
-        if ($obj->isNew() || $obj->isColumnModified(CourseStudentPeer::CREATED_AT))
-            $columns[CourseStudentPeer::CREATED_AT] = $obj->getCreatedAt();
-
         }
 
         return BasePeer::doValidate(CourseStudentPeer::DATABASE_NAME, CourseStudentPeer::TABLE_NAME, $columns);

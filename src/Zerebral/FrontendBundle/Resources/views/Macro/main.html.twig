@@ -1,5 +1,5 @@
 {% macro month(calendar) %}
-    <div class="calendar-widget">
+    <div class="calendar-widget" xmlns="http://www.w3.org/1999/html">
         <h4>{{ calendar.currentMonth.format('F') }}</h4>
         <table class="">
             <tr class="day-name">
@@ -27,6 +27,31 @@
     </div>
 {% endmacro %}
 
+{% macro guardianChildrenSelect() %}
+    {% set children = app.user.guardian.students %}
+    {% if children|length > 0 %}
+    <ul class="nav menu span3 pull-right selected-child-toggle">
+        {% set selectedChild = app.user.guardian.selectedChild(app.session.get('selectedChildId')) %}
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <img width="27" height="27" src="{{ user_avatar(selectedChild.user) | imagine_filter('top_thumbnail') }}" /> &nbsp; {{ selectedChild.user.firstName }} {{ selectedChild.user.lastName }} &nbsp; <b class="caret"></b></a>
+            </a>
+            <ul class="dropdown-menu">
+                {% for child in children %}
+                    {% if child.id != selectedChild.id %}
+                        <li><a href="{{ path('guardian_set_child', { childId: child.id }) }}"><i class="icon-user"></i> {{ child.user.firstName }} {{ child.user.lastName }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if children|length > 1 %}
+                <li class="divider"></li>
+                {% endif %}
+                <li><a href="#"><i class="icon-user"></i> {{ selectedChild.user.firstName }}'s profile</a></li>
+            </ul>
+        </li>
+    </ul>
+    {% endif %}
+{% endmacro %}
+
 
 {% macro topMenu(selected, course) %}
     <ul>
@@ -41,6 +66,16 @@
         {% endif %}
         <li{{ selected == 'materials' ? ' class="active"' : '' }}><a href="{{ path('course_materials', {courseId: course.id}) }}">Syllabus</a></li>
         <li{{ selected == 'members' ? ' class="active"' : '' }}><a href="{{ path('course_members', {id: course.id}) }}">Members</a></li>
+    </ul>
+{% endmacro %}
+
+{% macro guardianTopMenu(selected) %}
+    <ul>
+        <li{{ selected == 'summary' ? ' class="active"' : '' }}><a href="{{ path('guardian_summary') }}">Summary</a></li>
+        <li{{ selected == 'grades' ? ' class="active"' : '' }}><a href="#">Grades</a></li>
+        <li{{ selected == 'attendance' ? ' class="active"' : '' }}><a href="{{ path('guardian_attendance') }}">Attendance</a></li>
+        <li{{ selected == 'assignments' ? ' class="active"' : '' }}><a href="{{ path('guardian_assignments') }}">Assignments</a></li>
+        <li{{ selected == 'guardians' ? ' class="active"' : '' }}><a href="#">Parents</a></li>
     </ul>
 {% endmacro %}
 
@@ -109,6 +144,8 @@
                 </ul>
             </div>
         </div>
+    {% else %}
+        <br />
     {% endif %}
 {% endmacro %}
 

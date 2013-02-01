@@ -1096,30 +1096,6 @@ abstract class BaseUserPeer
             }
         } else {
 
-        if ($obj->isNew() || $obj->isColumnModified(UserPeer::FIRST_NAME))
-            $columns[UserPeer::FIRST_NAME] = $obj->getFirstName();
-
-        if ($obj->isNew() || $obj->isColumnModified(UserPeer::LAST_NAME))
-            $columns[UserPeer::LAST_NAME] = $obj->getLastName();
-
-        if ($obj->isNew() || $obj->isColumnModified(UserPeer::SALUTATION))
-            $columns[UserPeer::SALUTATION] = $obj->getSalutation();
-
-        if ($obj->isNew() || $obj->isColumnModified(UserPeer::BIRTHDAY))
-            $columns[UserPeer::BIRTHDAY] = $obj->getBirthday();
-
-        if ($obj->isNew() || $obj->isColumnModified(UserPeer::GENDER))
-            $columns[UserPeer::GENDER] = $obj->getGender();
-
-        if ($obj->isNew() || $obj->isColumnModified(UserPeer::EMAIL))
-            $columns[UserPeer::EMAIL] = $obj->getEmail();
-
-        if ($obj->isNew() || $obj->isColumnModified(UserPeer::SALT))
-            $columns[UserPeer::SALT] = $obj->getSalt();
-
-        if ($obj->isNew() || $obj->isColumnModified(UserPeer::IS_ACTIVE))
-            $columns[UserPeer::IS_ACTIVE] = $obj->getIsActive();
-
         }
 
         return BasePeer::doValidate(UserPeer::DATABASE_NAME, UserPeer::TABLE_NAME, $columns);

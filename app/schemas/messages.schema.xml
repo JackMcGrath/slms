@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <database name="default" defaultIdMethod="native" package="message" namespace="Zerebral\BusinessBundle\Model\Message" defaultPhpNamingMethod="phpname">
+
     <table name="messages" phpName="Message" idMethod="native">
         <column name="id" phpName="Id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="thread_id" phpName="ThreadId" type="BIGINT" size="22" sqlType="bigint(22) unsigned" required="true"/>
@@ -10,6 +11,7 @@
         <column name="subject" phpName="Subject" type="VARCHAR" size="255" required="true"/>
         <column name="body" phpName="Body" type="LONGVARCHAR" required="true"/>
         <column name="created_at" phpName="CreatedAt" type="TIMESTAMP" required="true"/>
+
         <foreign-key foreignTable="users" name="messages_ibfk_3" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="user_id" foreign="id"/>
         </foreign-key>
@@ -19,6 +21,7 @@
         <foreign-key foreignTable="users" name="messages_ibfk_2" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="to_id" foreign="id"/>
         </foreign-key>
+
         <index name="from_id">
             <index-column name="from_id"/>
         </index>
@@ -41,4 +44,5 @@
             <reference local="message_id" foreign="id"/>
         </foreign-key>
     </table>
+
 </database>

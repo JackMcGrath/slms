@@ -952,12 +952,6 @@ abstract class BaseDisciplinePeer
             }
         } else {
 
-        if ($obj->isNew() || $obj->isColumnModified(DisciplinePeer::TEACHER_ID))
-            $columns[DisciplinePeer::TEACHER_ID] = $obj->getTeacherId();
-
-        if ($obj->isNew() || $obj->isColumnModified(DisciplinePeer::NAME))
-            $columns[DisciplinePeer::NAME] = $obj->getName();
-
         }
 
         return BasePeer::doValidate(DisciplinePeer::DATABASE_NAME, DisciplinePeer::TABLE_NAME, $columns);

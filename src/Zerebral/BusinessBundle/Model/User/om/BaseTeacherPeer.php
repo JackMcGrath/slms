@@ -986,15 +986,6 @@ abstract class BaseTeacherPeer
             }
         } else {
 
-        if ($obj->isNew() || $obj->isColumnModified(TeacherPeer::BIO))
-            $columns[TeacherPeer::BIO] = $obj->getBio();
-
-        if ($obj->isNew() || $obj->isColumnModified(TeacherPeer::SUBJECTS))
-            $columns[TeacherPeer::SUBJECTS] = $obj->getSubjects();
-
-        if ($obj->isNew() || $obj->isColumnModified(TeacherPeer::GRADES))
-            $columns[TeacherPeer::GRADES] = $obj->getGrades();
-
         }
 
         return BasePeer::doValidate(TeacherPeer::DATABASE_NAME, TeacherPeer::TABLE_NAME, $columns);

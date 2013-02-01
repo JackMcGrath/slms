@@ -1769,21 +1769,6 @@ abstract class BaseCoursePeer
             }
         } else {
 
-        if ($obj->isNew() || $obj->isColumnModified(CoursePeer::DISCIPLINE_ID))
-            $columns[CoursePeer::DISCIPLINE_ID] = $obj->getDisciplineId();
-
-        if ($obj->isNew() || $obj->isColumnModified(CoursePeer::GRADE_LEVEL_ID))
-            $columns[CoursePeer::GRADE_LEVEL_ID] = $obj->getGradeLevelId();
-
-        if ($obj->isNew() || $obj->isColumnModified(CoursePeer::NAME))
-            $columns[CoursePeer::NAME] = $obj->getName();
-
-        if ($obj->isNew() || $obj->isColumnModified(CoursePeer::DESCRIPTION))
-            $columns[CoursePeer::DESCRIPTION] = $obj->getDescription();
-
-        if ($obj->isNew() || $obj->isColumnModified(CoursePeer::CREATED_BY))
-            $columns[CoursePeer::CREATED_BY] = $obj->getCreatedBy();
-
         }
 
         return BasePeer::doValidate(CoursePeer::DATABASE_NAME, CoursePeer::TABLE_NAME, $columns);
