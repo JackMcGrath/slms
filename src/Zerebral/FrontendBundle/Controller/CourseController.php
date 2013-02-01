@@ -48,12 +48,13 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
         $nextMonth = new Calendar(strtotime("+1 month"), $provider);
 
         $upcomingAssignments = $this->getRoleUser()->getUpcomingAssignments();
+        $courses = \Zerebral\BusinessBundle\Model\Course\CourseQuery::create()->filterByRoleUser($this->getRoleUser())->find();
 
         return array(
             'currentMonth' => $currentMonth,
             'nextMonth' => $nextMonth,
             'upcomingAssignments' => $upcomingAssignments,
-            'courses' => \Zerebral\BusinessBundle\Model\Course\CourseQuery::create()->findByRoleUser($this->getRoleUser()),
+            'courses' => $courses,
             'target' => 'courses',
             'courseJoinForm' => $this->createForm(new FormType\CourseJoinType())->createView(),
             'dateFilter' => array('startDate' => $dateFilter ? $dateFilter['startDate'] : null, 'endDate' => $dateFilter ? $dateFilter['endDate'] : null),
