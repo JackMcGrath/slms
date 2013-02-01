@@ -92,6 +92,9 @@
                         </li>
                         {% endif %}
                     </ul>
+                    {% if is_granted('ROLE_GUARDIAN') %}
+                        {{ mainPartials.guardianChildrenSelect() }}
+                    {% endif %}
                 </div>
             </div>
         </div>
