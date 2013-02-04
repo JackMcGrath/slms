@@ -2,7 +2,11 @@
 {% import "ZerebralFrontendBundle:Macro:main.html.twig" as mainPartials %}
 
 {% block content %}
-    {% javascripts '@ZerebralFrontendBundle/Resources/public/js/controllers/guardian/index.js' output='js/compiled/guardian_index.js' %}
+    {% javascripts
+        '@ZerebralFrontendBundle/Resources/public/js/plugins/jquery.dataTables.min.js'
+        '@ZerebralFrontendBundle/Resources/public/js/plugins/FixedColumns.min.js'
+        '@ZerebralFrontendBundle/Resources/public/js/controllers/guardian/attendance.js'
+    output='js/compiled/guardian_attendance.js' %}
     <script type="text/javascript" src="{{ asset_url }}"></script>
     {% endjavascripts %}
 
@@ -10,7 +14,9 @@
         {{ mainPartials.guardianTopMenu('assignments') }}
     </div>
 
-    <div class="row-fluid attendance-block">
+
+
+    <div class="row-fluid attendance-block parent">
         <div class="content">
             <div class="row-fluid">
                 <h2 class="pull-left form-title">
@@ -20,28 +26,54 @@
             <hr/>
 
             <div class="attendance-table">
-
                 <div class="date-selector">
+                    {% if isMonthRange %}
+                        <a href="{{ path('guardian_attendance', {startDate: startDate|strtotime('first day of -1 month')|date('Y-m-d'), endDate: endDate|strtotime('last day of -1 month')|date('Y-m-d')}) }}">&#706;</a>
+                    {% else %}
+                        <a href="{{ path('guardian_attendance', {startDate: startDate|strtotime('Monday -1 week')|date('Y-m-d'), endDate: endDate|strtotime('Sunday -1 week')|date('Y-m-d')}) }}">&#706;</a>
+                    {% endif %}
+                    {{ mainPartials.attendanceDateRangeName(startDate, endDate, isMonthRange) }}
+                    {% if isMonthRange %}
+                        <a href="{{ path('guardian_attendance', {startDate: startDate|strtotime('first day of +1 month')|date('Y-m-d'), endDate: endDate|strtotime('last day of +1 month')|date('Y-m-d')}) }}">&#707;</a>
+                    {% else %}
+                        <a href="{{ path('guardian_attendance', {startDate: startDate|strtotime('Monday +1 week')|date('Y-m-d'), endDate: endDate|strtotime('Sunday +1 week')|date('Y-m-d')}) }}">&#707;</a>
+                    {% endif %}
+                </div>
 
+                <div class="pick-date">
+                    <div class="btn-group">
+                        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                            Select filter
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{{ path('guardian_attendance', {startDate: "now"|strtotime('monday this week')|date('Y-m-d'), endDate: "now"|strtotime('sunday this week')|date('Y-m-d')}) }}">Current week</a></li>
+                            <li><a href="{{ path('guardian_attendance', {startDate: "now"|strtotime('monday -1 week')|date('Y-m-d'), endDate: "now"|strtotime('sunday -1 week')|date('Y-m-d')}) }}">Last week</a></li>
+                            <li><a href="{{ path('guardian_attendance', {startDate: "now"|strtotime('first day of this month')|date('Y-m-d'), endDate: "now"|strtotime('last day of this month')|date('Y-m-d')}) }}">Current Month</a></li>
+                            <li><a href="{{ path('guardian_attendance', {startDate: "now"|strtotime('first day of -1 month')|date('Y-m-d'), endDate: "now"|strtotime('last day of -1 month')|date('Y-m-d')}) }}">Last Month</a></li>
+                        </ul>
+                    </div>
                 </div>
 
                 <div class="clearfix"></div>
 
                 <table class="table table-bordered table-striped">
-                    <tr>
-                        <th class="name">Course name</th>
-                        {% for day in dateRange %}
-                            <th>{{ day }}</th>
-                        {% endfor %}
-                    </tr>
+                    <thead>
+                        <tr>
+                            <th class="name">Course name</th>
+                            {% for day in range(startDate|date('U'), endDate|date('U'), 3600 * 24) %}
+                                <th class="day">{{ day | date('D d, M') }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
 
                     <tbody>
                     {% for courseId, course in attendancies %}
                         <tr>
-                            <td><a href="{{ path('course_view', {id: courseId}) }}">{{ courses[courseId].name }}</a></td>
-                            {% for day in dateRange %}
+                            <td class="name"><a href="{{ path('course_view', {id: courseId}) }}">{{ courses[courseId].name }}</a></td>
+                            {% for day in range(startDate|date('U'), endDate|date('U'), 3600 * 24) %}
                                 <td>
-                                    {{ course[day] is defined ? course[day].status : '-' }}
+                                    {{ course[day|date('Y-m-d')] is defined ? course[day|date('Y-m-d')].status : '-' }}
                                 </td>
                             {% endfor %}
                         </tr>

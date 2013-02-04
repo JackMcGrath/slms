@@ -248,3 +248,21 @@
         {% endif %}
     </div>
 {% endmacro %}
+
+{% macro attendanceDateRangeName(startDate, endDate, isMonthRange) %}
+    {% if startDate == ("now"|strtotime("Monday this week")|date('Y-m-d')) and endDate == ("now"|strtotime("Sunday this week")|date('Y-m-d')) %}
+        Current week
+    {% elseif startDate == ("now"|strtotime("Monday -1 week")|date('Y-m-d')) and endDate == ("now"|strtotime("Sunday -1 week")|date('Y-m-d')) %}
+        Last week
+    {% elseif startDate == ("now"|strtotime("first day of this month")|date('Y-m-d')) and endDate == ("now"|strtotime("last day of this month")|date('Y-m-d')) %}
+        Current month
+    {% elseif startDate == ("now"|strtotime("first day of -1 month")|date('Y-m-d')) and endDate == ("now"|strtotime("last day of -1 month")|date('Y-m-d')) %}
+        Last month
+    {% else %}
+        {% if isMonthRange %}
+            {{ startDate | date('F, Y') }}
+        {% else %}
+            {{ startDate | date('Y-m-d') ~ ' - ' ~ endDate | date('Y-m-d')}}
+        {% endif %}
+    {% endif %}
+{% endmacro %}

@@ -59,9 +59,12 @@ class GuardianController extends \Zerebral\CommonBundle\Component\Controller
         /** @var \Zerebral\BusinessBundle\Model\User\Guardian $guardian  */
         $guardian = $this->getRoleUser();
         $selectedChild = $guardian->getSelectedChild($this->get('session')->get('selectedChildId'));
-        //$date = date('Y-m-d');
-        $date = '2013-02-01';
-        $studentAttendances = \Zerebral\BusinessBundle\Model\Attendance\StudentAttendanceQuery::create()->filterByDateAndStudent($date, $selectedChild)->find();
+        $dateRange = array(
+            'start' => $this->getRequest()->get('startDate', date('Y-m-d', strtotime('Monday this week'))),
+            'end' => $this->getRequest()->get('endDate', date('Y-m-d', strtotime('Sunday this week')))
+        );
+
+        $studentAttendances = \Zerebral\BusinessBundle\Model\Attendance\StudentAttendanceQuery::create()->filterByDateAndStudent($dateRange, $selectedChild)->find();
 
 
         $studentAttendanceFormatted = array();
@@ -78,9 +81,11 @@ class GuardianController extends \Zerebral\CommonBundle\Component\Controller
         return array(
             'attendancies' => $studentAttendanceFormatted,
             'courses' => $courses,
-            'dateRange' => array('2013-01-28', '2013-01-29', '2013-01-30', '2013-01-31', '2013-02-01', '2013-02-02'),
-            'date' => $date,
-            'target' => 'attendance'
+            'isMonthRange' => (strtotime($dateRange['end']) - strtotime($dateRange['start']) > 3600*24*26),
+            'startDate' => $dateRange['start'],
+            'endDate' => $dateRange['end'],
+            'target' => 'attendance',
+
         );
     }
 

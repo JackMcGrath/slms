@@ -10,6 +10,16 @@ class NativeTwigFunction extends \Twig_Extension
         return array();
     }
 
+    public function getFilters()
+    {
+        return array(
+            'sort_by' => new \Twig_Filter_Method($this, 'sortBy'),
+            'max' => new \Twig_Filter_Method($this, 'max'),
+            'max_key' => new \Twig_Filter_Method($this, 'maxKey'),
+            'strtotime' => new \Twig_Filter_Method($this, 'stringToTime')
+        );
+    }
+
     /**
      * @param array $collection
      * @param $field
@@ -48,13 +58,11 @@ class NativeTwigFunction extends \Twig_Extension
         return $this->max(array_keys((array)$collection));
     }
 
-    public function getFilters()
+
+
+    public function stringToTime($time, $str)
     {
-        return array(
-            'sort_by' => new \Twig_Filter_Method($this, 'sortBy'),
-            'max' => new \Twig_Filter_Method($this, 'max'),
-            'max_key' => new \Twig_Filter_Method($this, 'maxKey'),
-        );
+        return strtotime($str, strtotime($time));
     }
 
     public function getName()
