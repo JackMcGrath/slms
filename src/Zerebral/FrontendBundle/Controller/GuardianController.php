@@ -9,6 +9,7 @@ use JMS\SecurityExtraBundle\Annotation\Secure;
 use JMS\SecurityExtraBundle\Annotation\SecureParam;
 use JMS\SecurityExtraBundle\Annotation\PreAuthorize;
 
+use Zerebral\BusinessBundle\Model as Model;
 use Zerebral\BusinessBundle\Model\User\Student;
 
 /**
@@ -49,13 +50,38 @@ class GuardianController extends \Zerebral\CommonBundle\Component\Controller
     }
 
     /**
-     * @Route("/attendace", name="guardian_attendance")
+     * @Route("/attendance/", name="guardian_attendance")
      * @PreAuthorize("hasRole('ROLE_GUARDIAN')")
      * @Template
      */
-    public function attendaceAction()
+    public function attendanceAction()
     {
-        return array();
+        /** @var \Zerebral\BusinessBundle\Model\User\Guardian $guardian  */
+        $guardian = $this->getRoleUser();
+        $selectedChild = $guardian->getSelectedChild($this->get('session')->get('selectedChildId'));
+        //$date = date('Y-m-d');
+        $date = '2013-02-01';
+        $studentAttendances = \Zerebral\BusinessBundle\Model\Attendance\StudentAttendanceQuery::create()->filterByDateAndStudent($date, $selectedChild)->find();
+
+
+        $studentAttendanceFormatted = array();
+        $courses = array();
+
+        /**
+         * @var $attendance \Zerebral\BusinessBundle\Model\Attendance\StudentAttendance
+         */
+        foreach ($studentAttendances as $attendance) {
+            $studentAttendanceFormatted[$attendance->getAttendance()->getCourseId()][$attendance->getAttendance()->getDate('Y-m-d')] = $attendance;
+            $courses[$attendance->getAttendance()->getCourseId()] = $attendance->getAttendance()->getCourse();
+        }
+
+        return array(
+            'attendancies' => $studentAttendanceFormatted,
+            'courses' => $courses,
+            'dateRange' => array('2013-01-28', '2013-01-29', '2013-01-30', '2013-01-31', '2013-02-01', '2013-02-02'),
+            'date' => $date,
+            'target' => 'attendance'
+        );
     }
 
     /**

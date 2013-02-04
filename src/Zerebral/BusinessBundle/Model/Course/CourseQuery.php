@@ -28,8 +28,6 @@ class CourseQuery extends BaseCourseQuery
         $this->joinWith('CourseTeacher', \Criteria::LEFT_JOIN);
         $this->leftJoinCourseStudent();
 
-
-
         if ($roleUser->getUser()->isTeacher()) {
             $this->filterByTeacher($roleUser);
             $this->addJoinCondition('Assignment', 'Assignment.teacher_id='.$roleUser->getId());
@@ -47,6 +45,5 @@ class CourseQuery extends BaseCourseQuery
 
 
         return $this;
-
     }
 }
