@@ -125,19 +125,14 @@ Zerebral\BusinessBundle\Model\Assignment\Assignment:
         threshold:
             - NotBlank:
                 groups: [numeric]
-            - Type:
-                type: integer
-                message: Threshold should be numerical
-                groups: [numeric]
             - MaxLength:
                 groups: [numeric]
                 limit: 3
-            - Max:
+            - Range:
                 groups: [numeric]
-                limit: 100
-            - Min:
-                groups: [numeric]
-                limit: 0
+                min: 0
+                max: 100
+                invalidMessage: Threshold should be numerical
 
 
 Zerebral\BusinessBundle\Model\Assignment\AssignmentCategory:
