@@ -200,9 +200,8 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
                         throw new AccessDeniedHttpException('You have not permissions to delete this message.');
                     }
                     $message->delete();
-                    return $this->redirect($this->getRequest()->headers->get('referer'));
-
                 }
+                return $this->redirect($this->getRequest()->headers->get('referer'));
             } else if ($this->getRequest()->get('mark-as-read', false)) {
                 foreach ($messages as $message) {
                     if ($message->getUserId() != $user->getId()) {
