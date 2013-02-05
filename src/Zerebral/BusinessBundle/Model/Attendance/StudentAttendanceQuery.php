@@ -13,6 +13,7 @@ class StudentAttendanceQuery extends BaseStudentAttendanceQuery
         $this->add('student_attendance.student_id', $student->getId());
         $this->add('attendance.date', $dateRange['start'], \Criteria::GREATER_EQUAL);
         $this->add('attendance.date', $dateRange['end'], \Criteria::LESS_EQUAL);
+        $this->addAscendingOrderByColumn('LOWER(Courses.name)');
         return $this;
     }
 }

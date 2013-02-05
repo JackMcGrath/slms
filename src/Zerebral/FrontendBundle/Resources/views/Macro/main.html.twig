@@ -262,7 +262,7 @@
         {% if isMonthRange %}
             {{ startDate | date('F, Y') }}
         {% else %}
-            {{ startDate | date('Y-m-d') ~ ' - ' ~ endDate | date('Y-m-d')}}
+            {{ startDate | date('M d, Y') ~ ' - ' ~ endDate | date('M d, Y')}}
         {% endif %}
     {% endif %}
 {% endmacro %}

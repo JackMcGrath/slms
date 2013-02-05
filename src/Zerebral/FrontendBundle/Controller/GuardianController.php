@@ -66,7 +66,6 @@ class GuardianController extends \Zerebral\CommonBundle\Component\Controller
 
         $studentAttendances = \Zerebral\BusinessBundle\Model\Attendance\StudentAttendanceQuery::create()->filterByDateAndStudent($dateRange, $selectedChild)->find();
 
-
         $studentAttendanceFormatted = array();
         $courses = array();
 
