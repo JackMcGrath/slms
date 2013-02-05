@@ -104,4 +104,30 @@ class GuardianController extends \Zerebral\CommonBundle\Component\Controller
             'selectedChild' => $selectedChild
         );
     }
+
+    /**
+     * @Route("/grading", name="guardian_grading")
+     * @PreAuthorize("hasRole('ROLE_GUARDIAN')")
+     * @Template
+     */
+    public function gradingAction()
+    {
+        /** @var \Zerebral\BusinessBundle\Model\User\Guardian $guardian  */
+        $guardian = $this->getRoleUser();
+        $selectedChild = $guardian->getSelectedChild($this->get('session')->get('selectedChildId'));
+
+        $coursesGrading = \Zerebral\BusinessBundle\Model\Course\CourseQuery::create()->gradingByStudent($selectedChild)->find();
+        $courseAssignmentsSize = array();
+        foreach ($coursesGrading as $course) {
+            $courseAssignmentsSize[$course->getId()] = $course->getAssignments()->count();
+        }
+
+        return array(
+            'target' => 'grading',
+            'courseAssignmentsSize' => $courseAssignmentsSize,
+            'coursesGrading' => $coursesGrading,
+            'guardian' => $guardian,
+            'selectedChild' => $selectedChild
+        );
+    }
 }

@@ -46,4 +46,17 @@ class CourseQuery extends BaseCourseQuery
 
         return $this;
     }
+
+    public function gradingByStudent(\Zerebral\BusinessBundle\Model\User\Student $student)
+    {
+        //$this->leftJoinAssignment();
+        $this->joinWith('Assignment', \Criteria::LEFT_JOIN);
+        $this->joinWith('Assignment.StudentAssignment StudentAssignment', \Criteria::LEFT_JOIN);
+        $this->add('StudentAssignment.student_id', $student->getId(), \Criteria::EQUAL);
+        $this->add('StudentAssignment.grading', null, \Criteria::ISNOTNULL);
+        $this->addAscendingOrderByColumn('courses.name');
+
+
+        return $this;
+    }
 }
