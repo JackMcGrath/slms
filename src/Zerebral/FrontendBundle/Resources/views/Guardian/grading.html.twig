@@ -47,9 +47,9 @@
                                         <td class="value">
                                             <div class="hint" data-content="
                                                 <b class='title'>{{ assignment.name|escape }}</b><br/>
-                                                {{ assignment.threshold ? '<b>Threshold:</b>'~ assignment.threshold ~'<br/>' : ''}}
-                                                {{ studentAssignment.gradingComment ? '<b>Comment:</b> '~ studentAssignment.gradingComment | escape : ''}}"
-                                                 data-original-title="Grade: {{ assignment.gradeType == 'numeric' ? studentAssignment.grading : (studentAssignment.grading is sameas('0') ? 'incomplete' : 'completed') }}">
+                                                {{ assignment.threshold ? 'Threshold: <span class=\"label\">'~ assignment.threshold ~'</span><br/>' : ''}}
+                                                {{ studentAssignment.gradingComment ? 'Comment: <i>'~ studentAssignment.gradingComment | escape ~ '</i>' : ''}}"
+                                                 data-original-title="{{ mainPartials.gradePopoverTitle(assignment, studentAssignment)|escape }}">
                                                 {% if assignment.gradeType == 'numeric' %}
                                                     {{ studentAssignment.grading }}
                                                 {% else %}

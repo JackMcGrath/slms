@@ -266,3 +266,18 @@
         {% endif %}
     {% endif %}
 {% endmacro %}
+
+{% macro gradePopoverTitle(assignment, studentAssignment) %}
+    Grade:
+    {% if assignment.gradeType == 'numeric' %}
+        {{ studentAssignment.grading  }}
+        {% if studentAssignment.grading >= assignment.threshold %}
+            <span class="label label-success">completed</span>
+        {% else %}
+            <span class="label label-important">incomplete</span>
+        {% endif %}
+    {% else %}
+        {{ studentAssignment.grading is sameas('0') ? '<span class="label label-important">incomplete</span>' : '<span class="label label-success">completed</span>' }}
+    {% endif %}
+    <img class="pull-right" width="27" height="27" src="{{ user_avatar(assignment.teacher.user) | imagine_filter('top_thumbnail') }}"/>
+{% endmacro %}
