@@ -279,5 +279,5 @@
     {% else %}
         {{ studentAssignment.grading is sameas('0') ? '<span class="label label-important">incomplete</span>' : '<span class="label label-success">completed</span>' }}
     {% endif %}
-    <img class="pull-right" width="27" height="27" src="{{ user_avatar(assignment.teacher.user) | imagine_filter('top_thumbnail') }}"/>
+    <img class="pull-right rounded" width="27" height="27" src="{{ user_avatar(assignment.teacher.user) | imagine_filter('top_thumbnail') }}"/>
 {% endmacro %}
