@@ -42,7 +42,7 @@ class GuardianController extends \Zerebral\CommonBundle\Component\Controller
         $referrer = $this->getRequest()->headers->get('referer');
         if (($this->getRoleUser()->isGuardianFor($student)) && (!is_null($referrer))) {
             $this->get('session')->set('selectedChildId', $student->getId());
-            return $this->redirect($this->getRequest()->headers->get('referer'));
+            return $this->redirect($this->generateUrl('guardian_summary'));
         } else {
             throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException('You can\'t access this URL directly');
         }
@@ -97,6 +97,7 @@ class GuardianController extends \Zerebral\CommonBundle\Component\Controller
     {
         /** @var \Zerebral\BusinessBundle\Model\User\Guardian $guardian  */
         $guardian = $this->getRoleUser();
+        /** @var Student $selectedChild  */
         $selectedChild = $guardian->getSelectedChild($this->get('session')->get('selectedChildId'));
         return array(
             'target' => 'home',
@@ -123,11 +124,16 @@ class GuardianController extends \Zerebral\CommonBundle\Component\Controller
             throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException('Course #' . $course->getId() . ' not found');
         }
 
+        /** @var \Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery $assigmentsQuery  */
+        $assigmentsQuery = \Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery::create()->filterByUserAndDueDate($selectedChild->getUser(), $course);
+
+
         return array(
             'target' => 'home',
             'guardian' => $guardian,
             'selectedChild' => $selectedChild,
-            'course' => $course
+            'course' => $course,
+            'assignments' => $assigmentsQuery->clearOrderByColumns()->addDescendingOrderByColumn(\Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer::DUE_AT)->find()
         );
     }
 
