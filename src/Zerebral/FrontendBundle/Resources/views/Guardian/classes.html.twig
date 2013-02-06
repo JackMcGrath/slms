@@ -15,20 +15,17 @@
             <hr/>
 
             <div class="span9 items-list">
-                {% for course in selectedChild.courses %}
+                {% for course in courses %}
                     <div class="list-item span12{{ loop.last ? ' last' : '' }}" {% if course.assignmentsDueDates %}due-date="{{ course.assignmentsDueDates | join(',') }}"{% endif %}>
                         <div class="symbol pull-left"><img class="rounded" src="{{ user_avatar(course.teacher) | imagine_filter('thumbnail') }}"/></div>
                         <div class="details pull-left">
                             <h4><a href="{{ path('guardian_classes_course', {courseId: course.id}) }}">{{ course.name }}</a></h4>
                             <div class="stat">
                                 <div class="instructor-name pull-left" >Teacher: <b><a href="#">{{ course.teacher.fullName }}</a></b></div>
-
-                                {% if course.start is not null %}
-                                    <div class="course-date">From <b>{{ course.start.format('Y-m-d') }}</b> to <b>{{ course.end.format('Y-m-d') }}</b></div>
-                                {% endif %}
                                 <div class="clear"></div>
                             </div>
                             <div class="description">{{ course.description|raw }}</div>
+                            {{ mainPartials.courseSchedule(course) }}
                             <br />
                         </div>
                     </div>
@@ -37,6 +34,17 @@
         </div>
         <div class="right-navbar pull-left">
 
+            <div class="calendar">
+                {{ mainPartials.month(currentMonth) }}
+                {{ mainPartials.month(nextMonth) }}
+                <p class="reset"><a href="#" class="btn btn-small">Reset filter</a></p>
+            </div>
+
         </div>
     </div>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('.calendar').calendarSelectable({itemList: '.items-list', calculateAssignmentsCount: true, startDate: "{{ dateFilter.startDate }}", endDate: "{{ dateFilter.endDate }}"});
+        });
+    </script>
 {% endblock %}

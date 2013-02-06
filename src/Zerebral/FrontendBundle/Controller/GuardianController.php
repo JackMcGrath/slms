@@ -12,6 +12,10 @@ use JMS\SecurityExtraBundle\Annotation\PreAuthorize;
 use Zerebral\BusinessBundle\Model as Model;
 use Zerebral\BusinessBundle\Model\User\Student;
 
+use Zerebral\BusinessBundle\Calendar\EventProviders\CourseAssignmentEventsProvider;
+use Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery;
+use Zerebral\CommonBundle\Component\Calendar\Calendar;
+
 /**
   * @Route("/parent-area")
  */
@@ -99,10 +103,27 @@ class GuardianController extends \Zerebral\CommonBundle\Component\Controller
         $guardian = $this->getRoleUser();
         /** @var Student $selectedChild  */
         $selectedChild = $guardian->getSelectedChild($this->get('session')->get('selectedChildId'));
+
+
+        $session = $this->getRequest()->getSession();
+        $dateFilter = $session->get('assigmentDateFilter', array());
+
+        $provider = new CourseAssignmentEventsProvider($assignments = AssignmentQuery::create()->filterByUserAndDueDate($selectedChild->getUser(), null, false)->find());
+        $currentMonth = new Calendar(time(), $provider);
+
+        $nextMonth = new Calendar(strtotime("+1 month"), $provider);
+
+
+        $courses = \Zerebral\BusinessBundle\Model\Course\CourseQuery::create()->filterByRoleUser($selectedChild)->find();
+
         return array(
             'target' => 'home',
             'guardian' => $guardian,
-            'selectedChild' => $selectedChild
+            'selectedChild' => $selectedChild,
+            'courses' => $courses,
+            'currentMonth' => $currentMonth,
+            'nextMonth' => $nextMonth,
+            'dateFilter' => array('startDate' => $dateFilter ? $dateFilter['startDate'] : null, 'endDate' => $dateFilter ? $dateFilter['endDate'] : null)
         );
     }
 

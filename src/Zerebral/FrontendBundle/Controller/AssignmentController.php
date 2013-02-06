@@ -59,7 +59,7 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
 
     /**
      * @Route("/date-filter/set", name="assignments_date_filter")
-     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @PreAuthorize("hasRole('ROLE_USER')")
      */
     public function dateFilterAction()
     {

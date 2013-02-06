@@ -13,7 +13,7 @@
     <div class="row-fluid courses-list course-details">
         <div class="span6 main-list-block">
             <div class="row-fluid manage">
-                <h2 class="pull-left form-title"><a href="{{ path('guardian_classes') }}">{{ course.name }}</a> &raquo; Assignments</h2>
+                <h2 class="pull-left form-title">Assignments&nbsp;<small><a href="{{ path('guardian_classes') }}">{{ course.name }}</a></small></h2>
             </div>
 
             <hr/>
@@ -36,14 +36,18 @@
             </div>
         </div>
         <div class="right-navbar pull-left">
+            <div class="block teacher-profile">
+                {{ mainPartials.teacherShortInfo(course.teacher) }}
+            </div>
+
             <div class="block">
                 <h4>Assignments filter</h4>
-                    <label class="radio"><input type="radio" name="assignmentsFilter" value="all" checked />All</label>
-                    <label class="radio"><input type="radio" name="assignmentsFilter" value="past" />Past</label>
-                    <label class="radio"><input type="radio" name="assignmentsFilter" value="future" />Upcoming</label>
-                    <div class="clearfix"></div>
-                </div>
+                <label class="radio"><input type="radio" name="assignmentsFilter" value="all" checked />All</label>
+                <label class="radio"><input type="radio" name="assignmentsFilter" value="past" />Past</label>
+                <label class="radio"><input type="radio" name="assignmentsFilter" value="future" />Upcoming</label>
+                <div class="clearfix"></div>
             </div>
+        </div>
         </div>
     </div>
 {% endblock %}
