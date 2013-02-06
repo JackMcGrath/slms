@@ -28,7 +28,7 @@ class FileController extends \Zerebral\CommonBundle\Component\Controller
         $response->headers->set('X-SendFile', ucfirst($file->getAbsolutePath())); // apache mod_xsendfile
         $response->headers->set('X-Accel-Redirect', $file->getAbsolutePath()); // nginx
         $response->headers->set('Content-Type', $file->getMimeType());
-        $response->headers->set('Content-Disposition', 'attachment; filename=' . $file->getName());
+        $response->headers->set('Content-Disposition', 'attachment; filename="' . $file->getName() . '"');
         return $response;
     }
 }
