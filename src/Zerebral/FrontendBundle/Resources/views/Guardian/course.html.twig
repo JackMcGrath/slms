@@ -1,0 +1,43 @@
+{% extends 'ZerebralFrontendBundle::layout.html.twig' %}
+{% import "ZerebralFrontendBundle:Macro:main.html.twig" as mainPartials %}
+
+{% block content %}
+    {% javascripts '@ZerebralFrontendBundle/Resources/public/js/controllers/guardian/course.js' output='js/compiled/guardian_course.js' %}
+    <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+
+    <div class="top-second-navbar">
+        {{ mainPartials.guardianTopMenu('classes') }}
+    </div>
+
+    <div class="row-fluid courses-list course-details">
+        <div class="span6 main-list-block">
+            <div class="row-fluid manage">
+                <h2 class="pull-left form-title"><a href="{{ path('guardian_classes') }}">{{ course.name }}</a> &raquo; Assignments</h2>
+            </div>
+
+            <hr/>
+
+            <div class="span9 items-list">
+                {% for assignment in course.assignments %}
+                    <div class="list-item span12{{ loop.last ? ' last' : '' }}">
+                        <div class="details pull-left">
+                            <h4>{{ assignment.name }}&nbsp;({{ assignment.assignmentCategory.name }})</h4>
+                            <b>
+                                {% if date(assignment.dueAt) < date() %}Past due by{% else %}Due{% endif %}&nbsp;{{ time_diff(assignment.dueAt) }}<br />
+                                {{ assignment.dueAt|date('d/m/Y') }}
+                            </b>
+                            <div class="stat">
+                            </div>
+                            <div class="description">{{ assignment.description }}</div>
+                            <br />
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="right-navbar pull-left">
+
+        </div>
+    </div>
+{% endblock %}

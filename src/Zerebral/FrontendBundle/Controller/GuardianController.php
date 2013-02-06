@@ -89,11 +89,11 @@ class GuardianController extends \Zerebral\CommonBundle\Component\Controller
     }
 
     /**
-     * @Route("/assignments", name="guardian_assignments")
+     * @Route("/classes", name="guardian_classes")
      * @PreAuthorize("hasRole('ROLE_GUARDIAN')")
      * @Template
      */
-    public function assignmentsAction()
+    public function classesAction()
     {
         /** @var \Zerebral\BusinessBundle\Model\User\Guardian $guardian  */
         $guardian = $this->getRoleUser();
@@ -102,6 +102,32 @@ class GuardianController extends \Zerebral\CommonBundle\Component\Controller
             'target' => 'home',
             'guardian' => $guardian,
             'selectedChild' => $selectedChild
+        );
+    }
+
+    /**
+     * @Route("/classes/{courseId}", name="guardian_classes_course")
+     * @PreAuthorize("hasRole('ROLE_GUARDIAN')")
+     * @param \Zerebral\BusinessBundle\Model\Course\Course $course
+     * @return array
+     * @ParamConverter("course", options={"mapping": {"courseId": "id"}})
+     * @Template
+     */
+    public function courseAction(\Zerebral\BusinessBundle\Model\Course\Course $course)
+    {
+        /** @var \Zerebral\BusinessBundle\Model\User\Guardian $guardian  */
+        $guardian = $this->getRoleUser();
+        $selectedChild = $guardian->getSelectedChild($this->get('session')->get('selectedChildId'));
+
+        if (!$selectedChild->hasCourse($course)) {
+            throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException('Course #' . $course->getId() . ' not found');
+        }
+
+        return array(
+            'target' => 'home',
+            'guardian' => $guardian,
+            'selectedChild' => $selectedChild,
+            'course' => $course
         );
     }
 
