@@ -52,9 +52,9 @@ Controller.prototype = {
 
     switchThresholdByValue: function(value) {
         if (value == 'numeric') {
-            $('.threshold').parents('.control-group').show();
+            $('.threshold').parents('.control-group').show().find('input').removeAttr('disabled');
         } else {
-            $('.threshold').parents('.control-group').hide();
+            $('.threshold').parents('.control-group').hide().find('input').attr('disabled', 'disabled');
         }
     }
 };
