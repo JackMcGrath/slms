@@ -40,7 +40,7 @@
                     <tbody>
                         {% for course in coursesGrading %}
                             <tr>
-                                <td class="name"><a href="{{ path('course_view', {id: course.id}) }}">{{ course.name }}</a></td>
+                                <td class="name">{{ course.name }}</td>
 
                                 {% for assignment in course.assignments %}
                                     {% for studentAssignment in assignment.studentAssignments %}

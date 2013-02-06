@@ -48,7 +48,7 @@
                         </a>
                         <ul class="dropdown-menu">
                             <li><a href="{{ path('guardian_attendance', {startDate: "now"|strtotime('monday this week')|date('Y-m-d'), endDate: "now"|strtotime('sunday this week')|date('Y-m-d')}) }}">Current week</a></li>
-                            <li><a href="{{ path('guardian_attendance', {startDate: "now"|strtotime('monday -1 week')|date('Y-m-d'), endDate: "now"|strtotime('sunday -1 week')|date('Y-m-d')}) }}">Last week</a></li>
+                            <li><a href="{{ path('guardian_attendance', {startDate: "now"|strtotime('Monday previous week')|date('Y-m-d'), endDate: "now"|strtotime('Sunday previous  week')|date('Y-m-d')}) }}">Last week</a></li>
                             <li><a href="{{ path('guardian_attendance', {startDate: "now"|strtotime('first day of this month')|date('Y-m-d'), endDate: "now"|strtotime('last day of this month')|date('Y-m-d')}) }}">Current Month</a></li>
                             <li><a href="{{ path('guardian_attendance', {startDate: "now"|strtotime('first day of -1 month')|date('Y-m-d'), endDate: "now"|strtotime('last day of -1 month')|date('Y-m-d')}) }}">Last Month</a></li>
                         </ul>
@@ -70,7 +70,7 @@
                     <tbody>
                     {% for courseId, course in attendancies %}
                         <tr>
-                            <td class="name"><a href="{{ path('course_view', {id: courseId}) }}">{{ courses[courseId].name }}</a></td>
+                            <td class="name">{{ courses[courseId].name }}</td>
                             {% for day in range(startDate|date('U'), endDate|date('U'), 3600 * 24) %}
                                 <td>
                                     {{ course[day|date('Y-m-d')] is defined ? course[day|date('Y-m-d')].status : '-' }}
