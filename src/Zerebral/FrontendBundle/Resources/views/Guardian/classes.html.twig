@@ -27,7 +27,7 @@
                                     <div class="course-date">From <b>{{ course.start.format('Y-m-d') }}</b> to <b>{{ course.end.format('Y-m-d') }}</b></div>
                                 {% endif %}
                             </div>
-                            <div class="description">{{ course.description }}</div>
+                            <div class="description">{{ course.description|raw }}</div>
                             <br />
                         </div>
                     </div>
