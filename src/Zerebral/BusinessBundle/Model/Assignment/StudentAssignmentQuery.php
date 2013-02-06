@@ -9,7 +9,7 @@ class StudentAssignmentQuery extends BaseStudentAssignmentQuery
     public function findStudentsByAssignmentId($assignmentId)
     {
         $this->filterByAssignmentId($assignmentId);
-        $this->filterByIsSubmitted(true);
+        //$this->filterByIsSubmitted(true);
         $this->innerJoinStudentAssignmentFile();
         $this->leftJoinStudent();
         $this->leftJoin('Student.User User');
@@ -24,7 +24,7 @@ class StudentAssignmentQuery extends BaseStudentAssignmentQuery
     {
         $this->filterByStudent($student);
         $this->filterByAssignment($assignment);
-        $this->filterByIsSubmitted(true);
+        //$this->filterByIsSubmitted(true);
         return $this;
     }
 
