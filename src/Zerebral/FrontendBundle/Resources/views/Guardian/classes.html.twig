@@ -21,11 +21,12 @@
                         <div class="details pull-left">
                             <h4><a href="{{ path('guardian_classes_course', {courseId: course.id}) }}">{{ course.name }}</a></h4>
                             <div class="stat">
-                                <div class="instructor-name">Teacher: <b><a href="#">{{ course.teacher.fullName }}</a></b></div>
+                                <div class="instructor-name pull-left" >Teacher: <b><a href="#">{{ course.teacher.fullName }}</a></b></div>
 
                                 {% if course.start is not null %}
                                     <div class="course-date">From <b>{{ course.start.format('Y-m-d') }}</b> to <b>{{ course.end.format('Y-m-d') }}</b></div>
                                 {% endif %}
+                                <div class="clear"></div>
                             </div>
                             <div class="description">{{ course.description|raw }}</div>
                             <br />
