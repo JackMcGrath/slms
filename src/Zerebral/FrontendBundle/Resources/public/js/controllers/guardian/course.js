@@ -15,5 +15,7 @@ $(document).ready(function() {
 
     $('.pull-left input').click(function() {
         filterAssignments($(this).val());
+        $(this).parents('ul').find('li').removeClass('active');
+        $(this).parents('li').addClass('active');
     });
 });

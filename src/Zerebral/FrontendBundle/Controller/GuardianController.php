@@ -148,6 +148,23 @@ class GuardianController extends \Zerebral\CommonBundle\Component\Controller
 
         /** @var \Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery $assigmentsQuery  */
         $assigmentsQuery = \Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery::create()->filterByUserAndDueDate($selectedChild->getUser(), $course);
+        $assignmentsCollection = $assigmentsQuery->clearOrderByColumns()->addDescendingOrderByColumn(\Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer::DUE_AT)->find();
+
+        $assignmentsUpcoming = array();
+        $assignmentsOther = array();
+        $currentDate = new \DateTime();
+
+        foreach ($assignmentsCollection as $assignment) {
+
+            if ((!is_null($assignment->getDueAt())) && ($currentDate <= $assignment->getDueAt())) {
+                $assignmentsUpcoming[] = $assignment;
+            } else {
+                $assignmentsOther[] = $assignment;
+            }
+        }
+
+        $assignmentsUpcoming = array_reverse($assignmentsUpcoming);
+        $assignments = array_merge($assignmentsUpcoming, $assignmentsOther);
 
 
         return array(
@@ -155,7 +172,7 @@ class GuardianController extends \Zerebral\CommonBundle\Component\Controller
             'guardian' => $guardian,
             'selectedChild' => $selectedChild,
             'course' => $course,
-            'assignments' => $assigmentsQuery->clearOrderByColumns()->addDescendingOrderByColumn(\Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer::DUE_AT)->find()
+            'assignments' => $assignments
         );
     }
 

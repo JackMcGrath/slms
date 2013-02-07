@@ -127,7 +127,7 @@
     {% endif %}
 {% endmacro %}
 
-{% macro courseSchedule(course) %}
+{% macro courseSchedule(course, padding) %}
     {% if course.start or course.end or course.getCourseScheduleDays.count %}
         <div class="timetable">
             {% if course.start or course.end %}
@@ -145,7 +145,7 @@
             </div>
         </div>
     {% else %}
-        <br />
+        {% if padding %}<br />{% endif %}
     {% endif %}
 {% endmacro %}
 

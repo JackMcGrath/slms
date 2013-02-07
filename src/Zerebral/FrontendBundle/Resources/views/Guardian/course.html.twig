@@ -20,11 +20,15 @@
 
             <div id="test" class="span9 items-list">
                 {% for assignment in assignments %}
-                    <div class="list-item span12{{ loop.last ? ' last' : '' }}" data-due="{% if date(assignment.dueAt) < date() %}past{% else %}future{% endif %}">
+                    <div class="list-item span12{{ loop.last ? ' last' : '' }}" data-due="{% if assignment.dueAt is null %}nodue{% else %}{% if date(assignment.dueAt) < date() %}past{% else %}future{% endif %}{% endif %}">
                         <div class="details pull-left">
                             <h4>{{ assignment.name }}&nbsp;({{ assignment.assignmentCategory.name }})</h4>
                             <b>
-                                {% if date(assignment.dueAt) < date() %}Past due by{% else %}Due{% endif %}&nbsp;{{ time_diff(assignment.dueAt)|replace({'now': 'today'})|replace({'ago': ''}) }}<br />
+                                {% if assignment.dueAt %}
+                                    {% if date(assignment.dueAt) < date() %}Past due by{% else %}Due{% endif %}&nbsp;{{ time_diff(assignment.dueAt)|replace({'now': 'today'})|replace({'ago': ''}) }}<br />
+                                {% else %}
+                                    No due date
+                                {% endif %}
                             </b>
                             <div class="stat">
                             </div>
@@ -42,9 +46,12 @@
 
             <div class="block">
                 <h4>Assignments filter</h4>
-                <label class="radio"><input type="radio" name="assignmentsFilter" value="all" checked />All</label>
-                <label class="radio"><input type="radio" name="assignmentsFilter" value="past" />Past</label>
-                <label class="radio"><input type="radio" name="assignmentsFilter" value="future" />Upcoming</label>
+                <ul class="radio">
+                    <li class="active"><label><input type="radio" name="assignmentsFilter" value="all" checked=""> All</label></li>
+                    <li><label><input type="radio" name="assignmentsFilter" value="past" > Past</label></li>
+                    <li><label><input type="radio" name="assignmentsFilter" value="future"> Upcoming</label></li>
+                    <li><label><input type="radio" name="assignmentsFilter" value="nodue"> No due date</label></li>
+                </ul>
                 <div class="clearfix"></div>
             </div>
         </div>

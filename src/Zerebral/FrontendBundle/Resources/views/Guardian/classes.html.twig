@@ -24,8 +24,8 @@
                                 <div class="instructor-name pull-left" >Teacher: <b><a href="#">{{ course.teacher.fullName }}</a></b></div>
                                 <div class="clear"></div>
                             </div>
+                            {{ mainPartials.courseSchedule(course, false) }}
                             <div class="description">{{ course.description|raw }}</div>
-                            {{ mainPartials.courseSchedule(course) }}
                             <br />
                         </div>
                     </div>
