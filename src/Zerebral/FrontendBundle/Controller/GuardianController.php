@@ -12,6 +12,10 @@ use JMS\SecurityExtraBundle\Annotation\PreAuthorize;
 use Zerebral\BusinessBundle\Model as Model;
 use Zerebral\BusinessBundle\Model\User\Student;
 
+use Zerebral\BusinessBundle\Calendar\EventProviders\CourseAssignmentEventsProvider;
+use Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery;
+use Zerebral\CommonBundle\Component\Calendar\Calendar;
+
 /**
   * @Route("/parent-area")
  */
@@ -89,19 +93,86 @@ class GuardianController extends \Zerebral\CommonBundle\Component\Controller
     }
 
     /**
-     * @Route("/assignments", name="guardian_assignments")
+     * @Route("/classes", name="guardian_classes")
      * @PreAuthorize("hasRole('ROLE_GUARDIAN')")
      * @Template
      */
-    public function assignmentsAction()
+    public function classesAction()
+    {
+        /** @var \Zerebral\BusinessBundle\Model\User\Guardian $guardian  */
+        $guardian = $this->getRoleUser();
+        /** @var Student $selectedChild  */
+        $selectedChild = $guardian->getSelectedChild($this->get('session')->get('selectedChildId'));
+
+
+        $session = $this->getRequest()->getSession();
+        $dateFilter = $session->get('assigmentDateFilter', array());
+
+        $provider = new CourseAssignmentEventsProvider($assignments = AssignmentQuery::create()->filterByUserAndDueDate($selectedChild->getUser(), null, false)->find());
+        $currentMonth = new Calendar(time(), $provider);
+
+        $nextMonth = new Calendar(strtotime("+1 month"), $provider);
+
+
+        $courses = \Zerebral\BusinessBundle\Model\Course\CourseQuery::create()->filterByRoleUser($selectedChild)->find();
+
+        return array(
+            'target' => 'home',
+            'guardian' => $guardian,
+            'selectedChild' => $selectedChild,
+            'courses' => $courses,
+            'currentMonth' => $currentMonth,
+            'nextMonth' => $nextMonth,
+            'dateFilter' => array('startDate' => $dateFilter ? $dateFilter['startDate'] : null, 'endDate' => $dateFilter ? $dateFilter['endDate'] : null)
+        );
+    }
+
+    /**
+     * @Route("/classes/{courseId}", name="guardian_classes_course")
+     * @PreAuthorize("hasRole('ROLE_GUARDIAN')")
+     * @param \Zerebral\BusinessBundle\Model\Course\Course $course
+     * @return array
+     * @ParamConverter("course", options={"mapping": {"courseId": "id"}})
+     * @Template
+     */
+    public function courseAction(\Zerebral\BusinessBundle\Model\Course\Course $course)
     {
         /** @var \Zerebral\BusinessBundle\Model\User\Guardian $guardian  */
         $guardian = $this->getRoleUser();
         $selectedChild = $guardian->getSelectedChild($this->get('session')->get('selectedChildId'));
+
+        if (!$selectedChild->hasCourse($course)) {
+            //throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException('Course #' . $course->getId() . ' not found');
+            return $this->redirect($this->generateUrl('guardian_classes'));
+        }
+
+        /** @var \Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery $assigmentsQuery  */
+        $assigmentsQuery = \Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery::create()->filterByUserAndDueDate($selectedChild->getUser(), $course);
+        $assignmentsCollection = $assigmentsQuery->clearOrderByColumns()->addDescendingOrderByColumn(\Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer::DUE_AT)->find();
+
+        $assignmentsUpcoming = array();
+        $assignmentsOther = array();
+        $currentDate = new \DateTime();
+
+        foreach ($assignmentsCollection as $assignment) {
+
+            if ((!is_null($assignment->getDueAt())) && ($currentDate <= $assignment->getDueAt())) {
+                $assignmentsUpcoming[] = $assignment;
+            } else {
+                $assignmentsOther[] = $assignment;
+            }
+        }
+
+        $assignmentsUpcoming = array_reverse($assignmentsUpcoming);
+        $assignments = array_merge($assignmentsUpcoming, $assignmentsOther);
+
+
         return array(
             'target' => 'home',
             'guardian' => $guardian,
-            'selectedChild' => $selectedChild
+            'selectedChild' => $selectedChild,
+            'course' => $course,
+            'assignments' => $assignments
         );
     }
 

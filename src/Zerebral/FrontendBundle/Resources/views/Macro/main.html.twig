@@ -39,13 +39,13 @@
             <ul class="dropdown-menu">
                 {% for child in children %}
                     {% if child.id != selectedChild.id %}
-                        <li><a href="{{ path('guardian_set_child', { childId: child.id }) }}"><i class="icon-user"></i> {{ child.user.firstName }} {{ child.user.lastName }}</a></li>
+                        <li><a href="{{ path('guardian_set_child', { childId: child.id }) }}"><img src="{{ user_avatar(child.user) | imagine_filter('top_thumbnail') }}" class="img-rounded" /> {{ child.user.firstName }} {{ child.user.lastName }}</a></li>
                     {% endif %}
                 {% endfor %}
                 {% if children|length > 1 %}
                 <li class="divider"></li>
                 {% endif %}
-                <li><a href="#"><i class="icon-user"></i> {{ selectedChild.user.firstName }}'s profile</a></li>
+                <li><a href="#"><img src="{{ user_avatar(selectedChild.user) | imagine_filter('top_thumbnail') }}" class="img-rounded" /> {{ selectedChild.user.firstName }}'s profile</a></li>
             </ul>
         </li>
     </ul>
@@ -72,9 +72,9 @@
 {% macro guardianTopMenu(selected) %}
     <ul>
         <li{{ selected == 'summary' ? ' class="active"' : '' }}><a href="{{ path('guardian_summary') }}">Summary</a></li>
-        <li{{ selected == 'grading' ? ' class="active"' : '' }}><a href="{{ path('guardian_grading') }}">Grades</a></li>
+        <li{{ selected == 'grading' ? ' class="active"' : '' }}><a href="{{ path('guardian_grading') }}">Grading</a></li>
         <li{{ selected == 'attendance' ? ' class="active"' : '' }}><a href="{{ path('guardian_attendance') }}">Attendance</a></li>
-        <li{{ selected == 'assignments' ? ' class="active"' : '' }}><a href="{{ path('guardian_assignments') }}">Assignments</a></li>
+        <li{{ selected == 'classes' ? ' class="active"' : '' }}><a href="{{ path('guardian_classes') }}">Classes</a></li>
         <li{{ selected == 'guardians' ? ' class="active"' : '' }}><a href="#">Parents</a></li>
     </ul>
 {% endmacro %}
@@ -127,7 +127,7 @@
     {% endif %}
 {% endmacro %}
 
-{% macro courseSchedule(course) %}
+{% macro courseSchedule(course, padding) %}
     {% if course.start or course.end or course.getCourseScheduleDays.count %}
         <div class="timetable">
             {% if course.start or course.end %}
@@ -145,7 +145,7 @@
             </div>
         </div>
     {% else %}
-        <br />
+        {% if padding %}<br />{% endif %}
     {% endif %}
 {% endmacro %}
 
