@@ -39,13 +39,13 @@
             <ul class="dropdown-menu">
                 {% for child in children %}
                     {% if child.id != selectedChild.id %}
-                        <li><a href="{{ path('guardian_set_child', { childId: child.id }) }}"><i class="icon-user"></i> {{ child.user.firstName }} {{ child.user.lastName }}</a></li>
+                        <li><a href="{{ path('guardian_set_child', { childId: child.id }) }}"><img src="{{ user_avatar(child.user) | imagine_filter('top_thumbnail') }}" class="img-rounded" /> {{ child.user.firstName }} {{ child.user.lastName }}</a></li>
                     {% endif %}
                 {% endfor %}
                 {% if children|length > 1 %}
                 <li class="divider"></li>
                 {% endif %}
-                <li><a href="#"><i class="icon-user"></i> {{ selectedChild.user.firstName }}'s profile</a></li>
+                <li><a href="#"><img src="{{ user_avatar(selectedChild.user) | imagine_filter('top_thumbnail') }}" class="img-rounded" /> {{ selectedChild.user.firstName }}'s profile</a></li>
             </ul>
         </li>
     </ul>
