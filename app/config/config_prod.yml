@@ -36,3 +36,6 @@ services:
         tags:
           - { name: file_storage, alias: local, default: true }
 
+
+parameters:
+    kissmetrics.key: 1c35c18798aace5f0c5762e99d88b3216503096f

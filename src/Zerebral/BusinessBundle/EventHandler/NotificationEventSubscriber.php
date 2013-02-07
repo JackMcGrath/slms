@@ -24,7 +24,6 @@ class NotificationEventSubscriber implements \Symfony\Component\EventDispatcher\
             'assignment_files.insert.post' => 'createFile', //New Assignment File,
             'attendance.save.post' => 'updateAttendance',
             'feed_items.insert.post' => 'createFeed',
-            'feed_items.insert.post' => 'createFeed',
             'student_assignments.update.post' => 'createGrade'
         );
     }

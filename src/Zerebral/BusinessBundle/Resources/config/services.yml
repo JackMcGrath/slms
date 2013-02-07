@@ -36,6 +36,12 @@ services:
             -       { name: propel.event }
 
     zerebral.notification_event_subscriber:
-            class:      Zerebral\BusinessBundle\EventHandler\NotificationEventSubscriber
-            tags:
-                -       { name: propel.event }
+        class:      Zerebral\BusinessBundle\EventHandler\NotificationEventSubscriber
+        tags:
+            -       { name: propel.event }
+
+    zerebral.kissmetrics_event_subscriber:
+        class:      Zerebral\BusinessBundle\EventHandler\KissMetricsEventSubscriber
+        arguments:  [@kissmetrics]
+        tags:
+            -       { name: propel.event }
