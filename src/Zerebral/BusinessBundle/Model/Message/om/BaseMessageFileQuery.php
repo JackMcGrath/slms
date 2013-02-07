@@ -67,7 +67,7 @@ abstract class BaseMessageFileQuery extends ModelCriteria
      * Returns a new MessageFileQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     MessageFileQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   MessageFileQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return MessageFileQuery
      */
@@ -131,8 +131,8 @@ abstract class BaseMessageFileQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   MessageFile A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 MessageFile A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -244,7 +244,8 @@ abstract class BaseMessageFileQuery extends ModelCriteria
      * <code>
      * $query->filterByfileId(1234); // WHERE file_id = 1234
      * $query->filterByfileId(array(12, 34)); // WHERE file_id IN (12, 34)
-     * $query->filterByfileId(array('min' => 12)); // WHERE file_id > 12
+     * $query->filterByfileId(array('min' => 12)); // WHERE file_id >= 12
+     * $query->filterByfileId(array('max' => 12)); // WHERE file_id <= 12
      * </code>
      *
      * @see       filterByFile()
@@ -259,8 +260,22 @@ abstract class BaseMessageFileQuery extends ModelCriteria
      */
     public function filterByfileId($fileId = null, $comparison = null)
     {
-        if (is_array($fileId) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($fileId)) {
+            $useMinMax = false;
+            if (isset($fileId['min'])) {
+                $this->addUsingAlias(MessageFilePeer::FILE_ID, $fileId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($fileId['max'])) {
+                $this->addUsingAlias(MessageFilePeer::FILE_ID, $fileId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(MessageFilePeer::FILE_ID, $fileId, $comparison);
@@ -273,7 +288,8 @@ abstract class BaseMessageFileQuery extends ModelCriteria
      * <code>
      * $query->filterBymessageId(1234); // WHERE message_id = 1234
      * $query->filterBymessageId(array(12, 34)); // WHERE message_id IN (12, 34)
-     * $query->filterBymessageId(array('min' => 12)); // WHERE message_id > 12
+     * $query->filterBymessageId(array('min' => 12)); // WHERE message_id >= 12
+     * $query->filterBymessageId(array('max' => 12)); // WHERE message_id <= 12
      * </code>
      *
      * @see       filterByMessage()
@@ -288,8 +304,22 @@ abstract class BaseMessageFileQuery extends ModelCriteria
      */
     public function filterBymessageId($messageId = null, $comparison = null)
     {
-        if (is_array($messageId) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($messageId)) {
+            $useMinMax = false;
+            if (isset($messageId['min'])) {
+                $this->addUsingAlias(MessageFilePeer::MESSAGE_ID, $messageId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($messageId['max'])) {
+                $this->addUsingAlias(MessageFilePeer::MESSAGE_ID, $messageId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(MessageFilePeer::MESSAGE_ID, $messageId, $comparison);
@@ -301,8 +331,8 @@ abstract class BaseMessageFileQuery extends ModelCriteria
      * @param   File|PropelObjectCollection $file The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   MessageFileQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 MessageFileQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByFile($file, $comparison = null)
     {
@@ -377,8 +407,8 @@ abstract class BaseMessageFileQuery extends ModelCriteria
      * @param   Message|PropelObjectCollection $message The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   MessageFileQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 MessageFileQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByMessage($message, $comparison = null)
     {

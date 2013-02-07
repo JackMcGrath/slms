@@ -96,7 +96,7 @@ abstract class BaseCourseMaterialQuery extends ModelCriteria
      * Returns a new CourseMaterialQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     CourseMaterialQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   CourseMaterialQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return CourseMaterialQuery
      */
@@ -158,8 +158,8 @@ abstract class BaseCourseMaterialQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   CourseMaterial A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 CourseMaterial A model object, or null if the key is not found
+     * @throws PropelException
      */
      public function findOneById($key, $con = null)
      {
@@ -173,8 +173,8 @@ abstract class BaseCourseMaterialQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   CourseMaterial A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 CourseMaterial A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -274,7 +274,8 @@ abstract class BaseCourseMaterialQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -287,8 +288,22 @@ abstract class BaseCourseMaterialQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(CourseMaterialPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(CourseMaterialPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(CourseMaterialPeer::ID, $id, $comparison);
@@ -301,7 +316,8 @@ abstract class BaseCourseMaterialQuery extends ModelCriteria
      * <code>
      * $query->filterByCourseId(1234); // WHERE course_id = 1234
      * $query->filterByCourseId(array(12, 34)); // WHERE course_id IN (12, 34)
-     * $query->filterByCourseId(array('min' => 12)); // WHERE course_id > 12
+     * $query->filterByCourseId(array('min' => 12)); // WHERE course_id >= 12
+     * $query->filterByCourseId(array('max' => 12)); // WHERE course_id <= 12
      * </code>
      *
      * @see       filterByCourse()
@@ -344,7 +360,8 @@ abstract class BaseCourseMaterialQuery extends ModelCriteria
      * <code>
      * $query->filterByFolderId(1234); // WHERE folder_id = 1234
      * $query->filterByFolderId(array(12, 34)); // WHERE folder_id IN (12, 34)
-     * $query->filterByFolderId(array('min' => 12)); // WHERE folder_id > 12
+     * $query->filterByFolderId(array('min' => 12)); // WHERE folder_id >= 12
+     * $query->filterByFolderId(array('max' => 12)); // WHERE folder_id <= 12
      * </code>
      *
      * @see       filterByCourseFolder()
@@ -416,7 +433,8 @@ abstract class BaseCourseMaterialQuery extends ModelCriteria
      * <code>
      * $query->filterByFileId(1234); // WHERE file_id = 1234
      * $query->filterByFileId(array(12, 34)); // WHERE file_id IN (12, 34)
-     * $query->filterByFileId(array('min' => 12)); // WHERE file_id > 12
+     * $query->filterByFileId(array('min' => 12)); // WHERE file_id >= 12
+     * $query->filterByFileId(array('max' => 12)); // WHERE file_id <= 12
      * </code>
      *
      * @see       filterByFile()
@@ -459,7 +477,8 @@ abstract class BaseCourseMaterialQuery extends ModelCriteria
      * <code>
      * $query->filterByCreatedBy(1234); // WHERE created_by = 1234
      * $query->filterByCreatedBy(array(12, 34)); // WHERE created_by IN (12, 34)
-     * $query->filterByCreatedBy(array('min' => 12)); // WHERE created_by > 12
+     * $query->filterByCreatedBy(array('min' => 12)); // WHERE created_by >= 12
+     * $query->filterByCreatedBy(array('max' => 12)); // WHERE created_by <= 12
      * </code>
      *
      * @see       filterByTeacher()
@@ -544,8 +563,8 @@ abstract class BaseCourseMaterialQuery extends ModelCriteria
      * @param   Teacher|PropelObjectCollection $teacher The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   CourseMaterialQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 CourseMaterialQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByTeacher($teacher, $comparison = null)
     {
@@ -620,8 +639,8 @@ abstract class BaseCourseMaterialQuery extends ModelCriteria
      * @param   Course|PropelObjectCollection $course The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   CourseMaterialQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 CourseMaterialQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByCourse($course, $comparison = null)
     {
@@ -696,8 +715,8 @@ abstract class BaseCourseMaterialQuery extends ModelCriteria
      * @param   CourseFolder|PropelObjectCollection $courseFolder The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   CourseMaterialQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 CourseMaterialQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByCourseFolder($courseFolder, $comparison = null)
     {
@@ -772,8 +791,8 @@ abstract class BaseCourseMaterialQuery extends ModelCriteria
      * @param   File|PropelObjectCollection $file The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   CourseMaterialQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 CourseMaterialQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByFile($file, $comparison = null)
     {

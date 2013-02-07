@@ -36,6 +36,7 @@ services:
             -       { name: propel.event }
 
     zerebral.notification_event_subscriber:
-            class:      Zerebral\BusinessBundle\EventHandler\NotificationEventSubscriber
-            tags:
-                -       { name: propel.event }
+        class:      Zerebral\BusinessBundle\EventHandler\NotificationEventSubscriber
+        tags:
+            -       { name: propel.event }
+

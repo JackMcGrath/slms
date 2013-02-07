@@ -19,6 +19,7 @@ class DashboardController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function indexAction()
     {
+  //      var_dump($this->container->get('security.context'));
         if ($this->getUser()->isGuardian()) {
             return $this->redirect($this->generateUrl('guardian_summary'));
         }

@@ -108,7 +108,7 @@ abstract class BaseFileQuery extends ModelCriteria
      * Returns a new FileQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     FileQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   FileQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return FileQuery
      */
@@ -170,8 +170,8 @@ abstract class BaseFileQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   File A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 File A model object, or null if the key is not found
+     * @throws PropelException
      */
      public function findOneById($key, $con = null)
      {
@@ -185,8 +185,8 @@ abstract class BaseFileQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   File A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 File A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -286,7 +286,8 @@ abstract class BaseFileQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -299,8 +300,22 @@ abstract class BaseFileQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(FilePeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(FilePeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(FilePeer::ID, $id, $comparison);
@@ -400,7 +415,8 @@ abstract class BaseFileQuery extends ModelCriteria
      * <code>
      * $query->filterBySize(1234); // WHERE size = 1234
      * $query->filterBySize(array(12, 34)); // WHERE size IN (12, 34)
-     * $query->filterBySize(array('min' => 12)); // WHERE size > 12
+     * $query->filterBySize(array('min' => 12)); // WHERE size >= 12
+     * $query->filterBySize(array('max' => 12)); // WHERE size <= 12
      * </code>
      *
      * @param     mixed $size The value to use as filter.
@@ -541,8 +557,8 @@ abstract class BaseFileQuery extends ModelCriteria
      * @param   AssignmentFile|PropelObjectCollection $assignmentFile  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   FileQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 FileQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByAssignmentFile($assignmentFile, $comparison = null)
     {
@@ -615,8 +631,8 @@ abstract class BaseFileQuery extends ModelCriteria
      * @param   StudentAssignmentFile|PropelObjectCollection $studentAssignmentFile  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   FileQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 FileQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByStudentAssignmentFile($studentAssignmentFile, $comparison = null)
     {
@@ -689,8 +705,8 @@ abstract class BaseFileQuery extends ModelCriteria
      * @param   CourseMaterial|PropelObjectCollection $courseMaterial  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   FileQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 FileQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByCourseMaterial($courseMaterial, $comparison = null)
     {
@@ -763,8 +779,8 @@ abstract class BaseFileQuery extends ModelCriteria
      * @param   MessageFile|PropelObjectCollection $messageFile  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   FileQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 FileQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByMessageFile($messageFile, $comparison = null)
     {
@@ -837,8 +853,8 @@ abstract class BaseFileQuery extends ModelCriteria
      * @param   User|PropelObjectCollection $user  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   FileQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 FileQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByUser($user, $comparison = null)
     {
