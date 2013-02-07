@@ -3,16 +3,19 @@
 namespace Zerebral\BusinessBundle\EventHandler;
 
 use Glorpen\PropelEvent\PropelEventBundle\Events\ModelEvent;
+use Zerebral\CommonBundle\KissMetrics\KissMetrics;
 
-class KissmetricsEventSubscriber implements \Symfony\Component\EventDispatcher\EventSubscriberInterface
+
+class KissMetricsEventSubscriber implements \Symfony\Component\EventDispatcher\EventSubscriberInterface
 {
-    public $webTracker;
-    public $sessionTracker;
+    /**
+     * @var KissMetrics
+     */
+    private $kissMetrics = null;
 
-    public function __construct($webTracker, $sessionTracker)
+    public function __construct(KissMetrics $kissMetrics)
     {
-        $this->setWebTracker($webTracker);
-        $this->setSessionTracker($sessionTracker);
+        $this->setKissMetrics($kissMetrics);
     }
 
     /**
@@ -34,7 +37,7 @@ class KissmetricsEventSubscriber implements \Symfony\Component\EventDispatcher\E
         /** @var $user \Zerebral\BusinessBundle\Model\User\User */
         $user = $event->getModel();
 
-        $this->getSessionTracker()->addRecords('Registration', array('role' => $user->getRole()));
+        $this->getKissMetrics()->createEvent('Registration', array('role' => $user->getRole()));
     }
 
     public function newCourse(ModelEvent $event)
@@ -42,14 +45,14 @@ class KissmetricsEventSubscriber implements \Symfony\Component\EventDispatcher\E
         /** @var $course \Zerebral\BusinessBundle\Model\Course\Course */
         $course = $event->getModel();
 
-        $this->getSessionTracker()->addRecords('new_course');
+        $this->getKissMetrics()->createEvent('new_course');
     }
 
     public function newAssignment(ModelEvent $event)
     {
         /** @var $assignment \Zerebral\BusinessBundle\Model\Assignment\Assignment */
         $assignment = $event->getModel();
-        $this->getSessionTracker()->addRecords('new_assignment', array('test' => 'test'));
+        $this->getKissMetrics()->createEvent('new_assignment', array('test' => 'test'));
     }
 
     public function newMessage(ModelEvent $event)
@@ -59,7 +62,7 @@ class KissmetricsEventSubscriber implements \Symfony\Component\EventDispatcher\E
 
         //do not handle copy of message
         if ($message->getUserId() != $message->getFromId()) {
-            $this->getSessionTracker()->addRecords('new_message');
+            $this->getKissMetrics()->createEvent('new_message');
         }
     }
 
@@ -68,33 +71,22 @@ class KissmetricsEventSubscriber implements \Symfony\Component\EventDispatcher\E
         /** @var $studentAttendance \Zerebral\BusinessBundle\Model\Attendance\StudentAttendance */
         $studentAttendance = $event->getModel();
 
-        $this->getSessionTracker()->addRecords('Attendance', array('status' => $studentAttendance->getStatus()));
-    }
-
-    public function setWebTracker($webTracker)
-    {
-        $this->webTracker = $webTracker;
+        $this->getKissMetrics()->createEvent('Attendance', array('status' => $studentAttendance->getStatus()));
     }
 
     /**
-     * @return \Tirna\KissmetricsBundle\Tracker\WebTracker
+     * @param \Zerebral\CommonBundle\KissMetrics\KissMetrics $kissMetrics
      */
-    public function getWebTracker()
+    public function setKissMetrics($kissMetrics)
     {
-        return $this->webTracker;
-    }
-
-    public function setSessionTracker($sessionTracker)
-    {
-        $this->sessionTracker = $sessionTracker;
+        $this->kissMetrics = $kissMetrics;
     }
 
     /**
-     * @return \Tirna\KissmetricsBundle\Tracker\WebTracker\SessionTracker
+     * @return \Zerebral\CommonBundle\KissMetrics\KissMetrics
      */
-    public function getSessionTracker()
+    public function getKissMetrics()
     {
-        return $this->sessionTracker;
+        return $this->kissMetrics;
     }
-
 }
