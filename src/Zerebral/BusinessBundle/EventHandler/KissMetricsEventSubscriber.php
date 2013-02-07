@@ -4,7 +4,7 @@ namespace Zerebral\BusinessBundle\EventHandler;
 
 use Glorpen\PropelEvent\PropelEventBundle\Events\ModelEvent;
 use Zerebral\CommonBundle\KissMetrics\KissMetrics;
-use Zerebral\BusinessBundle\Model as Model;
+
 
 class KissMetricsEventSubscriber implements \Symfony\Component\EventDispatcher\EventSubscriberInterface
 {
@@ -24,30 +24,54 @@ class KissMetricsEventSubscriber implements \Symfony\Component\EventDispatcher\E
     public static function getSubscribedEvents()
     {
         return array(
-            'courses.insert.post' => 'createCourseEvent',
-            'feed_items.insert.post' => 'createFeedEvent',
+            'users.insert.post' => 'newUser',
+            'courses.insert.post' => 'newCourse',
+            'assignments.insert.post' => 'newAssignment',
+            'messages.insert.post' => 'newMessage',
+            'student_attendance' => 'newStudentAttendance'
         );
     }
 
-    public function createCourseEvent(ModelEvent $event)
+    public function newUser(ModelEvent $event)
     {
-        /** @var $course Model\Course\Course */
-        $course = $event->getModel();
-        $this->getKissMetrics()->createEvent('course', array(
-            'name' => $course->getName(),
-            'subject_area' => $course->getDiscipline()->getName(),
-            'grade_level' => $course->getGradeLevel()->getName(),
-        ));
+        /** @var $user \Zerebral\BusinessBundle\Model\User\User */
+        $user = $event->getModel();
+
+        $this->getKissMetrics()->createEvent('Registration', array('role' => $user->getRole()));
     }
 
-    public function createFeedEvent(ModelEvent $event)
+    public function newCourse(ModelEvent $event)
     {
-        /** @var $feedItem Model\Feed\FeedItem */
-        $feedItem = $event->getModel();
-        $this->getKissMetrics()->createEvent('feed', array(
-            'type' => $feedItem->getFeedContent()->getType(),
-            'course' => $feedItem->getCourseId() ? $feedItem->getCourse()->getName() : 'global',
-        ));
+        /** @var $course \Zerebral\BusinessBundle\Model\Course\Course */
+        $course = $event->getModel();
+
+        $this->getKissMetrics()->createEvent('new_course');
+    }
+
+    public function newAssignment(ModelEvent $event)
+    {
+        /** @var $assignment \Zerebral\BusinessBundle\Model\Assignment\Assignment */
+        $assignment = $event->getModel();
+        $this->getKissMetrics()->createEvent('new_assignment', array('test' => 'test'));
+    }
+
+    public function newMessage(ModelEvent $event)
+    {
+        /** @var $message \Zerebral\BusinessBundle\Model\Message\Message */
+        $message = $event->getModel();
+
+        //do not handle copy of message
+        if ($message->getUserId() != $message->getFromId()) {
+            $this->getKissMetrics()->createEvent('new_message');
+        }
+    }
+
+    public function newStudentAttendance(ModelEvent $event)
+    {
+        /** @var $studentAttendance \Zerebral\BusinessBundle\Model\Attendance\StudentAttendance */
+        $studentAttendance = $event->getModel();
+
+        $this->getKissMetrics()->createEvent('Attendance', array('status' => $studentAttendance->getStatus()));
     }
 
     /**
