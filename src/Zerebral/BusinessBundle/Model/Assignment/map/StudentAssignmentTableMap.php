@@ -49,6 +49,7 @@ class StudentAssignmentTableMap extends TableMap
         $this->addColumn('is_submitted', 'IsSubmitted', 'BOOLEAN', true, 1, false);
         $this->addColumn('grading', 'Grading', 'VARCHAR', false, 10, null);
         $this->addColumn('grading_comment', 'GradingComment', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('graded_at', 'GradedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('submitted_at', 'SubmittedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', true, null, null);
         // validators

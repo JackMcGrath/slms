@@ -71,7 +71,7 @@ abstract class BaseGuardianQuery extends ModelCriteria
      * Returns a new GuardianQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     GuardianQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   GuardianQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return GuardianQuery
      */
@@ -133,8 +133,8 @@ abstract class BaseGuardianQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Guardian A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Guardian A model object, or null if the key is not found
+     * @throws PropelException
      */
      public function findOneById($key, $con = null)
      {
@@ -148,8 +148,8 @@ abstract class BaseGuardianQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Guardian A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Guardian A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -249,7 +249,8 @@ abstract class BaseGuardianQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -262,8 +263,22 @@ abstract class BaseGuardianQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(GuardianPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(GuardianPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(GuardianPeer::ID, $id, $comparison);
@@ -276,7 +291,8 @@ abstract class BaseGuardianQuery extends ModelCriteria
      * <code>
      * $query->filterByUserId(1234); // WHERE user_id = 1234
      * $query->filterByUserId(array(12, 34)); // WHERE user_id IN (12, 34)
-     * $query->filterByUserId(array('min' => 12)); // WHERE user_id > 12
+     * $query->filterByUserId(array('min' => 12)); // WHERE user_id >= 12
+     * $query->filterByUserId(array('max' => 12)); // WHERE user_id <= 12
      * </code>
      *
      * @see       filterByUser()
@@ -347,8 +363,8 @@ abstract class BaseGuardianQuery extends ModelCriteria
      * @param   User|PropelObjectCollection $user The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   GuardianQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 GuardianQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByUser($user, $comparison = null)
     {
@@ -423,8 +439,8 @@ abstract class BaseGuardianQuery extends ModelCriteria
      * @param   StudentGuardian|PropelObjectCollection $studentGuardian  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   GuardianQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 GuardianQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByStudentGuardian($studentGuardian, $comparison = null)
     {

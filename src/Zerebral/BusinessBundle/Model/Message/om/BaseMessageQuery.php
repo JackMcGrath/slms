@@ -103,7 +103,7 @@ abstract class BaseMessageQuery extends ModelCriteria
      * Returns a new MessageQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     MessageQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   MessageQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return MessageQuery
      */
@@ -165,8 +165,8 @@ abstract class BaseMessageQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Message A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Message A model object, or null if the key is not found
+     * @throws PropelException
      */
      public function findOneById($key, $con = null)
      {
@@ -180,8 +180,8 @@ abstract class BaseMessageQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Message A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Message A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -281,7 +281,8 @@ abstract class BaseMessageQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -294,8 +295,22 @@ abstract class BaseMessageQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(MessagePeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(MessagePeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(MessagePeer::ID, $id, $comparison);
@@ -308,7 +323,8 @@ abstract class BaseMessageQuery extends ModelCriteria
      * <code>
      * $query->filterByThreadId(1234); // WHERE thread_id = 1234
      * $query->filterByThreadId(array(12, 34)); // WHERE thread_id IN (12, 34)
-     * $query->filterByThreadId(array('min' => 12)); // WHERE thread_id > 12
+     * $query->filterByThreadId(array('min' => 12)); // WHERE thread_id >= 12
+     * $query->filterByThreadId(array('max' => 12)); // WHERE thread_id <= 12
      * </code>
      *
      * @param     mixed $threadId The value to use as filter.
@@ -349,7 +365,8 @@ abstract class BaseMessageQuery extends ModelCriteria
      * <code>
      * $query->filterByFromId(1234); // WHERE from_id = 1234
      * $query->filterByFromId(array(12, 34)); // WHERE from_id IN (12, 34)
-     * $query->filterByFromId(array('min' => 12)); // WHERE from_id > 12
+     * $query->filterByFromId(array('min' => 12)); // WHERE from_id >= 12
+     * $query->filterByFromId(array('max' => 12)); // WHERE from_id <= 12
      * </code>
      *
      * @see       filterByUserRelatedByFromId()
@@ -392,7 +409,8 @@ abstract class BaseMessageQuery extends ModelCriteria
      * <code>
      * $query->filterByToId(1234); // WHERE to_id = 1234
      * $query->filterByToId(array(12, 34)); // WHERE to_id IN (12, 34)
-     * $query->filterByToId(array('min' => 12)); // WHERE to_id > 12
+     * $query->filterByToId(array('min' => 12)); // WHERE to_id >= 12
+     * $query->filterByToId(array('max' => 12)); // WHERE to_id <= 12
      * </code>
      *
      * @see       filterByUserRelatedByToId()
@@ -462,7 +480,8 @@ abstract class BaseMessageQuery extends ModelCriteria
      * <code>
      * $query->filterByUserId(1234); // WHERE user_id = 1234
      * $query->filterByUserId(array(12, 34)); // WHERE user_id IN (12, 34)
-     * $query->filterByUserId(array('min' => 12)); // WHERE user_id > 12
+     * $query->filterByUserId(array('min' => 12)); // WHERE user_id >= 12
+     * $query->filterByUserId(array('max' => 12)); // WHERE user_id <= 12
      * </code>
      *
      * @see       filterByUserRelatedByUserId()
@@ -605,8 +624,8 @@ abstract class BaseMessageQuery extends ModelCriteria
      * @param   User|PropelObjectCollection $user The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   MessageQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 MessageQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByUserRelatedByUserId($user, $comparison = null)
     {
@@ -681,8 +700,8 @@ abstract class BaseMessageQuery extends ModelCriteria
      * @param   User|PropelObjectCollection $user The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   MessageQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 MessageQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByUserRelatedByFromId($user, $comparison = null)
     {
@@ -757,8 +776,8 @@ abstract class BaseMessageQuery extends ModelCriteria
      * @param   User|PropelObjectCollection $user The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   MessageQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 MessageQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByUserRelatedByToId($user, $comparison = null)
     {
@@ -833,8 +852,8 @@ abstract class BaseMessageQuery extends ModelCriteria
      * @param   MessageFile|PropelObjectCollection $messageFile  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   MessageQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 MessageQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByMessageFile($messageFile, $comparison = null)
     {

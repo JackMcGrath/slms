@@ -34,13 +34,13 @@ abstract class BaseStudentAssignmentPeer
     const TM_CLASS = 'StudentAssignmentTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 8;
+    const NUM_COLUMNS = 9;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 8;
+    const NUM_HYDRATE_COLUMNS = 9;
 
     /** the column name for the id field */
     const ID = 'student_assignments.id';
@@ -59,6 +59,9 @@ abstract class BaseStudentAssignmentPeer
 
     /** the column name for the grading_comment field */
     const GRADING_COMMENT = 'student_assignments.grading_comment';
+
+    /** the column name for the graded_at field */
+    const GRADED_AT = 'student_assignments.graded_at';
 
     /** the column name for the submitted_at field */
     const SUBMITTED_AT = 'student_assignments.submitted_at';
@@ -85,12 +88,12 @@ abstract class BaseStudentAssignmentPeer
      * e.g. StudentAssignmentPeer::$fieldNames[StudentAssignmentPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'StudentId', 'AssignmentId', 'IsSubmitted', 'Grading', 'GradingComment', 'SubmittedAt', 'CreatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'studentId', 'assignmentId', 'isSubmitted', 'grading', 'gradingComment', 'submittedAt', 'createdAt', ),
-        BasePeer::TYPE_COLNAME => array (StudentAssignmentPeer::ID, StudentAssignmentPeer::STUDENT_ID, StudentAssignmentPeer::ASSIGNMENT_ID, StudentAssignmentPeer::IS_SUBMITTED, StudentAssignmentPeer::GRADING, StudentAssignmentPeer::GRADING_COMMENT, StudentAssignmentPeer::SUBMITTED_AT, StudentAssignmentPeer::CREATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'STUDENT_ID', 'ASSIGNMENT_ID', 'IS_SUBMITTED', 'GRADING', 'GRADING_COMMENT', 'SUBMITTED_AT', 'CREATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'student_id', 'assignment_id', 'is_submitted', 'grading', 'grading_comment', 'submitted_at', 'created_at', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'StudentId', 'AssignmentId', 'IsSubmitted', 'Grading', 'GradingComment', 'GradedAt', 'SubmittedAt', 'CreatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'studentId', 'assignmentId', 'isSubmitted', 'grading', 'gradingComment', 'gradedAt', 'submittedAt', 'createdAt', ),
+        BasePeer::TYPE_COLNAME => array (StudentAssignmentPeer::ID, StudentAssignmentPeer::STUDENT_ID, StudentAssignmentPeer::ASSIGNMENT_ID, StudentAssignmentPeer::IS_SUBMITTED, StudentAssignmentPeer::GRADING, StudentAssignmentPeer::GRADING_COMMENT, StudentAssignmentPeer::GRADED_AT, StudentAssignmentPeer::SUBMITTED_AT, StudentAssignmentPeer::CREATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'STUDENT_ID', 'ASSIGNMENT_ID', 'IS_SUBMITTED', 'GRADING', 'GRADING_COMMENT', 'GRADED_AT', 'SUBMITTED_AT', 'CREATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'student_id', 'assignment_id', 'is_submitted', 'grading', 'grading_comment', 'graded_at', 'submitted_at', 'created_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
     );
 
     /**
@@ -100,12 +103,12 @@ abstract class BaseStudentAssignmentPeer
      * e.g. StudentAssignmentPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'StudentId' => 1, 'AssignmentId' => 2, 'IsSubmitted' => 3, 'Grading' => 4, 'GradingComment' => 5, 'SubmittedAt' => 6, 'CreatedAt' => 7, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'studentId' => 1, 'assignmentId' => 2, 'isSubmitted' => 3, 'grading' => 4, 'gradingComment' => 5, 'submittedAt' => 6, 'createdAt' => 7, ),
-        BasePeer::TYPE_COLNAME => array (StudentAssignmentPeer::ID => 0, StudentAssignmentPeer::STUDENT_ID => 1, StudentAssignmentPeer::ASSIGNMENT_ID => 2, StudentAssignmentPeer::IS_SUBMITTED => 3, StudentAssignmentPeer::GRADING => 4, StudentAssignmentPeer::GRADING_COMMENT => 5, StudentAssignmentPeer::SUBMITTED_AT => 6, StudentAssignmentPeer::CREATED_AT => 7, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'STUDENT_ID' => 1, 'ASSIGNMENT_ID' => 2, 'IS_SUBMITTED' => 3, 'GRADING' => 4, 'GRADING_COMMENT' => 5, 'SUBMITTED_AT' => 6, 'CREATED_AT' => 7, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'student_id' => 1, 'assignment_id' => 2, 'is_submitted' => 3, 'grading' => 4, 'grading_comment' => 5, 'submitted_at' => 6, 'created_at' => 7, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'StudentId' => 1, 'AssignmentId' => 2, 'IsSubmitted' => 3, 'Grading' => 4, 'GradingComment' => 5, 'GradedAt' => 6, 'SubmittedAt' => 7, 'CreatedAt' => 8, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'studentId' => 1, 'assignmentId' => 2, 'isSubmitted' => 3, 'grading' => 4, 'gradingComment' => 5, 'gradedAt' => 6, 'submittedAt' => 7, 'createdAt' => 8, ),
+        BasePeer::TYPE_COLNAME => array (StudentAssignmentPeer::ID => 0, StudentAssignmentPeer::STUDENT_ID => 1, StudentAssignmentPeer::ASSIGNMENT_ID => 2, StudentAssignmentPeer::IS_SUBMITTED => 3, StudentAssignmentPeer::GRADING => 4, StudentAssignmentPeer::GRADING_COMMENT => 5, StudentAssignmentPeer::GRADED_AT => 6, StudentAssignmentPeer::SUBMITTED_AT => 7, StudentAssignmentPeer::CREATED_AT => 8, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'STUDENT_ID' => 1, 'ASSIGNMENT_ID' => 2, 'IS_SUBMITTED' => 3, 'GRADING' => 4, 'GRADING_COMMENT' => 5, 'GRADED_AT' => 6, 'SUBMITTED_AT' => 7, 'CREATED_AT' => 8, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'student_id' => 1, 'assignment_id' => 2, 'is_submitted' => 3, 'grading' => 4, 'grading_comment' => 5, 'graded_at' => 6, 'submitted_at' => 7, 'created_at' => 8, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
     );
 
     /**
@@ -185,6 +188,7 @@ abstract class BaseStudentAssignmentPeer
             $criteria->addSelectColumn(StudentAssignmentPeer::IS_SUBMITTED);
             $criteria->addSelectColumn(StudentAssignmentPeer::GRADING);
             $criteria->addSelectColumn(StudentAssignmentPeer::GRADING_COMMENT);
+            $criteria->addSelectColumn(StudentAssignmentPeer::GRADED_AT);
             $criteria->addSelectColumn(StudentAssignmentPeer::SUBMITTED_AT);
             $criteria->addSelectColumn(StudentAssignmentPeer::CREATED_AT);
         } else {
@@ -194,6 +198,7 @@ abstract class BaseStudentAssignmentPeer
             $criteria->addSelectColumn($alias . '.is_submitted');
             $criteria->addSelectColumn($alias . '.grading');
             $criteria->addSelectColumn($alias . '.grading_comment');
+            $criteria->addSelectColumn($alias . '.graded_at');
             $criteria->addSelectColumn($alias . '.submitted_at');
             $criteria->addSelectColumn($alias . '.created_at');
         }

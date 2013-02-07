@@ -67,7 +67,7 @@ abstract class BaseStudentGuardianQuery extends ModelCriteria
      * Returns a new StudentGuardianQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     StudentGuardianQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   StudentGuardianQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return StudentGuardianQuery
      */
@@ -131,8 +131,8 @@ abstract class BaseStudentGuardianQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   StudentGuardian A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 StudentGuardian A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -244,7 +244,8 @@ abstract class BaseStudentGuardianQuery extends ModelCriteria
      * <code>
      * $query->filterBystudentId(1234); // WHERE student_id = 1234
      * $query->filterBystudentId(array(12, 34)); // WHERE student_id IN (12, 34)
-     * $query->filterBystudentId(array('min' => 12)); // WHERE student_id > 12
+     * $query->filterBystudentId(array('min' => 12)); // WHERE student_id >= 12
+     * $query->filterBystudentId(array('max' => 12)); // WHERE student_id <= 12
      * </code>
      *
      * @see       filterByStudent()
@@ -259,8 +260,22 @@ abstract class BaseStudentGuardianQuery extends ModelCriteria
      */
     public function filterBystudentId($studentId = null, $comparison = null)
     {
-        if (is_array($studentId) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($studentId)) {
+            $useMinMax = false;
+            if (isset($studentId['min'])) {
+                $this->addUsingAlias(StudentGuardianPeer::STUDENT_ID, $studentId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($studentId['max'])) {
+                $this->addUsingAlias(StudentGuardianPeer::STUDENT_ID, $studentId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(StudentGuardianPeer::STUDENT_ID, $studentId, $comparison);
@@ -273,7 +288,8 @@ abstract class BaseStudentGuardianQuery extends ModelCriteria
      * <code>
      * $query->filterByguardianId(1234); // WHERE guardian_id = 1234
      * $query->filterByguardianId(array(12, 34)); // WHERE guardian_id IN (12, 34)
-     * $query->filterByguardianId(array('min' => 12)); // WHERE guardian_id > 12
+     * $query->filterByguardianId(array('min' => 12)); // WHERE guardian_id >= 12
+     * $query->filterByguardianId(array('max' => 12)); // WHERE guardian_id <= 12
      * </code>
      *
      * @see       filterByGuardian()
@@ -288,8 +304,22 @@ abstract class BaseStudentGuardianQuery extends ModelCriteria
      */
     public function filterByguardianId($guardianId = null, $comparison = null)
     {
-        if (is_array($guardianId) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($guardianId)) {
+            $useMinMax = false;
+            if (isset($guardianId['min'])) {
+                $this->addUsingAlias(StudentGuardianPeer::GUARDIAN_ID, $guardianId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($guardianId['max'])) {
+                $this->addUsingAlias(StudentGuardianPeer::GUARDIAN_ID, $guardianId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(StudentGuardianPeer::GUARDIAN_ID, $guardianId, $comparison);
@@ -301,8 +331,8 @@ abstract class BaseStudentGuardianQuery extends ModelCriteria
      * @param   Student|PropelObjectCollection $student The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   StudentGuardianQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 StudentGuardianQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByStudent($student, $comparison = null)
     {
@@ -377,8 +407,8 @@ abstract class BaseStudentGuardianQuery extends ModelCriteria
      * @param   Guardian|PropelObjectCollection $guardian The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   StudentGuardianQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 StudentGuardianQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByGuardian($guardian, $comparison = null)
     {

@@ -54,6 +54,7 @@ class GradingController extends \Zerebral\CommonBundle\Component\Controller
         $form->bind($this->getRequest());
 
         if ($form->isValid()) {
+            $studentAssignment->setGradedAt(date('Y-m-d H:i:s'));
             $studentAssignment->save();
             return new JsonResponse(array(
                 'success' => true, 'content' => $studentAssignment->toArray()
