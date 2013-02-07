@@ -17,17 +17,46 @@
                     Summary
                 </h2>
             </div>
-
             <hr/>
-
-
-
+            <br />
             <div class="description">
-                There will be statistics about children
+                <h4>Grades</h4>
+                <table class="summary-table">
+                    <tr>
+                        <td><b>Total grades: </b>{{ summary.grades.totalCount }}</td>
+                        <td><b>Passed grades: </b>{{ summary.grades.passed }} ({{ summary.grades.passedPercents }}%)</td>
+                    </tr>
+                </table>
+                <br />
+                <h4>Attendance</h4>
+                <table class="summary-table">
+                    <tr>
+                        <td><b>Total attendance records: </b>{{ summary.attendance.totalCount }}</td>
+                        <td><b>Absent records: </b>{{ summary.attendance.absent }} ({{ summary.attendance.absentPercents }}%)</td>
+                    </tr>
+                    <tr>
+                        <td><b>Tardy records: </b>{{ summary.attendance.tardy }} ({{ summary.attendance.tardyPercents }}%)</td>
+                        <td><b>Excused records: </b>{{ summary.attendance.excused }} ({{ summary.attendance.excusedPercents }}%)</td>
+                    </tr>
+                </table>
+                <br />
+                <h4>Classes</h4>
+                <table class="summary-table">
+                    <tr>
+                        <td><b>Courses: </b></td>
+                        <td><b>Assignments: </b></td>
+                    </tr>
+                    <tr>
+                        <td><b>Courses passed: </b></td>
+                        <td><b>Assignment passed: </b></td>
+                    </tr>
+                </table>
             </div>
         </div>
         <div class="right-navbar pull-left">
-
+            <div class="upcoming-assignments block">
+                {{ mainPartials.upcomingAssignments(upcomingAssignments) }}
+            </div>
         </div>
     </div>
 {% endblock %}
