@@ -28,8 +28,14 @@ class GuardianController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function indexAction()
     {
+        /** @var \Zerebral\BusinessBundle\Model\User\Guardian $guardian  */
+        $guardian = $this->getRoleUser();
+        $selectedChild = $guardian->getSelectedChildWithSummary($this->get('session')->get('selectedChildId'));
+        $upcomingAssignments = $selectedChild->getUpcomingAssignments();
         return array(
-            'target' => 'home'
+            'target' => 'home',
+            'summary' => $selectedChild->getVirtualColumns(),
+            'upcomingAssignments' => $upcomingAssignments
         );
     }
 
