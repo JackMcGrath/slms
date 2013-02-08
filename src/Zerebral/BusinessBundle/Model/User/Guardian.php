@@ -45,7 +45,7 @@ SQL;
         $summary['coursesPassedCount'] = count(array_filter($attendanceResult, function($value) {
             return $value['isPassed'] == '1';
         }));
-        $summary['coursesPassedPercent'] = round($summary['coursesPassedCount'] * 100 / $summary['coursesCount']);
+        $summary['coursesPassedPercent'] = round($summary['coursesPassedCount'] * 100 / ($summary['coursesCount'] == 0 ? 1 : $summary['coursesCount']));
 
         $attendanceRecords = array_reduce($attendanceResult, function($array, $value) {
             if (strlen($value['attendance']) > 0) {
@@ -59,10 +59,10 @@ SQL;
         }
         $attendanceCount = count($attendanceRecords);
         $attendance = array_merge($attendance, array(
-            'presentPercent' => round($attendance['present'] * 100 / $attendanceCount),
-            'tardyPercent' => round($attendance['tardy'] * 100 / $attendanceCount),
-            'absentPercent' => round($attendance['absent'] * 100 / $attendanceCount),
-            'excusedPercent' => round($attendance['excused'] * 100 / $attendanceCount)
+            'presentPercent' => round($attendance['present'] * 100 / ($attendanceCount == 0 ? 1 : $attendanceCount)),
+            'tardyPercent' => round($attendance['tardy'] * 100 / ($attendanceCount == 0 ? 1 : $attendanceCount)),
+            'absentPercent' => round($attendance['absent'] * 100 / ($attendanceCount == 0 ? 1 : $attendanceCount)),
+            'excusedPercent' => round($attendance['excused'] * 100 / ($attendanceCount == 0 ? 1 : $attendanceCount)),
         ));
         $attendance['totalCount'] = $attendanceCount;
         $summary['attendance'] = $attendance;
@@ -92,7 +92,7 @@ SQL;
                 return $value == '1';
             }));
         }
-        $summary['gradesPassedPercent'] = round($summary['gradesPassedCount'] * 100 / $summary['gradesCount']);
+        $summary['gradesPassedPercent'] = round($summary['gradesPassedCount'] * 100 / ($summary['gradesCount'] == 0 ? 1 : $summary['gradesCount']));
 
 
         $classes = array();
@@ -107,7 +107,7 @@ SQL;
             }));
             $classes[$result['courseName']]['gradesCount'] = count($grades);
             $classes[$result['courseName']]['gradesPassedCount'] = $gradesPassedCount;
-            $classes[$result['courseName']]['gradesPassedPercent'] = round($gradesPassedCount * 100 / count($grades));
+            $classes[$result['courseName']]['gradesPassedPercent'] = round($gradesPassedCount * 100 / (count($grades) == 0 ? 1 : count($grades)));
         }
 
         foreach ($attendanceResult as $result) {
@@ -121,7 +121,7 @@ SQL;
                 $classes[$result['courseName']]['attendancePresentCount'] = count(array_filter($attendance, function($value) {
                     return $value == 'present';
                 }));
-                $classes[$result['courseName']]['attendancePresentPercent'] = round($classes[$result['courseName']]['attendancePresentCount'] * 100 / count($attendance));
+                $classes[$result['courseName']]['attendancePresentPercent'] = round($classes[$result['courseName']]['attendancePresentCount'] * 100 / (count($attendance) == 0 ? 1 : count($attendance)));
             }
         }
 
