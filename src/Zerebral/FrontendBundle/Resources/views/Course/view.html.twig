@@ -54,9 +54,11 @@
                 {{ mainPartials.recentMaterials(recentMaterials) }}
             </div>
 
+            {% if is_granted('ROLE_STUDENT') %}
             <div class="block teacher-profile">
                 {{ mainPartials.teacherShortInfo(course.teacher) }}
             </div>
+            {% endif %}
         </div>
     </div>
 {% endblock %}

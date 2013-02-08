@@ -35,9 +35,11 @@
                 {% endif %}
             </div>
 
+            {% if is_granted('ROLE_STUDENT') %}
             <div class="right-navbar pull-left">
                 {{ mainPartials.teacherShortInfo(course.teacher) }}
             </div>
+            {% endif %}
         </div>
     </div>
 

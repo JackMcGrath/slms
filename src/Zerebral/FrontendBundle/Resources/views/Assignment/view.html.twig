@@ -116,9 +116,11 @@
 
             {% endif %}
 
+            {% if is_granted('ROLE_STUDENT') %}
             <div class="block teacher-profile">
                 {{ mainPartials.teacherShortInfo(assignment.course.teacher) }}
             </div>
+            {% endif %}
         </div>
 
     </div>
