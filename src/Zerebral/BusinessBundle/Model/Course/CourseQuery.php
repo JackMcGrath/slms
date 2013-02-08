@@ -55,6 +55,7 @@ class CourseQuery extends BaseCourseQuery
         $this->add('StudentAssignment.student_id', $student->getId(), \Criteria::EQUAL);
         $this->add('StudentAssignment.grading', null, \Criteria::ISNOTNULL);
         $this->addAscendingOrderByColumn('courses.name');
+        $this->addAscendingOrderByColumn('assignments.due_at');
 
 
         return $this;

@@ -40,14 +40,14 @@
                     <tbody>
                         {% for course in coursesGrading %}
                             <tr>
-                                <td class="name">{{ course.name }}</td>
+                                <td class="name"><a href="{{ path('guardian_classes') }}#class{{ course.id }}">{{ course.name }}</a></td>
 
                                 {% for assignment in course.assignments %}
                                     {% for studentAssignment in assignment.studentAssignments %}
                                         <td class="value">
                                             <div class="hint" data-content="
                                                 <b class='title'>{{ assignment.name|escape }}</b><br/>
-                                                {{ studentAssignment.gradedAt ? 'Date: <span>' ~ studentAssignment.gradedAt | date('D d, F') ~ '</span>' : ''}}
+                                                {{ studentAssignment.gradedAt ? 'Date: <span>' ~ studentAssignment.gradedAt | date('D d, F') ~ '</span><br/>' : ''}}
                                                 {{ assignment.threshold ? 'Threshold: <span class=\"label\">'~ assignment.threshold ~'</span><br/>' : ''}}
                                                 {{ studentAssignment.gradingComment ? 'Comment: <i>'~ studentAssignment.gradingComment | escape ~ '</i>' : ''}}"
                                                  data-original-title="{{ mainPartials.gradePopoverTitle(assignment, studentAssignment)|escape }}">
