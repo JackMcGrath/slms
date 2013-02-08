@@ -84,7 +84,11 @@ class GuardianController extends \Zerebral\CommonBundle\Component\Controller
          */
         foreach ($studentAttendances as $attendance) {
             $studentAttendanceFormatted[$attendance->getAttendance()->getCourseId()][$attendance->getAttendance()->getDate('Y-m-d')] = $attendance;
-            $courses[$attendance->getAttendance()->getCourseId()] = $attendance->getAttendance()->getCourse();
+            $course = $attendance->getAttendance()->getCourse();
+
+
+            $courses[$course->getId()] = $course;
+
         }
 
         return array(

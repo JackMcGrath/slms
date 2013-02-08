@@ -28,7 +28,7 @@ class KissMetricsEventSubscriber implements \Symfony\Component\EventDispatcher\E
             'courses.insert.post' => 'newCourse',
             'assignments.insert.post' => 'newAssignment',
             'messages.insert.post' => 'newMessage',
-            'student_attendance' => 'newStudentAttendance'
+            'student_attendance.insert.post' => 'newStudentAttendance'
         );
     }
 
@@ -37,7 +37,7 @@ class KissMetricsEventSubscriber implements \Symfony\Component\EventDispatcher\E
         /** @var $user \Zerebral\BusinessBundle\Model\User\User */
         $user = $event->getModel();
 
-        $this->getKissMetrics()->createEvent('Registration', array('role' => $user->getRole()));
+        $this->getKissMetrics()->createEvent('Sign up', array('role' => $user->getRole()));
     }
 
     public function newCourse(ModelEvent $event)
@@ -45,14 +45,14 @@ class KissMetricsEventSubscriber implements \Symfony\Component\EventDispatcher\E
         /** @var $course \Zerebral\BusinessBundle\Model\Course\Course */
         $course = $event->getModel();
 
-        $this->getKissMetrics()->createEvent('new_course');
+        $this->getKissMetrics()->createEvent('New course');
     }
 
     public function newAssignment(ModelEvent $event)
     {
         /** @var $assignment \Zerebral\BusinessBundle\Model\Assignment\Assignment */
         $assignment = $event->getModel();
-        $this->getKissMetrics()->createEvent('new_assignment', array('test' => 'test'));
+        $this->getKissMetrics()->createEvent('New assignment', array('test' => 'test'));
     }
 
     public function newMessage(ModelEvent $event)
@@ -62,7 +62,7 @@ class KissMetricsEventSubscriber implements \Symfony\Component\EventDispatcher\E
 
         //do not handle copy of message
         if ($message->getUserId() != $message->getFromId()) {
-            $this->getKissMetrics()->createEvent('new_message');
+            $this->getKissMetrics()->createEvent('New message');
         }
     }
 
@@ -89,4 +89,4 @@ class KissMetricsEventSubscriber implements \Symfony\Component\EventDispatcher\E
     {
         return $this->kissMetrics;
     }
-}
+} 

@@ -80,6 +80,7 @@ class KissMetrics
     {
         $parameters['_k'] = $this->getApiKey();
         $parameters['_p'] = $this->getIdentity();
+        $parameters['_t'] = $this->getTimestamp();
 
         $ch = curl_init();
         curl_setopt_array($ch, array(
@@ -113,5 +114,10 @@ class KissMetrics
     public function getIdentity()
     {
         return $this->identity;
+    }
+
+    public function getTimestamp()
+    {
+        return time();
     }
 }

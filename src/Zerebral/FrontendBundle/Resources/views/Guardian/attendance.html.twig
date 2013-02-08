@@ -69,14 +69,16 @@
 
                     <tbody>
                     {% for courseId, course in attendancies %}
+                        {% if courses[courseId] is defined %}
                         <tr>
-                            <td class="name">{{ courses[courseId].name }}</td>
+                            <td class="name"><a href="{{ path('guardian_classes') }}#class{{ courseId }}">{{ courses[courseId].name }}</a></td>
                             {% for day in range(startDate|date('U'), endDate|date('U'), 3600 * 24) %}
                                 <td>
                                     {{ course[day|date('Y-m-d')] is defined ? course[day|date('Y-m-d')].status : '-' }}
                                 </td>
                             {% endfor %}
                         </tr>
+                        {% endif %}
                     {% endfor %}
                     </tbody>
                 </table>
