@@ -34,7 +34,7 @@ class GuardianController extends \Zerebral\CommonBundle\Component\Controller
         $upcomingAssignments = $selectedChild->getUpcomingAssignments();
         return array(
             'target' => 'home',
-            'summary' => $selectedChild->getVirtualColumns(),
+            'summary' => $selectedChild->getVirtualColumn('summary'),
             'upcomingAssignments' => $upcomingAssignments
         );
     }
