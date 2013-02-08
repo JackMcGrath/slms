@@ -28,7 +28,7 @@ class KissMetricsEventSubscriber implements \Symfony\Component\EventDispatcher\E
             'courses.insert.post' => 'newCourse',
             'assignments.insert.post' => 'newAssignment',
             'messages.insert.post' => 'newMessage',
-            'student_attendance' => 'newStudentAttendance'
+            'student_attendance.insert.post' => 'newStudentAttendance'
         );
     }
 
@@ -71,7 +71,7 @@ class KissMetricsEventSubscriber implements \Symfony\Component\EventDispatcher\E
         /** @var $studentAttendance \Zerebral\BusinessBundle\Model\Attendance\StudentAttendance */
         $studentAttendance = $event->getModel();
 
-        $this->getKissMetrics()->createEvent('Attendance', array('status' => $studentAttendance->getStatus()));
+        $this->getKissMetrics()->createEvent('attendance', array('status' => $studentAttendance->getStatus()));
     }
 
     /**

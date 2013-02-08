@@ -2,6 +2,9 @@
 {% import "ZerebralFrontendBundle:Macro:main.html.twig" as mainPartials %}
 
 {% block content %}
+    {% javascripts '@ZerebralFrontendBundle/Resources/public/js/controllers/guardian/classes.js' output='js/compiled/guardian_classes.js' %}
+    <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
     <div class="top-second-navbar">
         {{ mainPartials.guardianTopMenu('classes') }}
     </div>
@@ -16,7 +19,7 @@
 
             <div class="span9 items-list">
                 {% for course in courses %}
-                    <div class="list-item span12{{ loop.last ? ' last' : '' }}" {% if course.assignmentsDueDates %}due-date="{{ course.assignmentsDueDates | join(',') }}"{% endif %}>
+                    <div id="class{{ course.id }}" class="list-item span12{{ loop.last ? ' last' : '' }}" {% if course.assignmentsDueDates %}due-date="{{ course.assignmentsDueDates | join(',') }}"{% endif %}>
                         <div class="symbol pull-left"><img class="rounded" src="{{ user_avatar(course.teacher) | imagine_filter('thumbnail') }}"/></div>
                         <div class="details pull-left">
                             <h4><a href="{{ path('guardian_classes_course', {courseId: course.id}) }}">{{ course.name }}</a></h4>
