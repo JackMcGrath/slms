@@ -23,8 +23,8 @@
                 <h4>Grades</h4>
                 <table class="summary-table">
                     <tr>
-                        <td><b>Total grades: </b>{{ summary.grades.totalCount }}</td>
-                        <td><b>Passed grades: </b>{{ summary.grades.passed }} ({{ summary.grades.passedPercents }}%)</td>
+                        <td><b>Total grades: </b>{{ summary.gradesCount }}</td>
+                        <td><b>Passed grades: </b>{{ summary.gradesPassedCount }} ({{ summary.gradesPassedPercent }}%)</td>
                     </tr>
                 </table>
                 <br />
@@ -32,24 +32,47 @@
                 <table class="summary-table">
                     <tr>
                         <td><b>Total attendance records: </b>{{ summary.attendance.totalCount }}</td>
-                        <td><b>Absent records: </b>{{ summary.attendance.absent }} ({{ summary.attendance.absentPercents }}%)</td>
+                        <td><b>Absent records: </b>{{ summary.attendance.absent }} ({{ summary.attendance.absentPercent }}%)</td>
                     </tr>
                     <tr>
-                        <td><b>Tardy records: </b>{{ summary.attendance.tardy }} ({{ summary.attendance.tardyPercents }}%)</td>
-                        <td><b>Excused records: </b>{{ summary.attendance.excused }} ({{ summary.attendance.excusedPercents }}%)</td>
+                        <td><b>Tardy records: </b>{{ summary.attendance.tardy }} ({{ summary.attendance.tardyPercent }}%)</td>
+                        <td><b>Excused records: </b>{{ summary.attendance.excused }} ({{ summary.attendance.excusedPercent }}%)</td>
                     </tr>
                 </table>
                 <br />
                 <h4>Classes</h4>
                 <table class="summary-table">
                     <tr>
-                        <td><b>Courses: </b></td>
-                        <td><b>Assignments: </b></td>
+                        <td><b>Courses: </b>{{ summary.coursesCount }}</td>
+                        <td><b>Assignments: </b>{{ summary.assignmentsCount }}</td>
                     </tr>
-                    <tr>
-                        <td><b>Courses passed: </b></td>
-                        <td><b>Assignment passed: </b></td>
+                </table>
+                <br />
+                <table class="table table-bordered table-striped stat-table">
+                    <tr class="header">
+                        <td class="main"><b>Course</td>
+                        <td class="secondary"><b>Grades passed</td>
+                        <td class="secondary"><b>Attendance present</td>
                     </tr>
+                    {% for courseName, courseStat in summary.classes %}
+                    <tr class="{% if loop.index0 is odd %}odd{% else %}even{% endif %}">
+                        <td class="main">{{ courseName }}</td>
+                        <td class="secondary">
+                            {% if courseStat.gradesCount > 0 %}
+                                {{ courseStat.gradesPassedCount }} ({{ courseStat.gradesPassedPercent }}%)
+                            {% else %}
+                                <i>No data</i>
+                            {% endif %}
+                        </td>
+                        <td class="secondary">
+                            {% if courseStat.attendanceCount > 0 %}
+                                {{ courseStat.attendancePresentCount }} ({{ courseStat.attendancePresentPercent }}%)
+                            {% else %}
+                                <i>No data</i>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
                 </table>
             </div>
         </div>

@@ -21,82 +21,113 @@ class Guardian extends BaseGuardian
     public function getSelectedChildWithSummary($childId = null) {
         $child = $this->getSelectedChild($childId);
         $connection = \Propel::getConnection();
+        $summary = array();
 
-        // ===================== GRADES SUMMARY ======================//
+       // var_dump($child->getId());
 
+        // ==================== COURSES AND ATTENDANCE STATS =================//
         $query = <<<SQL
-        SELECT
-            -- `student_assignments`.`grading`, `assignments`.`grade_type`, `assignments`.`threshold`,
-            IF(`assignments`.`grade_type` = "pass", `student_assignments`.`grading`, `student_assignments`.`grading` > `assignments`.`threshold`) AS `isPassed`, COUNT(`student_assignments`.`id`) AS `totalCount`
-        FROM `student_assignments`
-        LEFT JOIN `assignments` ON `student_assignments`.`assignment_id` = `assignments`.`id`
-        WHERE
-            `student_assignments`.`student_id` = :student_id AND `student_assignments`.`grading` IS NOT NULL AND (`assignments`.`threshold` IS NOT NULL OR `assignments`.`grade_type` = 'pass')
-        GROUP BY `isPassed`
-SQL;
-
-        $statement = $connection->prepare($query);
-        $statement->execute(array(':student_id' => $child->getId()));
-        $gradesResult = $statement->fetchAll(\PDO::FETCH_ASSOC);
-        $grades = array('totalCount' => 0, 'passed' => 0, 'failed' => 0);
-        foreach ($gradesResult as $result) {
-            $grades['totalCount'] += $result['totalCount'];
-            $type = ($result['isPassed'] == 1) ? 'passed' : 'failed';
-            $grades[$type] += $result['totalCount'];
-        }
-        $grades['passedPercents'] = round($grades['passed'] * 100 / $grades['totalCount']);
-        $grades['failedPercents'] = round($grades['failed'] * 100 / $grades['totalCount']);
-        $child->setVirtualColumn('grades', $grades);
-
-
-        // ===================== ATTENDANCE SUMMARY ======================//
-
-        $query = <<<SQL
-        SELECT COUNT(`student_attendance`.`attendance_id`) AS `totalCount`, `student_attendance`.`status`
-        FROM `student_attendance`
-        WHERE `student_attendance`.`student_id` = :student_id
-        GROUP BY `student_attendance`.`status`
+        SELECT courses.name AS courseName, IFNULL(TRIM(BOTH "," FROM GROUP_CONCAT(student_attendance.status)), "") AS attendance, IF(courses.end IS NULL, 0, courses.end > NOW()) AS isPassed
+        FROM course_students
+        LEFT JOIN courses ON courses.id = course_students.course_id
+        LEFT JOIN attendance ON attendance.course_id = courses.id
+        LEFT JOIN student_attendance ON student_attendance.attendance_id = attendance.id AND student_attendance.student_id = :student_id
+        WHERE course_students.student_id = :student_id
+        GROUP BY courses.id
 SQL;
 
         $statement = $connection->prepare($query);
         $statement->execute(array(':student_id' => $child->getId()));
         $attendanceResult = $statement->fetchAll(\PDO::FETCH_ASSOC);
-        $attendance = array('totalCount' => 0, 'present' => 0, 'tardy' => 0, 'absent' => 0, 'excused' => 0);
-        foreach ($attendanceResult as $result) {
-            $attendance['totalCount'] += $result['totalCount'];
-            $type = $result['status'];
-            $attendance[$type] += $result['totalCount'];
+
+        $summary['coursesCount'] = count($attendanceResult);
+        $summary['assignmentsCount'] = \Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery::create()->filterByStudent($child)->count();
+        $summary['coursesPassedCount'] = count(array_filter($attendanceResult, function($value) {
+            return $value['isPassed'] == '1';
+        }));
+        $summary['coursesPassedPercent'] = round($summary['coursesPassedCount'] * 100 / $summary['coursesCount']);
+
+        $attendanceRecords = array_reduce($attendanceResult, function($array, $value) {
+            if (strlen($value['attendance']) > 0) {
+                $array = array_merge($array, explode(',', $value['attendance']));
+            }
+            return $array;
+        }, array());
+        $attendance = array('present' => 0, 'tardy' => 0, 'absent' => 0, 'excused' => 0);
+        foreach ($attendanceRecords as $record) {
+            $attendance[$record]++;
         }
-        $attendance['presentPercents'] = round($attendance['present'] * 100 / $attendance['totalCount']);
-        $attendance['tardyPercents'] = round($attendance['tardy'] * 100 / $attendance['totalCount']);
-        $attendance['absentPercents'] = round($attendance['absent'] * 100 / $attendance['totalCount']);
-        $attendance['excusedPercents'] = round($attendance['excused'] * 100 / $attendance['totalCount']);
-        $child->setVirtualColumn('attendance', $attendance);
+        $attendanceCount = count($attendanceRecords);
+        $attendance = array_merge($attendance, array(
+            'presentPercent' => round($attendance['present'] * 100 / $attendanceCount),
+            'tardyPercent' => round($attendance['tardy'] * 100 / $attendanceCount),
+            'absentPercent' => round($attendance['absent'] * 100 / $attendanceCount),
+            'excusedPercent' => round($attendance['excused'] * 100 / $attendanceCount)
+        ));
+        $attendance['totalCount'] = $attendanceCount;
+        $summary['attendance'] = $attendance;
 
 
-//        // ===================== CLASSES SUMMARY ======================//
-//
-//        $query = <<<SQL
-//        SELECT COUNT(`student_attendance`.`attendance_id`) AS `totalCount`, `student_attendance`.`status`
-//        FROM `student_attendance`
-//        WHERE `student_attendance`.`student_id` = :student_id
-//        GROUP BY `student_attendance`.`status`
-//SQL;
-//
-//        $statement = $connection->prepare($query);
-//        $statement->execute(array(':student_id' => $child->getId()));
-//        $attendanceResult = $statement->fetchAll(\PDO::FETCH_ASSOC);
-//        $attendance = array('totalCount' => 0, 'present' => 0, 'tardy' => 0, 'absent' => 0, 'excused' => 0);
-//        foreach ($attendanceResult as $result) {
-//            $attendance['totalCount'] += $result['totalCount'];
-//            $type = $result['status'];
-//            $attendance[$type] += $result['totalCount'];
-//        }
-//        $attendance['presentPercents'] = round($attendance['present'] * 100 / $attendance['totalCount']);
-//        $attendance['tardyPercents'] = round($attendance['tardy'] * 100 / $attendance['totalCount']);
-//        $attendance['absentPercents'] = round($attendance['absent'] * 100 / $attendance['totalCount']);
-//        $attendance['excusedPercents'] = round($attendance['excused'] * 100 / $attendance['totalCount']);
-//        $child->setVirtualColumn('attendance', $attendance);
+
+
+        $query = <<<SQL
+        SELECT courses.name AS courseName, GROUP_CONCAT(IF(assignments.grade_type = "pass", student_assignments.grading = 1,  student_assignments.grading  >= IFNULL(assignments.threshold, 99999))) AS isPassed
+        FROM student_assignments
+        LEFT JOIN assignments ON assignments.id = student_assignments.assignment_id
+        LEFT JOIN courses ON courses.id = assignments.course_id
+        WHERE student_assignments.student_id = :student_id AND student_assignments.grading IS NOT NULL
+        GROUP BY courses.id
+SQL;
+
+        $statement = $connection->prepare($query);
+        $statement->execute(array(':student_id' => $child->getId()));
+        $gradesResult = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+        $summary = array_merge($summary, array('gradesCount' => 0, 'gradesPassedCount' => 0, 'gradesPassedPercent' => 0));
+
+        foreach ($gradesResult as $result) {
+            $grades = explode(',', $result['isPassed']);
+            $summary['gradesCount'] += count($grades);
+            $summary['gradesPassedCount'] += count(array_filter($grades, function($value) {
+                return $value == '1';
+            }));
+        }
+        $summary['gradesPassedPercent'] = round($summary['gradesPassedCount'] * 100 / $summary['gradesCount']);
+
+
+        $classes = array();
+        foreach ($gradesResult as $result) {
+            if (!isset($classes[$result['courseName']])) {
+                $classes[$result['courseName']] = array('gradesCount' => 0, 'gradesPassedCount' => 0, 'gradesPassedPercent' => 0, 'attendanceCount' => 0, 'attendancePresentCount' => 0, 'attendancePresentPercent' => 0);
+            }
+
+            $grades = explode(',', $result['isPassed']);
+            $gradesPassedCount = count(array_filter($grades, function($value) {
+                return $value == '1';
+            }));
+            $classes[$result['courseName']]['gradesCount'] = count($grades);
+            $classes[$result['courseName']]['gradesPassedCount'] = $gradesPassedCount;
+            $classes[$result['courseName']]['gradesPassedPercent'] = round($gradesPassedCount * 100 / count($grades));
+        }
+
+        foreach ($attendanceResult as $result) {
+            if (!isset($classes[$result['courseName']])) {
+                $classes[$result['courseName']] = array('gradesCount' => 0, 'gradesPassedCount' => 0, 'gradesPassedPercent' => 0, 'attendanceCount' => 0, 'attendancePresentCount' => 0, 'attendancePresentPercent' => 0);
+            }
+
+            if (strlen($result['attendance']) > 0) {
+                $attendance = explode(',', $result['attendance']);
+                $classes[$result['courseName']]['attendanceCount'] = count($attendance);
+                $classes[$result['courseName']]['attendancePresentCount'] = count(array_filter($attendance, function($value) {
+                    return $value == 'present';
+                }));
+                $classes[$result['courseName']]['attendancePresentPercent'] = round($classes[$result['courseName']]['attendancePresentCount'] * 100 / count($attendance));
+            }
+        }
+
+
+        $summary['classes'] = $classes;
+        $child->setVirtualColumn('summary', $summary);
 
 
         return $child;
