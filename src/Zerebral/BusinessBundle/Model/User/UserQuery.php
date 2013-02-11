@@ -27,13 +27,15 @@ class UserQuery extends BaseUserQuery
 
         $usersToCoursesJoin = new \Join();
         $usersToCoursesJoin->setJoinType(\Criteria::LEFT_JOIN);
+
         if ($user->isStudent()) {
             $usersToCoursesJoin->addExplicitCondition(null, $user->getStudent()->getId(), null, 'course_students', 'student_id', 'userToCourses');
         } else if ($user->isTeacher()) {
             $usersToCoursesJoin->addExplicitCondition(null, $user->getTeacher()->getId(), null, 'course_teachers', 'teacher_id', 'userToCourses');
-        } else {
-            $usersToCoursesJoin->addExplicitCondition(null, $user->getGuardian()->getSelectedChild()->getId(), null, 'course_students', 'student_id', 'userToCourses');
+        } else if ($user->isGuardian()) {
+            $usersToCoursesJoin->addExplicitCondition(null, $user->getGuardianSelectedUser()->getId(), null, 'course_students', 'student_id', 'userToCourses');
         }
+
 
         $this->addJoinObject($usersToCoursesJoin);
 
@@ -78,6 +80,9 @@ class UserQuery extends BaseUserQuery
         }
 
         $this->groupBy('users.id');
+
+//        echo $this->toString();
+//        die;
 
         return $this;
     }

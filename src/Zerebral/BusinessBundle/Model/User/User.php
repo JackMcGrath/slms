@@ -35,6 +35,8 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
 
     private $relatedUsers = null;
 
+    public $guardianSelectedChild;
+
     public function __construct()
     {
         $this->setIsActive(true);
@@ -234,6 +236,11 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
         return $this->getGuardians()->getFirst();
     }
 
+    public function getGuardianSelectedUser()
+    {
+        return $this->getGuardian()->getSelectedChild($this->guardianSelectedChild);
+    }
+
     /**
      * Transit user to role-specific model like Teacher or Student
      *
@@ -389,5 +396,10 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
             $this->relatedUsers = UserQuery::create()->getRelatedUsers($this)->find();
         }
         return $this->relatedUsers;
+    }
+
+    public function setGuardianSelectedChild($userId)
+    {
+        $this->guardianSelectedChild = $userId;
     }
 }
