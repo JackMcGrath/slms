@@ -47,15 +47,24 @@ class CourseQuery extends BaseCourseQuery
         return $this;
     }
 
-    public function gradingByStudent(\Zerebral\BusinessBundle\Model\User\Student $student)
+    public function gradingByStudent(\Zerebral\BusinessBundle\Model\User\Student $student, $dateRange)
     {
-        //$this->leftJoinAssignment();
         $this->joinWith('Assignment', \Criteria::LEFT_JOIN);
         $this->joinWith('Assignment.StudentAssignment StudentAssignment', \Criteria::LEFT_JOIN);
+
         $this->add('StudentAssignment.student_id', $student->getId(), \Criteria::EQUAL);
         $this->add('StudentAssignment.grading', null, \Criteria::ISNOTNULL);
         $this->addAscendingOrderByColumn('courses.name');
-        $this->addAscendingOrderByColumn('assignments.due_at');
+        $this->addAscendingOrderByColumn('StudentAssignment.graded_at');
+
+        $this->add('StudentAssignment.graded_at', "StudentAssignment.graded_at between '".$dateRange['start']."' and '".$dateRange['end']."'", \Criteria::CUSTOM);
+        $this->addOr('StudentAssignment.graded_at', null, \Criteria::ISNULL);
+
+        $this->add('courses.start', "'" . $dateRange['start'] . " 00:00:00' between courses.start and courses.end", \Criteria::CUSTOM);
+        $this->addOr('courses.end', "'" . $dateRange['end'] . " 00:00:00' between courses.start and courses.end", \Criteria::CUSTOM);
+        $this->addOr('courses.end', null, \Criteria::ISNULL);
+        $this->addOr('courses.start', null, \Criteria::ISNULL);
+
 
 
         return $this;

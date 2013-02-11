@@ -196,14 +196,22 @@ class GuardianController extends \Zerebral\CommonBundle\Component\Controller
         /** @var \Zerebral\BusinessBundle\Model\User\Guardian $guardian  */
         $guardian = $this->getRoleUser();
         $selectedChild = $guardian->getSelectedChild($this->get('session')->get('selectedChildId'));
+        $dateRange = array(
+            'start' => $this->getRequest()->get('startDate', date('Y-m-d', strtotime('Monday this week'))),
+            'end' => $this->getRequest()->get('endDate', date('Y-m-d', strtotime('Sunday this week')))
+        );
 
-        $coursesGrading = \Zerebral\BusinessBundle\Model\Course\CourseQuery::create()->gradingByStudent($selectedChild)->find();
+        $coursesGrading = \Zerebral\BusinessBundle\Model\Course\CourseQuery::create()->gradingByStudent($selectedChild, $dateRange)->find();
         $courseAssignmentsSize = array();
         foreach ($coursesGrading as $course) {
             $courseAssignmentsSize[$course->getId()] = $course->getAssignments()->count();
         }
 
         return array(
+            'isMonthRange' => true,
+            'startDate' => $dateRange['start'],
+            'endDate' => $dateRange['end'],
+            'isMonthRange' => (strtotime($dateRange['end']) - strtotime($dateRange['start']) > 3600*24*26),
             'target' => 'grading',
             'courseAssignmentsSize' => $courseAssignmentsSize,
             'coursesGrading' => $coursesGrading,
