@@ -95,7 +95,11 @@
     </ul>
 </div>
 
-{% include "ZerebralFrontendBundle:Message:composePopup.html.twig" %}
+{{ _self.composeMessagePopup() }}
+{% endmacro %}
+
+{% macro composeMessagePopup() %}
+    {% include "ZerebralFrontendBundle:Message:composePopup.html.twig" %}
 {% endmacro %}
 
 {% macro upcomingAssignments(assignments) %}
