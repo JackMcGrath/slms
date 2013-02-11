@@ -71,14 +71,21 @@ class UserController extends \Zerebral\CommonBundle\Component\Controller
     /**
      * @Route("/user/suggest", name="ajax_user_suggest")
      *
-     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @PreAuthorize("hasRole('ROLE_USER')")
      * @Template()
      */
     public function suggestUserAction()
     {
         $name = $this->getRequest()->get('username');
+        if ($this->getUser()->isGuardian()) {
+            /** @var \Zerebral\BusinessBundle\Model\User\Guardian $guardian  */
+            $guardian = $this->getRoleUser();
+            $forUser = $guardian->getSelectedChild($this->get('session')->get('selectedChildId'))->getUser();
+        } else {
+            $forUser = $this->getUser();
+        }
         if ($name) {
-            $userList = \Zerebral\BusinessBundle\Model\User\UserQuery::create()->findForSuggestByNameForUser($name, $this->getUser());
+            $userList = \Zerebral\BusinessBundle\Model\User\UserQuery::create()->findForSuggestByNameForUser($name, $forUser);
             $response = array();
             if (count($userList)) {
                 foreach ($userList as $user) {

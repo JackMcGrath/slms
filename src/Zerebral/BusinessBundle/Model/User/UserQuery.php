@@ -29,7 +29,7 @@ class UserQuery extends BaseUserQuery
         $usersToCoursesJoin->setJoinType(\Criteria::LEFT_JOIN);
         if ($user->isStudent()) {
             $usersToCoursesJoin->addExplicitCondition(null, $user->getStudent()->getId(), null, 'course_students', 'student_id', 'userToCourses');
-        } else {
+        } elseif ($user->isTeacher()) {
             $usersToCoursesJoin->addExplicitCondition(null, $user->getTeacher()->getId(), null, 'course_teachers', 'teacher_id', 'userToCourses');
         }
         $this->addJoinObject($usersToCoursesJoin);
@@ -56,8 +56,23 @@ class UserQuery extends BaseUserQuery
         $teachersJoin->addExplicitCondition('courseToTeachers', 'teacher_id', null, 'teachers', 'id', null);
         $this->addJoinObject($teachersJoin);
 
+
+
+//        // LEFT JOIN student_guardians AS studentToGuardians ON courseToStudents.student_id = studentToGuardians.course_id
+//        $courseToTeachersJoin = new \Join();
+//        $courseToTeachersJoin->setJoinType(\Criteria::LEFT_JOIN);
+//        $courseToTeachersJoin->addExplicitCondition('courseToStudents', 'student_id', null, 'student_guardians', 'student_id', 'studentToGuardians');
+//        $this->addJoinObject($courseToTeachersJoin);
+//        // LEFT JOIN guardians ON courseToTeachers.teacher_id = guardians.id
+//        $teachersJoin = new \Join();
+//        $teachersJoin->setJoinType(\Criteria::LEFT_JOIN);
+//        $teachersJoin->addExplicitCondition('courseToStudents', 'guardian_id', null, 'guardians', 'id', null);
+//        $this->addJoinObject($teachersJoin);
+
         $this->where('users.id = students.user_id OR users.id = teachers.user_id');
         $this->groupBy('users.id');
+
+
 
         return $this;
     }

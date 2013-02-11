@@ -28,7 +28,7 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
     public $messagesOnPage = 10;
     /**
      * @Route("/", name="messages_inbox")
-     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @PreAuthorize("hasRole('ROLE_USER')")
      * @Template()
      */
     public function indexAction()
@@ -52,7 +52,7 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
 
     /**
      * @Route("/sent", name="messages_sent")
-     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @PreAuthorize("hasRole('ROLE_USER')")
      * @Template("ZerebralFrontendBundle:Message:index.html.twig")
      */
     public function sentAction()
@@ -75,7 +75,7 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
 
     /**
      * @Route("/reply/{threadId}", name="message_reply")
-     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @PreAuthorize("hasRole('ROLE_USER')")
      * @Template()
      */
     public function replyAction($threadId)
@@ -144,7 +144,7 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
 
     /**
      * @Route("/compose", name="message_compose")
-     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @PreAuthorize("hasRole('ROLE_USER')")
      * @Template()
      */
     public function composeAction()
@@ -183,7 +183,7 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
      /**
      * @Route("/edit", name="message_edit")
      *
-     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @PreAuthorize("hasRole('ROLE_USER')")
      * @Template()
      */
     public function editAction()
@@ -227,7 +227,7 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
     /**
      * @Route("/compose-form/{id}", name="ajax_compose_form")
      * @ParamConverter("user")
-     * @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_STUDENT')")
+     * @PreAuthorize("hasRole('ROLE_USER')")
      */
     public function ajaxComposeFormAction(Model\User\User $user)
     {
@@ -248,7 +248,7 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
 
     /**
      * @Route("/compose-popup", name="ajax_compose")
-     * @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_STUDENT')")
+     * @PreAuthorize("hasRole('ROLE_USER')")
      */
     public function ajaxComposeAction()
     {
