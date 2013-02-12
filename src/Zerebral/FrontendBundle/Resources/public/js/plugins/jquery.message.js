@@ -113,7 +113,8 @@ PrivateMessages.prototype = {
     onShowPopup: function(e) {
         e.preventDefault();
         this.userId = $(e.target).attr('userId');
-        this.recipients = 'recipients[]=' + $(e.target).attr('recipients').replace(/,/g, '&recipients[]=');
+        var recipients = $(e.target).attr('recipients');
+        this.recipients = 'recipients[]=' + (recipients ? recipients.replace(/,/g, '&recipients[]=') : '');
         $(this.element).modal('show');
     },
 
@@ -123,7 +124,6 @@ PrivateMessages.prototype = {
 $.registry('privateMessages', PrivateMessages, {
     methods: ['init'],
     defaults: {
-
         openPopupLink: '[rel="message-popup"]'
     }
 });
