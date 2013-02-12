@@ -67,7 +67,7 @@ abstract class BaseAssignmentFileQuery extends ModelCriteria
      * Returns a new AssignmentFileQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param   AssignmentFileQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param     AssignmentFileQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return AssignmentFileQuery
      */
@@ -131,8 +131,8 @@ abstract class BaseAssignmentFileQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return                 AssignmentFile A model object, or null if the key is not found
-     * @throws PropelException
+     * @return   AssignmentFile A model object, or null if the key is not found
+     * @throws   PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -244,8 +244,7 @@ abstract class BaseAssignmentFileQuery extends ModelCriteria
      * <code>
      * $query->filterByfileId(1234); // WHERE file_id = 1234
      * $query->filterByfileId(array(12, 34)); // WHERE file_id IN (12, 34)
-     * $query->filterByfileId(array('min' => 12)); // WHERE file_id >= 12
-     * $query->filterByfileId(array('max' => 12)); // WHERE file_id <= 12
+     * $query->filterByfileId(array('min' => 12)); // WHERE file_id > 12
      * </code>
      *
      * @see       filterByFile()
@@ -260,22 +259,8 @@ abstract class BaseAssignmentFileQuery extends ModelCriteria
      */
     public function filterByfileId($fileId = null, $comparison = null)
     {
-        if (is_array($fileId)) {
-            $useMinMax = false;
-            if (isset($fileId['min'])) {
-                $this->addUsingAlias(AssignmentFilePeer::FILE_ID, $fileId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($fileId['max'])) {
-                $this->addUsingAlias(AssignmentFilePeer::FILE_ID, $fileId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
+        if (is_array($fileId) && null === $comparison) {
+            $comparison = Criteria::IN;
         }
 
         return $this->addUsingAlias(AssignmentFilePeer::FILE_ID, $fileId, $comparison);
@@ -288,8 +273,7 @@ abstract class BaseAssignmentFileQuery extends ModelCriteria
      * <code>
      * $query->filterByassignmentId(1234); // WHERE assignment_id = 1234
      * $query->filterByassignmentId(array(12, 34)); // WHERE assignment_id IN (12, 34)
-     * $query->filterByassignmentId(array('min' => 12)); // WHERE assignment_id >= 12
-     * $query->filterByassignmentId(array('max' => 12)); // WHERE assignment_id <= 12
+     * $query->filterByassignmentId(array('min' => 12)); // WHERE assignment_id > 12
      * </code>
      *
      * @see       filterByAssignment()
@@ -304,22 +288,8 @@ abstract class BaseAssignmentFileQuery extends ModelCriteria
      */
     public function filterByassignmentId($assignmentId = null, $comparison = null)
     {
-        if (is_array($assignmentId)) {
-            $useMinMax = false;
-            if (isset($assignmentId['min'])) {
-                $this->addUsingAlias(AssignmentFilePeer::ASSIGNMENT_ID, $assignmentId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($assignmentId['max'])) {
-                $this->addUsingAlias(AssignmentFilePeer::ASSIGNMENT_ID, $assignmentId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
+        if (is_array($assignmentId) && null === $comparison) {
+            $comparison = Criteria::IN;
         }
 
         return $this->addUsingAlias(AssignmentFilePeer::ASSIGNMENT_ID, $assignmentId, $comparison);
@@ -331,8 +301,8 @@ abstract class BaseAssignmentFileQuery extends ModelCriteria
      * @param   File|PropelObjectCollection $file The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 AssignmentFileQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
+     * @return   AssignmentFileQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
      */
     public function filterByFile($file, $comparison = null)
     {
@@ -407,8 +377,8 @@ abstract class BaseAssignmentFileQuery extends ModelCriteria
      * @param   Assignment|PropelObjectCollection $assignment The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 AssignmentFileQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
+     * @return   AssignmentFileQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
      */
     public function filterByAssignment($assignment, $comparison = null)
     {

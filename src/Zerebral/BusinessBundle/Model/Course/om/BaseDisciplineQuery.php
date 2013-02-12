@@ -70,7 +70,7 @@ abstract class BaseDisciplineQuery extends ModelCriteria
      * Returns a new DisciplineQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param   DisciplineQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param     DisciplineQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return DisciplineQuery
      */
@@ -132,8 +132,8 @@ abstract class BaseDisciplineQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return                 Discipline A model object, or null if the key is not found
-     * @throws PropelException
+     * @return   Discipline A model object, or null if the key is not found
+     * @throws   PropelException
      */
      public function findOneById($key, $con = null)
      {
@@ -147,8 +147,8 @@ abstract class BaseDisciplineQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return                 Discipline A model object, or null if the key is not found
-     * @throws PropelException
+     * @return   Discipline A model object, or null if the key is not found
+     * @throws   PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -248,8 +248,7 @@ abstract class BaseDisciplineQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id >= 12
-     * $query->filterById(array('max' => 12)); // WHERE id <= 12
+     * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -290,8 +289,7 @@ abstract class BaseDisciplineQuery extends ModelCriteria
      * <code>
      * $query->filterByTeacherId(1234); // WHERE teacher_id = 1234
      * $query->filterByTeacherId(array(12, 34)); // WHERE teacher_id IN (12, 34)
-     * $query->filterByTeacherId(array('min' => 12)); // WHERE teacher_id >= 12
-     * $query->filterByTeacherId(array('max' => 12)); // WHERE teacher_id <= 12
+     * $query->filterByTeacherId(array('min' => 12)); // WHERE teacher_id > 12
      * </code>
      *
      * @see       filterByTeacher()
@@ -362,8 +360,8 @@ abstract class BaseDisciplineQuery extends ModelCriteria
      * @param   Teacher|PropelObjectCollection $teacher The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 DisciplineQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
+     * @return   DisciplineQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
      */
     public function filterByTeacher($teacher, $comparison = null)
     {
@@ -438,8 +436,8 @@ abstract class BaseDisciplineQuery extends ModelCriteria
      * @param   Course|PropelObjectCollection $course  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 DisciplineQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
+     * @return   DisciplineQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
      */
     public function filterByCourse($course, $comparison = null)
     {

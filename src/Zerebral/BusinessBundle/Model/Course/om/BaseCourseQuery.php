@@ -158,7 +158,7 @@ abstract class BaseCourseQuery extends ModelCriteria
      * Returns a new CourseQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param   CourseQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param     CourseQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return CourseQuery
      */
@@ -220,8 +220,8 @@ abstract class BaseCourseQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return                 Course A model object, or null if the key is not found
-     * @throws PropelException
+     * @return   Course A model object, or null if the key is not found
+     * @throws   PropelException
      */
      public function findOneById($key, $con = null)
      {
@@ -235,8 +235,8 @@ abstract class BaseCourseQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return                 Course A model object, or null if the key is not found
-     * @throws PropelException
+     * @return   Course A model object, or null if the key is not found
+     * @throws   PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -336,8 +336,7 @@ abstract class BaseCourseQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id >= 12
-     * $query->filterById(array('max' => 12)); // WHERE id <= 12
+     * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -350,22 +349,8 @@ abstract class BaseCourseQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id)) {
-            $useMinMax = false;
-            if (isset($id['min'])) {
-                $this->addUsingAlias(CoursePeer::ID, $id['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($id['max'])) {
-                $this->addUsingAlias(CoursePeer::ID, $id['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
+        if (is_array($id) && null === $comparison) {
+            $comparison = Criteria::IN;
         }
 
         return $this->addUsingAlias(CoursePeer::ID, $id, $comparison);
@@ -378,8 +363,7 @@ abstract class BaseCourseQuery extends ModelCriteria
      * <code>
      * $query->filterByDisciplineId(1234); // WHERE discipline_id = 1234
      * $query->filterByDisciplineId(array(12, 34)); // WHERE discipline_id IN (12, 34)
-     * $query->filterByDisciplineId(array('min' => 12)); // WHERE discipline_id >= 12
-     * $query->filterByDisciplineId(array('max' => 12)); // WHERE discipline_id <= 12
+     * $query->filterByDisciplineId(array('min' => 12)); // WHERE discipline_id > 12
      * </code>
      *
      * @see       filterByDiscipline()
@@ -422,8 +406,7 @@ abstract class BaseCourseQuery extends ModelCriteria
      * <code>
      * $query->filterByGradeLevelId(1234); // WHERE grade_level_id = 1234
      * $query->filterByGradeLevelId(array(12, 34)); // WHERE grade_level_id IN (12, 34)
-     * $query->filterByGradeLevelId(array('min' => 12)); // WHERE grade_level_id >= 12
-     * $query->filterByGradeLevelId(array('max' => 12)); // WHERE grade_level_id <= 12
+     * $query->filterByGradeLevelId(array('min' => 12)); // WHERE grade_level_id > 12
      * </code>
      *
      * @see       filterByGradeLevel()
@@ -639,8 +622,7 @@ abstract class BaseCourseQuery extends ModelCriteria
      * <code>
      * $query->filterByCreatedBy(1234); // WHERE created_by = 1234
      * $query->filterByCreatedBy(array(12, 34)); // WHERE created_by IN (12, 34)
-     * $query->filterByCreatedBy(array('min' => 12)); // WHERE created_by >= 12
-     * $query->filterByCreatedBy(array('max' => 12)); // WHERE created_by <= 12
+     * $query->filterByCreatedBy(array('min' => 12)); // WHERE created_by > 12
      * </code>
      *
      * @see       filterByCreatedByTeacher()
@@ -768,8 +750,8 @@ abstract class BaseCourseQuery extends ModelCriteria
      * @param   Teacher|PropelObjectCollection $teacher The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 CourseQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
+     * @return   CourseQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
      */
     public function filterByCreatedByTeacher($teacher, $comparison = null)
     {
@@ -844,8 +826,8 @@ abstract class BaseCourseQuery extends ModelCriteria
      * @param   Discipline|PropelObjectCollection $discipline The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 CourseQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
+     * @return   CourseQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
      */
     public function filterByDiscipline($discipline, $comparison = null)
     {
@@ -920,8 +902,8 @@ abstract class BaseCourseQuery extends ModelCriteria
      * @param   GradeLevel|PropelObjectCollection $gradeLevel The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 CourseQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
+     * @return   CourseQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
      */
     public function filterByGradeLevel($gradeLevel, $comparison = null)
     {
@@ -996,8 +978,8 @@ abstract class BaseCourseQuery extends ModelCriteria
      * @param   AssignmentCategory|PropelObjectCollection $assignmentCategory  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 CourseQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
+     * @return   CourseQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
      */
     public function filterByAssignmentCategory($assignmentCategory, $comparison = null)
     {
@@ -1070,8 +1052,8 @@ abstract class BaseCourseQuery extends ModelCriteria
      * @param   Assignment|PropelObjectCollection $assignment  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 CourseQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
+     * @return   CourseQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
      */
     public function filterByAssignment($assignment, $comparison = null)
     {
@@ -1144,8 +1126,8 @@ abstract class BaseCourseQuery extends ModelCriteria
      * @param   Attendance|PropelObjectCollection $attendance  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 CourseQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
+     * @return   CourseQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
      */
     public function filterByAttendance($attendance, $comparison = null)
     {
@@ -1218,8 +1200,8 @@ abstract class BaseCourseQuery extends ModelCriteria
      * @param   CourseStudent|PropelObjectCollection $courseStudent  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 CourseQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
+     * @return   CourseQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
      */
     public function filterByCourseStudent($courseStudent, $comparison = null)
     {
@@ -1292,8 +1274,8 @@ abstract class BaseCourseQuery extends ModelCriteria
      * @param   CourseTeacher|PropelObjectCollection $courseTeacher  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 CourseQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
+     * @return   CourseQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
      */
     public function filterByCourseTeacher($courseTeacher, $comparison = null)
     {
@@ -1366,8 +1348,8 @@ abstract class BaseCourseQuery extends ModelCriteria
      * @param   CourseScheduleDay|PropelObjectCollection $courseScheduleDay  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 CourseQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
+     * @return   CourseQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
      */
     public function filterByCourseScheduleDay($courseScheduleDay, $comparison = null)
     {
@@ -1440,8 +1422,8 @@ abstract class BaseCourseQuery extends ModelCriteria
      * @param   FeedItem|PropelObjectCollection $feedItem  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 CourseQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
+     * @return   CourseQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
      */
     public function filterByFeedItem($feedItem, $comparison = null)
     {
@@ -1514,8 +1496,8 @@ abstract class BaseCourseQuery extends ModelCriteria
      * @param   CourseFolder|PropelObjectCollection $courseFolder  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 CourseQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
+     * @return   CourseQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
      */
     public function filterByCourseFolder($courseFolder, $comparison = null)
     {
@@ -1588,8 +1570,8 @@ abstract class BaseCourseQuery extends ModelCriteria
      * @param   CourseMaterial|PropelObjectCollection $courseMaterial  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 CourseQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
+     * @return   CourseQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
      */
     public function filterByCourseMaterial($courseMaterial, $comparison = null)
     {
@@ -1662,8 +1644,8 @@ abstract class BaseCourseQuery extends ModelCriteria
      * @param   Notification|PropelObjectCollection $notification  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 CourseQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
+     * @return   CourseQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
      */
     public function filterByNotification($notification, $comparison = null)
     {
