@@ -2,59 +2,44 @@
 {% import "ZerebralFrontendBundle:Macro:main.html.twig" as mainPartials %}
 
 {% block content %}
-    {% javascripts '@ZerebralFrontendBundle/Resources/public/js/controllers/guardian/course.js' output='js/compiled/guardian_course.js' %}
+    {% javascripts '@ZerebralFrontendBundle/Resources/public/js/controllers/guardian/classes.js' output='js/compiled/guardian_classes.js' %}
     <script type="text/javascript" src="{{ asset_url }}"></script>
     {% endjavascripts %}
-
     <div class="top-second-navbar">
-        {{ mainPartials.guardianTopMenu('classes') }}
+        {{ mainPartials.guardianTopMenu('courses') }}
     </div>
 
     <div class="row-fluid courses-list course-details">
         <div class="span6 main-list-block">
             <div class="row-fluid manage">
-                <h2 class="pull-left form-title">Assignments&nbsp;<small><a href="{{ path('guardian_classes') }}">{{ course.name }}</a></small></h2>
+                <h2 class="pull-left form-title">
+                    {{ course.name }} <small>course details</small>
+                </h2>
             </div>
-
             <hr/>
 
-            <div id="test" class="span9 items-list">
-                {% for assignment in assignments %}
-                    <div class="list-item span12{{ loop.last ? ' last' : '' }}" data-due="{% if assignment.dueAt is null %}nodue{% else %}{% if date(assignment.dueAt) < date() %}past{% else %}future{% endif %}{% endif %}">
-                        <div class="details pull-left">
-                            <h4>{{ assignment.name }}&nbsp;({{ assignment.assignmentCategory.name }})</h4>
-                            <b>
-                                {% if assignment.dueAt %}
-                                    {% if date(assignment.dueAt) < date() %}Past due by{% else %}Due{% endif %}&nbsp;{{ time_diff(assignment.dueAt)|replace({'now': 'today'})|replace({'ago': ''}) }}<br />
-                                {% else %}
-                                    No due date
-                                {% endif %}
-                            </b>
-                            <div class="stat">
-                            </div>
-                            <div class="description">{{ assignment.description|raw }}</div>
-                            <br />
-                        </div>
-                    </div>
-                {% endfor %}
+            {{ mainPartials.courseSchedule(course) }}
+
+            <div class="description">
+                {% autoescape false %}
+                {{ course.description }}
+                {% endautoescape %}
             </div>
         </div>
         <div class="right-navbar pull-left">
+            <div class="block upcoming-assignments">
+                {{ mainPartials.upcomingAssignments(upcomingAssignments) }}
+            </div>
+
+            <div class="block recent-materials">
+                {{ mainPartials.recentMaterials(recentMaterials) }}
+            </div>
+
+
             <div class="block teacher-profile">
                 {{ mainPartials.teacherShortInfo(course.teacher) }}
             </div>
-
-            <div class="block">
-                <h4>Assignments filter</h4>
-                <ul class="radio">
-                    <li class="active"><label><input type="radio" name="assignmentsFilter" value="all" checked=""> All</label></li>
-                    <li><label><input type="radio" name="assignmentsFilter" value="past" > Past</label></li>
-                    <li><label><input type="radio" name="assignmentsFilter" value="future"> Upcoming</label></li>
-                    <li><label><input type="radio" name="assignmentsFilter" value="nodue"> No due date</label></li>
-                </ul>
-                <div class="clearfix"></div>
-            </div>
-        </div>
         </div>
     </div>
+
 {% endblock %}
