@@ -113,7 +113,7 @@ PrivateMessages.prototype = {
     onShowPopup: function(e) {
         e.preventDefault();
         this.userId = $(e.target).attr('userId');
-        this.recipients = 'recipients[]=' + $(e.target).attr('recipients').replace(',', '&recipients[]=');
+        this.recipients = 'recipients[]=' + $(e.target).attr('recipients').replace(/,/g, '&recipients[]=');
         $(this.element).modal('show');
     },
 
