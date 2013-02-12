@@ -54,6 +54,9 @@ class AssignmentQuery extends BaseAssignmentQuery
     {
 //        $this->leftJoinStudentAssignment();
         $this->joinWith('StudentAssignment', \Criteria::LEFT_JOIN);
+        $this->joinWith('StudentAssignment.Student AssignmentStudent', \Criteria::LEFT_JOIN);
+
+        //$this->leftJoin('Student.User AssignmentUser');
         $this->leftJoinCourse();
         $this->leftJoinFeedItem();
 
@@ -64,6 +67,7 @@ class AssignmentQuery extends BaseAssignmentQuery
 
         $this->withColumn('COUNT(DISTINCT IF(student_assignments.is_submitted = 1, student_assignments.id, null))', 'completedCount');
         $this->withColumn('COUNT(DISTINCT student_assignments.id) - COUNT(DISTINCT IF(student_assignments.is_submitted = 1, student_assignments.id, null))', 'remainingCount');
+        $this->withColumn('GROUP_CONCAT(IF(student_assignments.is_submitted = 0, `AssignmentStudent`.user_id, null))', 'remainingUserIds');
         //$this->withColumn('COUNT(DISTINCT IF(student_assignments.is_submitted = 1, `StudentAssignmentFile`.file_id , null))', 'filesCount');
         $this->withColumn('COUNT(DISTINCT `StudentAssignmentFile`.file_id)', 'filesCount');
         $this->withColumn('COUNT(DISTINCT student_assignments.id)', 'studentsCount');
