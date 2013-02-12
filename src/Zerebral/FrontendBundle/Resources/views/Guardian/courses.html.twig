@@ -6,7 +6,7 @@
     <script type="text/javascript" src="{{ asset_url }}"></script>
     {% endjavascripts %}
     <div class="top-second-navbar">
-        {{ mainPartials.guardianTopMenu('classes') }}
+        {{ mainPartials.guardianTopMenu('courses') }}
     </div>
 
     <div class="row-fluid courses-list course-details">
@@ -22,14 +22,13 @@
                     <div id="class{{ course.id }}" class="list-item span12{{ loop.last ? ' last' : '' }}" {% if course.assignmentsDueDates %}due-date="{{ course.assignmentsDueDates | join(',') }}"{% endif %}>
                         <div class="symbol pull-left"><img class="rounded" src="{{ user_avatar(course.teacher) | imagine_filter('thumbnail') }}"/></div>
                         <div class="details pull-left">
-                            <h4><a href="{{ path('guardian_classes_course', {courseId: course.id}) }}">{{ course.name }}</a></h4>
+                            <h4><a href="{{ path('guardian_course_view', {id: course.id}) }}">{{ course.name }}</a></h4>
                             <div class="stat">
                                 <div class="instructor-name pull-left" >Teacher: <b><a href="#">{{ course.teacher.fullName }}</a></b></div>
                                 <div class="clear"></div>
                             </div>
                             {{ mainPartials.courseSchedule(course, false) }}
-                            <div class="description">{{ course.description|raw }}</div>
-                            <br />
+
                         </div>
                     </div>
                 {% endfor %}

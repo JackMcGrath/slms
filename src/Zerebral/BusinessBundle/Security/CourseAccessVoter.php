@@ -48,6 +48,10 @@ class CourseAccessVoter extends \Zerebral\CommonBundle\Security\ModelAccessVoter
             return false;
         }
 
+        if ($user->getRole() == User::ROLE_GUARDIAN) {
+            return true; //all access check in controller
+        }
+
         return false;
     }
 }

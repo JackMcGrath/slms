@@ -126,4 +126,12 @@ class AssignmentQuery extends BaseAssignmentQuery
         $this->addDescendingOrderByColumn('due_at');
         return $this->find();
     }
+
+    public function getUpcomingByUserAndCourse($user, $course)
+    {
+        /** @var $assignment AssignmentQuery */
+        $assignment = $this->filterByUserAndDueDate($user, $course);
+        $assignment->add('assignments.due_at', 'assignments.due_at between "'.date('Y-m-d').'" and "' . date('Y-m-d', strtotime('+14 days')) . '"', \Criteria::CUSTOM);
+        return $assignment;
+    }
 }

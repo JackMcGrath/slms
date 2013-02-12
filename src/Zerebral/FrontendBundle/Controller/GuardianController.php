@@ -103,11 +103,11 @@ class GuardianController extends \Zerebral\CommonBundle\Component\Controller
     }
 
     /**
-     * @Route("/classes", name="guardian_classes")
+     * @Route("/courses", name="guardian_courses")
      * @PreAuthorize("hasRole('ROLE_GUARDIAN')")
      * @Template
      */
-    public function classesAction()
+    public function coursesAction()
     {
         /** @var \Zerebral\BusinessBundle\Model\User\Guardian $guardian  */
         $guardian = $this->getRoleUser();
@@ -138,14 +138,14 @@ class GuardianController extends \Zerebral\CommonBundle\Component\Controller
     }
 
     /**
-     * @Route("/classes/{courseId}", name="guardian_classes_course")
+     * @Route("/assignments/{courseId}", name="guardian_course_assignments")
      * @PreAuthorize("hasRole('ROLE_GUARDIAN')")
      * @param \Zerebral\BusinessBundle\Model\Course\Course $course
      * @return array
      * @ParamConverter("course", options={"mapping": {"courseId": "id"}})
      * @Template
      */
-    public function courseAction(\Zerebral\BusinessBundle\Model\Course\Course $course)
+    public function courseAssignmentsAction(Model\Course\Course $course)
     {
         /** @var \Zerebral\BusinessBundle\Model\User\Guardian $guardian  */
         $guardian = $this->getRoleUser();
@@ -153,12 +153,12 @@ class GuardianController extends \Zerebral\CommonBundle\Component\Controller
 
         if (!$selectedChild->hasCourse($course)) {
             //throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException('Course #' . $course->getId() . ' not found');
-            return $this->redirect($this->generateUrl('guardian_classes'));
+            return $this->redirect($this->generateUrl('guardian_courses'));
         }
 
-        /** @var \Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery $assigmentsQuery  */
-        $assigmentsQuery = \Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery::create()->filterByUserAndDueDate($selectedChild->getUser(), $course);
-        $assignmentsCollection = $assigmentsQuery->clearOrderByColumns()->addDescendingOrderByColumn(\Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer::DUE_AT)->find();
+        /** @var \Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery $assignmentsQuery  */
+        $assignmentsQuery = \Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery::create()->filterByUserAndDueDate($selectedChild->getUser(), $course);
+        $assignmentsCollection = $assignmentsQuery->clearOrderByColumns()->addDescendingOrderByColumn(\Zerebral\BusinessBundle\Model\Assignment\AssignmentPeer::DUE_AT)->find();
 
         $assignmentsUpcoming = array();
         $assignmentsOther = array();
@@ -185,6 +185,58 @@ class GuardianController extends \Zerebral\CommonBundle\Component\Controller
             'assignments' => $assignments
         );
     }
+
+    /**
+     * @Route("/course/{id}", name="guardian_course_view")
+     * @PreAuthorize("hasRole('ROLE_GUARDIAN')")
+     * @ParamConverter("course", options={"mapping": {"id": "id"}})
+     * @Template
+     */
+    public function courseAction(Model\Course\Course $course)
+    {
+        /** @var \Zerebral\BusinessBundle\Model\User\Guardian $guardian  */
+        $guardian = $this->getRoleUser();
+        $selectedChild = $guardian->getSelectedChild($this->get('session')->get('selectedChildId'));
+
+        if (!$selectedChild->hasCourse($course)) {
+            return $this->redirect($this->generateUrl('guardian_courses'));
+        }
+
+        $upcomingAssignments = AssignmentQuery::create()->getUpcomingByUserAndCourse($selectedChild->getUser(), $course)->find();
+        $recentMaterials = \Zerebral\BusinessBundle\Model\Material\CourseMaterialQuery::create()->findRecentCourseMaterials($course)->find();
+
+        return array(
+            'course' => $course,
+            'upcomingAssignments' => $upcomingAssignments,
+            'recentMaterials' => $recentMaterials,
+            'target' => 'courses',
+        );
+    }
+
+    /**
+     * @Route("/assignment/{id}", name="guardian_assignment_view")
+     * @ParamConverter("assignment")
+     *
+     * @SecureParam(name="assignment", permissions="VIEW")
+     * @PreAuthorize("hasRole('ROLE_GUARDIAN')")
+     * @Template()
+     */
+    public function assignmentAction(Model\Assignment\Assignment $assignment)
+    {
+        /** @var \Zerebral\BusinessBundle\Model\User\Guardian $guardian  */
+        $guardian = $this->getRoleUser();
+        $selectedChild = $guardian->getSelectedChild($this->get('session')->get('selectedChildId'));
+
+        return array(
+            'course' => $assignment->getCourse(),
+            'assignment' => $assignment,
+            'student' => $selectedChild,
+            'user' => $this->getRoleUser(),
+            'target' => 'assignments'
+        );
+    }
+
+
 
     /**
      * @Route("/grading", name="guardian_grading")

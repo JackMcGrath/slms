@@ -72,7 +72,7 @@
                     <tbody>
                         {% for course in coursesGrading %}
                             <tr>
-                                <td class="name"><a href="{{ path('guardian_classes') }}#class{{ course.id }}">{{ course.name }}</a></td>
+                                <td class="name"><a href="{{ path('guardian_courses') }}#class{{ course.id }}">{{ course.name }}</a></td>
 
                                 {% for assignment in course.assignments %}
                                     {% for studentAssignment in assignment.studentAssignments %}

@@ -1,0 +1,45 @@
+{% extends 'ZerebralFrontendBundle::layout.html.twig' %}
+{% import "ZerebralFrontendBundle:Macro:main.html.twig" as mainPartials %}
+
+{% block content %}
+    {% javascripts '@ZerebralFrontendBundle/Resources/public/js/controllers/guardian/course.js' output='js/compiled/guardian_course.js' %}
+    <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+
+    <div class="top-second-navbar">
+        {{ mainPartials.guardianTopMenu('courses') }}
+    </div>
+
+    <div class="row-fluid assignments-list">
+        <div class="span6 main-list-block">
+            <div class="row-fluid manage">
+                <h2 class="pull-left form-title">Assignments&nbsp;<small><a href="{{ path('guardian_courses') }}">{{ course.name }}</a></small></h2>
+            </div>
+
+            <hr/>
+
+            <div id="test" class="span9 items-list">
+                {% for assignment in assignments %}
+                    {{ mainPartials.assignmentItem(assignment, loop, null, course) }}
+                {% endfor %}
+            </div>
+        </div>
+        <div class="right-navbar pull-left">
+            <div class="block teacher-profile">
+                {{ mainPartials.teacherShortInfo(course.teacher) }}
+            </div>
+
+            <div class="block">
+                <h4>Assignments filter</h4>
+                <ul class="radio">
+                    <li class="active"><label><input type="radio" name="assignmentsFilter" value="all" checked=""> All</label></li>
+                    <li><label><input type="radio" name="assignmentsFilter" value="past" > Past</label></li>
+                    <li><label><input type="radio" name="assignmentsFilter" value="future"> Upcoming</label></li>
+                    <li><label><input type="radio" name="assignmentsFilter" value="nodue"> No due date</label></li>
+                </ul>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+        </div>
+    </div>
+{% endblock %}
