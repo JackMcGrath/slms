@@ -14,6 +14,8 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Zerebral\BusinessBundle\Model\User as User;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
+use Zerebral\BusinessBundle\Model\User\GuardianInviteQuery;
+
 class SecuredController extends Controller
 {
     /**
@@ -84,9 +86,24 @@ class SecuredController extends Controller
         }
 
 
-        return array(
+        $mainParameters = array(
             'form' => $form->createView(),
+            'guardianMode' => false
         );
+        $additionalParameters = array();
+
+
+
+        $guardianInviteCode = $this->get('session')->get('guardian_invite_code', 0);
+        $guardianInvite = GuardianInviteQuery::create()->filterByCode($guardianInviteCode)->filterByActivated(false)->findOne();
+        if (!is_null($guardianInvite)) {
+            $additionalParameters = array(
+                'guardianMode' => true,
+                'guardianInvite' => $guardianInvite
+            );
+        }
+
+        return array_merge($mainParameters, $additionalParameters);
     }
 
     /**

@@ -125,11 +125,23 @@
                 <div class="span4 pull-right">
                     <div class="guardian-list" style="padding: 17px;">
                         <h5>Parents:</h5>
+                        {% if user.getGuardians|length > 0 %}
                         <ul>
                             {% for guardian in user.getGuardians %}
                                 <li>{{ guardian.fullName }}</li>
                             {% endfor %}
                         </ul>
+                        {% else %}
+                            <p>No parents were invited</p>
+                        {% endif %}
+                        {% if user.getStudent().guardianInvites|length > 0 %}
+                        <h5>Invitations sent:</h5>
+                        <ul>
+                            {% for invite in user.getStudent().getNonActivedInvites %}
+                                <li>{{ invite.guardianEmail }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
                         <a href="#inviteModal" class="btn btn-danger invite" data-toggle="modal" data-target="#inviteModal">Invite your parent via email</a>
                     </div>
                 </div>

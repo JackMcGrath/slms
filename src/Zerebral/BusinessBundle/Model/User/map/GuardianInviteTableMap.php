@@ -42,9 +42,9 @@ class GuardianInviteTableMap extends TableMap
         $this->setPackage('Zerebral.BusinessBundle.Model.User');
         $this->setUseIdGenerator(false);
         // columns
-        $this->addForeignPrimaryKey('student_id', 'StudentId', 'INTEGER' , 'students', 'id', true, null, null);
+        $this->addForeignKey('student_id', 'StudentId', 'INTEGER', 'students', 'id', true, null, null);
         $this->addColumn('guardian_email', 'GuardianEmail', 'VARCHAR', true, 100, null);
-        $this->addColumn('code', 'Code', 'VARCHAR', true, 32, null);
+        $this->addPrimaryKey('code', 'Code', 'VARCHAR', true, 32, null);
         $this->addColumn('activated', 'Activated', 'BOOLEAN', true, 1, false);
         // validators
     } // initialize()

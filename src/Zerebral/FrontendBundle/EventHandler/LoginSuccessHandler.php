@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Router;
 
+use Zerebral\BusinessBundle\Model\User\GuardianInviteQuery;
+
 class LoginSuccessHandler implements AuthenticationSuccessHandlerInterface
 {
 
@@ -33,6 +35,12 @@ class LoginSuccessHandler implements AuthenticationSuccessHandlerInterface
                     'accessCode' => $code
                 ))
             );
+        }
+
+        if ($session->get('guardian_invite_code')) {
+            $code = $session->get('guardian_invite_code');
+            $session->set('guardian_invite_code', null);
+            return new RedirectResponse($this->router->generate('guardian_join', array('code' => $code)));
         }
 
         if ($this->security->isGranted('ROLE_TEACHER') && $this->security->getToken()->getUser()->getRoleModel()->countCourses() == 0) {

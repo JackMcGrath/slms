@@ -872,29 +872,29 @@ abstract class BaseGuardianInvite extends BaseObject implements Persistent
     public function buildPkeyCriteria()
     {
         $criteria = new Criteria(GuardianInvitePeer::DATABASE_NAME);
-        $criteria->add(GuardianInvitePeer::STUDENT_ID, $this->student_id);
+        $criteria->add(GuardianInvitePeer::CODE, $this->code);
 
         return $criteria;
     }
 
     /**
      * Returns the primary key for this object (row).
-     * @return int
+     * @return string
      */
     public function getPrimaryKey()
     {
-        return $this->getStudentId();
+        return $this->getCode();
     }
 
     /**
-     * Generic method to set the primary key (student_id column).
+     * Generic method to set the primary key (code column).
      *
-     * @param  int $key Primary key.
+     * @param  string $key Primary key.
      * @return void
      */
     public function setPrimaryKey($key)
     {
-        $this->setStudentId($key);
+        $this->setCode($key);
     }
 
     /**
@@ -904,7 +904,7 @@ abstract class BaseGuardianInvite extends BaseObject implements Persistent
     public function isPrimaryKeyNull()
     {
 
-        return null === $this->getStudentId();
+        return null === $this->getCode();
     }
 
     /**
@@ -920,8 +920,8 @@ abstract class BaseGuardianInvite extends BaseObject implements Persistent
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
+        $copyObj->setStudentId($this->getStudentId());
         $copyObj->setGuardianEmail($this->getGuardianEmail());
-        $copyObj->setCode($this->getCode());
         $copyObj->setActivated($this->getActivated());
 
         if ($deepCopy && !$this->startCopy) {
@@ -931,18 +931,13 @@ abstract class BaseGuardianInvite extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getStudent();
-            if ($relObj) {
-                $copyObj->setStudent($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
 
         if ($makeNew) {
             $copyObj->setNew(true);
-            $copyObj->setStudentId(NULL); // this is a auto-increment column, so set to default value
+            $copyObj->setCode(NULL); // this is a auto-increment column, so set to default value
         }
     }
 
@@ -1003,9 +998,10 @@ abstract class BaseGuardianInvite extends BaseObject implements Persistent
 
         $this->aStudent = $v;
 
-        // Add binding for other direction of this 1:1 relationship.
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Student object, it will not be re-added.
         if ($v !== null) {
-            $v->setGuardianInvite($this);
+            $v->addGuardianInvite($this);
         }
 
 
@@ -1025,8 +1021,13 @@ abstract class BaseGuardianInvite extends BaseObject implements Persistent
     {
         if ($this->aStudent === null && ($this->student_id !== null) && $doQuery) {
             $this->aStudent = StudentQuery::create()->findPk($this->student_id, $con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aStudent->setGuardianInvite($this);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aStudent->addGuardianInvites($this);
+             */
         }
 
         return $this->aStudent;

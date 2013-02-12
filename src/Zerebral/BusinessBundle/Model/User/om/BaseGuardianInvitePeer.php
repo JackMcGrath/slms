@@ -300,7 +300,7 @@ abstract class BaseGuardianInvitePeer
     {
         if (Propel::isInstancePoolingEnabled()) {
             if ($key === null) {
-                $key = (string) $obj->getStudentId();
+                $key = (string) $obj->getCode();
             } // if key === null
             GuardianInvitePeer::$instances[$key] = $obj;
         }
@@ -323,7 +323,7 @@ abstract class BaseGuardianInvitePeer
     {
         if (Propel::isInstancePoolingEnabled() && $value !== null) {
             if (is_object($value) && $value instanceof GuardianInvite) {
-                $key = (string) $value->getStudentId();
+                $key = (string) $value->getCode();
             } elseif (is_scalar($value)) {
                 // assume we've been passed a primary key
                 $key = (string) $value;
@@ -395,11 +395,11 @@ abstract class BaseGuardianInvitePeer
     public static function getPrimaryKeyHashFromRow($row, $startcol = 0)
     {
         // If the PK cannot be derived from the row, return null.
-        if ($row[$startcol] === null) {
+        if ($row[$startcol + 2] === null) {
             return null;
         }
 
-        return (string) $row[$startcol];
+        return (string) $row[$startcol + 2];
     }
 
     /**
@@ -414,7 +414,7 @@ abstract class BaseGuardianInvitePeer
     public static function getPrimaryKeyFromRow($row, $startcol = 0)
     {
 
-        return (int) $row[$startcol];
+        return (string) $row[$startcol + 2];
     }
 
     /**
@@ -583,8 +583,7 @@ abstract class BaseGuardianInvitePeer
                 } // if obj2 already loaded
 
                 // Add the $obj1 (GuardianInvite) to $obj2 (Student)
-                // one to one relationship
-                $obj1->setStudent($obj2);
+                $obj2->addGuardianInvite($obj1);
 
             } // if joined row was not null
 
@@ -705,7 +704,7 @@ abstract class BaseGuardianInvitePeer
                 } // if obj2 loaded
 
                 // Add the $obj1 (GuardianInvite) to the collection in $obj2 (Student)
-                $obj1->setStudent($obj2);
+                $obj2->addGuardianInvite($obj1);
             } // if joined row not null
 
             $results[] = $obj1;
@@ -808,10 +807,10 @@ abstract class BaseGuardianInvitePeer
         if ($values instanceof Criteria) {
             $criteria = clone $values; // rename for clarity
 
-            $comparison = $criteria->getComparison(GuardianInvitePeer::STUDENT_ID);
-            $value = $criteria->remove(GuardianInvitePeer::STUDENT_ID);
+            $comparison = $criteria->getComparison(GuardianInvitePeer::CODE);
+            $value = $criteria->remove(GuardianInvitePeer::CODE);
             if ($value) {
-                $selectCriteria->add(GuardianInvitePeer::STUDENT_ID, $value, $comparison);
+                $selectCriteria->add(GuardianInvitePeer::CODE, $value, $comparison);
             } else {
                 $selectCriteria->setPrimaryTableName(GuardianInvitePeer::TABLE_NAME);
             }
@@ -890,7 +889,7 @@ abstract class BaseGuardianInvitePeer
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(GuardianInvitePeer::DATABASE_NAME);
-            $criteria->add(GuardianInvitePeer::STUDENT_ID, (array) $values, Criteria::IN);
+            $criteria->add(GuardianInvitePeer::CODE, (array) $values, Criteria::IN);
             // invalidate the cache for this object(s)
             foreach ((array) $values as $singleval) {
                 GuardianInvitePeer::removeInstanceFromPool($singleval);
@@ -958,7 +957,7 @@ abstract class BaseGuardianInvitePeer
     /**
      * Retrieve a single object by pkey.
      *
-     * @param      int $pk the primary key.
+     * @param      string $pk the primary key.
      * @param      PropelPDO $con the connection to use
      * @return GuardianInvite
      */
@@ -974,7 +973,7 @@ abstract class BaseGuardianInvitePeer
         }
 
         $criteria = new Criteria(GuardianInvitePeer::DATABASE_NAME);
-        $criteria->add(GuardianInvitePeer::STUDENT_ID, $pk);
+        $criteria->add(GuardianInvitePeer::CODE, $pk);
 
         $v = GuardianInvitePeer::doSelect($criteria, $con);
 
@@ -1001,7 +1000,7 @@ abstract class BaseGuardianInvitePeer
             $objs = array();
         } else {
             $criteria = new Criteria(GuardianInvitePeer::DATABASE_NAME);
-            $criteria->add(GuardianInvitePeer::STUDENT_ID, $pks, Criteria::IN);
+            $criteria->add(GuardianInvitePeer::CODE, $pks, Criteria::IN);
             $objs = GuardianInvitePeer::doSelect($criteria, $con);
         }
 

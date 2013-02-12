@@ -16,6 +16,7 @@ use Zerebral\FrontendBundle\Form\Type as FormType;
 use Zerebral\BusinessBundle\Model as Model;
 use Zerebral\BusinessBundle\Model\Course\CourseQuery;
 use Zerebral\BusinessBundle\Model\Course\Course;
+use Zerebral\BusinessBundle\Model\User\GuardianInviteQuery;
 use Zerebral\BusinessBundle\Model\User\GuardianInvite;
 
 
@@ -179,6 +180,22 @@ class InviteController extends \Zerebral\CommonBundle\Component\Controller
                 $guardianInvite->setCode($code);
                 $guardianInvite->setActivated(false);
                 $guardianInvite->save();
+
+                $message = \Swift_Message::newInstance()
+                    ->setSubject('Zerebral - Invitation Notice')
+                    ->setFrom('hello@zerebral.com')
+                    ->setTo($email)
+                    ->setBody(
+                    $this->renderView(
+                        'ZerebralFrontendBundle:Email:guardianInvite.html.twig',
+                        array(
+                            'code' => $code,
+                            'student' => $student,
+                            'host' => $this->getRequest()->getHttpHost()
+                        )
+                    )
+                );
+                $this->get('mailer')->send($message);
             }
 
             $this->setFlash('invites_send', 'Invitations have been sent');
@@ -187,5 +204,35 @@ class InviteController extends \Zerebral\CommonBundle\Component\Controller
         }
 
         return new \Zerebral\CommonBundle\HttpFoundation\FormJsonResponse($form);
+    }
+
+    /**
+     * @Route("/join/{code}", name="guardian_join")
+     * @Template()
+     */
+    public function guardianJoinAction($code)
+    {
+        /** @var GuardianInvite $guardianInvite  */
+        $guardianInvite = GuardianInviteQuery::create()->filterByCode($code)->filterByActivated(false)->findOne();
+
+        if (!is_null($this->getUser())) {
+            if (!is_null($guardianInvite)) {
+                /** @var \Zerebral\BusinessBundle\Model\User\Guardian $guardian  */
+                $guardian = $this->getRoleUser();
+                $guardian->addStudent($guardianInvite->getStudent());
+                $guardian->save();
+                $guardianInvite->setActivated(true);
+                $guardianInvite->save();
+                $this->setFlash('child_added', 'Student ' . $guardianInvite->getStudent()->getFullName() . ' was successfully added as your child');
+            }
+            return $this->redirect($this->generateUrl('dashboard'));
+        }
+
+        if (is_null($guardianInvite)) {
+            throw $this->createNotFoundException('This link is wrong or expired');
+        }
+
+        $this->getRequest()->getSession()->set('guardian_invite_code', $guardianInvite->getCode());
+        return $this->redirect($this->generateUrl('signup', array()));
     }
 }

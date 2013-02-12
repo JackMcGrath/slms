@@ -41,8 +41,8 @@ use Zerebral\BusinessBundle\Model\User\Student;
  * @method GuardianInvite findOne(PropelPDO $con = null) Return the first GuardianInvite matching the query
  * @method GuardianInvite findOneOrCreate(PropelPDO $con = null) Return the first GuardianInvite matching the query, or a new GuardianInvite object populated from the query conditions when no match is found
  *
+ * @method GuardianInvite findOneByStudentId(int $student_id) Return the first GuardianInvite filtered by the student_id column
  * @method GuardianInvite findOneByGuardianEmail(string $guardian_email) Return the first GuardianInvite filtered by the guardian_email column
- * @method GuardianInvite findOneByCode(string $code) Return the first GuardianInvite filtered by the code column
  * @method GuardianInvite findOneByActivated(boolean $activated) Return the first GuardianInvite filtered by the activated column
  *
  * @method array findByStudentId(int $student_id) Return GuardianInvite objects filtered by the student_id column
@@ -134,7 +134,7 @@ abstract class BaseGuardianInviteQuery extends ModelCriteria
      * @return   GuardianInvite A model object, or null if the key is not found
      * @throws   PropelException
      */
-     public function findOneByStudentId($key, $con = null)
+     public function findOneByCode($key, $con = null)
      {
         return $this->findPk($key, $con);
      }
@@ -151,10 +151,10 @@ abstract class BaseGuardianInviteQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `student_id`, `guardian_email`, `code`, `activated` FROM `guardian_invites` WHERE `student_id` = :p0';
+        $sql = 'SELECT `student_id`, `guardian_email`, `code`, `activated` FROM `guardian_invites` WHERE `code` = :p0';
         try {
             $stmt = $con->prepare($sql);
-            $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
+            $stmt->bindValue(':p0', $key, PDO::PARAM_STR);
             $stmt->execute();
         } catch (Exception $e) {
             Propel::log($e->getMessage(), Propel::LOG_ERR);
@@ -224,7 +224,7 @@ abstract class BaseGuardianInviteQuery extends ModelCriteria
     public function filterByPrimaryKey($key)
     {
 
-        return $this->addUsingAlias(GuardianInvitePeer::STUDENT_ID, $key, Criteria::EQUAL);
+        return $this->addUsingAlias(GuardianInvitePeer::CODE, $key, Criteria::EQUAL);
     }
 
     /**
@@ -237,7 +237,7 @@ abstract class BaseGuardianInviteQuery extends ModelCriteria
     public function filterByPrimaryKeys($keys)
     {
 
-        return $this->addUsingAlias(GuardianInvitePeer::STUDENT_ID, $keys, Criteria::IN);
+        return $this->addUsingAlias(GuardianInvitePeer::CODE, $keys, Criteria::IN);
     }
 
     /**
@@ -262,8 +262,22 @@ abstract class BaseGuardianInviteQuery extends ModelCriteria
      */
     public function filterByStudentId($studentId = null, $comparison = null)
     {
-        if (is_array($studentId) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($studentId)) {
+            $useMinMax = false;
+            if (isset($studentId['min'])) {
+                $this->addUsingAlias(GuardianInvitePeer::STUDENT_ID, $studentId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($studentId['max'])) {
+                $this->addUsingAlias(GuardianInvitePeer::STUDENT_ID, $studentId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(GuardianInvitePeer::STUDENT_ID, $studentId, $comparison);
@@ -440,7 +454,7 @@ abstract class BaseGuardianInviteQuery extends ModelCriteria
     public function prune($guardianInvite = null)
     {
         if ($guardianInvite) {
-            $this->addUsingAlias(GuardianInvitePeer::STUDENT_ID, $guardianInvite->getStudentId(), Criteria::NOT_EQUAL);
+            $this->addUsingAlias(GuardianInvitePeer::CODE, $guardianInvite->getCode(), Criteria::NOT_EQUAL);
         }
 
         return $this;
