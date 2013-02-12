@@ -20,6 +20,7 @@ use Zerebral\BusinessBundle\Model\Attendance\StudentAttendance;
 use Zerebral\BusinessBundle\Model\Course\Course;
 use Zerebral\BusinessBundle\Model\Course\CourseStudent;
 use Zerebral\BusinessBundle\Model\User\Guardian;
+use Zerebral\BusinessBundle\Model\User\GuardianInvite;
 use Zerebral\BusinessBundle\Model\User\Student;
 use Zerebral\BusinessBundle\Model\User\StudentGuardian;
 use Zerebral\BusinessBundle\Model\User\StudentPeer;
@@ -62,6 +63,10 @@ use Zerebral\BusinessBundle\Model\User\User;
  * @method StudentQuery leftJoinStudentGuardian($relationAlias = null) Adds a LEFT JOIN clause to the query using the StudentGuardian relation
  * @method StudentQuery rightJoinStudentGuardian($relationAlias = null) Adds a RIGHT JOIN clause to the query using the StudentGuardian relation
  * @method StudentQuery innerJoinStudentGuardian($relationAlias = null) Adds a INNER JOIN clause to the query using the StudentGuardian relation
+ *
+ * @method StudentQuery leftJoinGuardianInvite($relationAlias = null) Adds a LEFT JOIN clause to the query using the GuardianInvite relation
+ * @method StudentQuery rightJoinGuardianInvite($relationAlias = null) Adds a RIGHT JOIN clause to the query using the GuardianInvite relation
+ * @method StudentQuery innerJoinGuardianInvite($relationAlias = null) Adds a INNER JOIN clause to the query using the GuardianInvite relation
  *
  * @method Student findOne(PropelPDO $con = null) Return the first Student matching the query
  * @method Student findOneOrCreate(PropelPDO $con = null) Return the first Student matching the query, or a new Student object populated from the query conditions when no match is found
@@ -794,6 +799,80 @@ abstract class BaseStudentQuery extends ModelCriteria
         return $this
             ->joinStudentGuardian($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'StudentGuardian', '\Zerebral\BusinessBundle\Model\User\StudentGuardianQuery');
+    }
+
+    /**
+     * Filter the query by a related GuardianInvite object
+     *
+     * @param   GuardianInvite|PropelObjectCollection $guardianInvite  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   StudentQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByGuardianInvite($guardianInvite, $comparison = null)
+    {
+        if ($guardianInvite instanceof GuardianInvite) {
+            return $this
+                ->addUsingAlias(StudentPeer::ID, $guardianInvite->getStudentId(), $comparison);
+        } elseif ($guardianInvite instanceof PropelObjectCollection) {
+            return $this
+                ->useGuardianInviteQuery()
+                ->filterByPrimaryKeys($guardianInvite->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByGuardianInvite() only accepts arguments of type GuardianInvite or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the GuardianInvite relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return StudentQuery The current query, for fluid interface
+     */
+    public function joinGuardianInvite($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('GuardianInvite');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'GuardianInvite');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the GuardianInvite relation GuardianInvite object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Zerebral\BusinessBundle\Model\User\GuardianInviteQuery A secondary query class using the current class as primary query
+     */
+    public function useGuardianInviteQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinGuardianInvite($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'GuardianInvite', '\Zerebral\BusinessBundle\Model\User\GuardianInviteQuery');
     }
 
     /**

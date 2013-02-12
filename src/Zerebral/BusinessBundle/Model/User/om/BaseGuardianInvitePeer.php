@@ -11,63 +11,55 @@ use \PropelException;
 use \PropelPDO;
 use Glorpen\PropelEvent\PropelEventBundle\Dispatcher\EventDispatcherProxy;
 use Glorpen\PropelEvent\PropelEventBundle\Events\PeerEvent;
-use Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentPeer;
-use Zerebral\BusinessBundle\Model\Attendance\StudentAttendancePeer;
-use Zerebral\BusinessBundle\Model\Course\CourseStudentPeer;
+use Zerebral\BusinessBundle\Model\User\GuardianInvite;
 use Zerebral\BusinessBundle\Model\User\GuardianInvitePeer;
-use Zerebral\BusinessBundle\Model\User\Student;
-use Zerebral\BusinessBundle\Model\User\StudentGuardianPeer;
 use Zerebral\BusinessBundle\Model\User\StudentPeer;
-use Zerebral\BusinessBundle\Model\User\UserPeer;
-use Zerebral\BusinessBundle\Model\User\map\StudentTableMap;
+use Zerebral\BusinessBundle\Model\User\map\GuardianInviteTableMap;
 
-abstract class BaseStudentPeer
+abstract class BaseGuardianInvitePeer
 {
 
     /** the default database name for this class */
     const DATABASE_NAME = 'default';
 
     /** the table name for this class */
-    const TABLE_NAME = 'students';
+    const TABLE_NAME = 'guardian_invites';
 
     /** the related Propel class for this table */
-    const OM_CLASS = 'Zerebral\\BusinessBundle\\Model\\User\\Student';
+    const OM_CLASS = 'Zerebral\\BusinessBundle\\Model\\User\\GuardianInvite';
 
     /** the related TableMap class for this table */
-    const TM_CLASS = 'StudentTableMap';
+    const TM_CLASS = 'GuardianInviteTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 5;
+    const NUM_COLUMNS = 4;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 5;
+    const NUM_HYDRATE_COLUMNS = 4;
 
-    /** the column name for the id field */
-    const ID = 'students.id';
+    /** the column name for the student_id field */
+    const STUDENT_ID = 'guardian_invites.student_id';
 
-    /** the column name for the user_id field */
-    const USER_ID = 'students.user_id';
+    /** the column name for the guardian_email field */
+    const GUARDIAN_EMAIL = 'guardian_invites.guardian_email';
 
-    /** the column name for the bio field */
-    const BIO = 'students.bio';
+    /** the column name for the code field */
+    const CODE = 'guardian_invites.code';
 
-    /** the column name for the activities field */
-    const ACTIVITIES = 'students.activities';
-
-    /** the column name for the interests field */
-    const INTERESTS = 'students.interests';
+    /** the column name for the activated field */
+    const ACTIVATED = 'guardian_invites.activated';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
 
     /**
-     * An identiy map to hold any loaded instances of Student objects.
+     * An identiy map to hold any loaded instances of GuardianInvite objects.
      * This must be public so that other peer classes can access this when hydrating from JOIN
      * queries.
-     * @var        array Student[]
+     * @var        array GuardianInvite[]
      */
     public static $instances = array();
 
@@ -76,30 +68,30 @@ abstract class BaseStudentPeer
      * holds an array of fieldnames
      *
      * first dimension keys are the type constants
-     * e.g. StudentPeer::$fieldNames[StudentPeer::TYPE_PHPNAME][0] = 'Id'
+     * e.g. GuardianInvitePeer::$fieldNames[GuardianInvitePeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'UserId', 'Bio', 'Activities', 'Interests', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'userId', 'bio', 'activities', 'interests', ),
-        BasePeer::TYPE_COLNAME => array (StudentPeer::ID, StudentPeer::USER_ID, StudentPeer::BIO, StudentPeer::ACTIVITIES, StudentPeer::INTERESTS, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'USER_ID', 'BIO', 'ACTIVITIES', 'INTERESTS', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'user_id', 'bio', 'activities', 'interests', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+        BasePeer::TYPE_PHPNAME => array ('StudentId', 'GuardianEmail', 'Code', 'Activated', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('studentId', 'guardianEmail', 'code', 'activated', ),
+        BasePeer::TYPE_COLNAME => array (GuardianInvitePeer::STUDENT_ID, GuardianInvitePeer::GUARDIAN_EMAIL, GuardianInvitePeer::CODE, GuardianInvitePeer::ACTIVATED, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('STUDENT_ID', 'GUARDIAN_EMAIL', 'CODE', 'ACTIVATED', ),
+        BasePeer::TYPE_FIELDNAME => array ('student_id', 'guardian_email', 'code', 'activated', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
     /**
      * holds an array of keys for quick access to the fieldnames array
      *
      * first dimension keys are the type constants
-     * e.g. StudentPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
+     * e.g. GuardianInvitePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'UserId' => 1, 'Bio' => 2, 'Activities' => 3, 'Interests' => 4, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'userId' => 1, 'bio' => 2, 'activities' => 3, 'interests' => 4, ),
-        BasePeer::TYPE_COLNAME => array (StudentPeer::ID => 0, StudentPeer::USER_ID => 1, StudentPeer::BIO => 2, StudentPeer::ACTIVITIES => 3, StudentPeer::INTERESTS => 4, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'USER_ID' => 1, 'BIO' => 2, 'ACTIVITIES' => 3, 'INTERESTS' => 4, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'user_id' => 1, 'bio' => 2, 'activities' => 3, 'interests' => 4, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+        BasePeer::TYPE_PHPNAME => array ('StudentId' => 0, 'GuardianEmail' => 1, 'Code' => 2, 'Activated' => 3, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('studentId' => 0, 'guardianEmail' => 1, 'code' => 2, 'activated' => 3, ),
+        BasePeer::TYPE_COLNAME => array (GuardianInvitePeer::STUDENT_ID => 0, GuardianInvitePeer::GUARDIAN_EMAIL => 1, GuardianInvitePeer::CODE => 2, GuardianInvitePeer::ACTIVATED => 3, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('STUDENT_ID' => 0, 'GUARDIAN_EMAIL' => 1, 'CODE' => 2, 'ACTIVATED' => 3, ),
+        BasePeer::TYPE_FIELDNAME => array ('student_id' => 0, 'guardian_email' => 1, 'code' => 2, 'activated' => 3, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
     /**
@@ -114,10 +106,10 @@ abstract class BaseStudentPeer
      */
     public static function translateFieldName($name, $fromType, $toType)
     {
-        $toNames = StudentPeer::getFieldNames($toType);
-        $key = isset(StudentPeer::$fieldKeys[$fromType][$name]) ? StudentPeer::$fieldKeys[$fromType][$name] : null;
+        $toNames = GuardianInvitePeer::getFieldNames($toType);
+        $key = isset(GuardianInvitePeer::$fieldKeys[$fromType][$name]) ? GuardianInvitePeer::$fieldKeys[$fromType][$name] : null;
         if ($key === null) {
-            throw new PropelException("'$name' could not be found in the field names of type '$fromType'. These are: " . print_r(StudentPeer::$fieldKeys[$fromType], true));
+            throw new PropelException("'$name' could not be found in the field names of type '$fromType'. These are: " . print_r(GuardianInvitePeer::$fieldKeys[$fromType], true));
         }
 
         return $toNames[$key];
@@ -134,11 +126,11 @@ abstract class BaseStudentPeer
      */
     public static function getFieldNames($type = BasePeer::TYPE_PHPNAME)
     {
-        if (!array_key_exists($type, StudentPeer::$fieldNames)) {
+        if (!array_key_exists($type, GuardianInvitePeer::$fieldNames)) {
             throw new PropelException('Method getFieldNames() expects the parameter $type to be one of the class constants BasePeer::TYPE_PHPNAME, BasePeer::TYPE_STUDLYPHPNAME, BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_NUM. ' . $type . ' was given.');
         }
 
-        return StudentPeer::$fieldNames[$type];
+        return GuardianInvitePeer::$fieldNames[$type];
     }
 
     /**
@@ -150,12 +142,12 @@ abstract class BaseStudentPeer
      *		$c->addJoin(TablePeer::alias("alias1", TablePeer::PRIMARY_KEY_COLUMN), TablePeer::PRIMARY_KEY_COLUMN);
      * </code>
      * @param      string $alias The alias for the current table.
-     * @param      string $column The column name for current table. (i.e. StudentPeer::COLUMN_NAME).
+     * @param      string $column The column name for current table. (i.e. GuardianInvitePeer::COLUMN_NAME).
      * @return string
      */
     public static function alias($alias, $column)
     {
-        return str_replace(StudentPeer::TABLE_NAME.'.', $alias.'.', $column);
+        return str_replace(GuardianInvitePeer::TABLE_NAME.'.', $alias.'.', $column);
     }
 
     /**
@@ -173,17 +165,15 @@ abstract class BaseStudentPeer
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(StudentPeer::ID);
-            $criteria->addSelectColumn(StudentPeer::USER_ID);
-            $criteria->addSelectColumn(StudentPeer::BIO);
-            $criteria->addSelectColumn(StudentPeer::ACTIVITIES);
-            $criteria->addSelectColumn(StudentPeer::INTERESTS);
+            $criteria->addSelectColumn(GuardianInvitePeer::STUDENT_ID);
+            $criteria->addSelectColumn(GuardianInvitePeer::GUARDIAN_EMAIL);
+            $criteria->addSelectColumn(GuardianInvitePeer::CODE);
+            $criteria->addSelectColumn(GuardianInvitePeer::ACTIVATED);
         } else {
-            $criteria->addSelectColumn($alias . '.id');
-            $criteria->addSelectColumn($alias . '.user_id');
-            $criteria->addSelectColumn($alias . '.bio');
-            $criteria->addSelectColumn($alias . '.activities');
-            $criteria->addSelectColumn($alias . '.interests');
+            $criteria->addSelectColumn($alias . '.student_id');
+            $criteria->addSelectColumn($alias . '.guardian_email');
+            $criteria->addSelectColumn($alias . '.code');
+            $criteria->addSelectColumn($alias . '.activated');
         }
     }
 
@@ -203,21 +193,21 @@ abstract class BaseStudentPeer
         // We need to set the primary table name, since in the case that there are no WHERE columns
         // it will be impossible for the BasePeer::createSelectSql() method to determine which
         // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(StudentPeer::TABLE_NAME);
+        $criteria->setPrimaryTableName(GuardianInvitePeer::TABLE_NAME);
 
         if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
             $criteria->setDistinct();
         }
 
         if (!$criteria->hasSelectClause()) {
-            StudentPeer::addSelectColumns($criteria);
+            GuardianInvitePeer::addSelectColumns($criteria);
         }
 
         $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
-        $criteria->setDbName(StudentPeer::DATABASE_NAME); // Set the correct dbName
+        $criteria->setDbName(GuardianInvitePeer::DATABASE_NAME); // Set the correct dbName
 
         if ($con === null) {
-            $con = Propel::getConnection(StudentPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(GuardianInvitePeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
         // BasePeer returns a PDOStatement
         $stmt = BasePeer::doCount($criteria, $con);
@@ -236,7 +226,7 @@ abstract class BaseStudentPeer
      *
      * @param      Criteria $criteria object used to create the SELECT statement.
      * @param      PropelPDO $con
-     * @return                 Student
+     * @return                 GuardianInvite
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -244,7 +234,7 @@ abstract class BaseStudentPeer
     {
         $critcopy = clone $criteria;
         $critcopy->setLimit(1);
-        $objects = StudentPeer::doSelect($critcopy, $con);
+        $objects = GuardianInvitePeer::doSelect($critcopy, $con);
         if ($objects) {
             return $objects[0];
         }
@@ -262,7 +252,7 @@ abstract class BaseStudentPeer
      */
     public static function doSelect(Criteria $criteria, PropelPDO $con = null)
     {
-        return StudentPeer::populateObjects(StudentPeer::doSelectStmt($criteria, $con));
+        return GuardianInvitePeer::populateObjects(GuardianInvitePeer::doSelectStmt($criteria, $con));
     }
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
@@ -280,16 +270,16 @@ abstract class BaseStudentPeer
     public static function doSelectStmt(Criteria $criteria, PropelPDO $con = null)
     {
         if ($con === null) {
-            $con = Propel::getConnection(StudentPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(GuardianInvitePeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
         if (!$criteria->hasSelectClause()) {
             $criteria = clone $criteria;
-            StudentPeer::addSelectColumns($criteria);
+            GuardianInvitePeer::addSelectColumns($criteria);
         }
 
         // Set the correct dbName
-        $criteria->setDbName(StudentPeer::DATABASE_NAME);
+        $criteria->setDbName(GuardianInvitePeer::DATABASE_NAME);
 
         // BasePeer returns a PDOStatement
         return BasePeer::doSelect($criteria, $con);
@@ -303,16 +293,16 @@ abstract class BaseStudentPeer
      * to the cache in order to ensure that the same objects are always returned by doSelect*()
      * and retrieveByPK*() calls.
      *
-     * @param      Student $obj A Student object.
+     * @param      GuardianInvite $obj A GuardianInvite object.
      * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
      */
     public static function addInstanceToPool($obj, $key = null)
     {
         if (Propel::isInstancePoolingEnabled()) {
             if ($key === null) {
-                $key = (string) $obj->getId();
+                $key = (string) $obj->getStudentId();
             } // if key === null
-            StudentPeer::$instances[$key] = $obj;
+            GuardianInvitePeer::$instances[$key] = $obj;
         }
     }
 
@@ -324,7 +314,7 @@ abstract class BaseStudentPeer
      * methods in your stub classes -- you may need to explicitly remove objects
      * from the cache in order to prevent returning objects that no longer exist.
      *
-     * @param      mixed $value A Student object or a primary key value.
+     * @param      mixed $value A GuardianInvite object or a primary key value.
      *
      * @return void
      * @throws PropelException - if the value is invalid.
@@ -332,17 +322,17 @@ abstract class BaseStudentPeer
     public static function removeInstanceFromPool($value)
     {
         if (Propel::isInstancePoolingEnabled() && $value !== null) {
-            if (is_object($value) && $value instanceof Student) {
-                $key = (string) $value->getId();
+            if (is_object($value) && $value instanceof GuardianInvite) {
+                $key = (string) $value->getStudentId();
             } elseif (is_scalar($value)) {
                 // assume we've been passed a primary key
                 $key = (string) $value;
             } else {
-                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or Student object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
+                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or GuardianInvite object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
                 throw $e;
             }
 
-            unset(StudentPeer::$instances[$key]);
+            unset(GuardianInvitePeer::$instances[$key]);
         }
     } // removeInstanceFromPool()
 
@@ -353,14 +343,14 @@ abstract class BaseStudentPeer
      * a multi-column primary key, a serialize()d version of the primary key will be returned.
      *
      * @param      string $key The key (@see getPrimaryKeyHash()) for this instance.
-     * @return   Student Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
+     * @return   GuardianInvite Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
      * @see        getPrimaryKeyHash()
      */
     public static function getInstanceFromPool($key)
     {
         if (Propel::isInstancePoolingEnabled()) {
-            if (isset(StudentPeer::$instances[$key])) {
-                return StudentPeer::$instances[$key];
+            if (isset(GuardianInvitePeer::$instances[$key])) {
+                return GuardianInvitePeer::$instances[$key];
             }
         }
 
@@ -376,35 +366,20 @@ abstract class BaseStudentPeer
     {
       if ($and_clear_all_references)
       {
-        foreach (StudentPeer::$instances as $instance)
+        foreach (GuardianInvitePeer::$instances as $instance)
         {
           $instance->clearAllReferences(true);
         }
       }
-        StudentPeer::$instances = array();
+        GuardianInvitePeer::$instances = array();
     }
 
     /**
-     * Method to invalidate the instance pool of all tables related to students
+     * Method to invalidate the instance pool of all tables related to guardian_invites
      * by a foreign key with ON DELETE CASCADE
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in StudentAssignmentPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        StudentAssignmentPeer::clearInstancePool();
-        // Invalidate objects in StudentAttendancePeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        StudentAttendancePeer::clearInstancePool();
-        // Invalidate objects in CourseStudentPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        CourseStudentPeer::clearInstancePool();
-        // Invalidate objects in StudentGuardianPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        StudentGuardianPeer::clearInstancePool();
-        // Invalidate objects in GuardianInvitePeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        GuardianInvitePeer::clearInstancePool();
     }
 
     /**
@@ -454,11 +429,11 @@ abstract class BaseStudentPeer
         $results = array();
 
         // set the class once to avoid overhead in the loop
-        $cls = StudentPeer::getOMClass();
+        $cls = GuardianInvitePeer::getOMClass();
         // populate the object(s)
         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key = StudentPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj = StudentPeer::getInstanceFromPool($key))) {
+            $key = GuardianInvitePeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj = GuardianInvitePeer::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -467,7 +442,7 @@ abstract class BaseStudentPeer
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                StudentPeer::addInstanceToPool($obj, $key);
+                GuardianInvitePeer::addInstanceToPool($obj, $key);
             } // if key exists
         }
         $stmt->closeCursor();
@@ -481,21 +456,21 @@ abstract class BaseStudentPeer
      * @param      int $startcol The 0-based offset for reading from the resultset row.
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
-     * @return array (Student object, last column rank)
+     * @return array (GuardianInvite object, last column rank)
      */
     public static function populateObject($row, $startcol = 0)
     {
-        $key = StudentPeer::getPrimaryKeyHashFromRow($row, $startcol);
-        if (null !== ($obj = StudentPeer::getInstanceFromPool($key))) {
+        $key = GuardianInvitePeer::getPrimaryKeyHashFromRow($row, $startcol);
+        if (null !== ($obj = GuardianInvitePeer::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $startcol, true); // rehydrate
-            $col = $startcol + StudentPeer::NUM_HYDRATE_COLUMNS;
+            $col = $startcol + GuardianInvitePeer::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = StudentPeer::OM_CLASS;
+            $cls = GuardianInvitePeer::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $startcol);
-            StudentPeer::addInstanceToPool($obj, $key);
+            GuardianInvitePeer::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -503,7 +478,7 @@ abstract class BaseStudentPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related User table
+     * Returns the number of rows matching criteria, joining the related Student table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -511,7 +486,7 @@ abstract class BaseStudentPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinUser(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinStudent(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -519,26 +494,26 @@ abstract class BaseStudentPeer
         // We need to set the primary table name, since in the case that there are no WHERE columns
         // it will be impossible for the BasePeer::createSelectSql() method to determine which
         // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(StudentPeer::TABLE_NAME);
+        $criteria->setPrimaryTableName(GuardianInvitePeer::TABLE_NAME);
 
         if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
             $criteria->setDistinct();
         }
 
         if (!$criteria->hasSelectClause()) {
-            StudentPeer::addSelectColumns($criteria);
+            GuardianInvitePeer::addSelectColumns($criteria);
         }
 
         $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
 
         // Set the correct dbName
-        $criteria->setDbName(StudentPeer::DATABASE_NAME);
+        $criteria->setDbName(GuardianInvitePeer::DATABASE_NAME);
 
         if ($con === null) {
-            $con = Propel::getConnection(StudentPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(GuardianInvitePeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(StudentPeer::USER_ID, UserPeer::ID, $join_behavior);
+        $criteria->addJoin(GuardianInvitePeer::STUDENT_ID, StudentPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -554,61 +529,62 @@ abstract class BaseStudentPeer
 
 
     /**
-     * Selects a collection of Student objects pre-filled with their User objects.
+     * Selects a collection of GuardianInvite objects pre-filled with their Student objects.
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of Student objects.
+     * @return array           Array of GuardianInvite objects.
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinUser(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinStudent(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
         // Set the correct dbName if it has not been overridden
         if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(StudentPeer::DATABASE_NAME);
+            $criteria->setDbName(GuardianInvitePeer::DATABASE_NAME);
         }
 
+        GuardianInvitePeer::addSelectColumns($criteria);
+        $startcol = GuardianInvitePeer::NUM_HYDRATE_COLUMNS;
         StudentPeer::addSelectColumns($criteria);
-        $startcol = StudentPeer::NUM_HYDRATE_COLUMNS;
-        UserPeer::addSelectColumns($criteria);
 
-        $criteria->addJoin(StudentPeer::USER_ID, UserPeer::ID, $join_behavior);
+        $criteria->addJoin(GuardianInvitePeer::STUDENT_ID, StudentPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
 
         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = StudentPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = StudentPeer::getInstanceFromPool($key1))) {
+            $key1 = GuardianInvitePeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = GuardianInvitePeer::getInstanceFromPool($key1))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj1->hydrate($row, 0, true); // rehydrate
             } else {
 
-                $cls = StudentPeer::getOMClass();
+                $cls = GuardianInvitePeer::getOMClass();
 
                 $obj1 = new $cls();
                 $obj1->hydrate($row);
-                StudentPeer::addInstanceToPool($obj1, $key1);
+                GuardianInvitePeer::addInstanceToPool($obj1, $key1);
             } // if $obj1 already loaded
 
-            $key2 = UserPeer::getPrimaryKeyHashFromRow($row, $startcol);
+            $key2 = StudentPeer::getPrimaryKeyHashFromRow($row, $startcol);
             if ($key2 !== null) {
-                $obj2 = UserPeer::getInstanceFromPool($key2);
+                $obj2 = StudentPeer::getInstanceFromPool($key2);
                 if (!$obj2) {
 
-                    $cls = UserPeer::getOMClass();
+                    $cls = StudentPeer::getOMClass();
 
                     $obj2 = new $cls();
                     $obj2->hydrate($row, $startcol);
-                    UserPeer::addInstanceToPool($obj2, $key2);
+                    StudentPeer::addInstanceToPool($obj2, $key2);
                 } // if obj2 already loaded
 
-                // Add the $obj1 (Student) to $obj2 (User)
-                $obj2->addStudent($obj1);
+                // Add the $obj1 (GuardianInvite) to $obj2 (Student)
+                // one to one relationship
+                $obj1->setStudent($obj2);
 
             } // if joined row was not null
 
@@ -637,26 +613,26 @@ abstract class BaseStudentPeer
         // We need to set the primary table name, since in the case that there are no WHERE columns
         // it will be impossible for the BasePeer::createSelectSql() method to determine which
         // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(StudentPeer::TABLE_NAME);
+        $criteria->setPrimaryTableName(GuardianInvitePeer::TABLE_NAME);
 
         if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
             $criteria->setDistinct();
         }
 
         if (!$criteria->hasSelectClause()) {
-            StudentPeer::addSelectColumns($criteria);
+            GuardianInvitePeer::addSelectColumns($criteria);
         }
 
         $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
 
         // Set the correct dbName
-        $criteria->setDbName(StudentPeer::DATABASE_NAME);
+        $criteria->setDbName(GuardianInvitePeer::DATABASE_NAME);
 
         if ($con === null) {
-            $con = Propel::getConnection(StudentPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(GuardianInvitePeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(StudentPeer::USER_ID, UserPeer::ID, $join_behavior);
+        $criteria->addJoin(GuardianInvitePeer::STUDENT_ID, StudentPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -671,12 +647,12 @@ abstract class BaseStudentPeer
     }
 
     /**
-     * Selects a collection of Student objects pre-filled with all related objects.
+     * Selects a collection of GuardianInvite objects pre-filled with all related objects.
      *
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of Student objects.
+     * @return array           Array of GuardianInvite objects.
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -686,50 +662,50 @@ abstract class BaseStudentPeer
 
         // Set the correct dbName if it has not been overridden
         if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(StudentPeer::DATABASE_NAME);
+            $criteria->setDbName(GuardianInvitePeer::DATABASE_NAME);
         }
 
+        GuardianInvitePeer::addSelectColumns($criteria);
+        $startcol2 = GuardianInvitePeer::NUM_HYDRATE_COLUMNS;
+
         StudentPeer::addSelectColumns($criteria);
-        $startcol2 = StudentPeer::NUM_HYDRATE_COLUMNS;
+        $startcol3 = $startcol2 + StudentPeer::NUM_HYDRATE_COLUMNS;
 
-        UserPeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + UserPeer::NUM_HYDRATE_COLUMNS;
-
-        $criteria->addJoin(StudentPeer::USER_ID, UserPeer::ID, $join_behavior);
+        $criteria->addJoin(GuardianInvitePeer::STUDENT_ID, StudentPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
 
         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = StudentPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = StudentPeer::getInstanceFromPool($key1))) {
+            $key1 = GuardianInvitePeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = GuardianInvitePeer::getInstanceFromPool($key1))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj1->hydrate($row, 0, true); // rehydrate
             } else {
-                $cls = StudentPeer::getOMClass();
+                $cls = GuardianInvitePeer::getOMClass();
 
                 $obj1 = new $cls();
                 $obj1->hydrate($row);
-                StudentPeer::addInstanceToPool($obj1, $key1);
+                GuardianInvitePeer::addInstanceToPool($obj1, $key1);
             } // if obj1 already loaded
 
-            // Add objects for joined User rows
+            // Add objects for joined Student rows
 
-            $key2 = UserPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+            $key2 = StudentPeer::getPrimaryKeyHashFromRow($row, $startcol2);
             if ($key2 !== null) {
-                $obj2 = UserPeer::getInstanceFromPool($key2);
+                $obj2 = StudentPeer::getInstanceFromPool($key2);
                 if (!$obj2) {
 
-                    $cls = UserPeer::getOMClass();
+                    $cls = StudentPeer::getOMClass();
 
                     $obj2 = new $cls();
                     $obj2->hydrate($row, $startcol2);
-                    UserPeer::addInstanceToPool($obj2, $key2);
+                    StudentPeer::addInstanceToPool($obj2, $key2);
                 } // if obj2 loaded
 
-                // Add the $obj1 (Student) to the collection in $obj2 (User)
-                $obj2->addStudent($obj1);
+                // Add the $obj1 (GuardianInvite) to the collection in $obj2 (Student)
+                $obj1->setStudent($obj2);
             } // if joined row not null
 
             $results[] = $obj1;
@@ -748,7 +724,7 @@ abstract class BaseStudentPeer
      */
     public static function getTableMap()
     {
-        return Propel::getDatabaseMap(StudentPeer::DATABASE_NAME)->getTable(StudentPeer::TABLE_NAME);
+        return Propel::getDatabaseMap(GuardianInvitePeer::DATABASE_NAME)->getTable(GuardianInvitePeer::TABLE_NAME);
     }
 
     /**
@@ -756,9 +732,9 @@ abstract class BaseStudentPeer
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getDatabaseMap(BaseStudentPeer::DATABASE_NAME);
-      if (!$dbMap->hasTable(BaseStudentPeer::TABLE_NAME)) {
-        $dbMap->addTableObject(new StudentTableMap());
+      $dbMap = Propel::getDatabaseMap(BaseGuardianInvitePeer::DATABASE_NAME);
+      if (!$dbMap->hasTable(BaseGuardianInvitePeer::TABLE_NAME)) {
+        $dbMap->addTableObject(new GuardianInviteTableMap());
       }
     }
 
@@ -770,13 +746,13 @@ abstract class BaseStudentPeer
      */
     public static function getOMClass()
     {
-        return StudentPeer::OM_CLASS;
+        return GuardianInvitePeer::OM_CLASS;
     }
 
     /**
-     * Performs an INSERT on the database, given a Student or Criteria object.
+     * Performs an INSERT on the database, given a GuardianInvite or Criteria object.
      *
-     * @param      mixed $values Criteria or Student object containing data that is used to create the INSERT statement.
+     * @param      mixed $values Criteria or GuardianInvite object containing data that is used to create the INSERT statement.
      * @param      PropelPDO $con the PropelPDO connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -785,22 +761,18 @@ abstract class BaseStudentPeer
     public static function doInsert($values, PropelPDO $con = null)
     {
         if ($con === null) {
-            $con = Propel::getConnection(StudentPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(GuardianInvitePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         if ($values instanceof Criteria) {
             $criteria = clone $values; // rename for clarity
         } else {
-            $criteria = $values->buildCriteria(); // build Criteria from Student object
-        }
-
-        if ($criteria->containsKey(StudentPeer::ID) && $criteria->keyContainsValue(StudentPeer::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.StudentPeer::ID.')');
+            $criteria = $values->buildCriteria(); // build Criteria from GuardianInvite object
         }
 
 
         // Set the correct dbName
-        $criteria->setDbName(StudentPeer::DATABASE_NAME);
+        $criteria->setDbName(GuardianInvitePeer::DATABASE_NAME);
 
         try {
             // use transaction because $criteria could contain info
@@ -817,9 +789,9 @@ abstract class BaseStudentPeer
     }
 
     /**
-     * Performs an UPDATE on the database, given a Student or Criteria object.
+     * Performs an UPDATE on the database, given a GuardianInvite or Criteria object.
      *
-     * @param      mixed $values Criteria or Student object containing data that is used to create the UPDATE statement.
+     * @param      mixed $values Criteria or GuardianInvite object containing data that is used to create the UPDATE statement.
      * @param      PropelPDO $con The connection to use (specify PropelPDO connection object to exert more control over transactions).
      * @return int             The number of affected rows (if supported by underlying database driver).
      * @throws PropelException Any exceptions caught during processing will be
@@ -828,35 +800,35 @@ abstract class BaseStudentPeer
     public static function doUpdate($values, PropelPDO $con = null)
     {
         if ($con === null) {
-            $con = Propel::getConnection(StudentPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(GuardianInvitePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
-        $selectCriteria = new Criteria(StudentPeer::DATABASE_NAME);
+        $selectCriteria = new Criteria(GuardianInvitePeer::DATABASE_NAME);
 
         if ($values instanceof Criteria) {
             $criteria = clone $values; // rename for clarity
 
-            $comparison = $criteria->getComparison(StudentPeer::ID);
-            $value = $criteria->remove(StudentPeer::ID);
+            $comparison = $criteria->getComparison(GuardianInvitePeer::STUDENT_ID);
+            $value = $criteria->remove(GuardianInvitePeer::STUDENT_ID);
             if ($value) {
-                $selectCriteria->add(StudentPeer::ID, $value, $comparison);
+                $selectCriteria->add(GuardianInvitePeer::STUDENT_ID, $value, $comparison);
             } else {
-                $selectCriteria->setPrimaryTableName(StudentPeer::TABLE_NAME);
+                $selectCriteria->setPrimaryTableName(GuardianInvitePeer::TABLE_NAME);
             }
 
-        } else { // $values is Student object
+        } else { // $values is GuardianInvite object
             $criteria = $values->buildCriteria(); // gets full criteria
             $selectCriteria = $values->buildPkeyCriteria(); // gets criteria w/ primary key(s)
         }
 
         // set the correct dbName
-        $criteria->setDbName(StudentPeer::DATABASE_NAME);
+        $criteria->setDbName(GuardianInvitePeer::DATABASE_NAME);
 
         return BasePeer::doUpdate($selectCriteria, $criteria, $con);
     }
 
     /**
-     * Deletes all rows from the students table.
+     * Deletes all rows from the guardian_invites table.
      *
      * @param      PropelPDO $con the connection to use
      * @return int             The number of affected rows (if supported by underlying database driver).
@@ -865,19 +837,19 @@ abstract class BaseStudentPeer
     public static function doDeleteAll(PropelPDO $con = null)
     {
         if ($con === null) {
-            $con = Propel::getConnection(StudentPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(GuardianInvitePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
         $affectedRows = 0; // initialize var to track total num of affected rows
         try {
             // use transaction because $criteria could contain info
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
-            $affectedRows += BasePeer::doDeleteAll(StudentPeer::TABLE_NAME, $con, StudentPeer::DATABASE_NAME);
+            $affectedRows += BasePeer::doDeleteAll(GuardianInvitePeer::TABLE_NAME, $con, GuardianInvitePeer::DATABASE_NAME);
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
             // instances get re-added by the select statement contained therein).
-            StudentPeer::clearInstancePool();
-            StudentPeer::clearRelatedInstancePool();
+            GuardianInvitePeer::clearInstancePool();
+            GuardianInvitePeer::clearRelatedInstancePool();
             $con->commit();
 
             return $affectedRows;
@@ -888,9 +860,9 @@ abstract class BaseStudentPeer
     }
 
     /**
-     * Performs a DELETE on the database, given a Student or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a GuardianInvite or Criteria object OR a primary key value.
      *
-     * @param      mixed $values Criteria or Student object or primary key or array of primary keys
+     * @param      mixed $values Criteria or GuardianInvite object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param      PropelPDO $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -901,32 +873,32 @@ abstract class BaseStudentPeer
      public static function doDelete($values, PropelPDO $con = null)
      {
         if ($con === null) {
-            $con = Propel::getConnection(StudentPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(GuardianInvitePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         if ($values instanceof Criteria) {
             // invalidate the cache for all objects of this type, since we have no
             // way of knowing (without running a query) what objects should be invalidated
             // from the cache based on this Criteria.
-            StudentPeer::clearInstancePool();
+            GuardianInvitePeer::clearInstancePool();
             // rename for clarity
             $criteria = clone $values;
-        } elseif ($values instanceof Student) { // it's a model object
+        } elseif ($values instanceof GuardianInvite) { // it's a model object
             // invalidate the cache for this single object
-            StudentPeer::removeInstanceFromPool($values);
+            GuardianInvitePeer::removeInstanceFromPool($values);
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(StudentPeer::DATABASE_NAME);
-            $criteria->add(StudentPeer::ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(GuardianInvitePeer::DATABASE_NAME);
+            $criteria->add(GuardianInvitePeer::STUDENT_ID, (array) $values, Criteria::IN);
             // invalidate the cache for this object(s)
             foreach ((array) $values as $singleval) {
-                StudentPeer::removeInstanceFromPool($singleval);
+                GuardianInvitePeer::removeInstanceFromPool($singleval);
             }
         }
 
         // Set the correct dbName
-        $criteria->setDbName(StudentPeer::DATABASE_NAME);
+        $criteria->setDbName(GuardianInvitePeer::DATABASE_NAME);
 
         $affectedRows = 0; // initialize var to track total num of affected rows
 
@@ -936,7 +908,7 @@ abstract class BaseStudentPeer
             $con->beginTransaction();
 
             $affectedRows += BasePeer::doDelete($criteria, $con);
-            StudentPeer::clearRelatedInstancePool();
+            GuardianInvitePeer::clearRelatedInstancePool();
             $con->commit();
 
             return $affectedRows;
@@ -947,13 +919,13 @@ abstract class BaseStudentPeer
     }
 
     /**
-     * Validates all modified columns of given Student object.
+     * Validates all modified columns of given GuardianInvite object.
      * If parameter $columns is either a single column name or an array of column names
      * than only those columns are validated.
      *
      * NOTICE: This does not apply to primary or foreign keys for now.
      *
-     * @param      Student $obj The object to validate.
+     * @param      GuardianInvite $obj The object to validate.
      * @param      mixed $cols Column name or array of column names.
      *
      * @return mixed TRUE if all columns are valid or the error message of the first invalid column.
@@ -963,8 +935,8 @@ abstract class BaseStudentPeer
         $columns = array();
 
         if ($cols) {
-            $dbMap = Propel::getDatabaseMap(StudentPeer::DATABASE_NAME);
-            $tableMap = $dbMap->getTable(StudentPeer::TABLE_NAME);
+            $dbMap = Propel::getDatabaseMap(GuardianInvitePeer::DATABASE_NAME);
+            $tableMap = $dbMap->getTable(GuardianInvitePeer::TABLE_NAME);
 
             if (! is_array($cols)) {
                 $cols = array($cols);
@@ -980,7 +952,7 @@ abstract class BaseStudentPeer
 
         }
 
-        return BasePeer::doValidate(StudentPeer::DATABASE_NAME, StudentPeer::TABLE_NAME, $columns);
+        return BasePeer::doValidate(GuardianInvitePeer::DATABASE_NAME, GuardianInvitePeer::TABLE_NAME, $columns);
     }
 
     /**
@@ -988,23 +960,23 @@ abstract class BaseStudentPeer
      *
      * @param      int $pk the primary key.
      * @param      PropelPDO $con the connection to use
-     * @return Student
+     * @return GuardianInvite
      */
     public static function retrieveByPK($pk, PropelPDO $con = null)
     {
 
-        if (null !== ($obj = StudentPeer::getInstanceFromPool((string) $pk))) {
+        if (null !== ($obj = GuardianInvitePeer::getInstanceFromPool((string) $pk))) {
             return $obj;
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(StudentPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(GuardianInvitePeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria = new Criteria(StudentPeer::DATABASE_NAME);
-        $criteria->add(StudentPeer::ID, $pk);
+        $criteria = new Criteria(GuardianInvitePeer::DATABASE_NAME);
+        $criteria->add(GuardianInvitePeer::STUDENT_ID, $pk);
 
-        $v = StudentPeer::doSelect($criteria, $con);
+        $v = GuardianInvitePeer::doSelect($criteria, $con);
 
         return !empty($v) > 0 ? $v[0] : null;
     }
@@ -1014,32 +986,32 @@ abstract class BaseStudentPeer
      *
      * @param      array $pks List of primary keys
      * @param      PropelPDO $con the connection to use
-     * @return Student[]
+     * @return GuardianInvite[]
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
     public static function retrieveByPKs($pks, PropelPDO $con = null)
     {
         if ($con === null) {
-            $con = Propel::getConnection(StudentPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(GuardianInvitePeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
         $objs = null;
         if (empty($pks)) {
             $objs = array();
         } else {
-            $criteria = new Criteria(StudentPeer::DATABASE_NAME);
-            $criteria->add(StudentPeer::ID, $pks, Criteria::IN);
-            $objs = StudentPeer::doSelect($criteria, $con);
+            $criteria = new Criteria(GuardianInvitePeer::DATABASE_NAME);
+            $criteria->add(GuardianInvitePeer::STUDENT_ID, $pks, Criteria::IN);
+            $objs = GuardianInvitePeer::doSelect($criteria, $con);
         }
 
         return $objs;
     }
 
-} // BaseStudentPeer
+} // BaseGuardianInvitePeer
 
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-BaseStudentPeer::buildTableMap();
+BaseGuardianInvitePeer::buildTableMap();
 
-EventDispatcherProxy::trigger(array('construct','peer.construct'), new PeerEvent('Zerebral\BusinessBundle\Model\User\om\BaseStudentPeer'));
+EventDispatcherProxy::trigger(array('construct','peer.construct'), new PeerEvent('Zerebral\BusinessBundle\Model\User\om\BaseGuardianInvitePeer'));

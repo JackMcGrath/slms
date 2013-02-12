@@ -16,6 +16,7 @@ use Zerebral\FrontendBundle\Form\Type as FormType;
 use Zerebral\BusinessBundle\Model as Model;
 use Zerebral\BusinessBundle\Model\Course\CourseQuery;
 use Zerebral\BusinessBundle\Model\Course\Course;
+use Zerebral\BusinessBundle\Model\User\GuardianInvite;
 
 
 class InviteController extends \Zerebral\CommonBundle\Component\Controller
@@ -168,8 +169,16 @@ class InviteController extends \Zerebral\CommonBundle\Component\Controller
         if ($form->isValid()) {
             $emails = $form['emails']->getData();
 
-            foreach ($emails as $email) {
+            $student = $this->getRoleUser();
 
+            foreach ($emails as $email) {
+                $code = md5($student->getId() . '_' . $student->getUserId() . '_' . $email . '_' . time() . uniqid('invite'));
+                $guardianInvite = new GuardianInvite();
+                $guardianInvite->setGuardianEmail($email);
+                $guardianInvite->setStudent($student);
+                $guardianInvite->setCode($code);
+                $guardianInvite->setActivated(false);
+                $guardianInvite->save();
             }
 
             $this->setFlash('invites_send', 'Invitations have been sent');

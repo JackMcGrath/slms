@@ -26,6 +26,8 @@ use Zerebral\BusinessBundle\Model\Course\CourseQuery;
 use Zerebral\BusinessBundle\Model\Course\CourseStudent;
 use Zerebral\BusinessBundle\Model\Course\CourseStudentQuery;
 use Zerebral\BusinessBundle\Model\User\Guardian;
+use Zerebral\BusinessBundle\Model\User\GuardianInvite;
+use Zerebral\BusinessBundle\Model\User\GuardianInviteQuery;
 use Zerebral\BusinessBundle\Model\User\GuardianQuery;
 use Zerebral\BusinessBundle\Model\User\Student;
 use Zerebral\BusinessBundle\Model\User\StudentGuardian;
@@ -116,6 +118,11 @@ abstract class BaseStudent extends BaseObject implements Persistent
     protected $collStudentGuardiansPartial;
 
     /**
+     * @var        GuardianInvite one-to-one related GuardianInvite object
+     */
+    protected $singleGuardianInvite;
+
+    /**
      * @var        PropelObjectCollection|Assignment[] Collection to store aggregation of Assignment objects.
      */
     protected $collAssignments;
@@ -191,6 +198,12 @@ abstract class BaseStudent extends BaseObject implements Persistent
      * @var		PropelObjectCollection
      */
     protected $studentGuardiansScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $guardianInvitesScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -469,6 +482,8 @@ abstract class BaseStudent extends BaseObject implements Persistent
             $this->collCourseStudents = null;
 
             $this->collStudentGuardians = null;
+
+            $this->singleGuardianInvite = null;
 
             $this->collAssignments = null;
             $this->collCourses = null;
@@ -764,6 +779,21 @@ abstract class BaseStudent extends BaseObject implements Persistent
                 }
             }
 
+            if ($this->guardianInvitesScheduledForDeletion !== null) {
+                if (!$this->guardianInvitesScheduledForDeletion->isEmpty()) {
+                    GuardianInviteQuery::create()
+                        ->filterByPrimaryKeys($this->guardianInvitesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->guardianInvitesScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->singleGuardianInvite !== null) {
+                if (!$this->singleGuardianInvite->isDeleted() && ($this->singleGuardianInvite->isNew() || $this->singleGuardianInvite->isModified())) {
+                        $affectedRows += $this->singleGuardianInvite->save($con);
+                }
+            }
+
             $this->alreadyInSave = false;
 
             if ($isInsert) {
@@ -989,6 +1019,12 @@ abstract class BaseStudent extends BaseObject implements Persistent
                     }
                 }
 
+                if ($this->singleGuardianInvite !== null) {
+                    if (!$this->singleGuardianInvite->validate($columns)) {
+                        $failureMap = array_merge($failureMap, $this->singleGuardianInvite->getValidationFailures());
+                    }
+                }
+
 
             $this->alreadyInValidation = false;
         }
@@ -1089,6 +1125,9 @@ abstract class BaseStudent extends BaseObject implements Persistent
             }
             if (null !== $this->collStudentGuardians) {
                 $result['StudentGuardians'] = $this->collStudentGuardians->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->singleGuardianInvite) {
+                $result['GuardianInvite'] = $this->singleGuardianInvite->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
             }
         }
 
@@ -1281,6 +1320,11 @@ abstract class BaseStudent extends BaseObject implements Persistent
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addStudentGuardian($relObj->copy($deepCopy));
                 }
+            }
+
+            $relObj = $this->getGuardianInvite();
+            if ($relObj) {
+                $copyObj->setGuardianInvite($relObj->copy($deepCopy));
             }
 
             //unflag object copy
@@ -2383,6 +2427,42 @@ abstract class BaseStudent extends BaseObject implements Persistent
     }
 
     /**
+     * Gets a single GuardianInvite object, which is related to this object by a one-to-one relationship.
+     *
+     * @param PropelPDO $con optional connection object
+     * @return GuardianInvite
+     * @throws PropelException
+     */
+    public function getGuardianInvite(PropelPDO $con = null)
+    {
+
+        if ($this->singleGuardianInvite === null && !$this->isNew()) {
+            $this->singleGuardianInvite = GuardianInviteQuery::create()->findPk($this->getPrimaryKey(), $con);
+        }
+
+        return $this->singleGuardianInvite;
+    }
+
+    /**
+     * Sets a single GuardianInvite object as related to this object by a one-to-one relationship.
+     *
+     * @param             GuardianInvite $v GuardianInvite
+     * @return Student The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setGuardianInvite(GuardianInvite $v = null)
+    {
+        $this->singleGuardianInvite = $v;
+
+        // Make sure that that the passed-in GuardianInvite isn't already associated with this object
+        if ($v !== null && $v->getStudent(null, false) === null) {
+            $v->setStudent($this);
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears out the collAssignments collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -2965,6 +3045,9 @@ abstract class BaseStudent extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->singleGuardianInvite) {
+                $this->singleGuardianInvite->clearAllReferences($deep);
+            }
             if ($this->collAssignments) {
                 foreach ($this->collAssignments as $o) {
                     $o->clearAllReferences($deep);
@@ -3003,6 +3086,10 @@ abstract class BaseStudent extends BaseObject implements Persistent
             $this->collStudentGuardians->clearIterator();
         }
         $this->collStudentGuardians = null;
+        if ($this->singleGuardianInvite instanceof PropelCollection) {
+            $this->singleGuardianInvite->clearIterator();
+        }
+        $this->singleGuardianInvite = null;
         if ($this->collAssignments instanceof PropelCollection) {
             $this->collAssignments->clearIterator();
         }

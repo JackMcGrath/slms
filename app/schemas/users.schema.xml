@@ -81,6 +81,19 @@
     </table>
 
 
+    <table name="guardian_invites" phpName="GuardianInvite">
+        <column name="student_id" phpName="StudentId" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" required="true"/>
+        <column name="guardian_email" phpName="GuardianEmail" type="VARCHAR" size="100" required="true"/>
+        <column name="code" phpName="Code" type="VARCHAR" size="32" required="true"/>
+        <column name="activated" phpName="Activated" type="BOOLEAN" size="1" sqlType="tinyint(1) unsigned" required="true" defaultValue="false" />
 
+        <foreign-key foreignTable="students" name="guardian_invites_student" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="student_id" foreign="id"/>
+        </foreign-key>
+
+        <unique name="code">
+            <unique-column name="code"/>
+        </unique>
+    </table>
 
 </database>
