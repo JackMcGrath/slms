@@ -63,6 +63,7 @@ class UserController extends \Zerebral\CommonBundle\Component\Controller
 
         return array(
             'form' => $form->createView(),
+            'parentsInviteForm' => $this->createForm(new FormType\CourseInviteType())->createView(),
             'user' => $user,
             'target' => 'my-profile'
         );

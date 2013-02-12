@@ -149,4 +149,34 @@ class InviteController extends \Zerebral\CommonBundle\Component\Controller
         return new \Zerebral\CommonBundle\HttpFoundation\FormJsonResponse($form);
 
     }
+
+
+    /**
+     * @Route("/invite-guardians", name="ajax_guardians_send_invites")
+     * @PreAuthorize("hasRole('ROLE_STUDENT')")
+     */
+    public function inviteGuardiansAction()
+    {
+        $form = $this->createForm(new FormType\CourseInviteType());
+
+        if (!$this->getRequest()->isXmlHttpRequest()) {
+            throw $this->createNotFoundException();
+        }
+
+        $form->bind($this->getRequest());
+
+        if ($form->isValid()) {
+            $emails = $form['emails']->getData();
+
+            foreach ($emails as $email) {
+
+            }
+
+            $this->setFlash('invites_send', 'Invitations have been sent');
+
+            return new JsonResponse(array('redirect' => $this->generateUrl('myprofile')));
+        }
+
+        return new \Zerebral\CommonBundle\HttpFoundation\FormJsonResponse($form);
+    }
 }
