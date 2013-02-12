@@ -226,14 +226,20 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
 
     /**
      * @Route("/compose-form/{id}", name="ajax_compose_form")
+     * @Route("/compose-multiple-form", name="ajax_compose_multiple_form")
      * @ParamConverter("user")
      * @PreAuthorize("hasRole('ROLE_USER')")
      */
-    public function ajaxComposeFormAction(Model\User\User $user)
+    public function ajaxComposeFormAction(Model\User\User $user = null)
     {
-        //validate user
         $newMessage = new Model\Message\ComposeMessage();
-        $newMessage->setRecipients(array($user));
+        $recipients = array();
+        if ($this->getRequest()->get('recipients', array())) {
+            $recipients = \Zerebral\BusinessBundle\Model\User\UserQuery::create()->findPks($this->getRequest()->get('recipients', array()));
+        } else if ($user) {
+            $recipients = array($user);
+        }
+        $newMessage->setRecipients($recipients);
         $newMessageType = new FormType\ComposeMessageType();
 
         $form = $this->createForm($newMessageType, $newMessage, array('validation_groups' => array('Default', 'compose')));

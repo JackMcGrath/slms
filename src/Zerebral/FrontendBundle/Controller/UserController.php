@@ -78,15 +78,13 @@ class UserController extends \Zerebral\CommonBundle\Component\Controller
     public function suggestUserAction()
     {
         $name = $this->getRequest()->get('username');
-        if ($this->getUser()->isGuardian()) {
-            /** @var \Zerebral\BusinessBundle\Model\User\Guardian $guardian  */
-            $guardian = $this->getRoleUser();
-            $forUser = $guardian->getSelectedChild($this->get('session')->get('selectedChildId'))->getUser();
-        } else {
-            $forUser = $this->getUser();
+        $user = $this->getUser();
+        if ($user->isGuardian()) {
+            $user->setGuardianSelectedChild($this->get('session')->get('selectedChildId'));
         }
+
         if ($name) {
-            $userList = \Zerebral\BusinessBundle\Model\User\UserQuery::create()->findForSuggestByNameForUser($name, $forUser);
+            $userList = \Zerebral\BusinessBundle\Model\User\UserQuery::create()->findForSuggestByNameForUser($name, $user);
             $response = array();
             if (count($userList)) {
                 foreach ($userList as $user) {

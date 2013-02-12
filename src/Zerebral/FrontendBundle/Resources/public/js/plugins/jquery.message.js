@@ -9,6 +9,7 @@ PrivateMessages.prototype = {
     lastIndex: undefined,
     template: undefined,
     userId: undefined,
+    recipients: undefined,
 
     init: function() {
         var self = this;
@@ -25,7 +26,7 @@ PrivateMessages.prototype = {
             modalBody.html('<p>Loading...</p>');
 
             $.ajax({
-                url: '/messages/compose-form/' + self.userId,
+                url: self.userId ? '/messages/compose-form/' + self.userId : '/messages/compose-multiple-form?' + self.recipients,
                 dataType: 'json',
                 type: 'GET',
                 success: function(response) {
@@ -112,6 +113,7 @@ PrivateMessages.prototype = {
     onShowPopup: function(e) {
         e.preventDefault();
         this.userId = $(e.target).attr('userId');
+        this.recipients = 'recipients[]=' + $(e.target).attr('recipients').replace(/,/g, '&recipients[]=');
         $(this.element).modal('show');
     },
 

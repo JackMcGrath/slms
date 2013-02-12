@@ -27,6 +27,38 @@
 
             {% set maxSize = courseAssignmentsSize | max()  %}
             <div class="grading-table">
+                <div class="table-date-filter top-margins">
+                    <div class="date-selector">
+                        {% if isMonthRange %}
+                            <a href="{{ path('guardian_grading', {startDate: startDate|strtotime('first day of -1 month')|date('Y-m-d'), endDate: endDate|strtotime('last day of -1 month')|date('Y-m-d')}) }}">&#706;</a>
+                        {% else %}
+                            <a href="{{ path('guardian_grading', {startDate: startDate|strtotime('Monday -1 week')|date('Y-m-d'), endDate: endDate|strtotime('Sunday -1 week')|date('Y-m-d')}) }}">&#706;</a>
+                        {% endif %}
+                        {{ mainPartials.attendanceDateRangeName(startDate, endDate, isMonthRange) }}
+                        {% if isMonthRange %}
+                            <a href="{{ path('guardian_grading', {startDate: startDate|strtotime('first day of +1 month')|date('Y-m-d'), endDate: endDate|strtotime('last day of +1 month')|date('Y-m-d')}) }}">&#707;</a>
+                        {% else %}
+                            <a href="{{ path('guardian_grading', {startDate: startDate|strtotime('Monday +1 week')|date('Y-m-d'), endDate: endDate|strtotime('Sunday +1 week')|date('Y-m-d')}) }}">&#707;</a>
+                        {% endif %}
+                    </div>
+
+                    <div class="pick-date">
+                        <div class="btn-group">
+                            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                                Select filter
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{{ path('guardian_grading', {startDate: "now"|strtotime('monday this week')|date('Y-m-d'), endDate: "now"|strtotime('sunday this week')|date('Y-m-d')}) }}">Current week</a></li>
+                                <li><a href="{{ path('guardian_grading', {startDate: "now"|strtotime('Monday previous week')|date('Y-m-d'), endDate: "now"|strtotime('Sunday previous  week')|date('Y-m-d')}) }}">Last week</a></li>
+                                <li><a href="{{ path('guardian_grading', {startDate: "now"|strtotime('first day of this month')|date('Y-m-d'), endDate: "now"|strtotime('last day of this month')|date('Y-m-d')}) }}">Current Month</a></li>
+                                <li><a href="{{ path('guardian_grading', {startDate: "now"|strtotime('first day of -1 month')|date('Y-m-d'), endDate: "now"|strtotime('last day of -1 month')|date('Y-m-d')}) }}">Last Month</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+
                 <table class="table table-bordered table-striped">
                     <thead>
                     <tr>
