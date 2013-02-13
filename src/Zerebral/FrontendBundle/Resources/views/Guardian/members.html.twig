@@ -39,7 +39,7 @@
             {% endif %}
 
             {% if 'student' in relatedUsers|keys %}
-                <div class="small-title">Classmate</div>
+                <div class="small-title">Classmates</div>
                 <div class="clearfix"></div>
                 {% for member in relatedUsers['student'] %}
                     {{ block('member') }}
