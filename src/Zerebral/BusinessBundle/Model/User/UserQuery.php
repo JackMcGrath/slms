@@ -21,8 +21,10 @@ class UserQuery extends BaseUserQuery
         return $this->getRelatedUsers($user)->find();
     }
 
-    public function getRelatedUsers(User $user)
+    public function getRelatedUsers(User $user, $excludeMe = false)
     {
+        #TODO need to add option for exclude $user and his children
+        #TODO need to add option for select related user for all parent children or selected
         //$criteria = new \Criteria();
 
         $usersToCoursesJoin = new \Join();
@@ -77,6 +79,14 @@ class UserQuery extends BaseUserQuery
             $this->addJoinObject($guardiansJoin);
 
             $this->_or()->where('users.id = guardians.user_id');
+
+        }
+
+        if ($excludeMe) {
+            $this->where('users.id <> ' . $user->getId());
+            if ($user->isGuardian()) {
+                $this->_and()->where('users.id NOT IN (' . $user->getGuardianSelectedUser()->getUser()->getId() . ')');
+            }
         }
 
         $this->groupBy('users.id');

@@ -75,7 +75,7 @@
         <li{{ selected == 'grading' ? ' class="active"' : '' }}><a href="{{ path('guardian_grading') }}">Grading</a></li>
         <li{{ selected == 'attendance' ? ' class="active"' : '' }}><a href="{{ path('guardian_attendance') }}">Attendance</a></li>
         <li{{ selected == 'courses' ? ' class="active"' : '' }}><a href="{{ path('guardian_courses') }}">Courses</a></li>
-        <li{{ selected == 'guardians' ? ' class="active"' : '' }}><a href="#">Parents</a></li>
+        <li{{ selected == 'members' ? ' class="active"' : '' }}><a href="{{ path('guardian_members_view') }}">Members</a></li>
     </ul>
 {% endmacro %}
 
