@@ -74,7 +74,14 @@
                             <td class="name"><a href="{{ path('guardian_courses') }}#class{{ courseId }}">{{ courses[courseId].name }}</a></td>
                             {% for day in range(startDate|date('U'), endDate|date('U'), 3600 * 24) %}
                                 <td>
-                                    {{ course[day|date('Y-m-d')] is defined ? course[day|date('Y-m-d')].status : '-' }}
+                                    {% if course[day|date('Y-m-d')] is defined %}
+                                        {{ course[day|date('Y-m-d')].status }}
+                                        {% if course[day|date('Y-m-d')].comment %}
+                                            <a class="attendance-comment-tooltip" href="#" rel="tooltip" title="{{ course[day|date('Y-m-d')].comment }}"><i class="info-icon icon-small-info"></i></a>
+                                        {% endif %}
+                                    {% else %}
+                                        -
+                                    {% endif %}
                                 </td>
                             {% endfor %}
                         </tr>
