@@ -65,6 +65,8 @@ class AssignmentQuery extends BaseAssignmentQuery
         $this->leftJoin('StudentAssignment.StudentAssignmentFile StudentAssignmentFile');
         $this->add('student_assignments.id', null, \Criteria::ISNOTNULL);
 
+        $this->add('due_at', "IF(assignments.due_at > '".date('Y-m-d H:i:s')."', student_assignments.is_submitted=1, TRUE)", \Criteria::CUSTOM);
+
         $this->withColumn('COUNT(DISTINCT IF(student_assignments.is_submitted = 1, student_assignments.id, null))', 'completedCount');
         $this->withColumn('COUNT(DISTINCT student_assignments.id) - COUNT(DISTINCT IF(student_assignments.is_submitted = 1, student_assignments.id, null))', 'remainingCount');
         $this->withColumn('GROUP_CONCAT(IF(student_assignments.is_submitted = 0, `AssignmentStudent`.user_id, null))', 'remainingUserIds');

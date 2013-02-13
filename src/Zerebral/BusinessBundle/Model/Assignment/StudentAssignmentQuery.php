@@ -8,11 +8,14 @@ class StudentAssignmentQuery extends BaseStudentAssignmentQuery
 {
     public function findStudentsByAssignmentId($assignmentId)
     {
+        $this->leftJoinAssignment();
         $this->filterByAssignmentId($assignmentId);
         //$this->filterByIsSubmitted(true);
         $this->innerJoinStudentAssignmentFile();
         $this->leftJoinStudent();
         $this->leftJoin('Student.User User');
+
+        $this->add('due_at', "IF(assignments.due_at > '".date('Y-m-d H:i:s')."', student_assignments.is_submitted=1, TRUE)", \Criteria::CUSTOM);
 
         $this->withColumn('COUNT(StudentAssignmentFile.file_id)', 'filesCount');
         $this->groupBy('student_assignments.id');
