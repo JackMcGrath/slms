@@ -19,6 +19,7 @@
             <hr/>
 
             {{ flashMessages.show('profile_save_success', 'success') }}
+            {{ flashMessages.show('invites_send', 'success') }}
             <form method="post" {{ form_enctype(form) }} novalidate  class="form-horizontal create-form no-left-margin">
                 <div class="span8">
                     {% if not is_granted('ROLE_GUARDIAN') %}
@@ -120,6 +121,32 @@
                     </div>
                 </div>
 
+                {% if user.isStudent() %}
+                <div class="span4 pull-right">
+                    <div class="guardian-list" style="padding: 17px;">
+                        <h5>Parents:</h5>
+                        {% if user.getGuardians|length > 0 %}
+                        <ul>
+                            {% for guardian in user.getGuardians %}
+                                <li>{{ guardian.fullName }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                            <p>No parents were invited</p>
+                        {% endif %}
+                        {% if user.getStudent().guardianInvites|length > 0 %}
+                        <h5>Invitations sent:</h5>
+                        <ul>
+                            {% for invite in user.getStudent().getNonActivedInvites %}
+                                <li>{{ invite.guardianEmail }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                        <a href="#inviteModal" class="btn btn-danger invite" data-toggle="modal" data-target="#inviteModal">Invite your parent via email</a>
+                    </div>
+                </div>
+                {% endif %}
+
 
                 {{ form_widget(form._token) }}
 
@@ -140,5 +167,36 @@
                 <li><a href="#"><i class="icon-new-mail"></i>Notifications</a></li>
             </ul>
         </div>
+    </div>
+
+
+    <div class="modal hide fade" id="inviteModal">
+        <form method="post" {{ form_enctype(parentsInviteForm) }} class="member-form" action="{{ path('ajax_guardians_send_invites') }}">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3>Invite your parents</h3>
+            </div>
+            <div class="modal-body">
+                <p>
+                    To send invitations to your parents, enter one ore more email addresses into the text box, separated by space or new lines, and click "Send Invites" button.
+                </p>
+                {{ form_row(parentsInviteForm.emails, {
+                    label: ' ',
+                    form_type: 'horizontal',
+                    attr: {
+                        class: 'input-block-level',
+                        rows: 6
+                    }
+                }) }}
+                {{ form_errors(parentsInviteForm) }}
+                <div class="clearfix"></div>
+
+            </div>
+            <div class="modal-footer">
+                <input type="submit" class="btn btn-danger" value="Send invites"/>
+                <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Cancel</a>
+            </div>
+            {{ form_rest(parentsInviteForm) }}
+        </form>
     </div>
 {% endblock %}

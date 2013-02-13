@@ -26,6 +26,8 @@ use Zerebral\BusinessBundle\Model\Course\CourseQuery;
 use Zerebral\BusinessBundle\Model\Course\CourseStudent;
 use Zerebral\BusinessBundle\Model\Course\CourseStudentQuery;
 use Zerebral\BusinessBundle\Model\User\Guardian;
+use Zerebral\BusinessBundle\Model\User\GuardianInvite;
+use Zerebral\BusinessBundle\Model\User\GuardianInviteQuery;
 use Zerebral\BusinessBundle\Model\User\GuardianQuery;
 use Zerebral\BusinessBundle\Model\User\Student;
 use Zerebral\BusinessBundle\Model\User\StudentGuardian;
@@ -116,6 +118,12 @@ abstract class BaseStudent extends BaseObject implements Persistent
     protected $collStudentGuardiansPartial;
 
     /**
+     * @var        PropelObjectCollection|GuardianInvite[] Collection to store aggregation of GuardianInvite objects.
+     */
+    protected $collGuardianInvites;
+    protected $collGuardianInvitesPartial;
+
+    /**
      * @var        PropelObjectCollection|Assignment[] Collection to store aggregation of Assignment objects.
      */
     protected $collAssignments;
@@ -191,6 +199,12 @@ abstract class BaseStudent extends BaseObject implements Persistent
      * @var		PropelObjectCollection
      */
     protected $studentGuardiansScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $guardianInvitesScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -469,6 +483,8 @@ abstract class BaseStudent extends BaseObject implements Persistent
             $this->collCourseStudents = null;
 
             $this->collStudentGuardians = null;
+
+            $this->collGuardianInvites = null;
 
             $this->collAssignments = null;
             $this->collCourses = null;
@@ -764,6 +780,23 @@ abstract class BaseStudent extends BaseObject implements Persistent
                 }
             }
 
+            if ($this->guardianInvitesScheduledForDeletion !== null) {
+                if (!$this->guardianInvitesScheduledForDeletion->isEmpty()) {
+                    GuardianInviteQuery::create()
+                        ->filterByPrimaryKeys($this->guardianInvitesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->guardianInvitesScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collGuardianInvites !== null) {
+                foreach ($this->collGuardianInvites as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             $this->alreadyInSave = false;
 
             if ($isInsert) {
@@ -989,6 +1022,14 @@ abstract class BaseStudent extends BaseObject implements Persistent
                     }
                 }
 
+                if ($this->collGuardianInvites !== null) {
+                    foreach ($this->collGuardianInvites as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
 
             $this->alreadyInValidation = false;
         }
@@ -1089,6 +1130,9 @@ abstract class BaseStudent extends BaseObject implements Persistent
             }
             if (null !== $this->collStudentGuardians) {
                 $result['StudentGuardians'] = $this->collStudentGuardians->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collGuardianInvites) {
+                $result['GuardianInvites'] = $this->collGuardianInvites->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1283,6 +1327,12 @@ abstract class BaseStudent extends BaseObject implements Persistent
                 }
             }
 
+            foreach ($this->getGuardianInvites() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addGuardianInvite($relObj->copy($deepCopy));
+                }
+            }
+
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1407,6 +1457,9 @@ abstract class BaseStudent extends BaseObject implements Persistent
         }
         if ('StudentGuardian' == $relationName) {
             $this->initStudentGuardians();
+        }
+        if ('GuardianInvite' == $relationName) {
+            $this->initGuardianInvites();
         }
     }
 
@@ -2383,6 +2436,224 @@ abstract class BaseStudent extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collGuardianInvites collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Student The current object (for fluent API support)
+     * @see        addGuardianInvites()
+     */
+    public function clearGuardianInvites()
+    {
+        $this->collGuardianInvites = null; // important to set this to null since that means it is uninitialized
+        $this->collGuardianInvitesPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collGuardianInvites collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialGuardianInvites($v = true)
+    {
+        $this->collGuardianInvitesPartial = $v;
+    }
+
+    /**
+     * Initializes the collGuardianInvites collection.
+     *
+     * By default this just sets the collGuardianInvites collection to an empty array (like clearcollGuardianInvites());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initGuardianInvites($overrideExisting = true)
+    {
+        if (null !== $this->collGuardianInvites && !$overrideExisting) {
+            return;
+        }
+        $this->collGuardianInvites = new PropelObjectCollection();
+        $this->collGuardianInvites->setModel('GuardianInvite');
+    }
+
+    /**
+     * Gets an array of GuardianInvite objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Student is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|GuardianInvite[] List of GuardianInvite objects
+     * @throws PropelException
+     */
+    public function getGuardianInvites($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collGuardianInvitesPartial && !$this->isNew();
+        if (null === $this->collGuardianInvites || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collGuardianInvites) {
+                // return empty collection
+                $this->initGuardianInvites();
+            } else {
+                $collGuardianInvites = GuardianInviteQuery::create(null, $criteria)
+                    ->filterByStudent($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collGuardianInvitesPartial && count($collGuardianInvites)) {
+                      $this->initGuardianInvites(false);
+
+                      foreach($collGuardianInvites as $obj) {
+                        if (false == $this->collGuardianInvites->contains($obj)) {
+                          $this->collGuardianInvites->append($obj);
+                        }
+                      }
+
+                      $this->collGuardianInvitesPartial = true;
+                    }
+
+                    $collGuardianInvites->getInternalIterator()->rewind();
+                    return $collGuardianInvites;
+                }
+
+                if($partial && $this->collGuardianInvites) {
+                    foreach($this->collGuardianInvites as $obj) {
+                        if($obj->isNew()) {
+                            $collGuardianInvites[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collGuardianInvites = $collGuardianInvites;
+                $this->collGuardianInvitesPartial = false;
+            }
+        }
+
+        return $this->collGuardianInvites;
+    }
+
+    /**
+     * Sets a collection of GuardianInvite objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $guardianInvites A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Student The current object (for fluent API support)
+     */
+    public function setGuardianInvites(PropelCollection $guardianInvites, PropelPDO $con = null)
+    {
+        $guardianInvitesToDelete = $this->getGuardianInvites(new Criteria(), $con)->diff($guardianInvites);
+
+        $this->guardianInvitesScheduledForDeletion = unserialize(serialize($guardianInvitesToDelete));
+
+        foreach ($guardianInvitesToDelete as $guardianInviteRemoved) {
+            $guardianInviteRemoved->setStudent(null);
+        }
+
+        $this->collGuardianInvites = null;
+        foreach ($guardianInvites as $guardianInvite) {
+            $this->addGuardianInvite($guardianInvite);
+        }
+
+        $this->collGuardianInvites = $guardianInvites;
+        $this->collGuardianInvitesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related GuardianInvite objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related GuardianInvite objects.
+     * @throws PropelException
+     */
+    public function countGuardianInvites(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collGuardianInvitesPartial && !$this->isNew();
+        if (null === $this->collGuardianInvites || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collGuardianInvites) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getGuardianInvites());
+            }
+            $query = GuardianInviteQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByStudent($this)
+                ->count($con);
+        }
+
+        return count($this->collGuardianInvites);
+    }
+
+    /**
+     * Method called to associate a GuardianInvite object to this object
+     * through the GuardianInvite foreign key attribute.
+     *
+     * @param    GuardianInvite $l GuardianInvite
+     * @return Student The current object (for fluent API support)
+     */
+    public function addGuardianInvite(GuardianInvite $l)
+    {
+        if ($this->collGuardianInvites === null) {
+            $this->initGuardianInvites();
+            $this->collGuardianInvitesPartial = true;
+        }
+        if (!in_array($l, $this->collGuardianInvites->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddGuardianInvite($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	GuardianInvite $guardianInvite The guardianInvite object to add.
+     */
+    protected function doAddGuardianInvite($guardianInvite)
+    {
+        $this->collGuardianInvites[]= $guardianInvite;
+        $guardianInvite->setStudent($this);
+    }
+
+    /**
+     * @param	GuardianInvite $guardianInvite The guardianInvite object to remove.
+     * @return Student The current object (for fluent API support)
+     */
+    public function removeGuardianInvite($guardianInvite)
+    {
+        if ($this->getGuardianInvites()->contains($guardianInvite)) {
+            $this->collGuardianInvites->remove($this->collGuardianInvites->search($guardianInvite));
+            if (null === $this->guardianInvitesScheduledForDeletion) {
+                $this->guardianInvitesScheduledForDeletion = clone $this->collGuardianInvites;
+                $this->guardianInvitesScheduledForDeletion->clear();
+            }
+            $this->guardianInvitesScheduledForDeletion[]= clone $guardianInvite;
+            $guardianInvite->setStudent(null);
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears out the collAssignments collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -2965,6 +3236,11 @@ abstract class BaseStudent extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collGuardianInvites) {
+                foreach ($this->collGuardianInvites as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collAssignments) {
                 foreach ($this->collAssignments as $o) {
                     $o->clearAllReferences($deep);
@@ -3003,6 +3279,10 @@ abstract class BaseStudent extends BaseObject implements Persistent
             $this->collStudentGuardians->clearIterator();
         }
         $this->collStudentGuardians = null;
+        if ($this->collGuardianInvites instanceof PropelCollection) {
+            $this->collGuardianInvites->clearIterator();
+        }
+        $this->collGuardianInvites = null;
         if ($this->collAssignments instanceof PropelCollection) {
             $this->collAssignments->clearIterator();
         }

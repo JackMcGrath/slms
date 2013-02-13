@@ -6,6 +6,17 @@ use Zerebral\BusinessBundle\Model\User\om\BaseGuardian;
 
 class Guardian extends BaseGuardian
 {
+
+    public function getFullName()
+    {
+        return $this->getUser()->getFullName();
+    }
+
+    public function getFormattedName()
+    {
+        return $this->getUser()->getFormattedName();
+    }
+
     public function getSelectedChild($childId = null) {
         $criteria = null;
 

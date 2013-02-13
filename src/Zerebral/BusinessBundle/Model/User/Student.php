@@ -84,4 +84,8 @@ class Student extends BaseStudent
         }
         return false;
     }
+
+    public function getNonActivedInvites() {
+        return GuardianInviteQuery::create()->filterByStudent($this)->filterByActivated(false)->find();
+    }
 }

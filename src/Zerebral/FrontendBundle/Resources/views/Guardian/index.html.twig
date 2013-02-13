@@ -1,5 +1,6 @@
 {% extends 'ZerebralFrontendBundle::layout.html.twig' %}
 {% import "ZerebralFrontendBundle:Macro:main.html.twig" as mainPartials %}
+{% import "ZerebralFrontendBundle:Macro:flashMessages.html.twig" as flashMessages %}
 
 {% block content %}
     {% javascripts '@ZerebralFrontendBundle/Resources/public/js/controllers/guardian/index.js' output='js/compiled/guardian_index.js' %}
@@ -19,6 +20,7 @@
             </div>
             <hr/>
             <br />
+            {{ flashMessages.show('child_added', 'success') }}
             <div class="description">
                 <h4>Grades</h4>
                 <table class="summary-table">
