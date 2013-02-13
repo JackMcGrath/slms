@@ -24,6 +24,10 @@ class DashboardController extends \Zerebral\CommonBundle\Component\Controller
             return $this->redirect($this->generateUrl('guardian_summary'));
         }
 
+        if ($this->getUser()->isSuperAdmin()) {
+            return $this->redirect($this->generateUrl('superadmin_index'));
+        }
+
         $feedItemFormType = new FormType\FeedItemType();
         $feedItemForm = $this->createForm($feedItemFormType, null);
 

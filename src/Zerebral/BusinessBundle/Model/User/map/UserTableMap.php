@@ -85,6 +85,7 @@ class UserTableMap extends TableMap
         $this->addRelation('Student', 'Zerebral\\BusinessBundle\\Model\\User\\Student', RelationMap::ONE_TO_MANY, array('id' => 'user_id', ), null, null, 'Students');
         $this->addRelation('Teacher', 'Zerebral\\BusinessBundle\\Model\\User\\Teacher', RelationMap::ONE_TO_MANY, array('id' => 'user_id', ), null, null, 'Teachers');
         $this->addRelation('Guardian', 'Zerebral\\BusinessBundle\\Model\\User\\Guardian', RelationMap::ONE_TO_MANY, array('id' => 'user_id', ), null, null, 'Guardians');
+        $this->addRelation('SuperAdmin', 'Zerebral\\BusinessBundle\\Model\\User\\SuperAdmin', RelationMap::ONE_TO_MANY, array('id' => 'user_id', ), null, null, 'SuperAdmins');
     } // buildRelations()
 
     /**

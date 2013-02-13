@@ -14,6 +14,7 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
     const ROLE_STUDENT = 'student';
     const ROLE_TEACHER = 'teacher';
     const ROLE_GUARDIAN = 'guardian';
+    const ROLE_SUPERADMIN = 'superadmin';
 
     /**
      * Plain password
@@ -57,6 +58,9 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
         }
         if ($this->getRole() == self::ROLE_GUARDIAN) {
             $roles[] = 'ROLE_GUARDIAN';
+        }
+        if ($this->getRole() == self::ROLE_SUPERADMIN) {
+            $roles[] = 'ROLE_SUPERADMIN';
         }
         return $roles;
     }
@@ -236,6 +240,11 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
         return $this->getGuardians()->getFirst();
     }
 
+    public function getSuperAdmin()
+    {
+        return $this->getSuperAdmins()->getFirst();
+    }
+
     public function getGuardianSelectedUser()
     {
         return $this->getGuardian()->getSelectedChild($this->guardianSelectedChild);
@@ -258,6 +267,9 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
                 break;
             case self::ROLE_GUARDIAN:
                 $model = new Guardian();
+                break;
+            case self::ROLE_SUPERADMIN:
+                $model = new SuperAdmin();
                 break;
         }
 
@@ -283,6 +295,9 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
                 break;
             case self::ROLE_GUARDIAN:
                 return $this->getGuardian();
+                break;
+            case self::ROLE_SUPERADMIN:
+                return $this->getSuperAdmin();
                 break;
         }
 
@@ -376,6 +391,11 @@ class User extends BaseUser implements UserInterface, \Serializable, EquatableIn
     public function isGuardian()
     {
         return $this->getRole() == self::ROLE_GUARDIAN;
+    }
+
+    public function isSuperAdmin()
+    {
+        return $this->getRole() == self::ROLE_SUPERADMIN;
     }
 
     public function getUnreadNotifications()

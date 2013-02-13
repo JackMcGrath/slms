@@ -31,6 +31,8 @@ use Zerebral\BusinessBundle\Model\User\Guardian;
 use Zerebral\BusinessBundle\Model\User\GuardianQuery;
 use Zerebral\BusinessBundle\Model\User\Student;
 use Zerebral\BusinessBundle\Model\User\StudentQuery;
+use Zerebral\BusinessBundle\Model\User\SuperAdmin;
+use Zerebral\BusinessBundle\Model\User\SuperAdminQuery;
 use Zerebral\BusinessBundle\Model\User\Teacher;
 use Zerebral\BusinessBundle\Model\User\TeacherQuery;
 use Zerebral\BusinessBundle\Model\User\User;
@@ -209,6 +211,12 @@ abstract class BaseUser extends BaseObject implements Persistent
     protected $collGuardiansPartial;
 
     /**
+     * @var        PropelObjectCollection|SuperAdmin[] Collection to store aggregation of SuperAdmin objects.
+     */
+    protected $collSuperAdmins;
+    protected $collSuperAdminsPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      * @var        boolean
@@ -287,6 +295,12 @@ abstract class BaseUser extends BaseObject implements Persistent
      * @var		PropelObjectCollection
      */
     protected $guardiansScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $superAdminsScheduledForDeletion = null;
 
     /**
      * Applies default values to this object.
@@ -996,6 +1010,8 @@ abstract class BaseUser extends BaseObject implements Persistent
 
             $this->collGuardians = null;
 
+            $this->collSuperAdmins = null;
+
         } // if (deep)
     }
 
@@ -1306,6 +1322,23 @@ abstract class BaseUser extends BaseObject implements Persistent
 
             if ($this->collGuardians !== null) {
                 foreach ($this->collGuardians as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->superAdminsScheduledForDeletion !== null) {
+                if (!$this->superAdminsScheduledForDeletion->isEmpty()) {
+                    SuperAdminQuery::create()
+                        ->filterByPrimaryKeys($this->superAdminsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->superAdminsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collSuperAdmins !== null) {
+                foreach ($this->collSuperAdmins as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1639,6 +1672,14 @@ abstract class BaseUser extends BaseObject implements Persistent
                     }
                 }
 
+                if ($this->collSuperAdmins !== null) {
+                    foreach ($this->collSuperAdmins as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
 
             $this->alreadyInValidation = false;
         }
@@ -1793,6 +1834,9 @@ abstract class BaseUser extends BaseObject implements Persistent
             }
             if (null !== $this->collGuardians) {
                 $result['Guardians'] = $this->collGuardians->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collSuperAdmins) {
+                $result['SuperAdmins'] = $this->collSuperAdmins->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -2077,6 +2121,12 @@ abstract class BaseUser extends BaseObject implements Persistent
                 }
             }
 
+            foreach ($this->getSuperAdmins() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addSuperAdmin($relObj->copy($deepCopy));
+                }
+            }
+
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -2219,6 +2269,9 @@ abstract class BaseUser extends BaseObject implements Persistent
         }
         if ('Guardian' == $relationName) {
             $this->initGuardians();
+        }
+        if ('SuperAdmin' == $relationName) {
+            $this->initSuperAdmins();
         }
     }
 
@@ -4628,6 +4681,224 @@ abstract class BaseUser extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collSuperAdmins collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return User The current object (for fluent API support)
+     * @see        addSuperAdmins()
+     */
+    public function clearSuperAdmins()
+    {
+        $this->collSuperAdmins = null; // important to set this to null since that means it is uninitialized
+        $this->collSuperAdminsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collSuperAdmins collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialSuperAdmins($v = true)
+    {
+        $this->collSuperAdminsPartial = $v;
+    }
+
+    /**
+     * Initializes the collSuperAdmins collection.
+     *
+     * By default this just sets the collSuperAdmins collection to an empty array (like clearcollSuperAdmins());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initSuperAdmins($overrideExisting = true)
+    {
+        if (null !== $this->collSuperAdmins && !$overrideExisting) {
+            return;
+        }
+        $this->collSuperAdmins = new PropelObjectCollection();
+        $this->collSuperAdmins->setModel('SuperAdmin');
+    }
+
+    /**
+     * Gets an array of SuperAdmin objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this User is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|SuperAdmin[] List of SuperAdmin objects
+     * @throws PropelException
+     */
+    public function getSuperAdmins($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collSuperAdminsPartial && !$this->isNew();
+        if (null === $this->collSuperAdmins || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collSuperAdmins) {
+                // return empty collection
+                $this->initSuperAdmins();
+            } else {
+                $collSuperAdmins = SuperAdminQuery::create(null, $criteria)
+                    ->filterByUser($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collSuperAdminsPartial && count($collSuperAdmins)) {
+                      $this->initSuperAdmins(false);
+
+                      foreach($collSuperAdmins as $obj) {
+                        if (false == $this->collSuperAdmins->contains($obj)) {
+                          $this->collSuperAdmins->append($obj);
+                        }
+                      }
+
+                      $this->collSuperAdminsPartial = true;
+                    }
+
+                    $collSuperAdmins->getInternalIterator()->rewind();
+                    return $collSuperAdmins;
+                }
+
+                if($partial && $this->collSuperAdmins) {
+                    foreach($this->collSuperAdmins as $obj) {
+                        if($obj->isNew()) {
+                            $collSuperAdmins[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collSuperAdmins = $collSuperAdmins;
+                $this->collSuperAdminsPartial = false;
+            }
+        }
+
+        return $this->collSuperAdmins;
+    }
+
+    /**
+     * Sets a collection of SuperAdmin objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $superAdmins A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return User The current object (for fluent API support)
+     */
+    public function setSuperAdmins(PropelCollection $superAdmins, PropelPDO $con = null)
+    {
+        $superAdminsToDelete = $this->getSuperAdmins(new Criteria(), $con)->diff($superAdmins);
+
+        $this->superAdminsScheduledForDeletion = unserialize(serialize($superAdminsToDelete));
+
+        foreach ($superAdminsToDelete as $superAdminRemoved) {
+            $superAdminRemoved->setUser(null);
+        }
+
+        $this->collSuperAdmins = null;
+        foreach ($superAdmins as $superAdmin) {
+            $this->addSuperAdmin($superAdmin);
+        }
+
+        $this->collSuperAdmins = $superAdmins;
+        $this->collSuperAdminsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related SuperAdmin objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related SuperAdmin objects.
+     * @throws PropelException
+     */
+    public function countSuperAdmins(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collSuperAdminsPartial && !$this->isNew();
+        if (null === $this->collSuperAdmins || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collSuperAdmins) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getSuperAdmins());
+            }
+            $query = SuperAdminQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByUser($this)
+                ->count($con);
+        }
+
+        return count($this->collSuperAdmins);
+    }
+
+    /**
+     * Method called to associate a SuperAdmin object to this object
+     * through the SuperAdmin foreign key attribute.
+     *
+     * @param    SuperAdmin $l SuperAdmin
+     * @return User The current object (for fluent API support)
+     */
+    public function addSuperAdmin(SuperAdmin $l)
+    {
+        if ($this->collSuperAdmins === null) {
+            $this->initSuperAdmins();
+            $this->collSuperAdminsPartial = true;
+        }
+        if (!in_array($l, $this->collSuperAdmins->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddSuperAdmin($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	SuperAdmin $superAdmin The superAdmin object to add.
+     */
+    protected function doAddSuperAdmin($superAdmin)
+    {
+        $this->collSuperAdmins[]= $superAdmin;
+        $superAdmin->setUser($this);
+    }
+
+    /**
+     * @param	SuperAdmin $superAdmin The superAdmin object to remove.
+     * @return User The current object (for fluent API support)
+     */
+    public function removeSuperAdmin($superAdmin)
+    {
+        if ($this->getSuperAdmins()->contains($superAdmin)) {
+            $this->collSuperAdmins->remove($this->collSuperAdmins->search($superAdmin));
+            if (null === $this->superAdminsScheduledForDeletion) {
+                $this->superAdminsScheduledForDeletion = clone $this->collSuperAdmins;
+                $this->superAdminsScheduledForDeletion->clear();
+            }
+            $this->superAdminsScheduledForDeletion[]= clone $superAdmin;
+            $superAdmin->setUser(null);
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -4719,6 +4990,11 @@ abstract class BaseUser extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collSuperAdmins) {
+                foreach ($this->collSuperAdmins as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->aAvatar instanceof Persistent) {
               $this->aAvatar->clearAllReferences($deep);
             }
@@ -4766,6 +5042,10 @@ abstract class BaseUser extends BaseObject implements Persistent
             $this->collGuardians->clearIterator();
         }
         $this->collGuardians = null;
+        if ($this->collSuperAdmins instanceof PropelCollection) {
+            $this->collSuperAdmins->clearIterator();
+        }
+        $this->collSuperAdmins = null;
         $this->aAvatar = null;
     }
 

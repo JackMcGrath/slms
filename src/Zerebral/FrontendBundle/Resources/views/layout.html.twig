@@ -70,27 +70,33 @@
                 <div class="container-fluid">
                     <div class="span1">
                     </div>
+
                     <div class="span6 pull-left">
                         <a class="brand" href="{{ path('dashboard') }}"></a>
                         <ul class="nav">
                             <li class="divider-vertical"></li>
                         </ul>
+                        {% if not app.user.isSuperAdmin() %}
                         {% set notificationsCount = app.user.unreadNotifications.count %}
                         <i class="icon-bell pull-left notifications">
                             {% if notificationsCount %}<small>{{ notificationsCount }}</small>{% endif %}
                         </i>
+                        {% endif %}
                         <form class="navbar-search pull-left" _lpchecked="1">
                             <input type="text" class="search-query icon-search-glass" placeholder="Search">
                         </form>
                     </div>
+
                     <ul class="nav menu span3 pull-right profile">
                         {% if is_granted('ROLE_USER') %}
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                             <img width="27" height="27" src="{{ user_avatar(app.user) | imagine_filter('top_thumbnail') }}" /> &nbsp; {{ app.user.firstName }} {{ app.user.lastName }} &nbsp; <b class="caret"></b></a>
                             <ul class="dropdown-menu">
+                                {% if not app.user.isSuperAdmin() %}
                                 <li><a href="{{ path('myprofile') }}"><i class="icon-user"></i> Profile</a></li>
                                 <li class="divider"></li>
+                                {% endif %}
                                 <li><a href="{{ path('_logout') }}" data-target="loginModal"><i class="icon-share-alt"></i> Sign Out</a></li>
                             </ul>
                         </li>
@@ -139,12 +145,12 @@
                             <a href="{{ path("assignments") }}"><i class="icon-big-bookmark"></i>Assignments</a>
                         </div>
                     </li>
-                    {% endif %}
                     <li class="{{ target is defined and target == 'messages' ? 'active' : ''}}">
                         <div class="menu-item">
                             <a href="{{ path("messages_inbox") }}"><i class="icon-big-mail">{% if app.user.unreadMessagesCount > 0 %}<small>{{ app.user.unreadMessagesCount }}</small>{% endif %}</i>Messages</a>
                         </div>
                     </li>
+                    {% endif %}
                     {#<li class="{{ target is defined and target == 'calendar' ? 'active' : ''}}"><div class="menu-item"><i class="icon-big-calendar"></i>Calendar</div></li>#}
                     {#<li class="{{ target is defined and target == 'members' ? 'active' : ''}}">#}
                         {#<div class="menu-item">#}

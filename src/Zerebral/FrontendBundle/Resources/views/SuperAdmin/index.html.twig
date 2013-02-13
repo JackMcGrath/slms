@@ -1,0 +1,31 @@
+{% extends 'ZerebralFrontendBundle::layout.html.twig' %}
+{% import "ZerebralFrontendBundle:Macro:main.html.twig" as mainPartials %}
+{% import "ZerebralFrontendBundle:Macro:flashMessages.html.twig" as flashMessages %}
+
+{% block content %}
+    {% javascripts '@ZerebralFrontendBundle/Resources/public/js/controllers/superadmin/index.js' output='js/compiled/superadmin_index.js' %}
+    <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+
+    <div class="top-second-navbar">
+
+    </div>
+
+    <div class="row-fluid courses-list course-details">
+        <div class="span6 main-list-block">
+            <div class="row-fluid manage">
+                <h2 class="pull-left form-title">
+                    Users list
+                </h2>
+            </div>
+            <hr/>
+            <br />
+
+            <div class="description">
+
+            </div>
+        </div>
+        <div class="right-navbar pull-left">
+        </div>
+    </div>
+{% endblock %}
