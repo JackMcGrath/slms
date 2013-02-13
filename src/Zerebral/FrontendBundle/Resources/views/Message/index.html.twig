@@ -22,6 +22,8 @@
             <form method="post" action="{{ path('message_edit') }}">
                 {{ flashMessages.show('message_compose_success', 'success') }}
                 {{ flashMessages.show('message_reply_success', 'success') }}
+                {{ flashMessages.show('message_delete_success', 'success') }}
+                {{ flashMessages.show('message_markasreed_success', 'success') }}
                 {% if messages and messages.count %}
                     <div class="messages-head">
                         <div class="pull-right">
