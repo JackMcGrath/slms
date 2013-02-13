@@ -15,7 +15,8 @@ class CourseQuery extends BaseCourseQuery
      * @param integer $id
      * @return Course|Course[]|mixed the result, formatted by the current formatter
      */
-    public function findByTeacher($id){
+    public function findByTeacher($id)
+    {
        return $this->findByCreatedBy($id);
     }
 
@@ -65,8 +66,13 @@ class CourseQuery extends BaseCourseQuery
         $this->addOr('courses.end', null, \Criteria::ISNULL);
         $this->addOr('courses.start', null, \Criteria::ISNULL);
 
+        return $this;
+    }
 
-
+    public function filterByIdForUser($id, $user)
+    {
+        $this->filterByRoleUser($user);
+        $this->filterById($id);
         return $this;
     }
 }

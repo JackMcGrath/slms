@@ -206,7 +206,7 @@ class GuardianController extends \Zerebral\CommonBundle\Component\Controller
         $recentMaterials = \Zerebral\BusinessBundle\Model\Material\CourseMaterialQuery::create()->findRecentCourseMaterials($course)->find();
 
         return array(
-            'course' => $course,
+            'course' => \Zerebral\BusinessBundle\Model\Course\CourseQuery::create()->filterByIdForUser($course->getId(), $selectedChild)->findOne(),
             'upcomingAssignments' => $upcomingAssignments,
             'recentMaterials' => $recentMaterials,
             'target' => 'courses',
