@@ -23,6 +23,7 @@
             {{ flashMessages.show('user_block', 'success') }}
             <div class="description">
                 <div class="table-header">
+                    {% if paginator.results|length > 0 %}
                     <div class="pagination">
                         <ul>
                             {# @todo: Paginator.first always true #}
@@ -33,6 +34,23 @@
                             <li {% if paginator.last %}class="disabled"{% endif %}><a href="{{ path('superadmin_users', {page: paginator.nextPage}) }}">&raquo;</a></li>
                         </ul>
                     </div>
+                    {% endif %}
+                    <div class="search">
+                        <span>Search:</span>
+                        <input id="usersListSearch" type="text" placeholder="Enter name or email"  value="{{ searchCriteria }}"/>
+                        <button id="usersListSearchButton" class="btn" type="button">Search</button>
+                        <button id="usersListSearchClearButton" class="btn" type="button" {% if searchCriteria|length == 0 %} disabled="disabled"{% endif %}>Clear</button>
+                    </div>
+                    <div class="filtering">
+                        <span>Filter by status:</span>
+                        <select id="usersListFilter">
+                            <option value="all" {% if filterCriteria == 'all' %} selected="selected"{% endif %}>All</option>
+                            <option value="active" {% if filterCriteria == 'active' %} selected="selected"{% endif %}>Active</option>
+                            <option value="blocked" {% if filterCriteria == 'blocked' %} selected="selected"{% endif %}>Blocked</option>
+                        </select>
+                    </div>
+
+
                 </div>
                 <table class="table-striped users-list">
                     <tr class="header">
@@ -64,9 +82,14 @@
                             {% endif %}
                         </td>
                     </tr>
+                    {% else %}
+                        <tr class="no-records">
+                            <td colspan="9">No records found</td>
+                        </tr>
                     {% endfor %}
                 </table>
                 <div class="table-footer">
+                    {% if paginator.results|length > 0 %}
                     <div class="pagination">
                         <ul>
                             {# @todo: Paginator.first always true #}
@@ -77,6 +100,7 @@
                             <li {% if paginator.last %}class="disabled"{% endif %}><a href="{{ path('superadmin_users', {page: paginator.nextPage}) }}">&raquo;</a></li>
                         </ul>
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

@@ -44,9 +44,24 @@ class SuperAdminController extends \Zerebral\CommonBundle\Component\Controller
     public function usersAction($page)
     {
 
-        $paginator = UserQuery::create()->paginate($page);
-        //$paginator->
+        $query = UserQuery::create();
+
+        if(!is_null($this->getRequest()->get('filter', null))) {
+            $query->filterByIsActive($this->getRequest()->get('filter') == 'active');
+        }
+
+
+        if(!is_null($this->getRequest()->get('search', null))) {
+            $query->_and()
+                  ->where('LOWER(CONCAT(users.first_name, " ", users.last_name)) LIKE ?', '%' . strtolower($this->getRequest()->get('search')) . '%', \PDO::PARAM_STR)
+                  ->_or()->where('LOWER(users.email) LIKE ?', '%' . strtolower($this->getRequest()->get('search')) . '%', \PDO::PARAM_STR);
+        }
+
+
+        $paginator = $query->paginate($page);
         return array(
+            'searchCriteria' => $this->getRequest()->get('search', ''),
+            'filterCriteria' => $this->getRequest()->get('filter', 'all'),
             'paginator' => $paginator,
             'target' => 'home'
         );
