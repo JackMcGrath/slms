@@ -271,4 +271,40 @@ class GuardianController extends \Zerebral\CommonBundle\Component\Controller
             'selectedChild' => $selectedChild
         );
     }
+
+    /**
+     * @Route("/members", name="guardian_members_view")
+     * @Route("/members/course/{courseId}", name="guardian_course_members_view")
+     * @ParamConverter("course", options={"mapping": {"courseId": "id"}})
+     * @PreAuthorize("hasRole('ROLE_GUARDIAN')")
+     * @Template
+     */
+    public function membersAction(Model\Course\Course $course = null)
+    {
+        $relatedUsersByRole = array();
+        $courses = array();
+        /** @var \Zerebral\BusinessBundle\Model\User\Guardian $guardian  */
+        $guardian = $this->getRoleUser();
+        $selectedChild = $guardian->getSelectedChild($this->get('session')->get('selectedChildId'));
+
+        $relatedUsersQuery = \Zerebral\BusinessBundle\Model\User\UserQuery::create()->getRelatedUsers($guardian->getUser(), true);
+        if ($course) {
+            $relatedUsersQuery->where('userToCourses.course_id = ' . $course->getId());
+        }
+        $relatedUsers = $relatedUsersQuery->addAscendingOrderByColumn('LOWER(users.last_name)')->find();
+
+        /** @var $user \Zerebral\BusinessBundle\Model\User\User */
+        foreach ($relatedUsers as $user) {
+            $relatedUsersByRole[$user->getRole()][] = $user;
+        }
+
+        $courses = \Zerebral\BusinessBundle\Model\Course\CourseQuery::create()->filterByRoleUser($selectedChild)->addAscendingOrderByColumn('LOWER(courses.name)')->find();
+
+        return array(
+            'relatedUsers' => $relatedUsersByRole,
+            'courses' => $courses,
+            'course' => $course,
+            'target' => 'members',
+        );
+    }
 }
