@@ -46,4 +46,10 @@ $(document).ready(function() {
         $('#usersListSearch').val('');
         $('#usersListSearchButton').click();
     });
+
+    $('#usersListSearch').on('keypress', function(event) {
+        if (event.charCode == 13) {
+            $('#usersListSearchButton').click();
+        }
+    });
 });
