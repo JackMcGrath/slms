@@ -2,6 +2,9 @@ parameters:
 #    zerebral_business.example.class: Zerebral\BusinessBundle\Example
 
 services:
+    security.user_checker:
+        class:      Zerebral\BusinessBundle\Security\UserBlockChecker
+
     security.course_access_voter:
         class:      Zerebral\BusinessBundle\Security\CourseAccessVoter
         public:     false
