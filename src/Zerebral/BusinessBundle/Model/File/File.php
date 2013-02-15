@@ -229,4 +229,23 @@ class File extends BaseFile implements \Zerebral\CommonBundle\File\Model\FileSto
     {
         return $this->folder;
     }
+
+    /**
+     *
+     * @param File $copyObj
+     * @param bool $deepCopy
+     * @param bool $makeNew
+     */
+    public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
+    {
+        parent::copyInto($copyObj, $deepCopy, $makeNew);
+        $copyObj->setFileStorage($this->getFileStorage());
+        $copyObj->setTemporaryFile($this->copyTemporaryFile());
+    }
+
+    private function copyTemporaryFile()
+    {
+        $file = $this->getFileStorage()->getTemporaryFile($this->getTemporaryFile());
+        return $this->getFileStorage()->createTemporaryFile($file);
+    }
 }

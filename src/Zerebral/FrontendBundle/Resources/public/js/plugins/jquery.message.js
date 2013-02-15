@@ -88,12 +88,21 @@ PrivateMessages.prototype = {
             multiple: true
         }, function (data) {
             var results = [];
-
             $.each(data.users, function (i, user) {
                 results.push({ value: user.id, text: user.name });
             });
-
             return results;
+        });
+
+        select.bind('liszt:hiding_dropdown', function(event, chosen) {
+            $('.chzn-drop ul.chzn-results').empty();
+            $(".search-field > input, .chzn-search > input").data('prevVal', '');
+        });
+
+        $('#message_to_chzn li.search-field input').bind('keyup', function(e) {
+            if ($(e.target).val().length == 0) {
+                $('.chzn-drop ul.chzn-results').empty();
+            }
         });
 
         var getSuggest = function(process) {
@@ -107,7 +116,7 @@ PrivateMessages.prototype = {
                     return process(response.users);
                 }
             });
-        }
+        };
     },
 
     onShowPopup: function(e) {

@@ -46,7 +46,7 @@ class Message extends BaseMessage
             $this->makeACopy();
         }
 
-        parent::postInsert($con);
+        return parent::postInsert($con);
     }
 
     public function getShortBody()

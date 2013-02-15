@@ -149,9 +149,6 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function composeAction()
     {
-//        var_dump($_POST);
-//        die;
-
         $newMessage = new Model\Message\ComposeMessage();
         $newMessageType = new FormType\ComposeMessageType();
 
