@@ -18,7 +18,7 @@ class NotificationController extends \Zerebral\CommonBundle\Component\Controller
 {
     /**
      * @Route("/", name="notifications")
-     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @PreAuthorize("hasRole('ROLE_USER')")
      * @Template()
      */
     public function indexAction()
@@ -36,7 +36,7 @@ class NotificationController extends \Zerebral\CommonBundle\Component\Controller
 
     /**
      * @Route("/unread-list", name="ajax_unread_list")
-     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @PreAuthorize("hasRole('ROLE_USER')")
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Zerebral\CommonBundle\HttpFoundation\FormJsonResponse
      */
     public function unreadListAction()
