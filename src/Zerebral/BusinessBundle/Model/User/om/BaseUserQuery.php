@@ -42,6 +42,7 @@ use Zerebral\BusinessBundle\Model\User\UserQuery;
  * @method UserQuery orderByIsActive($order = Criteria::ASC) Order by the is_active column
  * @method UserQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method UserQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
+ * @method UserQuery orderByResetCode($order = Criteria::ASC) Order by the reset_code column
  *
  * @method UserQuery groupById() Group by the id column
  * @method UserQuery groupByRole() Group by the role column
@@ -57,6 +58,7 @@ use Zerebral\BusinessBundle\Model\User\UserQuery;
  * @method UserQuery groupByIsActive() Group by the is_active column
  * @method UserQuery groupByCreatedAt() Group by the created_at column
  * @method UserQuery groupByUpdatedAt() Group by the updated_at column
+ * @method UserQuery groupByResetCode() Group by the reset_code column
  *
  * @method UserQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method UserQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -126,6 +128,7 @@ use Zerebral\BusinessBundle\Model\User\UserQuery;
  * @method User findOneByIsActive(boolean $is_active) Return the first User filtered by the is_active column
  * @method User findOneByCreatedAt(string $created_at) Return the first User filtered by the created_at column
  * @method User findOneByUpdatedAt(string $updated_at) Return the first User filtered by the updated_at column
+ * @method User findOneByResetCode(string $reset_code) Return the first User filtered by the reset_code column
  *
  * @method array findById(int $id) Return User objects filtered by the id column
  * @method array findByRole(string $role) Return User objects filtered by the role column
@@ -141,6 +144,7 @@ use Zerebral\BusinessBundle\Model\User\UserQuery;
  * @method array findByIsActive(boolean $is_active) Return User objects filtered by the is_active column
  * @method array findByCreatedAt(string $created_at) Return User objects filtered by the created_at column
  * @method array findByUpdatedAt(string $updated_at) Return User objects filtered by the updated_at column
+ * @method array findByResetCode(string $reset_code) Return User objects filtered by the reset_code column
  */
 abstract class BaseUserQuery extends ModelCriteria
 {
@@ -243,7 +247,7 @@ abstract class BaseUserQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `role`, `first_name`, `last_name`, `salutation`, `birthday`, `gender`, `email`, `password`, `salt`, `avatar_id`, `is_active`, `created_at`, `updated_at` FROM `users` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `role`, `first_name`, `last_name`, `salutation`, `birthday`, `gender`, `email`, `password`, `salt`, `avatar_id`, `is_active`, `created_at`, `updated_at`, `reset_code` FROM `users` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -788,6 +792,35 @@ abstract class BaseUserQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(UserPeer::UPDATED_AT, $updatedAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the reset_code column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByResetCode('fooValue');   // WHERE reset_code = 'fooValue'
+     * $query->filterByResetCode('%fooValue%'); // WHERE reset_code LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $resetCode The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return UserQuery The current query, for fluid interface
+     */
+    public function filterByResetCode($resetCode = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($resetCode)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $resetCode)) {
+                $resetCode = str_replace('*', '%', $resetCode);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(UserPeer::RESET_CODE, $resetCode, $comparison);
     }
 
     /**

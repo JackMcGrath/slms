@@ -117,4 +117,89 @@ class SecuredController extends Controller
         $factory = $this->get('security.encoder_factory');
         return $factory->getEncoder($user);
     }
+
+    /**
+     * @Route("/forgot-password", name="_forgot_password")
+     * @Template
+     */
+    public function forgotPasswordAction()
+    {
+        $data = array();
+        if ($this->getRequest()->isMethod('POST')) {
+            $email = $this->getRequest()->get('_username', null);
+            if (is_null($email)) {
+                $data['error'] = 'Please enter your email';
+            } else {
+                $user = \Zerebral\BusinessBundle\Model\User\UserQuery::create()->findOneByEmail($email);
+                if (is_null($user)) {
+                    $data['error'] = 'User with email "' . $email . '" is not registered';
+                } else {
+                    $code = md5($user->getId() . '_' . $user->getEmail() . '_' . time() . '_' . uniqid('password_reset'));
+                    $user->setResetCode($code);
+                    $user->save();
+
+                    $message = \Swift_Message::newInstance()
+                        ->setSubject('Zerebral - Password recovery')
+                        ->setFrom('hello@zerebral.com')
+                        ->setTo($email)
+                        ->setBody(
+                        $this->renderView(
+                            'ZerebralFrontendBundle:Email:passwordRecovery.html.twig',
+                            array(
+                                'email' => $email,
+                                'code' => $code,
+                                'userName' => $user->getFullName(),
+                                'host' => $this->getRequest()->getHttpHost()
+                            )
+                        )
+                    );
+                    $this->get('mailer')->send($message);
+                    $this->getRequest()->getSession()->setFlash('reset_list_sent', 'Email with activation link was send to "' . $email . '"');
+                    return $this->redirect($this->generateUrl('_login'));
+                }
+            }
+        } else {
+            $data['error'] = false;
+        }
+        return $data;
+    }
+
+
+    /**
+     * @Route("/reset-password/{code}", name="_reset_password")
+     * @Template
+     */
+    public function resetPasswordAction($code)
+    {
+
+        $user = \Zerebral\BusinessBundle\Model\User\UserQuery::create()->findOneByResetCode($code);
+        if (is_null($user)) {
+            return $this->redirect($this->generateUrl('_login'));
+        }
+
+        $form = $this->createForm(new \Zerebral\FrontendBundle\Form\Type\UserResetPasswordType(), $user);
+        if ($this->getRequest()->isMethod('POST')) {
+            $form->bind($this->getRequest());
+            if ($form->isValid()) {
+                /** @var $user User\User */
+                $user = $form->getData();
+
+                $user->setPasswordEncoder($this->getPasswordEncoder($user));
+                $user->setResetCode(null);
+                $user->transitToRoleModel()->save();
+
+                //automatic log in user.
+                $token = new UsernamePasswordToken($user, null, 'secured_area', $user->getRoles());
+                $this->get('security.context')->setToken($token);
+
+                return $this->get('zerebral.frontend.login_success_handler')->onAuthenticationSuccess($this->getRequest(), $token);
+            }
+        }
+
+        return array(
+            'user' => $user,
+            'form' => $form->createView(),
+            'code' => $code
+        );
+    }
 }
