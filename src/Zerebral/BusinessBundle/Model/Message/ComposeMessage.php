@@ -8,6 +8,9 @@ class ComposeMessage
     public $message;
     public $recipients;
 
+    /**
+     * @return Message
+     */
     public function getMessage()
     {
         return $this->message;
@@ -32,7 +35,10 @@ class ComposeMessage
     {
         foreach ($this->getRecipients() as $recipient) {
             $recipientMessage = $this->getMessage()->copy();
-            $recipientMessage->setTo($recipient);
+            foreach($this->getMessage()->getFiles() as $file) {
+                $recipientMessage->addFile($file->copy());
+            }
+            $recipientMessage->setToId($recipient->getId());
             $recipientMessage->setUserId($recipient->getId());
             $recipientMessage->save();
         }
