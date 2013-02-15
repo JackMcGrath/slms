@@ -232,7 +232,7 @@
                 </div>
             {% endif %}
             {% if course %}
-                {% if is_granted('ROLE_STUDENT') %}
+                {% if is_granted('ROLE_STUDENT') or is_granted('ROLE_TEACHER') %}
                     <h4><a href="{{ path('assignment_view', {id: assignment.id}) }}">{{ assignment.name }}</a></h4>
                 {% elseif is_granted('ROLE_GUARDIAN') %}
                     <h4><a href="{{ path('guardian_assignment_view', {id: assignment.id}) }}">{{ assignment.name }}</a></h4>
