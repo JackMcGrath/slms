@@ -3,7 +3,7 @@
 
     <table name="users" phpName="User" idMethod="native">
         <column name="id" phpName="Id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="role" phpName="Role" type="VARCHAR" valueSet="director,parent,teacher,student" sqlType="enum('director','gaurdian','teacher','student')" required="true" />
+        <column name="role" phpName="Role" type="VARCHAR" valueSet="superadmin,director,guardian,teacher,student" sqlType="enum('superadmin','director','guardian','teacher','student')" required="true" />
         <column name="first_name" phpName="FirstName" type="VARCHAR" size="100" required="true"/>
         <column name="last_name" phpName="LastName" type="VARCHAR" size="100" required="true"/>
         <column name="salutation" phpName="Salutation" type="VARCHAR" size="5" required="false"/>
@@ -58,6 +58,19 @@
         <column name="id" phpName="Id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="user_id" phpName="UserId" type="INTEGER" sqlType="int(11) unsigned" required="true"/>
         <column name="notes" phpName="Notes" type="LONGVARCHAR" required="false"/>
+
+        <foreign-key foreignTable="users">
+            <reference local="user_id" foreign="id"/>
+        </foreign-key>
+
+        <behavior name="delegate">
+            <parameter name="to" value="users"/>
+        </behavior>
+    </table>
+
+    <table name="super_admins" phpName="SuperAdmin" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="user_id" phpName="UserId" type="INTEGER" sqlType="int(11) unsigned" required="true"/>
 
         <foreign-key foreignTable="users">
             <reference local="user_id" foreign="id"/>

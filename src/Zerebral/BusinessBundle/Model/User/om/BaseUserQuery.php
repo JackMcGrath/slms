@@ -21,6 +21,7 @@ use Zerebral\BusinessBundle\Model\Message\Message;
 use Zerebral\BusinessBundle\Model\Notification\Notification;
 use Zerebral\BusinessBundle\Model\User\Guardian;
 use Zerebral\BusinessBundle\Model\User\Student;
+use Zerebral\BusinessBundle\Model\User\SuperAdmin;
 use Zerebral\BusinessBundle\Model\User\Teacher;
 use Zerebral\BusinessBundle\Model\User\User;
 use Zerebral\BusinessBundle\Model\User\UserPeer;
@@ -104,6 +105,10 @@ use Zerebral\BusinessBundle\Model\User\UserQuery;
  * @method UserQuery leftJoinGuardian($relationAlias = null) Adds a LEFT JOIN clause to the query using the Guardian relation
  * @method UserQuery rightJoinGuardian($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Guardian relation
  * @method UserQuery innerJoinGuardian($relationAlias = null) Adds a INNER JOIN clause to the query using the Guardian relation
+ *
+ * @method UserQuery leftJoinSuperAdmin($relationAlias = null) Adds a LEFT JOIN clause to the query using the SuperAdmin relation
+ * @method UserQuery rightJoinSuperAdmin($relationAlias = null) Adds a RIGHT JOIN clause to the query using the SuperAdmin relation
+ * @method UserQuery innerJoinSuperAdmin($relationAlias = null) Adds a INNER JOIN clause to the query using the SuperAdmin relation
  *
  * @method User findOne(PropelPDO $con = null) Return the first User matching the query
  * @method User findOneOrCreate(PropelPDO $con = null) Return the first User matching the query, or a new User object populated from the query conditions when no match is found
@@ -1599,6 +1604,80 @@ abstract class BaseUserQuery extends ModelCriteria
         return $this
             ->joinGuardian($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Guardian', '\Zerebral\BusinessBundle\Model\User\GuardianQuery');
+    }
+
+    /**
+     * Filter the query by a related SuperAdmin object
+     *
+     * @param   SuperAdmin|PropelObjectCollection $superAdmin  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   UserQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterBySuperAdmin($superAdmin, $comparison = null)
+    {
+        if ($superAdmin instanceof SuperAdmin) {
+            return $this
+                ->addUsingAlias(UserPeer::ID, $superAdmin->getUserId(), $comparison);
+        } elseif ($superAdmin instanceof PropelObjectCollection) {
+            return $this
+                ->useSuperAdminQuery()
+                ->filterByPrimaryKeys($superAdmin->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterBySuperAdmin() only accepts arguments of type SuperAdmin or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the SuperAdmin relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return UserQuery The current query, for fluid interface
+     */
+    public function joinSuperAdmin($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('SuperAdmin');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'SuperAdmin');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the SuperAdmin relation SuperAdmin object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Zerebral\BusinessBundle\Model\User\SuperAdminQuery A secondary query class using the current class as primary query
+     */
+    public function useSuperAdminQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinSuperAdmin($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'SuperAdmin', '\Zerebral\BusinessBundle\Model\User\SuperAdminQuery');
     }
 
     /**
