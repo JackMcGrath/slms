@@ -108,9 +108,7 @@ class UserController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function profileAction(Model\User\User $user = null)
     {
-
         $userProfile = $user ?: $this->getUser();
-
 
         return array(
             'user' => $userProfile,

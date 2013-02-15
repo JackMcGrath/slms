@@ -22,7 +22,7 @@
             {{ flashMessages.show('invites_send', 'success') }}
 
                 <div class="span8 content">
-                    {% if is_granted('ROLE_STUDENT') or is_granted('ROLE_TEACHER') %}
+                    {% if user.isStudent or user.isTeacher %}
                         {% if user.roleModel.bio %}
                             <div class="small-title">Bio</div>
                             <p>{{ user.roleModel.bio }}</p>
@@ -34,13 +34,13 @@
                         {% endif %}
                     {% endif %}
 
-                    {% if is_granted('ROLE_STUDENT') %}
+                    {% if user.isStudent %}
                         {% if user.roleModel.activities %}
                             <div class="small-title">Activities</div>
                             <p>{{ user.roleModel.activities }}</p>
                         {% endif %}
 
-                        {% if user.roleModel.interests %}
+                        {% if user.getRoleModel().interests %}
                             <div class="small-title">Interests</div>
                             <p>{{ user.roleModel.interests }}</p>
                         {% endif %}
