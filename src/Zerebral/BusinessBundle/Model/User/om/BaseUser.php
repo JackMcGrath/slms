@@ -146,6 +146,12 @@ abstract class BaseUser extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
+     * The value for the reset_code field.
+     * @var        string
+     */
+    protected $reset_code;
+
+    /**
      * @var        File
      */
     protected $aAvatar;
@@ -555,6 +561,16 @@ abstract class BaseUser extends BaseObject implements Persistent
     }
 
     /**
+     * Get the [reset_code] column value.
+     *
+     * @return string
+     */
+    public function getResetCode()
+    {
+        return $this->reset_code;
+    }
+
+    /**
      * Set the value of [id] column.
      *
      * @param int $v new value
@@ -867,6 +883,27 @@ abstract class BaseUser extends BaseObject implements Persistent
     } // setUpdatedAt()
 
     /**
+     * Set the value of [reset_code] column.
+     *
+     * @param string $v new value
+     * @return User The current object (for fluent API support)
+     */
+    public function setResetCode($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (string) $v;
+        }
+
+        if ($this->reset_code !== $v) {
+            $this->reset_code = $v;
+            $this->modifiedColumns[] = UserPeer::RESET_CODE;
+        }
+
+
+        return $this;
+    } // setResetCode()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -916,6 +953,7 @@ abstract class BaseUser extends BaseObject implements Persistent
             $this->is_active = ($row[$startcol + 11] !== null) ? (boolean) $row[$startcol + 11] : null;
             $this->created_at = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
             $this->updated_at = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
+            $this->reset_code = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -924,7 +962,7 @@ abstract class BaseUser extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 14; // 14 = UserPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 15; // 15 = UserPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating User object", $e);
@@ -1428,6 +1466,9 @@ abstract class BaseUser extends BaseObject implements Persistent
         if ($this->isColumnModified(UserPeer::UPDATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`updated_at`';
         }
+        if ($this->isColumnModified(UserPeer::RESET_CODE)) {
+            $modifiedColumns[':p' . $index++]  = '`reset_code`';
+        }
 
         $sql = sprintf(
             'INSERT INTO `users` (%s) VALUES (%s)',
@@ -1480,6 +1521,9 @@ abstract class BaseUser extends BaseObject implements Persistent
                         break;
                     case '`updated_at`':
                         $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
+                        break;
+                    case '`reset_code`':
+                        $stmt->bindValue($identifier, $this->reset_code, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -1757,6 +1801,9 @@ abstract class BaseUser extends BaseObject implements Persistent
             case 13:
                 return $this->getUpdatedAt();
                 break;
+            case 14:
+                return $this->getResetCode();
+                break;
             default:
                 return null;
                 break;
@@ -1800,6 +1847,7 @@ abstract class BaseUser extends BaseObject implements Persistent
             $keys[11] => $this->getIsActive(),
             $keys[12] => $this->getCreatedAt(),
             $keys[13] => $this->getUpdatedAt(),
+            $keys[14] => $this->getResetCode(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aAvatar) {
@@ -1914,6 +1962,9 @@ abstract class BaseUser extends BaseObject implements Persistent
             case 13:
                 $this->setUpdatedAt($value);
                 break;
+            case 14:
+                $this->setResetCode($value);
+                break;
         } // switch()
     }
 
@@ -1952,6 +2003,7 @@ abstract class BaseUser extends BaseObject implements Persistent
         if (array_key_exists($keys[11], $arr)) $this->setIsActive($arr[$keys[11]]);
         if (array_key_exists($keys[12], $arr)) $this->setCreatedAt($arr[$keys[12]]);
         if (array_key_exists($keys[13], $arr)) $this->setUpdatedAt($arr[$keys[13]]);
+        if (array_key_exists($keys[14], $arr)) $this->setResetCode($arr[$keys[14]]);
     }
 
     /**
@@ -1977,6 +2029,7 @@ abstract class BaseUser extends BaseObject implements Persistent
         if ($this->isColumnModified(UserPeer::IS_ACTIVE)) $criteria->add(UserPeer::IS_ACTIVE, $this->is_active);
         if ($this->isColumnModified(UserPeer::CREATED_AT)) $criteria->add(UserPeer::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(UserPeer::UPDATED_AT)) $criteria->add(UserPeer::UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(UserPeer::RESET_CODE)) $criteria->add(UserPeer::RESET_CODE, $this->reset_code);
 
         return $criteria;
     }
@@ -2053,6 +2106,7 @@ abstract class BaseUser extends BaseObject implements Persistent
         $copyObj->setIsActive($this->getIsActive());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
+        $copyObj->setResetCode($this->getResetCode());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -4917,6 +4971,7 @@ abstract class BaseUser extends BaseObject implements Persistent
         $this->is_active = null;
         $this->created_at = null;
         $this->updated_at = null;
+        $this->reset_code = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;

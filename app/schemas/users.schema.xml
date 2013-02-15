@@ -16,6 +16,11 @@
         <column name="is_active" phpName="IsActive" type="BOOLEAN" size="1" sqlType="tinyint(1) unsigned" required="true" defaultValue="true"/>
         <column name="created_at" phpName="CreatedAt" type="TIMESTAMP" required="false"/>
         <column name="updated_at" phpName="UpdatedAt" type="TIMESTAMP" required="true"/>
+        <column name="reset_code" phpName="ResetCode" type="VARCHAR" size="32" required="false" defaultValue="NULL"/>
+
+        <index name="reset_code">
+            <index-column name="reset_code"/>
+        </index>
 
         <foreign-key foreignTable="files" name="user_avatar" phpName="Avatar" onDelete="SET NULL" onUpdate="CASCADE">
             <reference local="avatar_id" foreign="id" />

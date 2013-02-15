@@ -45,10 +45,11 @@ class UserTableMap extends TableMap
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('role', 'Role', 'VARCHAR', true, null, null);
         $this->getColumn('role', false)->setValueSet(array (
-  0 => 'director',
-  1 => 'parent',
-  2 => 'teacher',
-  3 => 'student',
+  0 => 'superadmin',
+  1 => 'director',
+  2 => 'guardian',
+  3 => 'teacher',
+  4 => 'student',
 ));
         $this->addColumn('first_name', 'FirstName', 'VARCHAR', true, 100, null);
         $this->addColumn('last_name', 'LastName', 'VARCHAR', true, 100, null);
@@ -66,6 +67,7 @@ class UserTableMap extends TableMap
         $this->addColumn('is_active', 'IsActive', 'BOOLEAN', true, 1, true);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', true, null, null);
+        $this->addColumn('reset_code', 'ResetCode', 'VARCHAR', false, 32, null);
         // validators
     } // initialize()
 
