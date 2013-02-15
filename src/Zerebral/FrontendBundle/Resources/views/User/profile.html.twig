@@ -4,199 +4,80 @@
 
 {% block content %}
     {% javascripts
-        '@ZerebralFrontendBundle/Resources/public/js/controllers/user/profile.js'
-        output='js/compiled/profile.js' %}
-        <script type="text/javascript" src="{{ asset_url }}"></script>
+    '@ZerebralFrontendBundle/Resources/public/js/controllers/user/profile.js'
+    output='js/compiled/profile.js' %}
+    <script type="text/javascript" src="{{ asset_url }}"></script>
     {% endjavascripts %}
 
-    <div class="row-fluid profile">
+    <div class="row-fluid profile user-profile">
         <div class="span7">
             <div class="row-fluid">
                 <h2 class="span6 pull-left form-title">
-                    Profile <small>edit</small>
+                    {{ user.firstName }} {{ user.lastName }} <small>{{ user.role }}</small>
                 </h2>
             </div>
             <hr/>
 
             {{ flashMessages.show('profile_save_success', 'success') }}
             {{ flashMessages.show('invites_send', 'success') }}
-            <form method="post" {{ form_enctype(form) }} novalidate  class="form-horizontal create-form no-left-margin">
-                <div class="span8">
-                    {% if not is_granted('ROLE_GUARDIAN') %}
-                        {{ form_row(form.bio, {
-                            label: 'Bio',
-                            form_type: 'horizontal',
-                            attr: {
-                                class: 'input-block-level',
-                                rows: 6,
-                                help_block: 'About you in <b>160</b> characters',
-                            }
-                        }) }}
-                    {% endif %}
 
-                    {{ form_row(form.user.birthday, {
-                        label: 'Birthday',
-                        form_type: 'horizontal',
-                        attr: {
-                            class: 'birthday icon-new-calendar image-background input-small'
-                        }
-                    }) }}
-
-                    {{ form_row(form.user.gender, {
-                        label: 'Gender',
-                        form_type: 'horizontal',
-                        attr: {
-                            class: 'input-small'
-                        }
-                    }) }}
-
-                    {% if is_granted('ROLE_TEACHER') %}
-                        {{ form_row(form.subjects, {
-                        label: 'Subjects taught',
-                        form_type: 'horizontal',
-                        attr: {
-                            class: 'input-block-level',
-                            rows: 6
-                        }
-                        }) }}
-
-                        {{ form_row(form.grades, {
-                        label: 'Grades',
-                        form_type: 'horizontal',
-                        attr: {
-                            class: 'input-block-level',
-                            rows: 6
-                        }
-                        }) }}
+                <div class="span8 content">
+                    {% if is_granted('ROLE_STUDENT') or is_granted('ROLE_TEACHER') %}
+                        {% if user.roleModel.bio %}
+                            <div class="small-title">Bio</div>
+                            <p>{{ user.roleModel.bio }}</p>
+                        {% endif %}
+                    {% else %}
+                        {% if user.roleModel.notes %}
+                            <div class="small-title">Notes</div>
+                            <p>{{ user.roleModel.notes }}</p>
+                        {% endif %}
                     {% endif %}
 
                     {% if is_granted('ROLE_STUDENT') %}
-                        {{ form_row(form.activities, {
-                        label: 'Activities',
-                        form_type: 'horizontal',
-                        attr: {
-                            class: 'input-block-level',
-                            rows: 6
-                        }
-                        }) }}
+                        {% if user.roleModel.activities %}
+                            <div class="small-title">Activities</div>
+                            <p>{{ user.roleModel.activities }}</p>
+                        {% endif %}
 
-                        {{ form_row(form.interests, {
-                        label: 'Interests',
-                        form_type: 'horizontal',
-                        attr: {
-                            class: 'input-block-level',
-                            rows: 6
-                        }
-                        }) }}
-                    {% endif %}
-
-                    {% if is_granted('ROLE_GUARDIAN') %}
-                        {{ form_row(form.notes, {
-                        label: 'Notes',
-                        form_type: 'horizontal',
-                        attr: {
-                        class: 'input-block-level',
-                        rows: 6
-                        }
-                        }) }}
+                        {% if user.roleModel.interests %}
+                            <div class="small-title">Interests</div>
+                            <p>{{ user.roleModel.interests }}</p>
+                        {% endif %}
                     {% endif %}
 
                 </div>
 
                 <div class="span4 pull-right">
-                    {% set isValidFile = form.user.avatar.uploadedFile.vars.errors|length == 0 %}
-
                     <div class="profile-avatar pull-right span12">
                         <img class="span12" src="{{ user_avatar(user) | imagine_filter('big_thumbnail') }}"/>
-
-                        <a id="show_avatar_file_field" href="#" class="{{ isValidFile ? '' : 'hidden' }}">Change your avatar</a>
-                        <div class="hidden-avatar-div" style="{{ isValidFile ? '' : 'display:block;' }}">
-                            {{ form_widget(form.user.avatar.uploadedFile) }}
-                            {{ form_errors(form.user.avatar.uploadedFile) }}
-
-                            {{ form_row(form.user.avatar.name) }}
-                            {{ form_row(form.user.avatar.temporaryFile) }}
-                            {{ form_row(form.user.avatar.mimeType) }}
-                        </div>
                     </div>
-                </div>
-
-                {% if user.isStudent() %}
-                <div class="span4 pull-right">
-                    <div class="guardian-list" style="padding: 17px;">
-                        <h5>Parents:</h5>
-                        {% if user.getGuardians|length > 0 %}
-                        <ul>
-                            {% for guardian in user.getGuardians %}
-                                <li>{{ guardian.fullName }}</li>
+                    <div class="clearfix"></div>
+                    <div class="profile-links">
+                        <a href="#" rel="message-popup" userId="{{ user.id }}">Send a message</a><br/>
+                        {% if is_granted('ROLE_STUDENT') %}
+                            {% for parent in user.roleModel.studentGuardians %}
+                                <a href="{{ path('profile_view', {id: parent.guardian.userId}) }}">{{ parent.guardian.fullName }}</a><br/>
                             {% endfor %}
-                        </ul>
-                        {% else %}
-                            <p>No parents were invited</p>
                         {% endif %}
-                        {% if user.getStudent().guardianInvites|length > 0 %}
-                        <h5>Invitations sent:</h5>
-                        <ul>
-                            {% for invite in user.getStudent().getNonActivedInvites %}
-                                <li>{{ invite.guardianEmail }}</li>
-                            {% endfor %}
-                        </ul>
-                        {% endif %}
-                        <a href="#inviteModal" class="btn btn-danger invite" data-toggle="modal" data-target="#inviteModal">Invite your parent via email</a>
                     </div>
-                </div>
-                {% endif %}
 
-
-                {{ form_widget(form._token) }}
-
-                <div class="clearfix"></div>
-
-                <div class="form-actions">
-                    <input type="submit" class="btn btn-danger" value="{% if form.vars.value.id is defined and form.vars.value.id > 0 %}Update{% else %}Create{% endif %}" />
-                    <input type="reset" class="btn" value="Cancel" />
                 </div>
 
-            </form>
 
-        </div>
-        <div class="right-navbar">
-            <ul class="nav">
-                <li class="active"><a href="{{ path('myprofile') }}"><i class="icon-new-user"></i> Profile</a></li>
-                <li><a href="#"><i class="icon-new-gears"></i>Account Settings</a></li>
-                <li><a href="#"><i class="icon-new-mail"></i>Notifications</a></li>
-            </ul>
+
+
+
+
+
+
+
+
         </div>
     </div>
 
+    {{ mainPartials.composeMessagePopup() }}
 
-    <div class="modal hide fade" id="inviteModal">
-        <form method="post" {{ form_enctype(parentsInviteForm) }} class="member-form" action="{{ path('ajax_guardians_send_invites') }}">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h3>Invite your parents</h3>
-            </div>
-            <div class="modal-body">
-                <p>
-                    To send invitations to your parents, enter one ore more email addresses into the text box, separated by space or new lines, and click "Send Invites" button.
-                </p>
-                {{ form_row(parentsInviteForm.emails, {
-                    label: ' ',
-                    form_type: 'horizontal',
-                    attr: {
-                        class: 'input-block-level',
-                        rows: 6
-                    }
-                }) }}
-                {{ form_errors(parentsInviteForm) }}
-                <div class="clearfix"></div>
 
-            </div>
-            <div class="modal-footer">
-                <input type="submit" class="btn btn-danger" value="Send invites"/>
-                <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Cancel</a>
-            </div>
-            {{ form_rest(parentsInviteForm) }}
-        </form>
-    </div>
+
 {% endblock %}

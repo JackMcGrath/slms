@@ -22,7 +22,7 @@ class UserController extends \Zerebral\CommonBundle\Component\Controller
      * @PreAuthorize("hasRole('ROLE_USER')")
      * @Template()
      */
-    public function profileAction()
+    public function editProfileAction()
     {
         $profileType = null;
 
@@ -100,4 +100,21 @@ class UserController extends \Zerebral\CommonBundle\Component\Controller
         throw new \Symfony\Component\HttpKernel\Exception\HttpException(404, 'User name is empty.');
     }
 
+    /**
+     * @Route("/profile/{id}", name="profile_view")
+     * @Route("/profile/", name="myprofile_view")
+     * @PreAuthorize("hasRole('ROLE_USER')")
+     * @Template()
+     */
+    public function profileAction(Model\User\User $user = null)
+    {
+
+        $userProfile = $user ?: $this->getUser();
+
+
+        return array(
+            'user' => $userProfile,
+            'target' => 'profile'
+        );
+    }
 }
