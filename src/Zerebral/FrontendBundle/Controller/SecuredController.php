@@ -176,7 +176,6 @@ class SecuredController extends Controller
         if (is_null($user)) {
             return $this->redirect($this->generateUrl('_login'));
         }
-        var_dump($user->getPassword());
 
         $form = $this->createForm(new \Zerebral\FrontendBundle\Form\Type\UserResetPasswordType(), $user);
         if ($this->getRequest()->isMethod('POST')) {
