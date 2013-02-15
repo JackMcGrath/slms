@@ -151,6 +151,7 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
     {
 //        var_dump($_POST);
 //        die;
+
         $newMessage = new Model\Message\ComposeMessage();
         $newMessageType = new FormType\ComposeMessageType();
 
@@ -161,6 +162,7 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
             if ($form->isValid()) {
                 /** @var $newMessage Model\Message\Message */
                 $newMessage = $form->getData();
+
                 $newMessage->getMessage()->setFromId($this->getUser()->getId());
                 $newMessage->save();
 
@@ -201,7 +203,7 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
                     }
                     $message->delete();
                 }
-                $successMessage = $messages->count() > 1 ? 'Messages (<b>' . $messages->count() . '</b>)' : 'Message <b>"'.$messages->getFirst()->getSubject().'"</b>';
+                $successMessage = $messages->count() > 1 ? $messages->count() . ' messages' : 'Message <b>"'.$messages->getFirst()->getSubject().'"</b>';
                 $this->setFlash('message_delete_success', $successMessage . ' has been successfully deleted.');
                 return $this->redirect($this->getRequest()->headers->get('referer'));
             } else if ($this->getRequest()->get('mark-as-read', false)) {
@@ -212,7 +214,7 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
                     $message->setIsRead(true);
                     $message->save();
                 }
-                $successMessage = $messages->count() > 1 ? 'Messages (<b>' . $messages->count() . '</b>)' : 'Message <b>"'.$messages->getFirst()->getSubject().'"</b>';
+                $successMessage = $messages->count() > 1 ? $messages->count() . ' messages' : 'Message <b>"'.$messages->getFirst()->getSubject().'"</b>';
                 $this->setFlash('message_markasreed_success', $successMessage . ' has been successfully marked as read');
             } else if ($this->getRequest()->get('mark-as-unread', false)) {
                 foreach ($messages as $message) {
@@ -222,7 +224,7 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
                     $message->setIsRead(false);
                     $message->save();
                 }
-                $successMessage = $messages->count() > 1 ? 'Messages (<b>' . $messages->count() . '</b>)' : 'Message <b>"'.$messages->getFirst()->getSubject().'"</b>';
+                $successMessage = $messages->count() > 1 ? $messages->count() . ' messages' : 'Message <b>"'.$messages->getFirst()->getSubject().'"</b>';
                 $this->setFlash('message_markasreed_success', $successMessage . ' has been successfully marked as unread.');
             }
         }
