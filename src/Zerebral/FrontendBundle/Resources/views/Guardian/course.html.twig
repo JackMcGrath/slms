@@ -18,13 +18,13 @@
             </div>
             <hr/>
 
-            {{ mainPartials.courseSchedule(course) }}
-            <div class="clearfix"></div>
             <div class="stat count-line">
                 <div>
                     <span class="badge badge-important">{{ course.hasVirtualColumn('studentAssignmentsCount') ? course.getVirtualColumn('studentAssignmentsCount') : '-' }}</span> <a href="{{ path('guardian_course_assignments', {courseId: course.id} ) }}">Assignments</a>
                 </div>
             </div>
+
+            {{ mainPartials.courseSchedule(course) }}
 
             <div class="description">
                 {% autoescape false %}
