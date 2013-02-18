@@ -28,6 +28,12 @@ services:
         tags:
             -       { name: security.voter }
 
+    security.profile_access_voter:
+            class:      Zerebral\BusinessBundle\Security\ProfileAccessVoter
+            public:     false
+            tags:
+            -       { name: security.voter }
+
     zerebral.model_event_subscriber:
         class:      Zerebral\BusinessBundle\EventHandler\ModelEventSubscriber
         tags:

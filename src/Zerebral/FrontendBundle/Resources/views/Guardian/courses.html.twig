@@ -24,7 +24,7 @@
                         <div class="details pull-left">
                             <h4><a href="{{ path('guardian_course_view', {id: course.id}) }}">{{ course.name }}</a></h4>
                             <div class="stat">
-                                <div class="instructor-name pull-left" >Instructor<b> <a href="#">{{ course.teacher.fullName }}</a></b></div>
+                                <div class="instructor-name pull-left" >Instructor<b> <a href="{{ path('profile_view', {id: course.teacher.userId }) }}">{{ course.teacher.fullName }}</a></b></div>
                                 <div><span class="badge badge-important assignments-count" default-count="{{ course.getVirtualColumn('studentAssignmentsCount') }}">{{ course.getVirtualColumn('studentAssignmentsCount') }}</span><a href="{{ path('guardian_course_assignments', {courseId: course.id}) }}">Assignments</a></div>
                                 <div class="clear"></div>
                             </div>

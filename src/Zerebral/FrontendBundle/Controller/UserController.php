@@ -104,6 +104,7 @@ class UserController extends \Zerebral\CommonBundle\Component\Controller
      * @Route("/profile/{id}", name="profile_view")
      * @Route("/profile/", name="myprofile_view")
      * @PreAuthorize("hasRole('ROLE_USER')")
+     * @SecureParam(name="user", permissions="VIEW")
      * @Template()
      */
     public function profileAction(Model\User\User $user = null)

@@ -84,7 +84,7 @@
                 <div class="user-info">
                     {% set collocutor = thread.getFirst().toId == thread.getFirst().userId ? thread.getFirst().userRelatedByFromId : thread.getFirst().userRelatedByToId %}
                     <img class="rounded" src="{{ user_avatar(collocutor) | imagine_filter('thumbnail') }}" width="42" height="42" />
-                    <a href="#">{{ collocutor.getFullName() }}</a>
+                    <a href="{{ path('profile_view', {id: collocutor.id}) }}">{{ collocutor.getFullName() }}</a>
                 </div>
             </div>
 
@@ -107,7 +107,7 @@
 {% block message %}
     <div class="message {{ classHidden }}">
         <div class="info {{ message.fromId == message.userId ? 'self' : '' }}">
-            <a href="#">{{ message.fromId == message.userId ? 'Me' : message.userRelatedByFromId.getFullName() }}</a>
+            <a href="{{ path('profile_view', {id: message.fromId}) }}">{{ message.fromId == message.userId ? 'Me' : message.userRelatedByFromId.getFullName() }}</a>
             <p>{{ message.createdAt.format('m/d/Y <b\\r/>\\a\\t g:i a') | raw }}</p>
         </div>
         {{ message.body | raw }}

@@ -71,7 +71,7 @@
                     {% for courseId, course in attendancies %}
                         {% if courses[courseId] is defined %}
                         <tr>
-                            <td class="name"><a href="{{ path('guardian_courses') }}#class{{ courseId }}">{{ courses[courseId].name }}</a></td>
+                            <td class="name"><a href="{{ path('guardian_course_view', {id: courseId}) }}">{{ courses[courseId].name }}</a></td>
                             {% for day in range(startDate|date('U'), endDate|date('U'), 3600 * 24) %}
                                 <td>
                                     {% if course[day|date('Y-m-d')] is defined %}

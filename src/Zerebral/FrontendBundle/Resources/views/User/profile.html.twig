@@ -12,7 +12,7 @@
     <div class="row-fluid profile user-profile">
         <div class="span7">
             <div class="row-fluid">
-                <h2 class="span6 pull-left form-title">
+                <h2 class="pull-left form-title">
                     {{ user.firstName }} {{ user.lastName }} <small>{{ user.role }}</small>
                 </h2>
             </div>
@@ -46,6 +46,18 @@
                         {% endif %}
                     {% endif %}
 
+                    {% if user.isStudent or user.isTeacher %}
+                        {% if user.roleModel.courses %}
+                            <div class="user-courses">
+                            <h4>Courses:</h4>
+                            {% for course in user.roleModel.courses %}
+                                <a href="">{{ course.name }}</a><br/>
+                            {% endfor %}
+                            </div>
+                        {% endif %}
+                    {% endif %}
+
+
                 </div>
 
                 <div class="span4 pull-right">
@@ -55,24 +67,24 @@
                     <div class="clearfix"></div>
                     <div class="profile-links">
                         <a href="#" rel="message-popup" userId="{{ user.id }}">Send a message</a><br/>
-                        {% if is_granted('ROLE_STUDENT') %}
-                            {% for parent in user.roleModel.studentGuardians %}
-                                <a href="{{ path('profile_view', {id: parent.guardian.userId}) }}">{{ parent.guardian.fullName }}</a><br/>
-                            {% endfor %}
+                        {% if user.isStudent %}
+                            {% if user.roleModel.studentGuardians %}
+                                <h4>Parents:</h4>
+                                {% for parent in user.roleModel.studentGuardians %}
+                                    <a href="{{ path('profile_view', {id: parent.guardian.userId}) }}">{{ parent.guardian.fullName }}</a><br/>
+                                {% endfor %}
+                            {% endif %}
+                        {% elseif user.isGuardian %}
+                            {% if user.roleModel.students %}
+                                <h4>Child:</h4>
+                                {% for child in user.roleModel.students %}
+                                    <a href="{{ path('profile_view', {id: child.userId}) }}">{{ child.fullName }}</a><br/>
+                                {% endfor %}
+                            {% endif %}
                         {% endif %}
                     </div>
 
                 </div>
-
-
-
-
-
-
-
-
-
-
         </div>
     </div>
 

@@ -70,7 +70,7 @@
     <div class="member">
         <div class="avatar"><img src="{{ user_avatar(member) | imagine_filter('thumbnail') }}"/></div>
         <div class="info">
-            <a href="#">{{ member.fullName }}</a>
+            <a href="{{ path('profile_view', {id: member.id}) }}">{{ member.fullName }}</a>
             <div class="manage-buttons">
                 <a href="#" rel="message-popup" userId="{{ member.id }}">
                     <i class="icon-gray-mail"></i>Message

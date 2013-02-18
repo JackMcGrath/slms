@@ -72,7 +72,7 @@
             <img src="{{ user_avatar(user) | imagine_filter('thumbnail') }}" width="32" height="32" />
         </div>
         <div class="name">
-            <a href="#">{{ user.fullName }}</a>
+            <a href="{{ path('profile_view', {id: user.id}) }}">{{ user.fullName }}</a>
             <p>{{ message.getLastMessageDate | date('M d \\a\\t g:i a') }}</p>
         </div>
         <div class="message-content">
