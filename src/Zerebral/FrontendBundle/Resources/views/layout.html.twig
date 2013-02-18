@@ -127,31 +127,26 @@
                             <a href="{{ path('dashboard') }}"><i class="icon-big-home"></i>Home</a>
                         </div>
                     </li>
-                    {#<li class="{{ target is defined and target == 'notifications' ? 'active' : ''}}">#}
-                        {#{% set notificationsCount = app.user.unreadNotifications.count %}#}
-                        {#<div class="menu-item notice">#}
-                            {#<a href="{{ path('notifications') }}">#}
-                                {#<i class="icon-big-bell">{% if notificationsCount %}<small>{{ notificationsCount }}</small>{% endif %}</i>Notifications#}
-                            {#</a>#}
-                        {#</div>#}
-                    {#</li>#}
+
                     {% if is_granted('ROLE_STUDENT') or is_granted('ROLE_TEACHER') %}
-                    <li class="{{ target is defined and target == 'courses' ? 'active' : ''}}">
-                        <div class="menu-item">
-                            <a href="{{ path("courses") }}"><i class="icon-big-notepad"></i>Courses</a>
-                        </div>
-                    </li>
-                    <li class="{{ target is defined and target == 'assignments' ? 'active' : ''}}">
-                        <div class="menu-item">
-                            <a href="{{ path("assignments") }}"><i class="icon-big-bookmark"></i>Assignments</a>
-                        </div>
-                    </li>
+                        <li class="{{ target is defined and target == 'courses' ? 'active' : ''}}">
+                            <div class="menu-item">
+                                <a href="{{ path("courses") }}"><i class="icon-big-notepad"></i>Courses</a>
+                            </div>
+                        </li>
+                        <li class="{{ target is defined and target == 'assignments' ? 'active' : ''}}">
+                            <div class="menu-item">
+                                <a href="{{ path("assignments") }}"><i class="icon-big-bookmark"></i>Assignments</a>
+                            </div>
+                        </li>
+                    {% endif %}
+
                     <li class="{{ target is defined and target == 'messages' ? 'active' : ''}}">
                         <div class="menu-item">
                             <a href="{{ path("messages_inbox") }}"><i class="icon-big-mail">{% if app.user.unreadMessagesCount > 0 %}<small>{{ app.user.unreadMessagesCount }}</small>{% endif %}</i>Messages</a>
                         </div>
                     </li>
-                    {% endif %}
+
                     {#<li class="{{ target is defined and target == 'calendar' ? 'active' : ''}}"><div class="menu-item"><i class="icon-big-calendar"></i>Calendar</div></li>#}
                     {#<li class="{{ target is defined and target == 'members' ? 'active' : ''}}">#}
                         {#<div class="menu-item">#}
