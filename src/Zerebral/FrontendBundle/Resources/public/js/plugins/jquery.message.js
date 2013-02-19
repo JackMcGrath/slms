@@ -60,7 +60,9 @@ PrivateMessages.prototype = {
     },
 
     initForm: function() {
-        this.element.find('textarea').wysihtml5();
+        this.element.find('textarea').wysihtml5({
+            stylesheets: []
+        });
 
         $('#upload_files_div').collectionFormType({
             add: '.add_file_link',

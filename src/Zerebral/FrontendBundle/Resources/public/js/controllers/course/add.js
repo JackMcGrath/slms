@@ -1,5 +1,5 @@
 $(document).ready(function(){
-    $('textarea').wysihtml5();
+    $('textarea').wysihtml5({stylesheets: []});
     $('.optional-model').optionalModel();
 
     $('.icon-new-clock').timepicker({
