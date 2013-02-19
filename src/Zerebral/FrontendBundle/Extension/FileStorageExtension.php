@@ -67,8 +67,14 @@ class FileStorageExtension extends \Twig_Extension
     {
         static $unitLabels = array('B', 'KB', 'MB', 'GB', 'TB');
 
-        $unit = floor(log($bytes, 1024));
-        $size = round($bytes / pow(1024, $unit), $precision);
+        if ($bytes > 0) {
+            $unit = floor(log($bytes, 1024));
+            $size = round($bytes / pow(1024, $unit), $precision);
+        } else {
+            $size = 0;
+            $unit = 0;
+        }
+
 
         return $size . ' ' . $unitLabels[$unit];
     }

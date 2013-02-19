@@ -9,15 +9,17 @@ class StudentAssignmentPeer extends BaseStudentAssignmentPeer
     public static function getNextPrev($studentAssignments, $currentStudentAssignment)
     {
         $studentId = $currentStudentAssignment->getStudentId();
-
         $actualStudents = array();
-        /** @var \Zerebral\BusinessBundle\Model\Assignment\StudentAssignment $studentAssignment */
-        foreach ($studentAssignments as $studentAssignmentKey => $studentAssignmentActual) {
-            if ($studentAssignmentActual->isReadyForGrading()) {
+        $currentNumber = 0;
+        /** @var \Zerebral\BusinessBundle\Model\Assignment\StudentAssignment $studentAssignmentActual */
+        $studentAssignmentKey = 0;
+        foreach ($studentAssignments as $studentAssignmentActual) {
+            if ($studentAssignmentActual->isReadyForGrading() || $studentAssignmentActual->getIsSubmitted()) {
                 if ($studentAssignmentActual->getStudentId() == $studentId) {
                     $currentNumber = $studentAssignmentKey;
                 }
                 $actualStudents[$studentAssignmentKey] = $studentAssignmentActual;
+                $studentAssignmentKey ++;
             }
         }
         $totalCount = count($actualStudents);

@@ -104,33 +104,35 @@ GradingPopup.prototype = {
     },
 
     renderPopup: function(studentAssignmentId, self, $this) {
-        self.nextPrevUnbind();
-        var modalBody = $($this).find('.modal-body');
-        modalBody.html('<p>Loading...</p>');
+        if (typeof(studentAssignmentId) != 'undefined') {
+            self.nextPrevUnbind();
+            var modalBody = $($this).find('.modal-body');
+            modalBody.html('<p>Loading...</p>');
 
-        var gradingForm = $($this).find('.grading-form');
-        gradingForm.attr('action', gradingForm.attr('edit-action') + '/' + studentAssignmentId);
+            var gradingForm = $($this).find('.grading-form');
+            gradingForm.attr('action', gradingForm.attr('edit-action') + '/' + studentAssignmentId);
 
-        $.ajax({
-            url: '/grading/student-assignment/' + studentAssignmentId,
-            dataType: 'json',
-            type: 'GET',
-            success: function(response) {
-                if (!response.has_errors) {
-                    modalBody.html(response.content);
-                    self.container.gradingPopupSelector.find('.next-prev').html(self.generateNextPrevHtml(response.nextPrev));
-                    self.assignment = response.assignment;
-                    self.sliderBind();
-                    self.nextPrevBind();
+            $.ajax({
+                url: '/grading/student-assignment/' + studentAssignmentId,
+                dataType: 'json',
+                type: 'GET',
+                success: function(response) {
+                    if (!response.has_errors) {
+                        modalBody.html(response.content);
+                        self.container.gradingPopupSelector.find('.next-prev').html(self.generateNextPrevHtml(response.nextPrev));
+                        self.assignment = response.assignment;
+                        self.sliderBind();
+                        self.nextPrevBind();
 
-                    if (typeof(response.nextPrev) == 'object' && response.nextPrev.nextId == null) {
-                        self.container.gradingPopupSelector.find('.modal-footer button.continue').attr('disabled', 'disabled');
-                    } else {
-                        self.container.gradingPopupSelector.find('.modal-footer button.continue').removeAttr('disabled');
+                        if (typeof(response.nextPrev) == 'object' && response.nextPrev.nextId == null) {
+                            self.container.gradingPopupSelector.find('.modal-footer button.continue').attr('disabled', 'disabled');
+                        } else {
+                            self.container.gradingPopupSelector.find('.modal-footer button.continue').removeAttr('disabled');
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
     },
 
     nextPrevBind: function() {
