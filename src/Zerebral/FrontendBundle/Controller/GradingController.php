@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 
 use Zerebral\FrontendBundle\Form\Type as FormType;
 use Zerebral\BusinessBundle\Model as Model;
+use Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentQuery;
 
 /**
  * @Route("/grading")
@@ -28,13 +29,17 @@ class GradingController extends \Zerebral\CommonBundle\Component\Controller
     public function studentAction(Model\Assignment\StudentAssignment $studentAssignment)
     {
         $form = $this->initGradingForm($studentAssignment);
+
+        $anotherAssignments = StudentAssignmentQuery::create()->filterSortedByAssignmentId($studentAssignment->getAssignmentId())->find();
+        $nextPrev = \Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentPeer::getNextPrev($anotherAssignments, $studentAssignment);
+
         $content = $this->render('ZerebralFrontendBundle:Grading:studentAssignment.html.twig',
             array(
                 'studentAssignment' => $studentAssignment,
                 'form' => $form->createView())
         )->getContent();
 
-        return new JsonResponse(array('has_errors' => false, 'content' => $content, 'assignment' => $studentAssignment->getAssignment()->toArray()));
+        return new JsonResponse(array('has_errors' => false, 'content' => $content, 'nextPrev' => $nextPrev, 'assignment' => $studentAssignment->getAssignment()->toArray()));
     }
 
     protected function initGradingForm($studentAssignment = null)
@@ -53,11 +58,18 @@ class GradingController extends \Zerebral\CommonBundle\Component\Controller
         $form = $this->initGradingForm($studentAssignment);
         $form->bind($this->getRequest());
 
+        $isContinue = (bool)$this->getRequest()->get('continue', 0);
+        $nextPrev = array();
+        if ($isContinue) {
+            $anotherAssignments = StudentAssignmentQuery::create()->filterSortedByAssignmentId($studentAssignment->getAssignmentId())->find();
+            $nextPrev = \Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentPeer::getNextPrev($anotherAssignments, $studentAssignment);
+        }
+
         if ($form->isValid()) {
             $studentAssignment->setGradedAt(date('Y-m-d H:i:s'));
             $studentAssignment->save();
             return new JsonResponse(array(
-                'success' => true, 'content' => $studentAssignment->toArray()
+                'success' => true, 'content' => $studentAssignment->toArray(), 'nextPrev' => $nextPrev
             ));
         }
 

@@ -57,40 +57,14 @@ GradingPopup.prototype = {
         //this.container.table.find('a[data-toggle="modal"]').live('click', function(e) { alert('click');self.studentAssignment = $(e.target).closest('td').attr('studentAssignment'); console.log($(e.target).closest('td').attr('studentAssignment')); })
 
         this.container.gradingPopupSelector.on('show', function(e) {
-            var modalBody = $(this).find('.modal-body');
-            modalBody.html('<p>Loading...</p>');
-
-            var gradingForm = $(this).find('.grading-form');
-            gradingForm.attr('action', gradingForm.attr('edit-action') + '/' + self.studentAssignmentId);
-
-            $.ajax({
-                url: '/grading/student-assignment/' + self.studentAssignmentId,
-                dataType: 'json',
-                type: 'GET',
-                success: function(response) {
-                    if (!response.has_errors) {
-                        modalBody.html(response.content);
-                        self.assignment = response.assignment;
-                        self.sliderBind();
-                    }
-                }
-            });
+            self.renderPopup(self.studentAssignmentId, self, this);
         });
         this.container.gradingPopupSelector.on('hide', function(e) {
             var grade = self.container.table.find('td[studentAssignment="' + self.studentAssignmentId + '"] .grade-value');
             var value = grade.attr('value');
+            self.container.gradingPopupSelector.find('.next-prev').html('');
             this.assignment = undefined;
-            if (value != null && typeof(value) != 'undefined') {
-                if (grade.closest('td').hasClass('pass')) {
-                    if (value == 1) {
-                        grade.removeClass('hover').html('<i class="icon-new-passed"></i>');
-                    } else {
-                        grade.removeClass('hover').html('<i class="icon-new-fail"></i>');
-                    }
-                } else {
-                    grade.removeClass('hover').html(value);
-                }
-            }
+            self.updateGradeInTable(value, grade);
         });
 
         $('.grading-form').zerebralAjaxForm({
@@ -103,10 +77,77 @@ GradingPopup.prototype = {
                         assignmentTd.html('<div class="grade-value"></div><div class="edit hide"><a href="" class="" data-toggle="modal">Edit</a></div>');
                     }
                     assignmentTd.find('.grade-value').attr('value', response.content.Grading);
-                    self.container.gradingPopupSelector.modal('hide');
+                    if (typeof(response.nextPrev) == 'object' && response.nextPrev.nextId) {
+                        self.renderPopup(response.nextPrev.nextId, self, self.container.gradingPopupSelector);
+                        self.updateGradeInTable(response.content.Grading, assignmentTd.find('.grade-value'));
+                    } else {
+                        self.container.gradingPopupSelector.modal('hide');
+                    }
+
                 }
             }
         });
+    },
+
+    updateGradeInTable: function(value, grade) {
+        if (value != null && typeof(value) != 'undefined') {
+            if (grade.closest('td').hasClass('pass')) {
+                if (value == 1) {
+                    grade.removeClass('hover').html('<i class="icon-new-passed"></i>');
+                } else {
+                    grade.removeClass('hover').html('<i class="icon-new-fail"></i>');
+                }
+            } else {
+                grade.removeClass('hover').html(value);
+            }
+        }
+    },
+
+    renderPopup: function(studentAssignmentId, self, $this) {
+        self.nextPrevUnbind();
+        var modalBody = $($this).find('.modal-body');
+        modalBody.html('<p>Loading...</p>');
+
+        var gradingForm = $($this).find('.grading-form');
+        gradingForm.attr('action', gradingForm.attr('edit-action') + '/' + studentAssignmentId);
+
+        $.ajax({
+            url: '/grading/student-assignment/' + studentAssignmentId,
+            dataType: 'json',
+            type: 'GET',
+            success: function(response) {
+                if (!response.has_errors) {
+                    modalBody.html(response.content);
+                    self.container.gradingPopupSelector.find('.next-prev').html(self.generateNextPrevHtml(response.nextPrev));
+                    self.assignment = response.assignment;
+                    self.sliderBind();
+                    self.nextPrevBind();
+
+                    if (typeof(response.nextPrev) == 'object' && response.nextPrev.nextId == null) {
+                        self.container.gradingPopupSelector.find('.modal-footer button.continue').attr('disabled', 'disabled');
+                    } else {
+                        self.container.gradingPopupSelector.find('.modal-footer button.continue').removeAttr('disabled');
+                    }
+                }
+            }
+        });
+    },
+
+    nextPrevBind: function() {
+        var self = this;
+        var links = $(this.container.gradingPopupSelector).find('.next-prev');
+        links.find('.prev, .next').live('click', function(e) {
+            e.preventDefault();
+
+            self.renderPopup($(e.target).attr('studentAssignmentId'), self, self.container.gradingPopupSelector);
+
+        })
+    },
+
+    nextPrevUnbind: function() {
+        var self = this;
+        var links = $(this.container.gradingPopupSelector).find('.next-prev');
+        links.find('.prev, .next').die('click');
     },
 
     onShowPopup: function(e) {
@@ -168,5 +209,12 @@ GradingPopup.prototype = {
         button.addClass(value == 1 ? 'btn-success' : 'btn-danger');
 
         this.target.find('.grade-pass-value').val(value);
+    },
+
+    generateNextPrevHtml: function(nextPrevData) {
+        var prevLink = nextPrevData.prevId ? '<a href="#" class="prev" studentAssignmentId="' + nextPrevData.prevId + '"><span>&#706;&#706;</span> Prev</a> ' : '';
+        var nextLink = nextPrevData.nextId ? ' <a href="#" class="next" studentAssignmentId="' + nextPrevData.nextId + '">Next <span>&#707;&#707;</span></a>' : '';
+        var html = '<div class="prev-row">' + prevLink + '</div><b>' + nextPrevData.currentNumber + '</b>' + ' of ' + nextPrevData.totalCount + '<div class="next-row">' + nextLink + '</div>';
+        return html;
     }
 };

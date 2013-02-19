@@ -31,6 +31,15 @@ class StudentAssignmentQuery extends BaseStudentAssignmentQuery
         return $this;
     }
 
+    public function filterSortedByAssignmentId($assignmentId)
+    {
+        $this->filterByAssignmentId($assignmentId);
+        $this->leftJoinStudent();
+        $this->leftJoin('Student.User Users');
+        $this->addAscendingOrderByColumn('LOWER(Users.last_name)');
+        return $this;
+    }
+
     public function findTodayCount()
     {
         $this->leftJoinAssignment();

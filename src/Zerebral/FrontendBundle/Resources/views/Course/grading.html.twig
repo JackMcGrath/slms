@@ -62,14 +62,15 @@
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h3>Grade student</h3>
+                <div class="next-prev"></div>
             </div>
             <div class="modal-body">
 
             </div>
             <div class="modal-footer">
                 <button type="submit" class="btn-custom btn-danger">Submit</button>
-                {#<a href="#" class="btn btn-danger">Submit & Continue</a>#}
-                <a href="#" class="btn-custom" data-dismiss="modal">Cancel</a>
+                <button type="submit" name="continue" value="1" class="btn-custom btn-danger continue">Submit & Continue</button>
+                <button href="#" class="btn-custom" data-dismiss="modal">Close</button>
             </div>
         </form>
     </div>
