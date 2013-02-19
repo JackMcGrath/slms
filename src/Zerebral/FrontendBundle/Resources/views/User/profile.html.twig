@@ -51,13 +51,11 @@
                             <div class="user-courses">
                             <h4>Courses:</h4>
                             {% for course in user.roleModel.courses %}
-                                <a href="">{{ course.name }}</a><br/>
+                                <a href="{{ path('course_view', {id: course.id}) }}">{{ course.name }}</a><br/>
                             {% endfor %}
                             </div>
                         {% endif %}
                     {% endif %}
-
-
                 </div>
 
                 <div class="span4 pull-right">
