@@ -24,24 +24,24 @@
                 <div class="span8 content">
                     {% if user.isStudent or user.isTeacher %}
                         {% if user.roleModel.bio %}
-                            <div class="small-title">Bio</div>
+                            <div class="label">Biography</div>
                             <p>{{ user.roleModel.bio }}</p>
                         {% endif %}
                     {% else %}
                         {% if user.roleModel.notes %}
-                            <div class="small-title">Notes</div>
+                            <div class="label">Notes</div>
                             <p>{{ user.roleModel.notes }}</p>
                         {% endif %}
                     {% endif %}
 
                     {% if user.isStudent %}
                         {% if user.roleModel.activities %}
-                            <div class="small-title">Activities</div>
+                            <div class="label">Activities</div>
                             <p>{{ user.roleModel.activities }}</p>
                         {% endif %}
 
                         {% if user.getRoleModel().interests %}
-                            <div class="small-title">Interests</div>
+                            <div class="label">Interests</div>
                             <p>{{ user.roleModel.interests }}</p>
                         {% endif %}
                     {% endif %}
@@ -49,9 +49,9 @@
                     {% if user.isStudent or user.isTeacher %}
                         {% if user.roleModel.courses %}
                             <div class="user-courses">
-                            <h4>Courses:</h4>
+                            <div class="label">Classes</div><br/>
                             {% for course in user.roleModel.courses %}
-                                <a href="{{ path('course_view', {id: course.id}) }}">{{ course.name }}</a><br/>
+                                <span>{{ course.name }}</span><br/>
                             {% endfor %}
                             </div>
                         {% endif %}
@@ -64,17 +64,17 @@
                     </div>
                     <div class="clearfix"></div>
                     <div class="profile-links">
-                        <a href="#" rel="message-popup" userId="{{ user.id }}">Send a message</a><br/>
+                        <a href="#" class="btn" rel="message-popup" userId="{{ user.id }}">Send a message</a><br/>
                         {% if user.isStudent %}
                             {% if user.roleModel.studentGuardians %}
-                                <h4>Parents:</h4>
+                                <div class="label">Parents</div><br/>
                                 {% for parent in user.roleModel.studentGuardians %}
                                     <a href="{{ path('profile_view', {id: parent.guardian.userId}) }}">{{ parent.guardian.fullName }}</a><br/>
                                 {% endfor %}
                             {% endif %}
                         {% elseif user.isGuardian %}
                             {% if user.roleModel.students %}
-                                <h4>Child:</h4>
+                                <div class="label">Child</div><br/>
                                 {% for child in user.roleModel.students %}
                                     <a href="{{ path('profile_view', {id: child.userId}) }}">{{ child.fullName }}</a><br/>
                                 {% endfor %}
