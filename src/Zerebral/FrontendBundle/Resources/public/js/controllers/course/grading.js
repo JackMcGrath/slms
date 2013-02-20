@@ -125,9 +125,9 @@ GradingPopup.prototype = {
                         self.nextPrevBind();
 
                         if (typeof(response.nextPrev) == 'object' && response.nextPrev.nextId == null) {
-                            self.container.gradingPopupSelector.find('.modal-footer button.continue').attr('disabled', 'disabled');
+                            self.container.gradingPopupSelector.find('.modal-footer button.continue').removeAttr('name');
                         } else {
-                            self.container.gradingPopupSelector.find('.modal-footer button.continue').removeAttr('disabled');
+                            self.container.gradingPopupSelector.find('.modal-footer button.continue').attr('name', 'continue');
                         }
                     }
                 }
