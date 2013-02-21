@@ -1,5 +1,7 @@
 $(document).ready(function(){
-    $('textarea').wysihtml5({stylesheets: []});
+    $('textarea').wysihtml5({stylesheets: [
+        '/css/wysiwyg-custom.css'
+    ]});
     $('.optional-model').optionalModel();
 
     $('.icon-new-clock').timepicker({

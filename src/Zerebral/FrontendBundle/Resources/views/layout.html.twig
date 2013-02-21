@@ -46,6 +46,10 @@
         filter='lessphp' output='css/all.css' debug=true %}
         <link href="{{ asset_url }}" type="text/css" rel="stylesheet" />
     {% endstylesheets %}
+    {% stylesheets
+        '@ZerebralFrontendBundle/Resources/public/less/wysiwyg-custom.less'
+        filter='lessphp' output='css/wysiwyg-custom.css' debug=true %}
+    {% endstylesheets %}
 
     {% stylesheets output="css/wysiwyg-color.css"
         '@ZerebralFrontendBundle/Resources/public/css/wysiwyg-color.css'
