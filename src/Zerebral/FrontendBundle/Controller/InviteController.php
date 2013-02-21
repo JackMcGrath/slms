@@ -217,6 +217,9 @@ class InviteController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function guardianJoinAction($code)
     {
+        if (!is_null($this->getRoleUser())) {
+            return $this->redirect($this->generateUrl('dashboard'));
+        }
         /** @var GuardianInvite $guardianInvite  */
         $guardianInvite = GuardianInviteQuery::create()->filterByCode($code)->filterByActivated(false)->findOne();
 
