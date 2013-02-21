@@ -71,6 +71,7 @@ GradingPopup.prototype = {
             onSuccess: function(response) {
                 if (response.success) {
                     var assignmentTd = self.container.table.find('td[studentAssignment="' + response.content.Id + '"]');
+                    self.studentAssignmentId = response.content.Id;
                     if (response.content.Grading == null) {
                         assignmentTd.addClass('new').html('<a href="#" data-toggle="modal" data-toggle="modal"><i class="icon-new-plus-add"></i></a>');
                     } else if (!assignmentTd.find('.grade-level').length) {
@@ -90,6 +91,7 @@ GradingPopup.prototype = {
     },
 
     updateGradeInTable: function(value, grade) {
+        console.log(value);
         if (value != null && typeof(value) != 'undefined') {
             if (grade.closest('td').hasClass('pass')) {
                 if (value == 1) {
