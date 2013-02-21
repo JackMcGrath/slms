@@ -37,9 +37,8 @@ class LoginSuccessHandler implements AuthenticationSuccessHandlerInterface
             );
         }
 
-        if ($session->get('guardian_invite_code')) {
+        if ($session->has('guardian_invite_code')) {
             $code = $session->get('guardian_invite_code');
-            $session->set('guardian_invite_code', null);
             return new RedirectResponse($this->router->generate('guardian_join', array('code' => $code)));
         }
 
