@@ -33,7 +33,9 @@ class FeedItemQuery extends BaseFeedItemQuery
             $ids[] = $relatedUser->getId();
         }
 
-        $this->addAnd(FeedItemPeer::CREATED_BY, $ids, \Criteria::IN);
+        if (count($ids) > 0) {
+            $this->addAnd(FeedItemPeer::CREATED_BY, $ids, \Criteria::IN);
+        }
         $this->addDescendingOrderByColumn(FeedItemPeer::ID);
 
         $this->joinWith('Assignment', \Criteria::LEFT_JOIN);
