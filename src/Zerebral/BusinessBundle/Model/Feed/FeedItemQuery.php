@@ -35,6 +35,8 @@ class FeedItemQuery extends BaseFeedItemQuery
 
         if (count($ids) > 0) {
             $this->addAnd(FeedItemPeer::CREATED_BY, $ids, \Criteria::IN);
+        } else {
+            $this->addAnd(FeedItemPeer::CREATED_BY, $user->getId(), \Criteria::EQUAL);
         }
         $this->addDescendingOrderByColumn(FeedItemPeer::ID);
 
