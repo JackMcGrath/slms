@@ -18,11 +18,11 @@
             </div>
             <hr/>
 
-            <div class="stat count-line">
-                <div>
-                    <span class="badge badge-important">{{ course.hasVirtualColumn('studentAssignmentsCount') ? course.getVirtualColumn('studentAssignmentsCount') : '-' }}</span> <a href="{{ path('guardian_course_assignments', {courseId: course.id} ) }}">Assignments</a>
-                </div>
-            </div>
+            {#<div class="stat count-line">#}
+                {#<div>#}
+                    {#<span class="badge badge-important">{{ course.hasVirtualColumn('studentAssignmentsCount') ? course.getVirtualColumn('studentAssignmentsCount') : '-' }}</span> <a href="{{ path('guardian_course_assignments', {courseId: course.id} ) }}">Assignments</a>#}
+                {#</div>#}
+            {#</div>#}
 
             {{ mainPartials.courseSchedule(course) }}
 
@@ -34,7 +34,7 @@
         </div>
         <div class="right-navbar pull-left">
             <div class="block upcoming-assignments">
-                {{ mainPartials.upcomingAssignments(upcomingAssignments) }}
+                {{ mainPartials.upcomingAssignments(upcomingAssignments, course) }}
             </div>
 
             <div class="block recent-materials">

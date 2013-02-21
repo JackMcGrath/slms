@@ -15,7 +15,7 @@ Controller.prototype = {
         $('.icon-new-clock').timepicker({
             defaultTime: 'value'
         });
-        $('textarea').wysihtml5();
+        $('textarea').wysihtml5({stylesheets: []});
         $('.optional-model').optionalModel();
 
         this.bind();

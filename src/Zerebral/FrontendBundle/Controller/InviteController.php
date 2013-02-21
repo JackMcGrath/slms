@@ -19,6 +19,8 @@ use Zerebral\BusinessBundle\Model\Course\Course;
 use Zerebral\BusinessBundle\Model\User\GuardianInviteQuery;
 use Zerebral\BusinessBundle\Model\User\GuardianInvite;
 
+use Glorpen\PropelEvent\PropelEventBundle\Events\ModelEvent;
+
 
 class InviteController extends \Zerebral\CommonBundle\Component\Controller
 {
@@ -132,7 +134,10 @@ class InviteController extends \Zerebral\CommonBundle\Component\Controller
                     )
                 );
                 $this->get('mailer')->send($message);
+            }
 
+            if (count($emails)) {
+                $this->get('event_dispatcher')->dispatch('courses.invite_student', new ModelEvent($course));
 
             }
 

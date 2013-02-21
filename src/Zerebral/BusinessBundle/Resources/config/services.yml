@@ -54,3 +54,4 @@ services:
         arguments:  [@kissmetrics]
         tags:
             -       { name: propel.event }
+            -       { name: kernel.event_subscriber }

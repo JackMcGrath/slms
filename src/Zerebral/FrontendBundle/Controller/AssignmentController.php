@@ -142,16 +142,30 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
         if (empty($assignment)) {
             $assignment = new Model\Assignment\Assignment();
         }
+        $assignedStudentsIds = array();
 
         $assignmentType = new FormType\AssignmentType();
         $assignmentType->setTeacher($this->getRoleUser());
 
 
         $form = $this->createForm($assignmentType, $assignment);
-        $assignedStudents = $assignment ? $assignment->getStudents()->getPrimaryKeys() : array();
+
 
         if ($this->getRequest()->isMethod('POST')) {
             $form->bind($this->getRequest());
+
+            // TODO: redo with choice type
+            $studentAssignments = new \PropelCollection();
+            foreach ($this->getRequest()->get('students', array()) as $studentId) {
+                $studentAssignmentModel = StudentAssignmentQuery::create()->filterByAssignmentId($assignment->getId())->filterByStudentId($studentId)->findOne();
+                $studentAssignment = $studentAssignmentModel ?: new \Zerebral\BusinessBundle\Model\Assignment\StudentAssignment();
+                $studentAssignment->setStudentId($studentId);
+                $studentAssignment->setAssignment($assignment);
+                $studentAssignments[] = $studentAssignment;
+                $assignedStudentsIds[] = $studentId;
+            }
+            $assignment->setStudentAssignments($studentAssignments);
+
             if ($form->isValid()) {
                 /**
                  * @var \Zerebral\BusinessBundle\Model\Assignment\Assignment $assignment
@@ -160,22 +174,13 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
                 $assignment->setCourse($course);
                 $assignment->setTeacherId($this->getRoleUser()->getId());
 
-                // TODO: redo with choice type
-                $studentAssignments = new \PropelCollection();
-                foreach ($this->getRequest()->get('students', array()) as $studentId) {
-                    $studentAssignmentModel = StudentAssignmentQuery::create()->filterByAssignmentId($assignment->getId())->filterByStudentId($studentId)->findOne();
-                    $studentAssignment = $studentAssignmentModel ?: new \Zerebral\BusinessBundle\Model\Assignment\StudentAssignment();
-                    $studentAssignment->setStudentId($studentId);
-                    $studentAssignment->setAssignment($assignment);
-                    $studentAssignments[] = $studentAssignment;
-                }
-                $assignment->setStudentAssignments($studentAssignments);
-
                 $assignment->save();
 
                 return $this->redirect($this->generateUrl('assignment_view', array('id' => $assignment->getId())));
             }
         }
+
+        $assignedStudents = count($assignedStudentsIds) ? $assignedStudentsIds : ($assignment ? $assignment->getStudents()->getPrimaryKeys() : array());
 
         return array(
             'form' => $form->createView(),

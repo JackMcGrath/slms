@@ -27,11 +27,13 @@
                     <div class="pagination">
                         <ul>
                             {# @todo: Paginator.first always true #}
-                            <li {% if paginator.page == 1 %}class="disabled"{% endif %}><a href="{{ path('superadmin_users', {page: paginator.previousPage}) }}">&laquo; </a></li>
+                            <li {% if paginator.isFirstPage %}class="disabled"{% endif %}><a href="{{ path('superadmin_users', {page: paginator.firstPage}) }}">&laquo;&laquo;</a></li>
+                            <li {% if paginator.isFirstPage %}class="disabled"{% endif %}><a href="{{ path('superadmin_users', {page: paginator.previousPage}) }}">&laquo;</a></li>
                             {% for page in paginator.links %}
                             <li{% if paginator.page == page %} class="active"{% endif %}><a href="{{ path('superadmin_users', {page: page}) }}">{{ page }}</a></li>
                             {% endfor %}
-                            <li {% if paginator.last %}class="disabled"{% endif %}><a href="{{ path('superadmin_users', {page: paginator.nextPage}) }}">&raquo;</a></li>
+                            <li {% if paginator.isLastPage %}class="disabled"{% endif %}><a href="{{ path('superadmin_users', {page: paginator.nextPage}) }}">&raquo;</a></li>
+                            <li {% if paginator.isLastPage %}class="disabled"{% endif %}><a href="{{ path('superadmin_users', {page: paginator.lastPage}) }}">&raquo;&raquo;</a></li>
                         </ul>
                     </div>
                     {% endif %}
@@ -93,11 +95,13 @@
                     <div class="pagination">
                         <ul>
                             {# @todo: Paginator.first always true #}
-                            <li {% if paginator.page == 1 %}class="disabled"{% endif %}><a href="{{ path('superadmin_users', {page: paginator.previousPage}) }}">&laquo; </a></li>
+                            <li {% if paginator.isFirstPage %}class="disabled"{% endif %}><a href="{{ path('superadmin_users', {page: paginator.firstPage}) }}">&laquo;&laquo;</a></li>
+                            <li {% if paginator.isFirstPage %}class="disabled"{% endif %}><a href="{{ path('superadmin_users', {page: paginator.previousPage}) }}">&laquo; </a></li>
                             {% for page in paginator.links %}
                                 <li{% if paginator.page == page %} class="active"{% endif %}><a href="{{ path('superadmin_users', {page: page}) }}">{{ page }}</a></li>
                             {% endfor %}
-                            <li {% if paginator.last %}class="disabled"{% endif %}><a href="{{ path('superadmin_users', {page: paginator.nextPage}) }}">&raquo;</a></li>
+                            <li {% if paginator.isLastPage %}class="disabled"{% endif %}><a href="{{ path('superadmin_users', {page: paginator.nextPage}) }}">&raquo;</a></li>
+                            <li {% if paginator.isLastPage %}class="disabled"{% endif %}><a href="{{ path('superadmin_users', {page: paginator.lastPage}) }}">&raquo;&raquo;</a></li>
                         </ul>
                     </div>
                     {% endif %}
