@@ -217,6 +217,9 @@ class InviteController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function guardianJoinAction($code)
     {
+        if ((!is_null($this->getRoleUser())) && (!($this->getRequest()->getSession()->has('guardian_invite_code')))) {
+            return $this->redirect($this->generateUrl('dashboard'));
+        }
         /** @var GuardianInvite $guardianInvite  */
         $guardianInvite = GuardianInviteQuery::create()->filterByCode($code)->filterByActivated(false)->findOne();
 
@@ -228,6 +231,7 @@ class InviteController extends \Zerebral\CommonBundle\Component\Controller
                 $guardian->save();
                 $guardianInvite->setActivated(true);
                 $guardianInvite->save();
+                $this->getRequest()->getSession()->set('guardian_invite_code', null);
                 $this->setFlash('child_added', 'Student ' . $guardianInvite->getStudent()->getFullName() . ' was successfully added as your child');
             }
             return $this->redirect($this->generateUrl('dashboard'));
