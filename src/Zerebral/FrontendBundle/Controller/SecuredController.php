@@ -172,6 +172,10 @@ class SecuredController extends Controller
     public function resetPasswordAction($code)
     {
 
+        if (!is_null($this->getUser())) {
+            return $this->redirect($this->generateUrl('dashboard'));
+        }
+
         $user = \Zerebral\BusinessBundle\Model\User\UserQuery::create()->findOneByResetCode($code);
         if (is_null($user)) {
             return $this->redirect($this->generateUrl('_login'));
