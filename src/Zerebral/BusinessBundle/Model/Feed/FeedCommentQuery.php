@@ -32,7 +32,8 @@ class FeedCommentQuery extends BaseFeedCommentQuery
     public function getCommentsTreeAfter($parameters)
     {
         if (count($parameters) == 0) {
-            return array();
+            $this->filterById(0);
+            return $this;
         }
         $this->clearOrderByColumns()->addAscendingOrderByColumn(FeedCommentPeer::ID);
         $criteria = new \Criteria();
