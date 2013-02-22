@@ -180,7 +180,9 @@ ZerebralCourseDetailFeedBlock.prototype = {
                         if (self.feedItemsDiv.data('lastItemId') < response['lastItemId']) {
                             self.feedItemsDiv.data('lastItemId', response['lastItemId']);
                         }
-                        $.proxy(self.addItemBlock(response['content'], false), self);
+                        if (response['content'].trim().length > 0) {
+                            $.proxy(self.addItemBlock(response['content'], false), self);
+                        }
 
 
                         $.each(response['comments'], function(index, value) {
@@ -671,7 +673,7 @@ ZerebralAssignmentDetailFeedBlock.prototype = {
                     if (response.success) {
                         if (self.feedCommentsDiv.data('lastCommentId') < response['lastCommentId']) {
                             self.feedCommentsDiv.data('lastCommentId', response['lastCommentId']);
-                            if (response['content'] != '') {
+                            if (response['content'].trim().length > 0) {
                                 var commentBlock = $(response['content']);
                                 commentBlock.css('display', 'none');
                                 if (self.feedCommentsDiv.find('.comment:last').length > 0) {
