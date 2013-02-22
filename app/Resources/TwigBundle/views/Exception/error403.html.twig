@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>{{ status_text }}</title>
+    {% stylesheets
+        '@ZerebralFrontendBundle/Resources/public/less/app.less'
+        filter='lessphp' output='css/all.css' debug=true %}
+        <link href="{{ asset_url }}" type="text/css" rel="stylesheet" />
+    {% endstylesheets %}
+</head>
+<body class="custom-404">
+
+<h1>Oops!</h1>
+<h2>{{ status_code }} {{ status_text }}</h2>
+
+<p>Access denied for requested page</p>
+
+<div class="buttons">
+    <a class="btn back" href="{{ path('dashboard') }}"><i class="icon-chevron-left icon-white"></i> Back to Dashboard</a>
+    <a class="btn contact" href="mailto: hello@zerebral.com"><i class="icon-envelope"></i> Contact Support</a>
+</div>
+</body>
+</html>
