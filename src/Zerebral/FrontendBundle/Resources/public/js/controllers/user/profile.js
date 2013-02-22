@@ -1,5 +1,8 @@
 $(document).ready(function(){
-    $('input.birthday, .icon-new-calendar').datepicker();
+    $('input.birthday, .icon-new-calendar').datepicker({
+        endDate: '01/01/' + moment().format('YYYY'),
+        startDate: '01/01/1900'
+    });
 
 
     $('#show_avatar_file_field').click(function(e) {
