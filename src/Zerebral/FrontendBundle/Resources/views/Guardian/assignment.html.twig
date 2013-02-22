@@ -6,7 +6,7 @@
     '@ZerebralFrontendBundle/Resources/public/js/plugins/jquery.dataTables.min.js'
     '@ZerebralFrontendBundle/Resources/public/js/plugins/FixedColumns.min.js'
     '@ZerebralFrontendBundle/Resources/public/js/controllers/guardian/attendance.js'
-    output='js/compiled/guardian_attendance.js' %}
+    output='js/compiled/guardian_assignments.js' %}
     <script type="text/javascript" src="{{ asset_url }}"></script>
     {% endjavascripts %}
 
@@ -30,7 +30,7 @@
                     <ul>
                         <li><span>From:</span> {{ assignment.teacher.fullName }}</li>
                         {% if assignment.dueAt is not empty %}
-                            <li><span>Due:</span> <span class="date">{{ assignment.dueAt | date('Hi') == '0000' ? assignment.dueAt | date('l, M, d Y ') : assignment.dueAt | date('l, M, d Y h:i a') }}</span></li>
+                            <li><span>Due:</span> <span class="date">{{ assignment.dueAt | date('His') == '235959' ? assignment.dueAt | date('l, M, d Y ') : assignment.dueAt | date('l, M, d Y h:i a') }}</span></li>
                         {% endif %}
                         <li><span>Category:</span> <span class="label">{{ assignment.assignmentCategory.name }}</span></li>
                     </ul>
