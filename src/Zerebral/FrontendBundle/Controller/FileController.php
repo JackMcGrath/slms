@@ -24,9 +24,10 @@ class FileController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function downloadAction(File $file)
     {
+        $path = $file->getFileStorage()->getWebPath() . DIRECTORY_SEPARATOR . $file->getPath();
         $response = new \Symfony\Component\HttpFoundation\Response();
-        $response->headers->set('X-SendFile', ucfirst($file->getAbsolutePath())); // apache mod_xsendfile
-        $response->headers->set('X-Accel-Redirect', $file->getAbsolutePath()); // nginx
+        //$response->headers->set('X-SendFile', ucfirst($file->getAbsolutePath())); // apache mod_xsendfile
+        $response->headers->set('X-Accel-Redirect', $path); // nginx
         $response->headers->set('Content-Type', $file->getMimeType());
         $response->headers->set('Content-Disposition', 'attachment; filename="' . $file->getName() . '"');
         return $response;

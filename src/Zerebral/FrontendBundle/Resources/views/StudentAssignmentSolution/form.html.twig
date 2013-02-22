@@ -11,6 +11,14 @@
 {% endblock form_rows %}
 
 {% block content %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#uploadSolutionButton').click(function() {
+            $(this).attr('disabled', true);
+            $('#ajaxUploadSolutionsForm').submit();
+        });
+    });
+</script>
 <script type="text/template" id="solution_form">
     {{ form_widget(form.files.vars.prototype)|raw }}
 </script>
@@ -28,7 +36,7 @@
             <a id="addUploadFile" href="#">Add another file</a>
         </div>
         <div class="modal-footer">
-            <input type="submit" class="btn btn-danger" value="Upload"/>
+            <input id="uploadSolutionButton" type="submit" class="btn btn-danger" value="Upload"/>
             <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Cancel</a>
         </div>
         {{ form_widget(form._token) }}
