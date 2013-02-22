@@ -18,11 +18,14 @@ use Zerebral\BusinessBundle\Model as Model;
 use Zerebral\BusinessBundle\Model\Assignment\AssignmentQuery;
 use Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentQuery;
 
+/**
+ * @Route("/files")
+ */
 class AssignmentSolutionController extends \Zerebral\CommonBundle\Component\Controller
 {
     /**
-     * @Route("/files", name="assignment_solutions")
-     * @Route("/files/course/{courseId}", name="course_assignment_solutions")
+     * @Route("/", name="assignment_solutions")
+     * @Route("/course/{courseId}", name="course_assignment_solutions")
      * @ParamConverter("course", options={"mapping": {"courseId": "id"}})
      * @PreAuthorize("hasRole('ROLE_TEACHER')")
      * @SecureParam(name="course", permissions="VIEW")
@@ -61,7 +64,7 @@ class AssignmentSolutionController extends \Zerebral\CommonBundle\Component\Cont
     }
 
     /**
-     * @Route("/files/users/{assignmentId}", name="assignment_solutions_students")
+     * @Route("/users/{assignmentId}", name="assignment_solutions_students")
      * @ParamConverter("assignment", options={"mapping": {"assignmentId": "id"}})
      * @PreAuthorize("hasRole('ROLE_TEACHER')")
      * @SecureParam(name="assignment", permissions="VIEW")
@@ -93,8 +96,8 @@ class AssignmentSolutionController extends \Zerebral\CommonBundle\Component\Cont
     }
 
     /**
-     * @Route("/files/download/assignment/{assignmentId}", name="assignment_solutions_download")
-     * @Route("/files/download/student/{assignmentId}/{studentId}", name="student_solutions_download")
+     * @Route("/download/assignment/{assignmentId}", name="assignment_solutions_download")
+     * @Route("/download/student/{assignmentId}/{studentId}", name="student_solutions_download")
      * @ParamConverter("assignment", options={"mapping": {"assignmentId": "id"}})
      * @ParamConverter("student", options={"mapping": {"studentId": "id"}})
      * @PreAuthorize("hasRole('ROLE_TEACHER')")

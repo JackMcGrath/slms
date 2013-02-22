@@ -4,6 +4,7 @@
 
 {% block content %}
     {% javascripts
+    '@ZerebralFrontendBundle/Resources/public/js/vendors/bootstrap/bootstrap-datepicker-orig.js'
     '@ZerebralFrontendBundle/Resources/public/js/controllers/attendance/index.js'
     output='js/compiled/attendance.js' %}
     <script type="text/javascript" src="{{ asset_url }}"></script>
@@ -30,6 +31,7 @@
                 </div>
                 <div class="pick-date"  data-date="{{ dateRaw | date('m/d/Y') }}" data-date-format="mm/dd/yyyy">
                     Pick date <i class="icon-new-calendar"></i>
+                    <input type="hidden"/>
                 </div>
                 <div class="clearfix"></div>
 
