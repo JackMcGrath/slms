@@ -245,6 +245,10 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
      */
     public function removeStudent(Model\Course\CourseStudent $courseStudent)
     {
+        $assignments = $courseStudent->getCourse()->getAssignments();
+        $query = \Zerebral\BusinessBundle\Model\Assignment\StudentAssignmentQuery::create();
+        $studentAssignments = $query->filterByAssignmentAndStudent($courseStudent->getStudent(), $assignments)->find();
+        $studentAssignments->delete();
         $courseStudent->delete();
         $this->setFlash('delete_course_student_success', 'Student <b>' . $courseStudent->getStudent()->getFullName() . '</b> has been successfully deleted from course.');
         return $this->redirect($this->generateUrl('course_members', array('id' => $courseStudent->getCourseId())));
