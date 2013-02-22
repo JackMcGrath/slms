@@ -17,8 +17,8 @@ class TimeTransformer implements DataTransformerInterface
     public function transform($value)
     {
         if (preg_match('/^\d{2}:\d{2}$/is', $value, $matches)) {
-            if ($value == '00:00')
-                return '';
+//            if ($value == '00:00')
+//                return '';
 
             return strtoupper(date("h:i a", strtotime($value)));
         }

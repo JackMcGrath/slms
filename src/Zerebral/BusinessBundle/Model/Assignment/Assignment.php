@@ -29,6 +29,11 @@ class Assignment extends BaseAssignment
         return parent::preSave($con);
     }
 
+    public function setDefaultDueTime()
+    {
+        $this->setDueAt($this->getDueAt('Y-m-d') . ' 23:59:59');
+    }
+
     public function postSave(\PropelPDO $con = null)
     {
         if ($this->gradeTypeIsModified) {

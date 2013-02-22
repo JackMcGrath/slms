@@ -147,9 +147,7 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
         $assignmentType = new FormType\AssignmentType();
         $assignmentType->setTeacher($this->getRoleUser());
 
-
         $form = $this->createForm($assignmentType, $assignment);
-
 
         if ($this->getRequest()->isMethod('POST')) {
             $form->bind($this->getRequest());

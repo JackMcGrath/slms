@@ -90,6 +90,12 @@ class AssignmentType extends AbstractType
         );
 
         $builder->get('dueAt')->get('time')->addViewTransformer(new TimeTransformer());
+
+        $builder->addEventListener(\Symfony\Component\Form\FormEvents::POST_BIND, function(\Symfony\Component\Form\FormEvent $event) {
+            if ($event->getForm()->get('dueAt')->get('date')->getViewData() != '' && $event->getForm()->get('dueAt')->get('time')->getViewData() == '') {
+                $event->getData()->setDefaultDueTime();
+            }
+        });
     }
 
     public function getName()

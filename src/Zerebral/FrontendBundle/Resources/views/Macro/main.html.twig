@@ -251,12 +251,12 @@
             <div class="stat">
                 {% if is_granted('ROLE_STUDENT') or is_granted('ROLE_GUARDIAN') %}
                     <div class="instructor-name">Instructor <a href="{{ path('profile_view', {id: assignment.teacher.user.id}) }}"><b>{{ assignment.teacher.fullName }}</b></a></div>
-                    {% if assignment.dueAt %}<div class="due-at"><i class="icon-small-clock"></i> Due <small>{{ assignment.dueAt | date('Hi') == '0000' ? assignment.dueAt | date('D, M d') : assignment.dueAt | date('D, M d h:i a') }}</small></div>{% endif %}
+                    {% if assignment.dueAt %}<div class="due-at"><i class="icon-small-clock"></i> Due <small>{{ assignment.dueAt | date('His') == '235959' ? assignment.dueAt | date('D, M d') : assignment.dueAt | date('D, M d h:i a') }}</small></div>{% endif %}
                     {% if is_granted('ROLE_STUDENT') %}
                         <div><span class="badge">{{ assignment.hasVirtualColumn('commentsCount') ? assignment.getVirtualColumn('commentsCount') : '-' }}</span><a href="{{ path('assignment_view', {id: assignment.id}) }}#assignmentFeed">Comments</a></span></div>
                     {% endif %}
                 {% else %}
-                    {% if assignment.dueAt %}<div class="due-at"><i class="icon-small-clock"></i> Due <small>{{ assignment.dueAt | date('Hi') == '0000' ? assignment.dueAt | date('D, M d') : assignment.dueAt | date('D, M d h:i a') }}</small></div>{% endif %}
+                    {% if assignment.dueAt %}<div class="due-at"><i class="icon-small-clock"></i> Due <small>{{ assignment.dueAt | date('His') == '235959' ? assignment.dueAt | date('D, M d') : assignment.dueAt | date('D, M d h:i a') }}</small></div>{% endif %}
                     {#<div><span class="badge">{{ assignment.students.count }}</span><a href="">Assignments</a></div>#}
                     <div><span class="badge">{{ assignment.hasVirtualColumn('completedCount') ? assignment.getVirtualColumn('completedCount') : '-' }}</span><a href="{{ path('assignment_solutions_students', {assignmentId: assignment.id}) }}">Completed</a></div>
                     <div><span class="badge badge-inverse">{{ assignment.hasVirtualColumn('remainingCount') ? assignment.getVirtualColumn('remainingCount') : '-' }}</span><a rel="message-popup" recipients="{{ assignment.hasVirtualColumn('remainingUserIds') ? assignment.getVirtualColumn('remainingUserIds') : '-' }}" href="#">Remaining</a></div>
