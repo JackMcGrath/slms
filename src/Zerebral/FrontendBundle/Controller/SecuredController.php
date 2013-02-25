@@ -68,7 +68,13 @@ class SecuredController extends Controller
      */
     public function signupAction()
     {
-        $form = $this->createForm(new \Zerebral\FrontendBundle\Form\Type\UserSignupType());
+        $guardianInviteCode = $this->get('session')->get('guardian_invite_code', 0);
+        $guardianInvite = GuardianInviteQuery::create()->filterByCode($guardianInviteCode)->filterByActivated(false)->findOne();
+
+        $form = $this->createForm(new \Zerebral\FrontendBundle\Form\Type\UserSignupType(), null, array(
+            'default_role' => (!is_null($guardianInvite) ? 'guardian' : 'teacher')
+        ));
+
         if ($this->getRequest()->isMethod('POST')) {
             $form->bind($this->getRequest());
             if ($form->isValid()) {
@@ -94,8 +100,7 @@ class SecuredController extends Controller
 
 
 
-        $guardianInviteCode = $this->get('session')->get('guardian_invite_code', 0);
-        $guardianInvite = GuardianInviteQuery::create()->filterByCode($guardianInviteCode)->filterByActivated(false)->findOne();
+
         if (!is_null($guardianInvite)) {
             $additionalParameters = array(
                 'guardianMode' => true,
