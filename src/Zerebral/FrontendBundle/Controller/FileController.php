@@ -19,7 +19,7 @@ class FileController extends \Zerebral\CommonBundle\Component\Controller
      * @Route("/download/{id}", name="download_file")
      * @ParamConverter(name="file")
      *
-     * @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+     * @PreAuthorize("hasRole('ROLE_USER')")
      * @SecureParam(name="file", permissions="DOWNLOAD")
      */
     public function downloadAction(File $file)
