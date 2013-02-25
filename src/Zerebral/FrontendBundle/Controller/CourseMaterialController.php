@@ -55,7 +55,8 @@ class CourseMaterialController extends \Zerebral\CommonBundle\Component\Controll
             )));
         }
 
-        return new FormJsonResponse($form);
+        $response = new FormJsonResponse($form);
+        return new \Symfony\Component\HttpFoundation\Response($response->getContent());
     }
 
     /**

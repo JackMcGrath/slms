@@ -40,6 +40,7 @@ PrivateMessages.prototype = {
         });
         var popupForm = self.element.find('.message-form');
         popupForm.zerebralAjaxForm({
+            dataType: 'text',
             onSuccess: function(response) {
                 if (response.success) {
                     self.element.modal('hide');
