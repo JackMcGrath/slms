@@ -480,6 +480,7 @@ $.fn.ajaxSubmit = function(options) {
                 setTimeout(checkState,15);
                 // just in case form has element with name/id of 'submit'
                 var submitFn = document.createElement('form').submit;
+                $(form).find('textarea').removeAttr('disabled');
                 submitFn.apply(form);
             }
             finally {
