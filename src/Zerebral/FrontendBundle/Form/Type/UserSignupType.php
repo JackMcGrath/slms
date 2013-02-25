@@ -29,7 +29,7 @@ class UserSignupType extends AbstractType
             ),
             'expanded' => true,
             'multiple' => false,
-            'data' => User::ROLE_TEACHER,
+            'data' => $options['default_role'],
             'required' => false,
         ));
     }
@@ -46,7 +46,10 @@ class UserSignupType extends AbstractType
             'validation_groups' => array('signup'),
             'error_mapping' => array(
                 '.' => 'email'
-            )
+            ),
+
+
+            'default_role' => User::ROLE_TEACHER
         ));
     }
 }
