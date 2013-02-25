@@ -35,18 +35,19 @@ class StudentAssignmentSolutionController extends \Zerebral\CommonBundle\Compone
 
         if ($form->isValid()) {
             $form->getData()->save();
-            return new JsonResponse(array(
+            return new \Symfony\Component\HttpFoundation\Response(json_encode(array(
                 'redirect' => $this->generateUrl(
                     'assignment_view',
                     array(
                         'id' => $studentAssignment->getAssignment()->getId()
                     )
                 )
-            ));
+            )));
         }
 
 
-        return new FormJsonResponse($form);
+        $response = new FormJsonResponse($form);
+        return new \Symfony\Component\HttpFoundation\Response($response->getContent());
     }
 
     /**

@@ -21,7 +21,9 @@ $(document).ready(function(){
 
     $('.solutions-widget i.file-info').tooltip();
 
-    $('#ajaxUploadSolutionsForm').zerebralAjaxForm();
+    $('#ajaxUploadSolutionsForm').zerebralAjaxForm({
+        dataType: 'text'
+    });
 
     $('.assignment-details-feed').zerebralAssignmentDetailFeedBlock();
 

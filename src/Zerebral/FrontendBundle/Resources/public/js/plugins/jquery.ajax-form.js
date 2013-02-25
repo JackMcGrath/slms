@@ -12,13 +12,25 @@ ZerebralAjaxForm.prototype = {
     init: function() {
         var options = $.extend({}, {
             success: $.proxy(this.onSuccess, this),
-            dataType: 'json'
+            dataType: 'json',
+            beforeSubmit: $.proxy(this.beforeSubmit, this),
+            error: $.proxy(this.onError, this)
         }, this.options);
 
         $(this.element).ajaxForm(options);
     },
-
+    beforeSubmit: function() {
+        $(this.element).find('input[type="submit"]').attr('disabled', true);
+    },
+    onError: function() {
+        $(this.element).find('input[type="submit"]').removeAttr('disabled');
+    },
     onSuccess: function(response) {
+        $(this.element).find('input[type="submit"]').removeAttr('disabled');
+        if (this.options.dataType == 'text') {
+            response = JSON.parse(response);
+        }
+
 
         if (typeof(response.redirect) !== 'undefined') {
             window.location.href = response.redirect;
