@@ -79,16 +79,22 @@
                                 {% endif %}
                             </li>
                         {% else %}
-                            <span class="gray">No solution files yet.<br />Press "Upload" button to attach first one</span>
+                            {% if not studentAssignment.assignment.dueAt or not studentAssignment.isReadyForGrading  %}
+                                <span class="gray">No solution files yet.<br />Press "Upload" button to attach first one</span>
+                            {% endif %}
                         {% endfor %}
                     </ul>
-                    {% if not studentAssignment.isSubmitted %}
-                    <div class="buttons">
-                        <a href="#uploadModal" class="btn" data-toggle="modal" data-target="#uploadModal">Upload</a>
-                        <a id="submitSolutionsButton" href="{{ path('student_assignment_solutions_submit', {id: studentAssignment.id }) }}" class="btn btn-danger">Submit for review</a>
-                    </div>
+                    {% if studentAssignment.assignment.dueAt and studentAssignment.isReadyForGrading %}
+                        <span class="gray">You can not upload or submit solution files after due date</span>
+                    {% else %}
+                        {% if not studentAssignment.isSubmitted %}
+                        <div class="buttons">
+                            <a href="#uploadModal" class="btn" data-toggle="modal" data-target="#uploadModal">Upload</a>
+                            <a id="submitSolutionsButton" href="{{ path('student_assignment_solutions_submit', {id: studentAssignment.id }) }}" class="btn btn-danger">Submit for review</a>
+                        </div>
+                        {% endif %}
+                        <span class="gray"><b>Note:</b> You cannot modify anything upon submit</span>
                     {% endif %}
-                    <span class="gray"><b>Note:</b> You cannot modify anything upon submit</span>
                 </div>
             </div>
 
