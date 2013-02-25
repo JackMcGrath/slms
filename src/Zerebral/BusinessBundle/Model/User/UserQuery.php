@@ -23,8 +23,6 @@ class UserQuery extends BaseUserQuery
 
     public function getRelatedUsers(User $user, $excludeMe = false)
     {
-        #TODO need to add option for exclude $user and his children
-        #TODO need to add option for select related user for all parent children or selected
         //$criteria = new \Criteria();
 
         $usersToCoursesJoin = new \Join();
@@ -35,11 +33,22 @@ class UserQuery extends BaseUserQuery
         } else if ($user->isTeacher()) {
             $usersToCoursesJoin->addExplicitCondition(null, $user->getTeacher()->getId(), null, 'course_teachers', 'teacher_id', 'userToCourses');
         } else if ($user->isGuardian()) {
+            $children = $user->getGuardian()->getStudents();
+            $childIds = array();
+            foreach($children as $child) {
+                $childIds[] = $child->getId();
+            }
             $usersToCoursesJoin->addExplicitCondition(null, $user->getGuardianSelectedUser()->getId(), null, 'course_students', 'student_id', 'userToCourses');
+            $c = new \Criteria();
+            $c->add(null, 'userToCourses.student_id IN (' . implode(', ', $childIds) . ')', \Criteria::CUSTOM);
+            $usersToCoursesJoin->setJoinCondition($c->getLastCriterion());
         }
 
 
         $this->addJoinObject($usersToCoursesJoin);
+
+
+
 
         //LEFT JOIN course_students AS courseToStudents ON studentToCourses.course_id = courseToStudents.course_id
         $courseToStudentsJoin = new \Join();
