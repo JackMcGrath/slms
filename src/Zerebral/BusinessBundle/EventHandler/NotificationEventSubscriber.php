@@ -10,6 +10,7 @@ use Zerebral\BusinessBundle\Model\Notification\NotificationPeer;
 class NotificationEventSubscriber implements \Symfony\Component\EventDispatcher\EventSubscriberInterface
 {
     private $courseEventAlreadyHandled = false;
+    private $gradingIsModified = false;
     /**
      * {@inheritDoc}
      */
@@ -24,6 +25,7 @@ class NotificationEventSubscriber implements \Symfony\Component\EventDispatcher\
             'assignment_files.insert.post' => 'createFile', //New Assignment File,
             'attendance.save.post' => 'updateAttendance',
             'feed_items.insert.post' => 'createFeed',
+            'student_assignments.update.pre' => 'createGrade',
             'student_assignments.update.post' => 'createGrade'
         );
     }
@@ -170,12 +172,17 @@ class NotificationEventSubscriber implements \Symfony\Component\EventDispatcher\
 
         $assignment = $studentAssignment->getAssignment();
 
-        $notification = new Notification();
-        $notification->setUserId($studentAssignment->getStudent()->getUserId());
-        $notification->setType(NotificationPeer::TYPE_GRADING);
-        $notification->setCourse($assignment->getCourse());
-        $notification->setAssignment($assignment);
-        $notification->setCreatedBy($assignment->getTeacher()->getUserId());
-        $notification->save();
+        if ($this->gradingIsModified) {
+            $notification = new Notification();
+            $notification->setUserId($studentAssignment->getStudent()->getUserId());
+            $notification->setType(NotificationPeer::TYPE_GRADING);
+            $notification->setCourse($assignment->getCourse());
+            $notification->setAssignment($assignment);
+            $notification->setCreatedBy($assignment->getTeacher()->getUserId());
+            $notification->save();
+        }
+        if ($studentAssignment->isColumnModified('grading')) {
+            $this->gradingIsModified = true;
+        }
     }
 }
