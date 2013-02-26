@@ -285,6 +285,6 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
         }
 
         $response = new FormJsonResponse($form);
-        return new \Symfony\Component\BrowserKit\Response($response->getContent());
+        return new \Symfony\Component\HttpFoundation\Response($response->getContent());
     }
 }
