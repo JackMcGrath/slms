@@ -117,11 +117,11 @@
                 {% if is_granted('EDIT', course) %}
                     {% if member.hasVirtualColumn('isActiveOnCourse') and not member.getVirtualColumn('isActiveOnCourse') %}
                         <a href="{{ path('confirm_student_course', {courseId: course.id, studentId: member.id}) }}">
-                            <i class="icon-small-trash-bin"></i>Confirm
+                            <i class="icon-small-gears"></i>Confirm
                         </a>
                     {% else %}
                         <a href="{{ path('decline_student_course', {courseId: course.id, studentId: member.id}) }}" class="delete-confirm" confirm="Are you sure you want to move student to not confirmed group?">
-                            <i class="icon-small-trash-bin"></i>Decline
+                            <i class="icon-small-info"></i>Decline
                         </a>
                     {% endif %}
                 {% endif %}
