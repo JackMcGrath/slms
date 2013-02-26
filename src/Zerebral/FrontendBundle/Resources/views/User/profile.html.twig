@@ -65,15 +65,15 @@
                     <div class="clearfix"></div>
                     <div class="profile-links">
                         <a href="#" class="btn" rel="message-popup" userId="{{ user.id }}">Send a message</a><br/>
-                        {% if user.isStudent %}
-                            {% if user.roleModel.studentGuardians %}
+                        {% if user.isStudent and (is_granted('ROLE_TEACHER') or is_granted('ROLE_PARENT'))%}
+                            {% if user.roleModel.studentGuardians | length %}
                                 <div class="label">Parents</div><br/>
                                 {% for parent in user.roleModel.studentGuardians %}
                                     <a href="{{ path('profile_view', {id: parent.guardian.userId}) }}">{{ parent.guardian.fullName }}</a><br/>
                                 {% endfor %}
                             {% endif %}
                         {% elseif user.isGuardian %}
-                            {% if user.roleModel.students %}
+                            {% if user.roleModel.students | length %}
                                 <div class="label">Child</div><br/>
                                 {% for child in user.roleModel.students %}
                                     <a href="{{ path('profile_view', {id: child.userId}) }}">{{ child.fullName }}</a><br/>

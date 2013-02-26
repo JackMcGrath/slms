@@ -44,11 +44,7 @@ class UserQuery extends BaseUserQuery
             $usersToCoursesJoin->setJoinCondition($c->getLastCriterion());
         }
 
-
         $this->addJoinObject($usersToCoursesJoin);
-
-
-
 
         //LEFT JOIN course_students AS courseToStudents ON studentToCourses.course_id = courseToStudents.course_id
         $courseToStudentsJoin = new \Join();
@@ -75,7 +71,7 @@ class UserQuery extends BaseUserQuery
 
         $this->where('users.id = students.user_id OR users.id = teachers.user_id');
 
-        if ($user->isGuardian()) {
+        if ($user->isGuardian() || $user->isTeacher()) {
             $studentToGuardiansJon = new \Join();
             $studentToGuardiansJon->setJoinType(\Criteria::LEFT_JOIN);
             $studentToGuardiansJon->addExplicitCondition('courseToStudents', 'student_id', null, 'student_guardians', 'student_id', 'studentToGuardians');
@@ -87,7 +83,6 @@ class UserQuery extends BaseUserQuery
             $this->addJoinObject($guardiansJoin);
 
             $this->_or()->where('users.id = guardians.user_id');
-
         }
 
         if ($excludeMe) {
