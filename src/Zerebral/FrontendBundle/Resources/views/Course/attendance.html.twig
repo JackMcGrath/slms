@@ -47,10 +47,10 @@
                     </tr>
 
                     <tbody>
-
                     {% set attendancies = form.studentAttendances.children|sort_by('vars[data].student.formattedName') %}
                     {% for index, studentAttendance in attendancies %}
                         {% set student = studentAttendance.vars.data.student %}
+                        {% if student.id in actualStudents %}
                         <tr class="student">
                             <td>{{ student.formattedName }}</td>
                             <td class="status" statusName="present">
@@ -73,7 +73,7 @@
                                 <input type="hidden" name="attendance[studentAttendances][{{ index }}][attendanceId]" value="{{ attendance.id }}"/>
                             {% endif %}
                         </tr>
-
+                        {% endif %}
                     {% endfor %}
                     </tbody>
                 </table>

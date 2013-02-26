@@ -76,6 +76,12 @@
 .members-list {
     display: block;
     width: 675px;
+    &.teacher {
+        width: 915px;
+        .member {
+            width: 295px;
+        }
+    }
     .member {
         margin: 27px 5px 27px 0;
         width: 215px;
@@ -470,6 +476,16 @@
                 text-decoration: none;
                 padding-right: 6px;
             }
+        }
+    }
+}
+.not-confirmed-course {
+    width: 675px;
+    .well {
+        padding: 14px;
+        h3 {
+            color: #A0A0A0;
+            font-size: 16px;
         }
     }
 }

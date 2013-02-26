@@ -57,6 +57,13 @@ abstract class BaseCourseStudent extends BaseObject implements Persistent
     protected $student_id;
 
     /**
+     * The value for the is_active field.
+     * Note: this column has a database default value of: true
+     * @var        boolean
+     */
+    protected $is_active;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -93,6 +100,28 @@ abstract class BaseCourseStudent extends BaseObject implements Persistent
     protected $alreadyInClearAllReferencesDeep = false;
 
     /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see        __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->is_active = true;
+    }
+
+    /**
+     * Initializes internal state of BaseCourseStudent object.
+     * @see        applyDefaults()
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->applyDefaultValues();
+        EventDispatcherProxy::trigger(array('construct','model.construct'), new ModelEvent($this));
+}
+
+    /**
      * Get the [course_id] column value.
      *
      * @return int
@@ -110,6 +139,16 @@ abstract class BaseCourseStudent extends BaseObject implements Persistent
     public function getStudentId()
     {
         return $this->student_id;
+    }
+
+    /**
+     * Get the [is_active] column value.
+     *
+     * @return boolean
+     */
+    public function getIsActive()
+    {
+        return $this->is_active;
     }
 
     /**
@@ -203,6 +242,35 @@ abstract class BaseCourseStudent extends BaseObject implements Persistent
     } // setStudentId()
 
     /**
+     * Sets the value of the [is_active] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param boolean|integer|string $v The new value
+     * @return CourseStudent The current object (for fluent API support)
+     */
+    public function setIsActive($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->is_active !== $v) {
+            $this->is_active = $v;
+            $this->modifiedColumns[] = CourseStudentPeer::IS_ACTIVE;
+        }
+
+
+        return $this;
+    } // setIsActive()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param mixed $v string, integer (timestamp), or DateTime value.
@@ -235,6 +303,10 @@ abstract class BaseCourseStudent extends BaseObject implements Persistent
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->is_active !== true) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return true
         return true;
     } // hasOnlyDefaultValues()
@@ -259,7 +331,8 @@ abstract class BaseCourseStudent extends BaseObject implements Persistent
 
             $this->course_id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->student_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-            $this->created_at = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+            $this->is_active = ($row[$startcol + 2] !== null) ? (boolean) $row[$startcol + 2] : null;
+            $this->created_at = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -268,7 +341,7 @@ abstract class BaseCourseStudent extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 3; // 3 = CourseStudentPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 4; // 4 = CourseStudentPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating CourseStudent object", $e);
@@ -533,6 +606,9 @@ abstract class BaseCourseStudent extends BaseObject implements Persistent
         if ($this->isColumnModified(CourseStudentPeer::STUDENT_ID)) {
             $modifiedColumns[':p' . $index++]  = '`student_id`';
         }
+        if ($this->isColumnModified(CourseStudentPeer::IS_ACTIVE)) {
+            $modifiedColumns[':p' . $index++]  = '`is_active`';
+        }
         if ($this->isColumnModified(CourseStudentPeer::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`created_at`';
         }
@@ -552,6 +628,9 @@ abstract class BaseCourseStudent extends BaseObject implements Persistent
                         break;
                     case '`student_id`':
                         $stmt->bindValue($identifier, $this->student_id, PDO::PARAM_INT);
+                        break;
+                    case '`is_active`':
+                        $stmt->bindValue($identifier, (int) $this->is_active, PDO::PARAM_INT);
                         break;
                     case '`created_at`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
@@ -708,6 +787,9 @@ abstract class BaseCourseStudent extends BaseObject implements Persistent
                 return $this->getStudentId();
                 break;
             case 2:
+                return $this->getIsActive();
+                break;
+            case 3:
                 return $this->getCreatedAt();
                 break;
             default:
@@ -741,7 +823,8 @@ abstract class BaseCourseStudent extends BaseObject implements Persistent
         $result = array(
             $keys[0] => $this->getCourseId(),
             $keys[1] => $this->getStudentId(),
-            $keys[2] => $this->getCreatedAt(),
+            $keys[2] => $this->getIsActive(),
+            $keys[3] => $this->getCreatedAt(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aCourse) {
@@ -791,6 +874,9 @@ abstract class BaseCourseStudent extends BaseObject implements Persistent
                 $this->setStudentId($value);
                 break;
             case 2:
+                $this->setIsActive($value);
+                break;
+            case 3:
                 $this->setCreatedAt($value);
                 break;
         } // switch()
@@ -819,7 +905,8 @@ abstract class BaseCourseStudent extends BaseObject implements Persistent
 
         if (array_key_exists($keys[0], $arr)) $this->setCourseId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setStudentId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setCreatedAt($arr[$keys[2]]);
+        if (array_key_exists($keys[2], $arr)) $this->setIsActive($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
     }
 
     /**
@@ -833,6 +920,7 @@ abstract class BaseCourseStudent extends BaseObject implements Persistent
 
         if ($this->isColumnModified(CourseStudentPeer::COURSE_ID)) $criteria->add(CourseStudentPeer::COURSE_ID, $this->course_id);
         if ($this->isColumnModified(CourseStudentPeer::STUDENT_ID)) $criteria->add(CourseStudentPeer::STUDENT_ID, $this->student_id);
+        if ($this->isColumnModified(CourseStudentPeer::IS_ACTIVE)) $criteria->add(CourseStudentPeer::IS_ACTIVE, $this->is_active);
         if ($this->isColumnModified(CourseStudentPeer::CREATED_AT)) $criteria->add(CourseStudentPeer::CREATED_AT, $this->created_at);
 
         return $criteria;
@@ -906,6 +994,7 @@ abstract class BaseCourseStudent extends BaseObject implements Persistent
     {
         $copyObj->setCourseId($this->getCourseId());
         $copyObj->setStudentId($this->getStudentId());
+        $copyObj->setIsActive($this->getIsActive());
         $copyObj->setCreatedAt($this->getCreatedAt());
 
         if ($deepCopy && !$this->startCopy) {
@@ -1075,11 +1164,13 @@ abstract class BaseCourseStudent extends BaseObject implements Persistent
     {
         $this->course_id = null;
         $this->student_id = null;
+        $this->is_active = null;
         $this->created_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);

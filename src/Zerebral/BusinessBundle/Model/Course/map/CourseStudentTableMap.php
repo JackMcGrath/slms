@@ -45,6 +45,7 @@ class CourseStudentTableMap extends TableMap
         // columns
         $this->addForeignPrimaryKey('course_id', 'CourseId', 'INTEGER' , 'courses', 'id', true, null, null);
         $this->addForeignPrimaryKey('student_id', 'StudentId', 'INTEGER' , 'students', 'id', true, null, null);
+        $this->addColumn('is_active', 'IsActive', 'BOOLEAN', true, 1, true);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', true, null, null);
         // validators
     } // initialize()

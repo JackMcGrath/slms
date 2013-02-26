@@ -28,7 +28,6 @@ class StudentAttendanceType extends AbstractType
         $resolver->setDefaults(
             array(
                 'data_class' => 'Zerebral\BusinessBundle\Model\Attendance\StudentAttendance',
-
             )
         );
     }

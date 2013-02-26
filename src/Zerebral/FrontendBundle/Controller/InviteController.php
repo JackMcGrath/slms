@@ -47,6 +47,8 @@ class InviteController extends \Zerebral\CommonBundle\Component\Controller
             /** @var $course Course */
             $course = CourseQuery::create()->findOneByAccessCode($course->getAccessCode());
             $joined = $course->addUser($this->getRoleUser());
+
+
             if ($joined) {
                 $course->save();
             }
@@ -84,6 +86,12 @@ class InviteController extends \Zerebral\CommonBundle\Component\Controller
             $joined = $course->addUser($this->getRoleUser());
             if ($joined) {
                 $course->save();
+                if ($this->getUser()->isStudent()) {
+                    /** @var $courseStudent Model\Course\CourseStudent */
+                    $courseStudent = \Zerebral\BusinessBundle\Model\Course\CourseStudentQuery::create()->filterByCourse($course)->filterByStudent($this->getRoleUser())->findOne();
+                    $courseStudent->setIsActive(false);
+                    $courseStudent->save();
+                }
             }
 
             return new JsonResponse(array(
@@ -243,5 +251,26 @@ class InviteController extends \Zerebral\CommonBundle\Component\Controller
 
         $this->getRequest()->getSession()->set('guardian_invite_code', $guardianInvite->getCode());
         return $this->redirect($this->generateUrl('signup', array()));
+    }
+
+    /**
+     * @Route("/confirm/{courseId}/{studentId}", name="confirm_student_course", defaults={"action" = "confirm"})
+     * @Route("/decline/{courseId}/{studentId}", name="decline_student_course", defaults={"action" = "decline"})
+     * @PreAuthorize("hasRole('ROLE_TEACHER')")
+     * @ParamConverter("course", options={"mapping": {"courseId": "id"}})
+     * @ParamConverter("student", options={"mapping": {"studentId": "id"}})
+     */
+    public function confirmStudentAction(Model\Course\Course $course, Model\User\Student $student, $action = null)
+    {
+        /** @var $courseStudent Model\Course\CourseStudent */
+        $courseStudent = \Zerebral\BusinessBundle\Model\Course\CourseStudentQuery::create()->filterByCourse($course)->filterByStudent($student)->findOne();
+
+        if ($action == 'confirm') {
+            $courseStudent->setIsActive(true);
+        } else if ($action == 'decline') {
+            $courseStudent->setIsActive(false);
+        }
+        $courseStudent->save();
+        return $this->redirect($this->generateUrl('course_members', array('id' => $course->getId())));
     }
 }

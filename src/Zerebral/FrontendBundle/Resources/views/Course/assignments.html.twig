@@ -2,6 +2,7 @@
 {% import "ZerebralFrontendBundle:Macro:main.html.twig" as mainPartials %}
 
 {% block content %}
+    {% if course.userIsAllowed(app.user) %}
     {% javascripts
         '@ZerebralFrontendBundle/Resources/public/js/controllers/course/assignments.js'
         output='js/compiled/course.js' %}
@@ -90,4 +91,7 @@
             $('.calendar').calendarSelectable({itemList: '.items-list', calculateAssignmentsCount: true, startDate: "{{ dateFilter.startDate }}", endDate: "{{ dateFilter.endDate }}"});
         });
     </script>
+    {% else %}
+        {{ mainPartials.userIsNotActiveOnCourse(course) }}
+    {% endif %}
 {% endblock %}

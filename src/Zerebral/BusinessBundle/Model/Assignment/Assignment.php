@@ -60,4 +60,9 @@ class Assignment extends BaseAssignment
     {
         return StudentAssignmentQuery::create()->filterByStudent($student)->filterByAssignment($this)->findOne();
     }
+
+    public function getActiveStudents()
+    {
+        return \Zerebral\BusinessBundle\Model\User\StudentQuery::create()->findByAssignment($this)->find();
+    }
 }

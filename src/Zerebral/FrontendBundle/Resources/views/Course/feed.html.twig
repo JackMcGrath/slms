@@ -3,6 +3,7 @@
 {% import "ZerebralFrontendBundle:Feed:feed.html.twig" as feed %}
 
 {% block content %}
+    {% if course.userIsAllowed(app.user) %}
     {% javascripts
     '@ZerebralFrontendBundle/Resources/public/js/controllers/course/feed.js'
     output='js/compiled/course_feed.js' %}
@@ -51,4 +52,7 @@
             {% endif %}
         </div>
     </div>
+    {% else %}
+        {{ mainPartials.userIsNotActiveOnCourse(course) }}
+    {% endif %}
 {% endblock %}

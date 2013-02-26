@@ -178,12 +178,12 @@ class AssignmentController extends \Zerebral\CommonBundle\Component\Controller
             }
         }
 
-        $assignedStudents = count($assignedStudentsIds) ? $assignedStudentsIds : ($assignment ? $assignment->getStudents()->getPrimaryKeys() : array());
+        $assignedStudents = count($assignedStudentsIds) ? $assignedStudentsIds : ($assignment ? $assignment->getActiveStudents()->getPrimaryKeys() : array());
 
         return array(
             'form' => $form->createView(),
             'course' => $course,
-            'students' => $course->getStudents(),
+            'students' => $course->getActiveStudents(),
             'assignedStudents' => $assignedStudents,
             'target' => 'assignments'
         );

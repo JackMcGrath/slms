@@ -31,11 +31,42 @@ class StudentQuery extends BaseStudentQuery
      * @param \Zerebral\BusinessBundle\Model\Course\Course $course
      * @return mixed
      */
-    public function findByCourse($course)
+    public function findByCourse($course, $isActive = true)
     {
         $this->leftJoinUser();
         $this->filterByCourse($course);
+        $this->leftJoinCourseStudent();
+
+        $this->add('course_students.is_active', $isActive);
+        $this->add('users.is_active', true);
+
+        $this->withColumn('course_students.is_active', 'isActiveOnCourse');
+
         $this->addAscendingOrderByColumn('LOWER(users.last_name)');
+        $this->addGroupByColumn('course_students.student_id');
+        return $this;
+    }
+
+    /**
+     * @param \Zerebral\BusinessBundle\Model\Assignment\Assignment $course
+     * @return mixed
+     */
+    public function findByAssignment($assignment, $isActive = true)
+    {
+        $this->leftJoinUser();
+        $this->filterByAssignment($assignment);
+        $this->leftJoinStudentAssignment();
+        $this->leftJoin('StudentAssignment.Assignment Assignments');
+        $this->leftJoin('Assignments.Course Course');
+        $this->leftJoin('Course.CourseStudent CourseStudents');
+
+        $this->where('students.id=`CourseStudents`.student_id');
+        $this->add('CourseStudents.is_active', $isActive);
+        $this->add('users.is_active', true);
+        $this->withColumn('`CourseStudents`.is_active', 'isActiveOnCourse');
+
+        $this->addAscendingOrderByColumn('LOWER(users.last_name)');
+
         return $this;
     }
 }

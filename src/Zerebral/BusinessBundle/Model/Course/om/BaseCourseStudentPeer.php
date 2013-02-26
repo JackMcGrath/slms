@@ -33,19 +33,22 @@ abstract class BaseCourseStudentPeer
     const TM_CLASS = 'CourseStudentTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 3;
+    const NUM_COLUMNS = 4;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 3;
+    const NUM_HYDRATE_COLUMNS = 4;
 
     /** the column name for the course_id field */
     const COURSE_ID = 'course_students.course_id';
 
     /** the column name for the student_id field */
     const STUDENT_ID = 'course_students.student_id';
+
+    /** the column name for the is_active field */
+    const IS_ACTIVE = 'course_students.is_active';
 
     /** the column name for the created_at field */
     const CREATED_AT = 'course_students.created_at';
@@ -69,12 +72,12 @@ abstract class BaseCourseStudentPeer
      * e.g. CourseStudentPeer::$fieldNames[CourseStudentPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('CourseId', 'StudentId', 'CreatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('courseId', 'studentId', 'createdAt', ),
-        BasePeer::TYPE_COLNAME => array (CourseStudentPeer::COURSE_ID, CourseStudentPeer::STUDENT_ID, CourseStudentPeer::CREATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('COURSE_ID', 'STUDENT_ID', 'CREATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('course_id', 'student_id', 'created_at', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, )
+        BasePeer::TYPE_PHPNAME => array ('CourseId', 'StudentId', 'IsActive', 'CreatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('courseId', 'studentId', 'isActive', 'createdAt', ),
+        BasePeer::TYPE_COLNAME => array (CourseStudentPeer::COURSE_ID, CourseStudentPeer::STUDENT_ID, CourseStudentPeer::IS_ACTIVE, CourseStudentPeer::CREATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('COURSE_ID', 'STUDENT_ID', 'IS_ACTIVE', 'CREATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('course_id', 'student_id', 'is_active', 'created_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
     /**
@@ -84,12 +87,12 @@ abstract class BaseCourseStudentPeer
      * e.g. CourseStudentPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('CourseId' => 0, 'StudentId' => 1, 'CreatedAt' => 2, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('courseId' => 0, 'studentId' => 1, 'createdAt' => 2, ),
-        BasePeer::TYPE_COLNAME => array (CourseStudentPeer::COURSE_ID => 0, CourseStudentPeer::STUDENT_ID => 1, CourseStudentPeer::CREATED_AT => 2, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('COURSE_ID' => 0, 'STUDENT_ID' => 1, 'CREATED_AT' => 2, ),
-        BasePeer::TYPE_FIELDNAME => array ('course_id' => 0, 'student_id' => 1, 'created_at' => 2, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, )
+        BasePeer::TYPE_PHPNAME => array ('CourseId' => 0, 'StudentId' => 1, 'IsActive' => 2, 'CreatedAt' => 3, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('courseId' => 0, 'studentId' => 1, 'isActive' => 2, 'createdAt' => 3, ),
+        BasePeer::TYPE_COLNAME => array (CourseStudentPeer::COURSE_ID => 0, CourseStudentPeer::STUDENT_ID => 1, CourseStudentPeer::IS_ACTIVE => 2, CourseStudentPeer::CREATED_AT => 3, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('COURSE_ID' => 0, 'STUDENT_ID' => 1, 'IS_ACTIVE' => 2, 'CREATED_AT' => 3, ),
+        BasePeer::TYPE_FIELDNAME => array ('course_id' => 0, 'student_id' => 1, 'is_active' => 2, 'created_at' => 3, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
     /**
@@ -165,10 +168,12 @@ abstract class BaseCourseStudentPeer
         if (null === $alias) {
             $criteria->addSelectColumn(CourseStudentPeer::COURSE_ID);
             $criteria->addSelectColumn(CourseStudentPeer::STUDENT_ID);
+            $criteria->addSelectColumn(CourseStudentPeer::IS_ACTIVE);
             $criteria->addSelectColumn(CourseStudentPeer::CREATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.course_id');
             $criteria->addSelectColumn($alias . '.student_id');
+            $criteria->addSelectColumn($alias . '.is_active');
             $criteria->addSelectColumn($alias . '.created_at');
         }
     }

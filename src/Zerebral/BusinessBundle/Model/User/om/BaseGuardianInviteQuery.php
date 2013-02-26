@@ -69,7 +69,7 @@ abstract class BaseGuardianInviteQuery extends ModelCriteria
      * Returns a new GuardianInviteQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     GuardianInviteQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   GuardianInviteQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return GuardianInviteQuery
      */
@@ -131,8 +131,8 @@ abstract class BaseGuardianInviteQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   GuardianInvite A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 GuardianInvite A model object, or null if the key is not found
+     * @throws PropelException
      */
      public function findOneByCode($key, $con = null)
      {
@@ -146,8 +146,8 @@ abstract class BaseGuardianInviteQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   GuardianInvite A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 GuardianInvite A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -247,7 +247,8 @@ abstract class BaseGuardianInviteQuery extends ModelCriteria
      * <code>
      * $query->filterByStudentId(1234); // WHERE student_id = 1234
      * $query->filterByStudentId(array(12, 34)); // WHERE student_id IN (12, 34)
-     * $query->filterByStudentId(array('min' => 12)); // WHERE student_id > 12
+     * $query->filterByStudentId(array('min' => 12)); // WHERE student_id >= 12
+     * $query->filterByStudentId(array('max' => 12)); // WHERE student_id <= 12
      * </code>
      *
      * @see       filterByStudent()
@@ -374,8 +375,8 @@ abstract class BaseGuardianInviteQuery extends ModelCriteria
      * @param   Student|PropelObjectCollection $student The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   GuardianInviteQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 GuardianInviteQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByStudent($student, $comparison = null)
     {

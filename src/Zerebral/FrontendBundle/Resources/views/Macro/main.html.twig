@@ -305,3 +305,18 @@
     {% endif %}
     <img class="pull-right rounded" width="27" height="27" src="{{ user_avatar(assignment.teacher.user) | imagine_filter('top_thumbnail') }}"/>
 {% endmacro %}
+
+{% macro userIsNotActiveOnCourse(course, showWelcomeMessage) %}
+    <div class="not-confirmed-course">
+        {% if showWelcomeMessage %}
+            <div class="alert alert-success">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                <strong> Heads up!</strong> You have successfully joined new course - <strong>{{ course.getName }}</strong>.
+            </div>
+        {% endif %}
+
+        <div class="well">
+            <h3>Teacher does not confirm your participation yet</h3>
+        </div>
+    </div>
+{% endmacro %}

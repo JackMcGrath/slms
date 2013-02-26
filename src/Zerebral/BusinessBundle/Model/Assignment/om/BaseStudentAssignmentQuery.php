@@ -100,7 +100,7 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
      * Returns a new StudentAssignmentQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     StudentAssignmentQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   StudentAssignmentQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return StudentAssignmentQuery
      */
@@ -162,8 +162,8 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   StudentAssignment A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 StudentAssignment A model object, or null if the key is not found
+     * @throws PropelException
      */
      public function findOneById($key, $con = null)
      {
@@ -177,8 +177,8 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   StudentAssignment A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 StudentAssignment A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -278,7 +278,8 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -291,8 +292,22 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(StudentAssignmentPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(StudentAssignmentPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(StudentAssignmentPeer::ID, $id, $comparison);
@@ -305,7 +320,8 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
      * <code>
      * $query->filterByStudentId(1234); // WHERE student_id = 1234
      * $query->filterByStudentId(array(12, 34)); // WHERE student_id IN (12, 34)
-     * $query->filterByStudentId(array('min' => 12)); // WHERE student_id > 12
+     * $query->filterByStudentId(array('min' => 12)); // WHERE student_id >= 12
+     * $query->filterByStudentId(array('max' => 12)); // WHERE student_id <= 12
      * </code>
      *
      * @see       filterByStudent()
@@ -348,7 +364,8 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
      * <code>
      * $query->filterByAssignmentId(1234); // WHERE assignment_id = 1234
      * $query->filterByAssignmentId(array(12, 34)); // WHERE assignment_id IN (12, 34)
-     * $query->filterByAssignmentId(array('min' => 12)); // WHERE assignment_id > 12
+     * $query->filterByAssignmentId(array('min' => 12)); // WHERE assignment_id >= 12
+     * $query->filterByAssignmentId(array('max' => 12)); // WHERE assignment_id <= 12
      * </code>
      *
      * @see       filterByAssignment()
@@ -604,8 +621,8 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
      * @param   Student|PropelObjectCollection $student The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   StudentAssignmentQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 StudentAssignmentQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByStudent($student, $comparison = null)
     {
@@ -680,8 +697,8 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
      * @param   Assignment|PropelObjectCollection $assignment The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   StudentAssignmentQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 StudentAssignmentQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByAssignment($assignment, $comparison = null)
     {
@@ -756,8 +773,8 @@ abstract class BaseStudentAssignmentQuery extends ModelCriteria
      * @param   StudentAssignmentFile|PropelObjectCollection $studentAssignmentFile  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   StudentAssignmentQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 StudentAssignmentQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByStudentAssignmentFile($studentAssignmentFile, $comparison = null)
     {

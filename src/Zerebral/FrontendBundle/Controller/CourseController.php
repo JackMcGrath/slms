@@ -229,7 +229,8 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
     public function membersAction(Model\Course\Course $course)
     {
         return array(
-            'students' => $course->getStudents(),
+            'activeStudents' => $course->getActiveStudents(),
+            'notActiveStudents' => $course->getNotActiveStudents(),
             'teachers' => $course->getTeachers(),
             'course' => $course,
             'courseInviteForm' => $this->createForm(new FormType\CourseInviteType())->createView(),
@@ -288,11 +289,11 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
         $date = date('Y-m-d', $dateRaw);
         $dateTime = new \DateTime($date);
 
-        // TODO: create proper method in course to find attendance by date
-        $c = new \Criteria();
-        $c->add('date', $date);
+
         /** @var $attendance \Zerebral\BusinessBundle\Model\Attendance\Attendance */
-        $attendance = $course->getAttendances($c)->getFirst();
+        $attendance = \Zerebral\BusinessBundle\Model\Attendance\AttendanceQuery::create()->filterByCourseAndDate($course, $date)->findOne();
+        $actualStudents = StudentQuery::create()->findByCourse($course)->find()->getPrimaryKeys();
+
         if (empty($attendance)) {
             $attendance = new \Zerebral\BusinessBundle\Model\Attendance\Attendance();
             $attendance->initStudents(StudentQuery::create()->findByCourse($course)->find());
@@ -317,6 +318,7 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
         return array(
             'course' => $course,
             'attendance' => $attendance,
+            'actualStudents' => $actualStudents,
 //            'students' => $students,
             'form' => $form->createView(),
             'date' => $dateTime,
@@ -352,4 +354,5 @@ class CourseController extends \Zerebral\CommonBundle\Component\Controller
             'target' => 'course'
         );
     }
+
 }

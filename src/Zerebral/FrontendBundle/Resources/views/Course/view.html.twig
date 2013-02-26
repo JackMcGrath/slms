@@ -2,6 +2,7 @@
 {% import "ZerebralFrontendBundle:Macro:main.html.twig" as mainPartials %}
 
 {% block content %}
+    {% if course.userIsAllowed(app.user) %}
     {% javascripts
     '@ZerebralFrontendBundle/Resources/public/js/controllers/course/view.js'
     output='js/compiled/course_view.js' %}
@@ -61,4 +62,9 @@
             {% endif %}
         </div>
     </div>
+    {% else %}
+        {{ mainPartials.userIsNotActiveOnCourse(course, showWelcomeMessage) }}
+    {% endif %}
 {% endblock %}
+
+

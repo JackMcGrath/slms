@@ -89,4 +89,22 @@ class Course extends BaseCourse
 
         return $dates;
     }
+
+    public function getActiveStudents()
+    {
+        return \Zerebral\BusinessBundle\Model\User\StudentQuery::create()->findByCourse($this)->find();
+    }
+
+    public function getNotActiveStudents()
+    {
+        return \Zerebral\BusinessBundle\Model\User\StudentQuery::create()->findByCourse($this, false)->find();
+    }
+
+    public function userIsAllowed(User $user)
+    {
+        if ($user->isStudent()) {
+            return (bool)CourseStudentQuery::create()->filterByStudent($user->getRoleModel())->filterByCourse($this)->findOne()->getIsActive();
+        }
+        return true;
+    }
 }

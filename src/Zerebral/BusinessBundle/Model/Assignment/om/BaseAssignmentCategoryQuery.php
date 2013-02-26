@@ -83,7 +83,7 @@ abstract class BaseAssignmentCategoryQuery extends ModelCriteria
      * Returns a new AssignmentCategoryQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     AssignmentCategoryQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   AssignmentCategoryQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return AssignmentCategoryQuery
      */
@@ -145,8 +145,8 @@ abstract class BaseAssignmentCategoryQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   AssignmentCategory A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 AssignmentCategory A model object, or null if the key is not found
+     * @throws PropelException
      */
      public function findOneById($key, $con = null)
      {
@@ -160,8 +160,8 @@ abstract class BaseAssignmentCategoryQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   AssignmentCategory A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 AssignmentCategory A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -261,7 +261,8 @@ abstract class BaseAssignmentCategoryQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -302,7 +303,8 @@ abstract class BaseAssignmentCategoryQuery extends ModelCriteria
      * <code>
      * $query->filterByCourseId(1234); // WHERE course_id = 1234
      * $query->filterByCourseId(array(12, 34)); // WHERE course_id IN (12, 34)
-     * $query->filterByCourseId(array('min' => 12)); // WHERE course_id > 12
+     * $query->filterByCourseId(array('min' => 12)); // WHERE course_id >= 12
+     * $query->filterByCourseId(array('max' => 12)); // WHERE course_id <= 12
      * </code>
      *
      * @see       filterByCourse()
@@ -345,7 +347,8 @@ abstract class BaseAssignmentCategoryQuery extends ModelCriteria
      * <code>
      * $query->filterByTeacherId(1234); // WHERE teacher_id = 1234
      * $query->filterByTeacherId(array(12, 34)); // WHERE teacher_id IN (12, 34)
-     * $query->filterByTeacherId(array('min' => 12)); // WHERE teacher_id > 12
+     * $query->filterByTeacherId(array('min' => 12)); // WHERE teacher_id >= 12
+     * $query->filterByTeacherId(array('max' => 12)); // WHERE teacher_id <= 12
      * </code>
      *
      * @see       filterByTeacher()
@@ -459,8 +462,8 @@ abstract class BaseAssignmentCategoryQuery extends ModelCriteria
      * @param   Course|PropelObjectCollection $course The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   AssignmentCategoryQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 AssignmentCategoryQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByCourse($course, $comparison = null)
     {
@@ -535,8 +538,8 @@ abstract class BaseAssignmentCategoryQuery extends ModelCriteria
      * @param   Teacher|PropelObjectCollection $teacher The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   AssignmentCategoryQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 AssignmentCategoryQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByTeacher($teacher, $comparison = null)
     {
@@ -611,8 +614,8 @@ abstract class BaseAssignmentCategoryQuery extends ModelCriteria
      * @param   Assignment|PropelObjectCollection $assignment  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   AssignmentCategoryQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 AssignmentCategoryQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByAssignment($assignment, $comparison = null)
     {

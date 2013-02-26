@@ -58,6 +58,9 @@ class AssignmentQuery extends BaseAssignmentQuery
 
         //$this->leftJoin('Student.User AssignmentUser');
         $this->leftJoinCourse();
+        $this->leftJoin('Course.CourseStudent CourseStudents');
+        $this->add('CourseStudents.is_active', true);
+        $this->where('`CourseStudents`.student_id=student_assignments.student_id');
         $this->leftJoinFeedItem();
 
         $this->leftJoinFeedItem();

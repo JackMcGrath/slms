@@ -2,6 +2,7 @@
 {% import "ZerebralFrontendBundle:Macro:main.html.twig" as mainPartials %}
 
 {% block content %}
+    {% if course.userIsAllowed(app.user) %}
     {% javascripts
     '@ZerebralFrontendBundle/Resources/public/js/controllers/course/materials.js'
     output='js/compiled/materials.js' %}
@@ -117,5 +118,7 @@
             controller.init(controllerOptions);
         });
     </script>
-
+    {% else %}
+        {{ mainPartials.userIsNotActiveOnCourse(course) }}
+    {% endif %}
 {% endblock %}

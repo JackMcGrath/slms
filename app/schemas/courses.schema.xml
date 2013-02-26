@@ -57,6 +57,7 @@
     <table name="course_students" phpName="CourseStudent" idMethod="native" isCrossRef="true">
         <column name="course_id" phpName="CourseId" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" required="true"/>
         <column name="student_id" phpName="StudentId" type="INTEGER" sqlType="int(11) unsigned" primaryKey="true" required="true"/>
+        <column name="is_active" phpName="IsActive" type="BOOLEAN" size="1" sqlType="tinyint(1) unsigned" required="true" defaultValue="true"/>
         <column name="created_at" phpName="CreatedAt" type="TIMESTAMP" required="true"/>
 
         <foreign-key foreignTable="courses" name="course_students_course" onDelete="CASCADE" onUpdate="CASCADE">
