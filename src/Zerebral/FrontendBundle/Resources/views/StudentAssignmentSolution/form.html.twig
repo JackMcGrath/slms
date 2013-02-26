@@ -11,14 +11,6 @@
 {% endblock form_rows %}
 
 {% block content %}
-<script type="text/javascript">
-    $(document).ready(function() {
-        $('#uploadSolutionButton').click(function() {
-            $(this).attr('disabled', true);
-            $('#ajaxUploadSolutionsForm').submit();
-        });
-    });
-</script>
 <script type="text/template" id="solution_form">
     {{ form_widget(form.files.vars.prototype)|raw }}
 </script>

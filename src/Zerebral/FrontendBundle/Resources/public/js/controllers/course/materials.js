@@ -75,7 +75,9 @@ var UploadForm = function (container, target) {
 UploadForm.prototype = {
 
     bind:function () {
-        $('.upload-material').zerebralAjaxForm();
+        $('.upload-material').zerebralAjaxForm({
+            dataType: 'text'
+        });
         $('.optional-model').optionalModel();
 
         $('.uploadedFiles').collectionFormType({

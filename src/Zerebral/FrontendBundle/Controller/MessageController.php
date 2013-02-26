@@ -254,7 +254,7 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
                 'form' => $form->createView())
         )->getContent();
 
-        return new JsonResponse(array('has_errors' => false, 'content' => $content));
+        return new \Symfony\Component\HttpFoundation\Response(json_encode(array('has_errors' => false, 'content' => $content)));
     }
 
     /**
@@ -277,13 +277,14 @@ class MessageController extends \Zerebral\CommonBundle\Component\Controller
                 $newMessage->getMessage()->setFromId($this->getUser()->getId());
                 $newMessage->save();
 
-                return new JsonResponse(array(
+                return new \Symfony\Component\HttpFoundation\Response(json_encode(array(
                     'success' => true,
                     'content' => array()
-                ));
+                )));
             }
         }
 
-        return new FormJsonResponse($form);
+        $response = new FormJsonResponse($form);
+        return new \Symfony\Component\BrowserKit\Response($response->getContent());
     }
 }

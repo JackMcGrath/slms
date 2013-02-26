@@ -27,11 +27,12 @@ PrivateMessages.prototype = {
 
             $.ajax({
                 url: self.userId ? '/messages/compose-form/' + self.userId : '/messages/compose-multiple-form?' + self.recipients,
-                dataType: 'json',
+                dataType: 'text',
                 type: 'GET',
                 success: function(response) {
-                    if (!response.has_errors) {
-                        modalBody.html(response.content);
+                    var responseObject = JSON.parse(response);
+                    if (!responseObject['has_errors']) {
+                        modalBody.html(responseObject['content']);
                         self.initForm();
                     }
                 }
@@ -39,6 +40,7 @@ PrivateMessages.prototype = {
         });
         var popupForm = self.element.find('.message-form');
         popupForm.zerebralAjaxForm({
+            dataType: 'text',
             onSuccess: function(response) {
                 if (response.success) {
                     self.element.modal('hide');
