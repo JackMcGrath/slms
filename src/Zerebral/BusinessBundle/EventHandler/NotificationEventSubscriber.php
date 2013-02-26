@@ -181,7 +181,8 @@ class NotificationEventSubscriber implements \Symfony\Component\EventDispatcher\
             $notification->setCreatedBy($assignment->getTeacher()->getUserId());
             $notification->save();
         }
-        if ($studentAssignment->isColumnModified('grading')) {
+
+        if ($studentAssignment->isColumnModified('student_assignments.grading')) {
             $this->gradingIsModified = true;
         }
     }
