@@ -16,6 +16,7 @@ class FeedItemQuery extends BaseFeedItemQuery
         if ($user->isStudent()) {
             $this->addJoin(FeedItemPeer::COURSE_ID, CourseStudentPeer::COURSE_ID, \Criteria::LEFT_JOIN);
             $this->addAnd(CourseStudentPeer::STUDENT_ID, $user->getStudent()->getId(), \Criteria::EQUAL);
+            $this->addAnd(CourseStudentPeer::IS_ACTIVE, true, \Criteria::EQUAL);
             $this->addOr(FeedItemPeer::COURSE_ID, null, \Criteria::ISNULL);
 
             $this->addJoin(FeedItemPeer::ASSIGNMENT_ID, StudentAssignmentPeer::ASSIGNMENT_ID, \Criteria::LEFT_JOIN);
