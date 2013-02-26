@@ -91,7 +91,6 @@ GradingPopup.prototype = {
     },
 
     updateGradeInTable: function(value, grade) {
-        console.log(value);
         if (value != null && typeof(value) != 'undefined') {
             if (grade.closest('td').hasClass('pass')) {
                 if (value == 1) {
