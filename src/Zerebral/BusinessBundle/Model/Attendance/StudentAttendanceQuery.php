@@ -15,8 +15,8 @@ class StudentAttendanceQuery extends BaseStudentAttendanceQuery
 //        $this->add('Courses.start', "'" . $dateRange['start'] . " 00:00:00' between Courses.start and Courses.end", \Criteria::CUSTOM);
 //        $this->addOr('Courses.end', "'" . $dateRange['end'] . " 00:00:00' between Courses.start and Courses.end", \Criteria::CUSTOM);
 
-        $this->add('Courses.start', "Courses.start between '" . $dateRange['start'] . " 00:00:00' and '" . $dateRange['end'] . " 00:00:00'", \Criteria::CUSTOM);
-        $this->addOr('Courses.end', "Courses.end between '" . $dateRange['start'] . " 00:00:00' and '" . $dateRange['end'] . " 00:00:00'", \Criteria::CUSTOM);
+        $this->add('Courses.start', "Courses.start between '" . $dateRange['start'] . " 00:00:00' and '" . $dateRange['end'] . " 23:59:59'", \Criteria::CUSTOM);
+        $this->addOr('Courses.end', "Courses.end between '" . $dateRange['start'] . " 00:00:00' and '" . $dateRange['end'] . " 23:59:59'", \Criteria::CUSTOM);
 
         $this->addOr('Courses.end', null, \Criteria::ISNULL);
         $this->addOr('Courses.start', null, \Criteria::ISNULL);

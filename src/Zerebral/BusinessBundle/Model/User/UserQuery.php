@@ -75,7 +75,6 @@ class UserQuery extends BaseUserQuery
 
         $this->where('users.id = students.user_id OR users.id = teachers.user_id');
 
-
         if ($user->isGuardian()) {
             $studentToGuardiansJon = new \Join();
             $studentToGuardiansJon->setJoinType(\Criteria::LEFT_JOIN);

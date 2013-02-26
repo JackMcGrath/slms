@@ -63,8 +63,8 @@ class CourseQuery extends BaseCourseQuery
 
 //        $this->add('courses.start', "'" . $dateRange['start'] . " 00:00:00' between courses.start and courses.end", \Criteria::CUSTOM);
 //        $this->addOr('courses.end', "'" . $dateRange['end'] . " 00:00:00' between courses.start and courses.end", \Criteria::CUSTOM);
-        $this->add('courses.start', "courses.start between '" . $dateRange['start'] . " 00:00:00' and '" . $dateRange['end'] . " 00:00:00'", \Criteria::CUSTOM);
-        $this->addOr('courses.end', "courses.end between '" . $dateRange['start'] . " 00:00:00' and '" . $dateRange['end'] . " 00:00:00'", \Criteria::CUSTOM);
+        $this->add('courses.start', "courses.start between '" . $dateRange['start'] . " 00:00:00' and '" . $dateRange['end'] . " 23:59:59'", \Criteria::CUSTOM);
+        $this->addOr('courses.end', "courses.end between '" . $dateRange['start'] . " 00:00:00' and '" . $dateRange['end'] . " 23:59:59'", \Criteria::CUSTOM);
         $this->addOr('courses.end', null, \Criteria::ISNULL);
         $this->addOr('courses.start', null, \Criteria::ISNULL);
 
