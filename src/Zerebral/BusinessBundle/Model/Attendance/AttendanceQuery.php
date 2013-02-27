@@ -15,11 +15,11 @@ class AttendanceQuery extends BaseAttendanceQuery
         $this->leftJoinCourse('Course');
 
         $this->leftJoin('Course.CourseStudent CourseStudent');
-        $this->add('CourseStudent.is_active', true);
-        $this->where('`CourseStudent`.student_id=`StudentAttendances`.student_id');
+        $this->addJoinCondition('CourseStudent', '`CourseStudent`.is_active=1');
+        $this->addJoinCondition('CourseStudent', '`CourseStudent`.student_id=`StudentAttendances`.student_id');
         $this->leftJoin('CourseStudent.Student Student');
         $this->leftJoin('Student.User User');
-        $this->add('User.is_active', true);
+        $this->addJoinCondition('User', '`User`.is_active=1');
         $this->withColumn('`CourseStudent`.is_active', 'isActiveOnCourse');
         return $this;
     }
